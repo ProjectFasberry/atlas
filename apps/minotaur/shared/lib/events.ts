@@ -1,4 +1,7 @@
-import { type Action, type Atom, atom, type AtomMut, type Ctx, onConnect, onDisconnect, withReset } from "@reatom/framework";
+import {
+  type Action, type Atom, type AtomMut, type Ctx,
+  atom, onConnect, onDisconnect, withReset
+} from "@reatom/framework";
 import { LOGGING } from "../models/devtools/debug";
 import { logger } from "./logger";
 
@@ -10,19 +13,27 @@ type Page = {
   unsubscribe: () => void
 }
 
-type PageHandler<Args extends any[] = []> = (ctx: Ctx, atom: WithReset<Page>, ...args: Args) =>
-  Promise<void> | void;
+type PageHandler<Args extends unknown[] = []> = (
+  ctx: Ctx,
+  atom: WithReset<Page>,
+  ...args: Args
+) => Promise<void> | void;
 
-type PageModelConfig<TSpy> = {
-  name: string;
-  hooks?: Partial<{
-    onConnect: PageHandler<[isConnected: () => boolean]>;
-    onDisconnect: PageHandler;
-    onAfterDisconnect: PageHandler;
-  }>
+type PageBaseHooks = {
+  onConnect?: PageHandler<[isConnected: () => boolean]>;
+  onDisconnect?: PageHandler;
+  onAfterDisconnect?: PageHandler;
+};
+
+type PageModelConfig<TSpy = unknown> = {
+  name: string
 } & (
-  | { spyedAtom: Atom<TSpy>; hooks?: { onSpy: PageHandler<[payload: TSpy]> } }
-  | { spyedAtom?: never; hooks?: { onSpy?: never } }
+    | {
+      spyedAtom: Atom<TSpy>; hooks?: PageBaseHooks & { onSpy: PageHandler<[payload: TSpy]> }
+    }
+    | {
+      spyedAtom?: never; hooks?: PageBaseHooks & { onSpy?: never }
+    }
   )
 
 const pageLogger = logger.withTag("Page");

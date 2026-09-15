@@ -1,5 +1,4 @@
 import { DEFAULT_SOFT_DELAY } from "@/shared/consts";
-import { env } from "@/shared/env";
 import { client } from "@/shared/lib/client-wrapper";
 import { isError } from "@/shared/lib/utils";
 import { invariant } from "@/shared/lib/utils";
@@ -40,7 +39,8 @@ const chatState = atom(null).pipe(
 const url = createWsUrl({
   path: "/privated/chat/subscribe",
   host: getApiHost(),
-  isSecure: import.meta.env.PROD
+  isSecure: import.meta.env.PROD,
+  port: import.meta.env.DEV ? 5104 : undefined,
 });
 
 export const chatWs = atom(null, "chatWs").pipe(

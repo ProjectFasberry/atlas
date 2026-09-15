@@ -90,3 +90,6 @@ web_modules/
 
 # Old translation files
 /messages/_*.json
+
+# Old snapshots
+.old/

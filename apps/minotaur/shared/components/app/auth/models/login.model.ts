@@ -183,7 +183,8 @@ export const login = atom(null, "login").pipe(
           const wsUrl = createWsUrl({
             host: getApiHost(),
             isSecure: import.meta.env.PROD,
-            path: `auth/login/qr/events?token=${token}`
+            path: `auth/login/qr/events?token=${token}`,
+            port: import.meta.env.DEV ? 5104 : undefined,
           })
 
           const socket = new WebSocket(wsUrl)

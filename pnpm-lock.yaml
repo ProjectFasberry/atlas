@@ -40,6 +40,9 @@ importers:
       '@bprogress/core':
         specifier: 1.3.4
         version: 1.3.4
+      '@distribate/reatom-kit':
+        specifier: 0.2.0
+        version: 0.2.0(@reatom/async@3.16.10)(@reatom/core@3.10.3)(@reatom/effects@3.11.3)
       '@fingerprintjs/fingerprintjs':
         specifier: 5.2.0
         version: 5.2.0
@@ -84,7 +87,7 @@ importers:
         version: 10.56.0
       '@sentry/node':
         specifier: 10.56.0
-        version: 10.56.0
+        version: 10.56.0(supports-color@10.2.2)
       '@sinclair/typebox':
         specifier: 0.34.49
         version: 0.34.49
@@ -120,7 +123,7 @@ importers:
         version: 0.2.35
       '@vikejs/elysia':
         specifier: 0.2.0
-        version: 0.2.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)))
+        version: 0.2.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)))
       '@web-kits/audio':
         specifier: 0.1.0
         version: 0.1.0(react@19.1.0)
@@ -138,7 +141,7 @@ importers:
         version: 1.11.11
       elysia:
         specifier: 1.4.28
-        version: 1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3)
+        version: 1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3)
       ky:
         specifier: 2.0.2
         version: 2.0.2
@@ -168,16 +171,16 @@ importers:
         version: 2.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       tailwind-variants:
         specifier: 3.1.1
-        version: 3.1.1(tailwindcss@4.1.8)
+        version: 3.1.1(tailwind-merge@3.5.0)(tailwindcss@4.1.8)
       vaul:
         specifier: 1.1.2
         version: 1.1.2(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       vike:
         specifier: 0.4.259
-        version: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
+        version: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
       vike-react:
         specifier: 0.6.24
-        version: 0.6.24(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)))
+        version: 0.6.24(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)))
       zod:
         specifier: 4.2.1
         version: 4.2.1
@@ -214,7 +217,7 @@ importers:
         version: 19.1.6(@types/react@19.1.8)
       '@vitejs/plugin-react':
         specifier: 5.0.2
-        version: 5.0.2(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
+        version: 5.0.2(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
       consola:
         specifier: 3.4.2
         version: 3.4.2
@@ -241,7 +244,7 @@ importers:
         version: 1.3.8
       vite-tsconfig-paths:
         specifier: 5.1.4
-        version: 5.1.4(typescript@5.8.3)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
+        version: 5.1.4(supports-color@10.2.2)(typescript@5.8.3)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
 
   apps/taurus:
     dependencies:
@@ -289,7 +292,7 @@ importers:
         version: 3.10.5(@tiptap/core@3.10.5(@tiptap/pm@3.27.1))(@tiptap/pm@3.27.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@vikejs/hono':
         specifier: 0.2.1
-        version: 0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))
+        version: 0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))
       cnfast:
         specifier: 0.0.6
         version: 0.0.6
@@ -313,10 +316,10 @@ importers:
         version: 3.1.1(tailwind-merge@3.5.0)(tailwindcss@4.1.8)
       vike:
         specifier: 0.4.259
-        version: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+        version: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
       vike-solid:
         specifier: 0.8.2
-        version: 0.8.2(solid-js@1.9.13)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))(vite-plugin-solid@2.11.12(solid-js@1.9.13)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))
+        version: 0.8.2(solid-js@1.9.13)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))(vite-plugin-solid@2.11.12(solid-js@1.9.13)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))
       zod:
         specifier: 4.1.11
         version: 4.1.11
@@ -353,7 +356,7 @@ importers:
         version: 4.1.8
       tailwindcss-patch:
         specifier: ^9.5.0
-        version: 9.5.0(tailwindcss@4.1.8)
+        version: 9.5.0(supports-color@10.2.2)(tailwindcss@4.1.8)
       tw-animate-css:
         specifier: 1.3.4
         version: 1.3.4
@@ -362,7 +365,7 @@ importers:
         version: 5.8.3
       unplugin-tailwindcss-mangle:
         specifier: 5.1.4
-        version: 5.1.4(rollup@4.62.2)
+        version: 5.1.4(rollup@4.62.2)(supports-color@10.2.2)
       vite:
         specifier: 8.0.14
         version: 8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
@@ -665,6 +668,19 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@distribate/reatom-kit@0.2.0':
+    resolution: {integrity: sha512-4qQNRO94f3kKJYrFp7qm9NCVzwyV3qyyTsZlADvjmV4SryYgkh9sZmEyFDCkhqP2cHLjNW2j/wOrjhzT9TrhDA==}
+    peerDependencies:
+      '@reatom/async': ^3.16.10
+      '@reatom/core': 3.10.3
+      '@reatom/effects': ^3.11.3
+      '@tanstack/react-router': ^1.170.35
+    peerDependenciesMeta:
+      '@reatom/effects':
+        optional: true
+      '@tanstack/react-router':
+        optional: true
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -4927,20 +4943,20 @@ snapshots:
 
   '@babel/compat-data@7.29.7': {}
 
-  '@babel/core@7.29.7':
+  '@babel/core@7.29.7(supports-color@10.2.2)':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@babel/generator': 7.29.7
       '@babel/helper-compilation-targets': 7.29.7
-      '@babel/helper-module-transforms': 7.29.7(@babel/core@7.29.7)
+      '@babel/helper-module-transforms': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2)
       '@babel/helpers': 7.29.7
       '@babel/parser': 7.29.7
       '@babel/template': 7.29.7
-      '@babel/traverse': 7.29.7
+      '@babel/traverse': 7.29.7(supports-color@10.2.2)
       '@babel/types': 7.29.7
       '@jridgewell/remapping': 2.3.5
       convert-source-map: 2.0.0
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -4969,19 +4985,19 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.7
 
-  '@babel/helper-module-imports@7.29.7':
+  '@babel/helper-module-imports@7.29.7(supports-color@10.2.2)':
     dependencies:
-      '@babel/traverse': 7.29.7
+      '@babel/traverse': 7.29.7(supports-color@10.2.2)
       '@babel/types': 7.29.7
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/helper-module-transforms@7.29.7(@babel/core@7.29.7)':
+  '@babel/helper-module-transforms@7.29.7(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2)':
     dependencies:
-      '@babel/core': 7.29.7
-      '@babel/helper-module-imports': 7.29.7
+      '@babel/core': 7.29.7(supports-color@10.2.2)
+      '@babel/helper-module-imports': 7.29.7(supports-color@10.2.2)
       '@babel/helper-validator-identifier': 7.29.7
-      '@babel/traverse': 7.29.7
+      '@babel/traverse': 7.29.7(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -5002,19 +5018,19 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.7
 
-  '@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7)':
+  '@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7(supports-color@10.2.2))':
     dependencies:
-      '@babel/core': 7.29.7
+      '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
 
-  '@babel/plugin-transform-react-jsx-self@7.29.7(@babel/core@7.29.7)':
+  '@babel/plugin-transform-react-jsx-self@7.29.7(@babel/core@7.29.7(supports-color@10.2.2))':
     dependencies:
-      '@babel/core': 7.29.7
+      '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
 
-  '@babel/plugin-transform-react-jsx-source@7.29.7(@babel/core@7.29.7)':
+  '@babel/plugin-transform-react-jsx-source@7.29.7(@babel/core@7.29.7(supports-color@10.2.2))':
     dependencies:
-      '@babel/core': 7.29.7
+      '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/helper-plugin-utils': 7.29.7
 
   '@babel/runtime@7.29.7': {}
@@ -5025,7 +5041,7 @@ snapshots:
       '@babel/parser': 7.29.7
       '@babel/types': 7.29.7
 
-  '@babel/traverse@7.29.7':
+  '@babel/traverse@7.29.7(supports-color@10.2.2)':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@babel/generator': 7.29.7
@@ -5033,7 +5049,7 @@ snapshots:
       '@babel/parser': 7.29.7
       '@babel/template': 7.29.7
       '@babel/types': 7.29.7
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -5177,6 +5193,13 @@ snapshots:
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+
+  '@distribate/reatom-kit@0.2.0(@reatom/async@3.16.10)(@reatom/core@3.10.3)(@reatom/effects@3.11.3)':
+    dependencies:
+      '@reatom/async': 3.16.10
+      '@reatom/core': 3.10.3
+    optionalDependencies:
+      '@reatom/effects': 3.11.3
 
   '@emnapi/core@1.10.0':
     dependencies:
@@ -5668,12 +5691,12 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/semantic-conventions': 1.41.1
 
-  '@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1)':
+  '@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.214.0
       import-in-the-middle: 3.1.0
-      require-in-the-middle: 8.0.1
+      require-in-the-middle: 8.0.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -6180,7 +6203,7 @@ snapshots:
 
   '@sentry/core@10.56.0': {}
 
-  '@sentry/node-core@10.56.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)':
+  '@sentry/node-core@10.56.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)':
     dependencies:
       '@sentry/core': 10.56.0
       '@sentry/opentelemetry': 10.56.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)
@@ -6188,20 +6211,20 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.214.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation': 0.214.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
       '@opentelemetry/sdk-trace-base': 2.8.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.41.1
 
-  '@sentry/node@10.56.0':
+  '@sentry/node@10.56.0(supports-color@10.2.2)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/instrumentation': 0.214.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation': 0.214.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
       '@opentelemetry/sdk-trace-base': 2.8.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.41.1
       '@sentry-internal/server-utils': 10.56.0
       '@sentry/core': 10.56.0
-      '@sentry/node-core': 10.56.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)
+      '@sentry/node-core': 10.56.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)
       '@sentry/opentelemetry': 10.56.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)
       import-in-the-middle: 3.1.0
     transitivePeerDependencies:
@@ -6262,11 +6285,11 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@tailwindcss-mangle/core@5.1.6':
+  '@tailwindcss-mangle/core@5.1.6(supports-color@10.2.2)':
     dependencies:
       '@ast-core/escape': 1.0.1
       '@babel/parser': 7.29.7
-      '@babel/traverse': 7.29.7
+      '@babel/traverse': 7.29.7(supports-color@10.2.2)
       '@babel/types': 7.29.7
       '@tailwindcss-mangle/config': 7.0.2
       '@tailwindcss-mangle/shared': 4.1.5
@@ -6703,9 +6726,9 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  '@tokenizer/inflate@0.4.1':
+  '@tokenizer/inflate@0.4.1(supports-color@10.2.2)':
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       token-types: 6.1.2
     transitivePeerDependencies:
       - supports-color
@@ -6834,33 +6857,12 @@ snapshots:
     optionalDependencies:
       srvx: 0.11.17
 
-  '@universal-deploy/vite@0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))':
-    dependencies:
-      '@universal-deploy/netlify': 0.2.2(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
-      '@universal-deploy/node': 0.1.7(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
-      '@universal-deploy/store': 0.2.1(srvx@0.11.17)
-      '@universal-middleware/express': 0.4.30(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
-      magic-string: 0.30.21
-      rou3: 0.8.1
-    optionalDependencies:
-      vite: 8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-      - '@hattip/core'
-      - '@types/express'
-      - '@webroute/route'
-      - elysia
-      - fastify
-      - h3
-      - hono
-      - srvx
-
-  '@universal-deploy/vite@0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))':
+  '@universal-deploy/vite@0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))':
     dependencies:
       '@universal-deploy/netlify': 0.2.2(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
       '@universal-deploy/node': 0.1.7(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
       '@universal-deploy/store': 0.2.1(srvx@0.11.17)
-      '@universal-middleware/express': 0.4.30(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
+      '@universal-middleware/express': 0.4.30(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
       magic-string: 0.30.21
       rou3: 0.8.1
     optionalDependencies:
@@ -6876,28 +6878,41 @@ snapshots:
       - hono
       - srvx
 
+  '@universal-deploy/vite@0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))':
+    dependencies:
+      '@universal-deploy/netlify': 0.2.2(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+      '@universal-deploy/node': 0.1.7(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+      '@universal-deploy/store': 0.2.1(srvx@0.11.17)
+      '@universal-middleware/express': 0.4.30(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      magic-string: 0.30.21
+      rou3: 0.8.1
+    optionalDependencies:
+      vite: 8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+      - '@hattip/core'
+      - '@types/express'
+      - '@webroute/route'
+      - elysia
+      - fastify
+      - h3
+      - hono
+      - srvx
+
   '@universal-middleware/compress@0.2.35': {}
 
-  '@universal-middleware/core@0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
+  '@universal-middleware/core@0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
     dependencies:
       regexparam: 3.0.0
       tough-cookie: 6.0.1
     optionalDependencies:
-      elysia: 1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3)
+      elysia: 1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3)
       hono: 4.12.26
       srvx: 0.11.17
 
-  '@universal-middleware/core@0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)':
+  '@universal-middleware/elysia@0.6.5(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
     dependencies:
-      regexparam: 3.0.0
-      tough-cookie: 6.0.1
-    optionalDependencies:
-      elysia: 1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3)
-      srvx: 0.11.17
-
-  '@universal-middleware/elysia@0.6.5(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)':
-    dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
+      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@hattip/core'
@@ -6909,10 +6924,10 @@ snapshots:
       - hono
       - srvx
 
-  '@universal-middleware/express@0.4.30(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
+  '@universal-middleware/express@0.4.30(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
     dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
-      '@universal-middleware/node': 0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      '@universal-middleware/node': 0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@hattip/core'
@@ -6924,10 +6939,9 @@ snapshots:
       - hono
       - srvx
 
-  '@universal-middleware/express@0.4.30(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)':
+  '@universal-middleware/hono@0.4.21(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
     dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
-      '@universal-middleware/node': 0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
+      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@hattip/core'
@@ -6939,9 +6953,9 @@ snapshots:
       - hono
       - srvx
 
-  '@universal-middleware/hono@0.4.21(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
+  '@universal-middleware/node@0.1.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
     dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@hattip/core'
@@ -6953,9 +6967,9 @@ snapshots:
       - hono
       - srvx
 
-  '@universal-middleware/node@0.1.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
+  '@universal-middleware/node@0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
     dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@hattip/core'
@@ -6967,53 +6981,11 @@ snapshots:
       - hono
       - srvx
 
-  '@universal-middleware/node@0.1.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)':
+  '@vikejs/elysia@0.2.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)))':
     dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-      - '@hattip/core'
-      - '@types/express'
-      - '@webroute/route'
-      - elysia
-      - fastify
-      - h3
-      - hono
-      - srvx
-
-  '@universal-middleware/node@0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)':
-    dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-      - '@hattip/core'
-      - '@types/express'
-      - '@webroute/route'
-      - elysia
-      - fastify
-      - h3
-      - hono
-      - srvx
-
-  '@universal-middleware/node@0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)':
-    dependencies:
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-      - '@hattip/core'
-      - '@types/express'
-      - '@webroute/route'
-      - elysia
-      - fastify
-      - h3
-      - hono
-      - srvx
-
-  '@vikejs/elysia@0.2.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)))':
-    dependencies:
-      '@universal-middleware/elysia': 0.6.5(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
-      elysia: 1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3)
-      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
+      '@universal-middleware/elysia': 0.6.5(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      elysia: 1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3)
+      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@hattip/core'
@@ -7024,11 +6996,11 @@ snapshots:
       - hono
       - srvx
 
-  '@vikejs/hono@0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))':
+  '@vikejs/hono@0.2.1(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))':
     dependencies:
-      '@universal-middleware/hono': 0.4.21(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      '@universal-middleware/hono': 0.4.21(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
       hono: 4.12.26
-      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@hattip/core'
@@ -7039,11 +7011,11 @@ snapshots:
       - h3
       - srvx
 
-  '@vitejs/plugin-react@5.0.2(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))':
+  '@vitejs/plugin-react@5.0.2(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))':
     dependencies:
-      '@babel/core': 7.29.7
-      '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
-      '@babel/plugin-transform-react-jsx-source': 7.29.7(@babel/core@7.29.7)
+      '@babel/core': 7.29.7(supports-color@10.2.2)
+      '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))
+      '@babel/plugin-transform-react-jsx-source': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))
       '@rolldown/pluginutils': 1.0.0-beta.34
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
@@ -7714,19 +7686,19 @@ snapshots:
 
   axobject-query@4.1.0: {}
 
-  babel-plugin-jsx-dom-expressions@0.40.7(@babel/core@7.29.7):
+  babel-plugin-jsx-dom-expressions@0.40.7(@babel/core@7.29.7(supports-color@10.2.2)):
     dependencies:
-      '@babel/core': 7.29.7
+      '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/helper-module-imports': 7.18.6
-      '@babel/plugin-syntax-jsx': 7.29.7(@babel/core@7.29.7)
+      '@babel/plugin-syntax-jsx': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))
       '@babel/types': 7.29.7
       html-entities: 2.3.3
       parse5: 7.3.0
 
-  babel-preset-solid@1.9.12(@babel/core@7.29.7)(solid-js@1.9.13):
+  babel-preset-solid@1.9.12(@babel/core@7.29.7(supports-color@10.2.2))(solid-js@1.9.13):
     dependencies:
-      '@babel/core': 7.29.7
-      babel-plugin-jsx-dom-expressions: 0.40.7(@babel/core@7.29.7)
+      '@babel/core': 7.29.7(supports-color@10.2.2)
+      babel-plugin-jsx-dom-expressions: 0.40.7(@babel/core@7.29.7(supports-color@10.2.2))
     optionalDependencies:
       solid-js: 1.9.13
 
@@ -7917,10 +7889,6 @@ snapshots:
 
   dayjs@1.11.11: {}
 
-  debug@4.4.3:
-    dependencies:
-      ms: 2.1.3
-
   debug@4.4.3(supports-color@10.2.2):
     dependencies:
       ms: 2.1.3
@@ -7983,30 +7951,17 @@ snapshots:
 
   electron-to-chromium@1.5.376: {}
 
-  elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3):
+  elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3):
     dependencies:
       '@sinclair/typebox': 0.34.49
       cookie: 1.1.1
       exact-mirror: 1.2.2
       fast-decode-uri-component: 1.0.1
-      file-type: 22.0.1
+      file-type: 22.0.1(supports-color@10.2.2)
       memoirist: 0.4.0
       openapi-types: 12.1.3
     optionalDependencies:
       '@types/bun': 1.2.22(@types/react@19.1.8)
-      typescript: 5.8.3
-    optional: true
-
-  elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3):
-    dependencies:
-      '@sinclair/typebox': 0.34.49
-      cookie: 1.1.1
-      exact-mirror: 1.2.2
-      fast-decode-uri-component: 1.0.1
-      file-type: 22.0.1
-      memoirist: 0.4.0
-      openapi-types: 12.1.3
-    optionalDependencies:
       typescript: 5.8.3
 
   emoji-regex@8.0.0: {}
@@ -8125,9 +8080,9 @@ snapshots:
 
   fflate@0.6.10: {}
 
-  file-type@22.0.1:
+  file-type@22.0.1(supports-color@10.2.2):
     dependencies:
-      '@tokenizer/inflate': 0.4.1
+      '@tokenizer/inflate': 0.4.1(supports-color@10.2.2)
       strtok3: 10.3.5
       token-types: 6.1.2
       uint8array-extras: 1.5.0
@@ -8777,9 +8732,9 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  require-in-the-middle@8.0.1:
+  require-in-the-middle@8.0.1(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -8948,10 +8903,10 @@ snapshots:
       '@corvu/utils': 0.4.2(solid-js@1.9.13)
       solid-js: 1.9.13
 
-  solid-refresh@0.6.3(solid-js@1.9.13):
+  solid-refresh@0.6.3(solid-js@1.9.13)(supports-color@10.2.2):
     dependencies:
       '@babel/generator': 7.29.7
-      '@babel/helper-module-imports': 7.29.7
+      '@babel/helper-module-imports': 7.29.7(supports-color@10.2.2)
       '@babel/types': 7.29.7
       solid-js: 1.9.13
     transitivePeerDependencies:
@@ -9064,20 +9019,16 @@ snapshots:
     optionalDependencies:
       tailwind-merge: 3.5.0
 
-  tailwind-variants@3.1.1(tailwindcss@4.1.8):
-    dependencies:
-      tailwindcss: 4.1.8
-
   tailwindcss-config@2.0.0:
     dependencies:
       '@weapp-tailwindcss/shared': 2.0.0
       jiti: 2.7.0
 
-  tailwindcss-patch@9.5.0(tailwindcss@4.1.8):
+  tailwindcss-patch@9.5.0(supports-color@10.2.2)(tailwindcss@4.1.8):
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
-      '@babel/traverse': 7.29.7
+      '@babel/traverse': 7.29.7(supports-color@10.2.2)
       '@babel/types': 7.29.7
       '@tailwindcss-mangle/config': 7.0.2
       '@tailwindcss-mangle/engine': 0.1.0(tailwindcss@4.1.8)
@@ -9185,11 +9136,11 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-tailwindcss-mangle@5.1.4(rollup@4.62.2):
+  unplugin-tailwindcss-mangle@5.1.4(rollup@4.62.2)(supports-color@10.2.2):
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
       '@tailwindcss-mangle/config': 7.0.2
-      '@tailwindcss-mangle/core': 5.1.6
+      '@tailwindcss-mangle/core': 5.1.6(supports-color@10.2.2)
       '@tailwindcss-mangle/shared': 4.1.5
       is-css-request: 1.0.1
       magic-string: 0.30.21
@@ -9264,71 +9215,32 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  vike-react@0.6.24(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))):
+  vike-react@0.6.24(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))):
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       react-streaming: 0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
+      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
 
-  vike-solid@0.8.2(solid-js@1.9.13)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))(vite-plugin-solid@2.11.12(solid-js@1.9.13)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))):
+  vike-solid@0.8.2(solid-js@1.9.13)(vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)))(vite-plugin-solid@2.11.12(solid-js@1.9.13)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))):
     dependencies:
       isbot-fast: 1.2.0
       solid-js: 1.9.13
-      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
-      vite-plugin-solid: 2.11.12(solid-js@1.9.13)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+      vike: 0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+      vite-plugin-solid: 2.11.12(solid-js@1.9.13)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
 
-  vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)):
+  vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)):
     dependencies:
-      '@babel/core': 7.29.7
+      '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/types': 7.29.7
       '@brillout/import': 0.2.6
       '@brillout/json-serializer': 0.5.25
       '@brillout/picocolors': 1.0.31
       '@brillout/vite-plugin-server-entry': 0.7.18
       '@universal-deploy/store': 0.2.1(srvx@0.11.17)
-      '@universal-deploy/vite': 0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
-      '@universal-middleware/node': 0.1.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
-      cac: 6.7.14
-      convert-route: 1.1.1
-      es-module-lexer: 1.7.0
-      esbuild: 0.28.1
-      json5: 2.2.3
-      magic-string: 0.30.21
-      picomatch: 4.0.4
-      semver: 7.8.5
-      sirv: 3.0.2
-      source-map-support: 0.5.21
-      tinyglobby: 0.2.17
-      vite-plugin-wrapper: 0.1.0(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
-    optionalDependencies:
-      react-streaming: 0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      vite: 8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
-    transitivePeerDependencies:
-      - '@cloudflare/workers-types'
-      - '@hattip/core'
-      - '@types/express'
-      - '@webroute/route'
-      - elysia
-      - fastify
-      - h3
-      - hono
-      - srvx
-      - supports-color
-
-  vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)):
-    dependencies:
-      '@babel/core': 7.29.7
-      '@babel/types': 7.29.7
-      '@brillout/import': 0.2.6
-      '@brillout/json-serializer': 0.5.25
-      '@brillout/picocolors': 1.0.31
-      '@brillout/vite-plugin-server-entry': 0.7.18
-      '@universal-deploy/store': 0.2.1(srvx@0.11.17)
-      '@universal-deploy/vite': 0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
-      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
-      '@universal-middleware/node': 0.1.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.8.3))(srvx@0.11.17)
+      '@universal-deploy/vite': 0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1))
+      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      '@universal-middleware/node': 0.1.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
       cac: 6.7.14
       convert-route: 1.1.1
       es-module-lexer: 1.7.0
@@ -9356,16 +9268,55 @@ snapshots:
       - srvx
       - supports-color
 
+  vike@0.4.259(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(react-streaming@0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(srvx@0.11.17)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)):
+    dependencies:
+      '@babel/core': 7.29.7(supports-color@10.2.2)
+      '@babel/types': 7.29.7
+      '@brillout/import': 0.2.6
+      '@brillout/json-serializer': 0.5.25
+      '@brillout/picocolors': 1.0.31
+      '@brillout/vite-plugin-server-entry': 0.7.18
+      '@universal-deploy/store': 0.2.1(srvx@0.11.17)
+      '@universal-deploy/vite': 0.1.10(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+      '@universal-middleware/core': 0.4.18(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      '@universal-middleware/node': 0.1.0(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.2.22(@types/react@19.1.8))(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript@5.8.3))(hono@4.12.26)(srvx@0.11.17)
+      cac: 6.7.14
+      convert-route: 1.1.1
+      es-module-lexer: 1.7.0
+      esbuild: 0.28.1
+      json5: 2.2.3
+      magic-string: 0.30.21
+      picomatch: 4.0.4
+      semver: 7.8.5
+      sirv: 3.0.2
+      source-map-support: 0.5.21
+      tinyglobby: 0.2.17
+      vite-plugin-wrapper: 0.1.0(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
+    optionalDependencies:
+      react-streaming: 0.4.20(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      vite: 8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+      - '@hattip/core'
+      - '@types/express'
+      - '@webroute/route'
+      - elysia
+      - fastify
+      - h3
+      - hono
+      - srvx
+      - supports-color
+
   vite-bundle-analyzer@1.3.8: {}
 
-  vite-plugin-solid@2.11.12(solid-js@1.9.13)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)):
+  vite-plugin-solid@2.11.12(solid-js@1.9.13)(supports-color@10.2.2)(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)):
     dependencies:
-      '@babel/core': 7.29.7
+      '@babel/core': 7.29.7(supports-color@10.2.2)
       '@types/babel__core': 7.20.5
-      babel-preset-solid: 1.9.12(@babel/core@7.29.7)(solid-js@1.9.13)
+      babel-preset-solid: 1.9.12(@babel/core@7.29.7(supports-color@10.2.2))(solid-js@1.9.13)
       merge-anything: 5.1.7
       solid-js: 1.9.13
-      solid-refresh: 0.6.3(solid-js@1.9.13)
+      solid-refresh: 0.6.3(solid-js@1.9.13)(supports-color@10.2.2)
       vite: 8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
       vitefu: 1.1.3(vite@8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0))
     transitivePeerDependencies:
@@ -9379,9 +9330,9 @@ snapshots:
     dependencies:
       vite: 8.0.14(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)):
+  vite-tsconfig-paths@5.1.4(supports-color@10.2.2)(typescript@5.8.3)(vite@7.2.7(@types/node@26.0.0)(jiti@2.7.0)(lightningcss@1.30.1)):
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.8.3)
     optionalDependencies:
