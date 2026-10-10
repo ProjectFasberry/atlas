@@ -1,6 +1,6 @@
-import { LOCALES, LOCALES_MAP, type Locale } from "@/shared/locales"
+import { LOCALES_MAP } from "@/shared/locales"
 import { SettingsContentWrapper } from "./ui"
-import { getLocale } from "@/paraglide/runtime"
+import { getLocale, locales, type Locale } from "@/paraglide/runtime"
 import { reatomComponent } from "@reatom/npm-react"
 import { locale } from "@/shared/models/shared.model"
 import { settings } from "../models/settings.model"
@@ -36,7 +36,7 @@ const SettingsLanguageListItem = reatomComponent<{ value: Locale }>(({ ctx, valu
 }, "SettingsLanguageListItem")
 
 const SettingsLanguageList = () => {
-  return LOCALES.map((locale) => <SettingsLanguageListItem key={locale} value={locale} />)
+  return locales.map((locale) => <SettingsLanguageListItem key={locale} value={locale} />)
 }
 
 export const SettingsLanguage = () => {

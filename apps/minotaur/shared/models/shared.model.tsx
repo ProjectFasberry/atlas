@@ -9,8 +9,7 @@ import { useInView } from "react-intersection-observer";
 import { useUpdate } from "@reatom/npm-react";
 import { withSsr } from "./ssr";
 import { invariant } from "../lib/utils";
-import { setLocale } from "@/paraglide/runtime";
-import { LOCALES, type Locale } from "../locales";
+import { locales, setLocale, type Locale } from "@/paraglide/runtime";
 import { logError } from "../lib/log";
 
 type ExistNicknamePayload = ExtractApiData<"getValidateNicknameByNickname">["data"]
@@ -87,7 +86,7 @@ export const getCurrencies = action((ctx) => {
   return data
 })
 
-const isAvailableLang = (lang: string): lang is Locale => LOCALES.includes(lang as Locale)
+const isAvailableLang = (lang: string): lang is Locale => locales.includes(lang as Locale)
 
 export const locale = atom(null, "locale").pipe(
   withAssign((_, name) => ({

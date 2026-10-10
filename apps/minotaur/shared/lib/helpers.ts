@@ -172,3 +172,6 @@ export const getNotExistUrlByEntity = (t?: keyof typeof NOT_EXIST_TYPES): `/not-
 export const getNotExistType = (search: Record<string, string>): typeof NOT_EXIST_TYPES_ARR[number] => {
   return NOT_EXIST_TYPES_ARR.find((t) => t === search.t) ?? "default"
 }
+
+export const getStaticImage = (target: string) => `${env.VITE_VOLUME_URL}/static/${target}`
+export const getObjectUrl = (bucket: string, key: string) => `${env.VITE_VOLUME_URL}/${bucket}/${key}`

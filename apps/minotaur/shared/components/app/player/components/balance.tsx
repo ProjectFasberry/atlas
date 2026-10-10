@@ -1,7 +1,7 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
 import { Button } from "@/shared/ui/button";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { Icon } from "@/shared/ui/icon"
 import { balance, balanceState } from "../models/balance.model";
 import { navigate } from "vike/client/router";

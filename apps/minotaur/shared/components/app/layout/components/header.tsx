@@ -12,8 +12,8 @@ import { Banner } from "../../widgets/components/banner";
 import { translate } from "@/shared/locales/helpers";
 import { action } from "@reatom/framework";
 import { Portal } from "@ark-ui/react/portal";
-import { getLocale } from "@/paraglide/runtime";
-import { LOCALES, LOCALES_MAP } from "@/shared/locales";
+import { getLocale, locales } from "@/paraglide/runtime";
+import { LOCALES_MAP } from "@/shared/locales";
 import { locale } from "@/shared/models/shared.model";
 import { createListCollection, Select } from "@ark-ui/react/select";
 import { SelectItemIndicator, selectVariant } from "@/shared/ui/select";
@@ -90,7 +90,7 @@ const LangSwitcher = reatomComponent(({ ctx }) => {
       }}
       multiple={false}
       value={[getLocale()]}
-      collection={createListCollection({ items: LOCALES })}
+      collection={createListCollection({ items: locales })}
     >
       <Select.Trigger
         aria-label={translate["shared.change-lang.title"]()}
@@ -103,7 +103,7 @@ const LangSwitcher = reatomComponent(({ ctx }) => {
         <Select.Positioner>
           <Select.Content className={selectVariant.content("min-w-[200px]" )}>
             <Select.ItemGroup className={selectVariant.itemGroup()}>
-              {LOCALES.map((locale) => (
+              {locales.map((locale) => (
                 <Select.Item key={locale} item={locale} className={selectVariant.item("text-base")}>
                   <Select.ItemText className={selectVariant.itemText()}>
                     {LOCALES_MAP[locale]}

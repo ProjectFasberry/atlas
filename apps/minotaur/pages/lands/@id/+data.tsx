@@ -2,7 +2,7 @@ import { dayjs } from "@/shared/lib/dayjs"
 import { wrapTitle } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { type PageContextServer } from "vike/types";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { logRouting } from "@/shared/lib/log";
 import { land } from "@/shared/components/app/land/models/land.model";
 import { createCtx } from "@reatom/framework";
@@ -19,6 +19,7 @@ function metadata(
 ) {
   const title = wrapTitle(land.name.slice(0, 64))
   const created_at = dayjs(land.created_at.toString()).format("DD MMM YYYY");
+  // todo: i18n meta
   const description = `
     Территория ${land.name}. Создана ${created_at}. ${land.members.length} участников
   `

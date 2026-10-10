@@ -1,6 +1,6 @@
 import { client } from "@/shared/lib/client-wrapper"
 import { createPageModel } from "@/shared/lib/events"
-import { getStaticImage } from "@/shared/lib/volume-helpers"
+import { getStaticImage } from "@/shared/lib/helpers"
 import { translate } from "@/shared/locales/helpers"
 import { PageHeaderImage } from "@/shared/ui/header-image"
 import {

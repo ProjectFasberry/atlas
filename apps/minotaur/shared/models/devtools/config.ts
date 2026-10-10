@@ -1,5 +1,4 @@
 import type { AtomMut, Ctx } from "@reatom/framework"
-import { DEBUG_MODULES } from "./debug"
 
 type ConfigItemMeta<T> =
   | { applyAs: "atom", applyTarget: AtomMut<T> }
@@ -15,9 +14,9 @@ export type DevtoolsConfig = {
 };
 
 const createConfig = <T extends DevtoolsConfig>(config: T): T => config;
-
-/** Helper for defining the item if types is broken */
-const defineItem = <T>(item: ConfigItem<T>) => item;
+const defineItem = <T>(item: ConfigItem<T>) => {
+  return item
+};
 
 const loggingConfig = createConfig({
   "Snapshots": {
@@ -34,19 +33,6 @@ const loggingConfig = createConfig({
   }
 })
 
-const globalConfig = createConfig({
-  "Flags": {
-    "react-scan": defineItem({
-      value: false,
-      __meta: {
-        applyAs: "static",
-        onChange: (_, val) => val ? DEBUG_MODULES[0].activate() : DEBUG_MODULES[0].deactivate()
-      }
-    })
-  }
-})
-
 export const devtoolsConfig = {
   "Logging": loggingConfig,
-  "Global": globalConfig
 } satisfies Record<string, DevtoolsConfig>;

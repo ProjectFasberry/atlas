@@ -1,6 +1,6 @@
 import { client } from "@/shared/lib/client-wrapper";
 import { logRouting } from "@/shared/lib/log";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { getNotExistUrlByEntity, wrapTitle } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { render } from "vike/abort";

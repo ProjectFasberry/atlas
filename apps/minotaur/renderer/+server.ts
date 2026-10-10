@@ -6,7 +6,7 @@ import consola from "consola";
 import { env } from "@/shared/env";
 import { sentry } from "@/shared/sentry";
 import { paraglideMiddleware } from "@/paraglide/server";
-import { DEFAULT_LOCALE, type Locale } from "@/shared/locales";
+import { baseLocale } from "@/paraglide/runtime";
 
 await sentry.init({ variant: "server" }).catch(e => {
   consola.error("Failed to initialize Sentry", e)
@@ -30,7 +30,7 @@ function printAppInfo() {
 
 const defineLocale = () => new Elysia()
   .derive(async (ctx) => {
-    let locale: Locale = DEFAULT_LOCALE;
+    let locale = baseLocale;
 
     await paraglideMiddleware(ctx.request, ({ locale: newLocale, request: newRequest }) => {
       ctx.request = newRequest;

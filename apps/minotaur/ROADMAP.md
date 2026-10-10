@@ -7,4 +7,4 @@
 - [ ] migrate from `ky` to `openapi-fetch`
 
 ## done
-- [x] dropped `@tabler/icons-react` in favor of sprites
+- [x] drop `@tabler/icons-react` in favor of sprites

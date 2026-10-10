@@ -8,7 +8,7 @@ import { Icon, type IconName } from "@/shared/ui/icon"
 import { pageState } from "@/shared/models/page-context.model";
 import { Button } from "@/shared/ui/button";
 import { type SkinAnimationType, skinModel, type SkinVariant, type SkinsHistory } from "../models/skin.model";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { ReactSkinview3d } from "react-skinview3d"
 import { ClientOnly } from "vike-react/ClientOnly"
 import { appState } from "@/shared/models/app/index.model";

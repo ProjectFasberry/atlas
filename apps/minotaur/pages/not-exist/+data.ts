@@ -1,5 +1,5 @@
 import { logRouting } from "@/shared/lib/log";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { type PageContextServer } from "vike/types";
 import { getNotExistType, wrapTitle } from "@/shared/lib/helpers";

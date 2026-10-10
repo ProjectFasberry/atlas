@@ -1,5 +1,5 @@
 import { Link } from "@/shared/components/config/link/link";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { Icon } from "@/shared/ui/icon"

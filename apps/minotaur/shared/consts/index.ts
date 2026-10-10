@@ -4,6 +4,7 @@ const ALERT_DIALOG_DELAY = 150
 
 const ENVIRONMENT = typeof window === 'undefined' ? "server" : "client"
 
+// todo: fetch dynamically
 const DONATE_COLORS: Record<string, string> = {
   "arkhont": "#30ff5d",
   "authentic": "#e342cd",

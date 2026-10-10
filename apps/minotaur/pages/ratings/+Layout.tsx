@@ -1,5 +1,5 @@
 import { Typography } from "@/shared/ui/typography"
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { type PropsWithChildren } from "react";
 import { PageHeaderImage } from "@/shared/ui/header-image";
 import { BackButton } from "@/shared/ui/back-button";

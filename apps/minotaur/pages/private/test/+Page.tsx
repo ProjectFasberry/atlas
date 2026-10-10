@@ -1,7 +1,7 @@
+import { locales } from "@/paraglide/runtime"
 import { EditorMenuBar } from "@/shared/components/config/editor/editor"
 import { EDITOR_DEFAULT_CONTENT, editorExtensions, editorState } from "@/shared/components/config/editor/editor.model"
 import { Link } from "@/shared/components/config/link/link"
-import { LOCALES } from "@/shared/locales"
 import { translate } from "@/shared/locales/helpers"
 import { Typography } from "@/shared/ui/typography"
 import { reatomComponent } from "@reatom/npm-react"
@@ -38,7 +38,7 @@ export default function Page() {
         {translate["shared.change-lang.title"]()}
       </Typography>
       <div className="flex flex-col w-full gap-1">
-        {LOCALES.map((locale) => (
+        {locales.map((locale) => (
           <Link
             key={locale}
             locale={locale}

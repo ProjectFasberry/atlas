@@ -1,5 +1,5 @@
 import { Link } from "@/shared/components/config/link/link"
-import { getStaticImage } from "@/shared/lib/volume-helpers"
+import { getStaticImage } from "@/shared/lib/helpers"
 import { Typography } from "@/shared/ui/typography"
 import { getItemStatus, type StoreItem as StoreItemProps, storeItem } from "../../models/store-item.model"
 import { Skeleton } from "@/shared/ui/skeleton"

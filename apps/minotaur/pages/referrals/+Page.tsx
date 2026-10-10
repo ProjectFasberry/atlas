@@ -1,4 +1,4 @@
-import { getStaticImage } from "@/shared/lib/volume-helpers"
+import { getStaticImage } from "@/shared/lib/helpers"
 import { PageHeaderImage } from "@/shared/ui/header-image"
 import { Typography } from "@/shared/ui/typography"
 import { ReferralsLink } from "@/shared/components/app/referrals/components/referrals"

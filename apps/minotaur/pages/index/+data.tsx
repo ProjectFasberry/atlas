@@ -1,7 +1,7 @@
 import { type PageContextServer } from "vike/types";
 import { useConfig } from 'vike-react/useConfig'
 import { wrapTitle } from "@/shared/lib/helpers";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { logRouting } from "@/shared/lib/log";
 import { env } from "@/shared/env";
 import { getNews, newsState } from "@/shared/components/app/news/models/news.model";

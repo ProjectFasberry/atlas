@@ -1,4 +1,4 @@
-import { getStaticImage } from "../lib/volume-helpers"
+import { getStaticImage } from "../lib/helpers"
 
 const loaderImage = getStaticImage("gifs/loading.webp")
 

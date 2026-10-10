@@ -1,6 +1,6 @@
 import { Typography } from "@/shared/ui/typography"
 import { LandsList } from "@/shared/components/app/lands/components/lands-list";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { PageHeaderImage } from "@/shared/ui/header-image";
 import { translate } from "@/shared/locales/helpers";
 import { createPageModel } from "@/shared/lib/events";

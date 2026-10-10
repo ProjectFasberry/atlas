@@ -8,7 +8,7 @@ import { Skeleton } from "@/shared/ui/skeleton"
 import { tv } from "tailwind-variants"
 import { type ReactNode } from "react"
 import { belkoinImage, charismImage } from "@/shared/consts/images"
-import { getStaticImage } from "@/shared/lib/volume-helpers"
+import { getStaticImage } from "@/shared/lib/helpers"
 import { PageLoader } from "@/shared/ui/page-loader"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"

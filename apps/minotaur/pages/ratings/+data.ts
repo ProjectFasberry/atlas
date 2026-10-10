@@ -1,6 +1,6 @@
 import { useConfig } from 'vike-react/useConfig'
 import { wrapTitle } from "@/shared/lib/helpers"
-import { getStaticImage } from '@/shared/lib/volume-helpers'
+import { getStaticImage } from '@/shared/lib/helpers'
 import { type PageContextServer } from 'vike/types'
 import { logRouting } from '@/shared/lib/log'
 import { translate } from '@/shared/locales/helpers'

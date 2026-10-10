@@ -3,7 +3,7 @@ import { storeItems } from "@/shared/components/app/shop/models/store.model";
 import { env } from "@/shared/env";
 import { isBotRequest } from "@/shared/lib/helpers";
 import { logRouting } from "@/shared/lib/log";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { wrapTitle } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { type PageContextServer } from "vike/types";
