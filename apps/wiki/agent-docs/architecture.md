@@ -39,8 +39,9 @@
 1. `getPage(slug)` from PostgreSQL, otherwise `notFound()`; `getLocalizedPage(slug, locale)` swaps
    in the translation when it is still fresh, otherwise the Russian original is used.
 2. `renderPageHtml(page)` -> `withHeadingIds` puts `id` on h2/h3 headings and builds the TOC.
-3. `getEditor()` - when editing is allowed, the article gets an "Edit" button and the layout
-   gets an "Editor" chip in the bottom right corner.
+3. `getViewer()` - the signed-in user (session cookie, forwarded to the backend) becomes the
+   skin-head badge in the header; its menu carries the "Editor" chip when editing is allowed,
+   and the article gets an "Edit" button.
 4. `<WikiPage ... />` - a client component that receives ready HTML and renders it via
    `dangerouslySetInnerHTML` (read mode) or TipTap (edit mode).
 

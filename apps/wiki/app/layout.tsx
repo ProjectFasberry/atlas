@@ -1,9 +1,8 @@
-import { IconPencil } from '@tabler/icons-react';
 import { i18nProvider } from 'fumadocs-ui/i18n';
 import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import { Inter } from 'next/font/google';
-import { getEditor } from '@/lib/auth';
+import { getViewer } from '@/lib/auth';
 import { getPageTree } from '@/lib/content/pages';
 import { getLocale } from '@/lib/i18n/locale';
 import { buildRootMetadata } from '@/lib/seo/metadata';
@@ -12,6 +11,7 @@ import { baseOptions, defaultTranslations, translations } from '@/lib/ui/layout'
 import { cn } from '@/lib/utils/cn';
 import { m } from '@/paraglide/messages';
 import { Footer } from '@/shared/components/app/footer';
+import { ViewerSync } from '@/shared/components/app/viewer-sync';
 import { LocaleSync } from '@/shared/components/app/locale-sync';
 import { ReatomProvider } from '@/shared/components/app/reatom-provider';
 import { SidebarLinks } from '@/shared/ui/sidebar-links';
@@ -32,7 +32,7 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
   const locale = await getLocale();
   const theme = await getServerTheme();
   const options = baseOptions();
-  const editor = await getEditor();
+  const viewer = await getViewer();
 
   return (
     <html
@@ -48,6 +48,7 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
         >
           <ReatomProvider>
             <LocaleSync locale={locale} />
+            <ViewerSync viewer={viewer} />
             <DocsLayout
               tree={await getPageTree(locale)}
               {...options}
@@ -66,19 +67,6 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
               {children}
             </DocsLayout>
             <Footer />
-            {editor ? (
-              <span
-                title={`${m['layout.editor-badge-title']({}, { locale })}${editor.name ? `: ${editor.name}` : ''}`}
-                className="
-                  pointer-events-none fixed bottom-4 right-4 z-40 inline-flex
-                  items-center gap-1.5 rounded-full border border-fd-primary/30 bg-fd-primary/10
-                  px-2.5 py-1 text-xs font-medium text-fd-primary backdrop-blur
-                "
-              >
-                <IconPencil size={13} stroke={2} aria-hidden />
-                {m['layout.editor-badge']({}, { locale })}
-              </span>
-            ) : null}
           </ReatomProvider>
         </RootProvider>
       </body>
