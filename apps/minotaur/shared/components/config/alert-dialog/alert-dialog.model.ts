@@ -5,6 +5,7 @@ import {
 } from "@reatom/framework"
 import { sleep, withAssign, withReset } from "@reatom/framework"
 import { toast } from "sonner"
+import { translate } from "@/shared/locales/helpers"
 
 type AlertDialogConfig = {
   onConfirm?: Action | (() => ControlledPromise<any>),
@@ -33,7 +34,7 @@ export const alertDialog = atom(null, "alertDialog").pipe(
       if (ctx.get(alertDialog.confirm.statusesAtom).isPending) return;
 
       if (ctx.get(alertDialog.afterClose.statusesAtom).isPending) {
-        toast.warning("Не так быстро")
+        toast.warning(translate["shared.alert-dialog.not-so-fast"]())
         return;
       }
 
@@ -41,7 +42,7 @@ export const alertDialog = atom(null, "alertDialog").pipe(
         autoClose: true,
         withCancel: true,
         withPending: true,
-        confirmLabel: "Подтвердить",
+        confirmLabel: translate["shared.alert-dialog.confirm"](),
         ...config,
       }
 

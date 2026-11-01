@@ -14,6 +14,8 @@ import { Portal } from '@ark-ui/react/portal'
 import { createLink } from "@/shared/components/config/link/link.model";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { SummaryNumber } from "@/shared/ui/summary-number";
+import { Button } from "@/shared/ui/button";
+import { Typography } from "@/shared/ui/typography";
 
 const playerSeemsLikePlayersCountAtom = atom((ctx) => ctx.spy(playerSLP.fetch.dataAtom)?.meta.count ?? 0)
 
@@ -47,9 +49,30 @@ const PlayerSeemsLikePlayersCount = reatomComponent(({ ctx }) =>
   <SummaryNumber value={ctx.spy(playerSeemsLikePlayersCountAtom)} />, "PlayerSeemsLikePlayersCount"
 )
 
+const PlayerSeemsLikePlayersRestore = reatomComponent(({ ctx }) => {
+  const title = translate["player.seems-like-players.title"]();
+
+  return (
+    <div className="flex items-center justify-start w-full">
+      <Button
+        background="default"
+        className="gap-2 h-8 px-3 font-semibold"
+        title={title}
+        aria-label={title}
+        onClick={() => playerSLPState.settings.isShow.toggle(ctx, true)}
+      >
+        <Icon name="sprite:eye" className="size-4 text-neutral-400" />
+        <Typography className="text-sm text-neutral-400">
+          {title}
+        </Typography>
+      </Button>
+    </div>
+  )
+}, "PlayerSeemsLikePlayersRestore")
+
 export const PlayerSeemsLikePlayers = reatomComponent(({ ctx }) => {
   const isShow = ctx.spy(playerSLPState.settings.isShow);
-  if (!isShow) return null;
+  if (!isShow) return <PlayerSeemsLikePlayersRestore />;
 
   return (
     <div className="flex flex-col gap-2 w-full h-full">

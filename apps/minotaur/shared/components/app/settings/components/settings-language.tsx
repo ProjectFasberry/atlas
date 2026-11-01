@@ -6,6 +6,7 @@ import { locale } from "@/shared/models/shared.model"
 import { settings } from "../models/settings.model"
 import { checkboxVariant } from "@/shared/ui/checkbox"
 import { Checkbox } from "@ark-ui/react/checkbox"
+import { translate } from "@/shared/locales/helpers"
 
 const SettingsLanguageListItem = reatomComponent<{ value: Locale }>(({ ctx, value }) => {
   const isActive = getLocale() === value;
@@ -41,7 +42,7 @@ const SettingsLanguageList = () => {
 
 export const SettingsLanguage = () => {
   return (
-    <SettingsContentWrapper title="Язык">
+    <SettingsContentWrapper title={translate["settings.language.title"]()}>
       <div className="flex flex-col gap-8 w-full h-full">
         <div className="flex flex-col gap-2 w-full h-full">
           <SettingsLanguageList />

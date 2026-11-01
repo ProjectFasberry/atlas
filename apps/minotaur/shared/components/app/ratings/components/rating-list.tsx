@@ -10,7 +10,7 @@ import { reatomComponent } from "@reatom/npm-react";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { type ReactNode } from "react";
 import { type AtomState } from "@reatom/framework";
-import { ratingsState, ratings } from "../models/ratings.model";
+import { ratingsState, ratings, RatingsViewer } from "../models/ratings.model";
 import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
@@ -302,7 +302,7 @@ export const COMPONENTS: Record<AtomState<typeof ratingsState.filters.by>, React
 
 const RatingTableHeader = reatomComponent(({ ctx }) => HEADERS[ctx.spy(ratingsState.filters.by)], "RatingTableHeader")
 const RatingTableBody = reatomComponent(({ ctx }) => {
-  if (ctx.spy(ratings.update.statusesAtom).isPending) {
+  if (!ctx.spy(ratingsState.data) && ctx.spy(ratings.update.statusesAtom).isPending) {
     return Array.from({ length: 32 }).map((_, idx) => <TableRowsSkeleton key={idx} />)
   }
 
@@ -318,14 +318,17 @@ export const Ratings = reatomComponent(({ ctx }) => {
   if (!ctx.spy(ratingsState.data)) return <Noop />
 
   return (
-    <Table>
-      <TableCaption>Рейтинг</TableCaption>
-      <TableHeader>
-        <RatingTableHeader />
-      </TableHeader>
-      <TableBody>
-        <RatingTableBody />
-      </TableBody>
-    </Table>
+    <>
+      <Table>
+        <TableCaption>Рейтинг</TableCaption>
+        <TableHeader>
+          <RatingTableHeader />
+        </TableHeader>
+        <TableBody>
+          <RatingTableBody />
+        </TableBody>
+      </Table>
+      <RatingsViewer />
+    </>
   )
 }, "Ratings")

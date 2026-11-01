@@ -9,6 +9,7 @@ import { navigate } from "vike/client/router"
 import * as z from "zod"
 import { createNavigationModel } from "../../auth/models/navigation.model"
 import { validateNumber } from "@/shared/lib/utils"
+import { translate } from "@/shared/locales/helpers"
 
 type OutputPayload = ExtractApiData<"postStoreOrderExternalCreate">["data"]
 export type StoreExchangeRatesPayload = ExtractApiData<"getStoreOrderExternalExchange-rates">["data"]
@@ -46,10 +47,12 @@ export const topupState = atom(null, "topupState").pipe(
     validationError: atom<z.ZodError<Schema> | null>(null, "topUpValidationError").pipe(withReset()),
     resultError: atom<Error | null>(null, "topUpResultError").pipe(withReset()),
     search: atom<Partial<Record<TopUpSearch, string>>>({}, "topUpSearch").pipe(withReset()),
-    WALLETS: [
-      { title: "Харизма", value: "CHARISM" },
-      { title: "Белкоин", value: "BELKOIN" }
-    ],
+    get WALLETS() {
+      return [
+        { title: translate["store.topup.wallet.charism"](), value: "CHARISM" },
+        { title: translate["store.topup.wallet.belkoin"](), value: "BELKOIN" }
+      ]
+    },
     type: atom<TopupType>("start-input", `${name}.type`).pipe(withReset())
   }))
 )

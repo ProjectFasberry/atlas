@@ -30,7 +30,6 @@ export const registerSchema = z.object({
 	...z.object({
 		findout: z.string().min(1).max(128),
 		findoutType: z.enum(["custom", "referrer"]),
-		hash: z.string(),
 	}).superRefine((data, ctx) => {
 		if (data.findoutType === "referrer") {
 			const { error, success } = nicknameSchema.safeParse(data.findout);

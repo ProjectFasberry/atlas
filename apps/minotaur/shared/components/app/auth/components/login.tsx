@@ -131,6 +131,7 @@ const LoginVerified = () => (
 )
 
 const LOGIN_QR_COMPONENTS: Partial<Record<AuthLoginQRStatus, ReactNode>> = {
+  "idle": <LoginQRConnected />,
   "expired": <LoginQRRetry />,
   "connected": <LoginQRConnected />,
   "declined": <LoginQRDeclined />,

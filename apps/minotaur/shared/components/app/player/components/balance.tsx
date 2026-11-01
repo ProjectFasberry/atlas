@@ -120,7 +120,7 @@ const BalanceCardContent = reatomComponent<BalanceCardProps>(({ ctx, value, wall
           <Button
             background="white"
             className="p-0"
-            onClick={() => navigate(`/store/cart/topup?target=${value}`)}
+            onClick={() => navigate(`/store/cart/topup?target=${wallet}`)}
           >
             <Icon name="sprite:plus" className="size-5 text-neutral-950" />
           </Button>

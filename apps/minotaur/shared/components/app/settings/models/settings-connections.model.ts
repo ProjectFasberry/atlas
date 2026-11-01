@@ -9,6 +9,7 @@ import { client } from "@/shared/lib/client-wrapper";
 import { toast } from "sonner";
 import { env } from "@/shared/env";
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
+import { translate } from "@/shared/locales/helpers";
 
 const connectionsStatusAtom = reatomMap<string, boolean>()
 
@@ -69,12 +70,12 @@ const connectionsControl = atom(null, "connectionsControl").pipe(
 
         if (!warningIsConfirmed) {
           alertDialog.open(ctx, {
-            title: "После нажатия вас перекинет на коннект дискорда",
+            title: translate["settings.connections.discord-warning"](),
             onConfirm: action((ctx) => {
               connectionsState.warningIsConfirmed(ctx, true);
               connectionsControl.addWrapper(ctx, social);
             }),
-            confirmLabel: "Перейти"
+            confirmLabel: translate["settings.connections.go"]()
           })
         }
 
@@ -91,12 +92,12 @@ const connectionsControl = atom(null, "connectionsControl").pipe(
 
         if (!warningIsConfirmed) {
           alertDialog.open(ctx, {
-            title: "Продолжить?",
+            title: translate["settings.connections.continue-confirm"](),
             onConfirm: action((ctx) => {
               connectionsState.warningIsConfirmed(ctx, true);
               connectionsControl.addWrapper(ctx, social);
             }),
-            confirmLabel: "Перейти"
+            confirmLabel: translate["settings.connections.go"]()
           })
 
           return;
@@ -141,7 +142,7 @@ const connectionsControl = atom(null, "connectionsControl").pipe(
           connections.fetchList.dataAtom(ctx, (state) => state.filter(t => t.social !== res.type))
         },
         onReject: (ctx, e) => {
-          toast.error("Не удалось удалить социальную сеть.")
+          toast.error(translate["settings.connections.remove-error"]())
         }
       })
 

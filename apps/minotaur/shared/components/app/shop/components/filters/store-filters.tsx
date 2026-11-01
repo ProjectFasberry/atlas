@@ -35,13 +35,15 @@ export const StoreSearch = reatomComponent(({ ctx }) => {
 const StoreFilterItem = reatomComponent<Omit<Filter, "atom">>(({
   ctx, title, filters, updater, origin
 }) => {
+  const defaultFilterValue = origin === "wallet" ? "ALL" : "all";
+
   const handle = (
     updater: (ctx: Ctx, value: string) => void,
     isChecked: string | boolean,
     target: string
   ) => {
     if (typeof isChecked !== 'boolean') return;
-    updater(ctx, isChecked ? target : "ALL");
+    updater(ctx, isChecked ? target : defaultFilterValue);
   }
 
   const getUniqueFilterId = (v1: string, v2: string) => `${v1}${v2}`

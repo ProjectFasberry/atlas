@@ -1,11 +1,12 @@
 import { SettingsContentWrapper, SettingsSection } from "./ui"
 import { type SettingsSectionItem } from "../models/settings.model"
+import { translate } from "@/shared/locales/helpers"
 
 const SECURITY_SECTIONS: SettingsSectionItem[] = []
 
 export const SettingsMainSecurity = () => {
   return (
-    <SettingsContentWrapper title="Безопасность">
+    <SettingsContentWrapper title={translate["settings.security.title"]()}>
       <div className="flex flex-col gap-8 w-full h-full">
         {SECURITY_SECTIONS.map((section, idx) => <SettingsSection key={idx} {...section} />)}
       </div>

@@ -126,6 +126,9 @@ export const settings = atom(null, "settings").pipe(
       const currValue = ctx.get(settingsState.isOpen)
 
       if (!currValue) {
+        const cleanup = ctx.get(settingsState.cleanup)?.cb;
+
+        cleanup?.();
         settingsState.target.reset(ctx);
         settingsState.cleanup.reset(ctx);
       }

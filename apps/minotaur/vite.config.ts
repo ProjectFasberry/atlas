@@ -109,9 +109,6 @@ export default defineConfig(({ mode }) => {
               return 'react-core';
             }
 
-            if (id.includes('@scure/bip39/wordlists/english.js')) {
-              return 'english-wordlist';
-            }
             if (id.includes('tweakpane')) {
               return 'devonly';
             }

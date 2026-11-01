@@ -8,6 +8,7 @@ import { Dialog } from "@ark-ui/react/dialog"
 import { Portal } from "@ark-ui/react/portal"
 import { dialogVariant } from "@/shared/ui/dialog"
 import type React from "react"
+import { translate } from "@/shared/locales/helpers"
 
 const ChangeRecipientField = reatomComponent(({ ctx }) => {
   const oldRecipient = ctx.spy(changeLocalRecipientState.oldRecipient) ?? ""
@@ -17,7 +18,7 @@ const ChangeRecipientField = reatomComponent(({ ctx }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
       <Input
-        placeholder="Введите никнейм"
+        placeholder={translate["store.recipient.placeholder"]()}
         value={newRecipient ?? oldRecipient}
         onChange={e => changeLocalRecipientState.newRecipient(ctx, e.target.value)}
         variant={error ? "danger" : "default"}
@@ -35,7 +36,7 @@ const ChangeRecipientSave = reatomComponent<{ id: number }>(({ ctx, id }) => (
     className="w-fit self-end text-sm font-semibold"
     disabled={!ctx.spy(changeRecipientIsValidAtom) || ctx.spy(changeLocalRecipient.submit.statusesAtom).isPending}
   >
-    Применить
+    {translate["store.recipient.apply"]()}
   </Button>
 ), "ChangeRecipientSave")
 
@@ -60,17 +61,16 @@ export const ChangeRecipientDialog = reatomComponent(({ ctx }) => {
             <form onSubmit={handle} className="flex flex-col gap-4 w-full h-full">
               <div className="flex flex-col gap-1 w-full">
                 <Typography className="font-semibold leading-tight">
-                  Получатель товара <span className="italic text-neutral-50">{title}</span>
+                  {translate["store.recipient.title"]()} <span className="italic text-neutral-50">{title}</span>
                 </Typography>
                 <Typography color="gray" className="text-sm">
-                  Для некоторых товаров доступен выбор получателя.
-                  Если получатель не выбран, то товар будет приобретен для вас
+                  {translate["store.recipient.description"]()}
                 </Typography>
               </div>
               <div className="flex items-center w-full gap-2">
                 <div className="flex flex-col w-full">
                   <Typography color="gray" className="text-sm">
-                    Текущий получатель
+                    {translate["store.recipient.current"]()}
                   </Typography>
                   <ChangeRecipientField />
                 </div>

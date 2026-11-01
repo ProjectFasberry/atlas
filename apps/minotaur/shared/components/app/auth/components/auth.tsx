@@ -6,8 +6,6 @@ import { ErrorBlock } from "@/shared/ui/error-block";
 import { translate } from "@/shared/locales/helpers";
 import { tabsTriggerVariants } from "@/shared/ui/tabs"
 import { Tabs } from '@ark-ui/react/tabs'
-import { Link } from "@/shared/components/config/link/link";
-import { showResetPasswordAtom } from "../models/login.model";
 import { LoginForm } from "./login";
 import { RegisterForm } from "./register";
 
@@ -73,16 +71,6 @@ export const AuthError = reatomComponent(({ ctx }) => {
   return error ? <ErrorBlock title={error} /> : null
 }, "AuthError")
 
-export const ResetPassword = reatomComponent(({ ctx }) => {
-  if (!ctx.spy(showResetPasswordAtom)) return null;
-
-  return (
-    <Link href="/auth/restore" className='flex items-center justify-center w-full text-sm text-neutral-400'>
-      {translate["auth.navigation.auth.recoveryTitle"]()}
-    </Link>
-  )
-}, "ResetPassword")
-
 const createAuthVariants = () => ([
   { label: translate["auth.navigation.auth.loginTitle"](), value: "login" },
   { label: translate["auth.navigation.auth.regTitle"](), value: "register" }
@@ -114,7 +102,6 @@ export const Auth = reatomComponent(({ ctx }) => {
         <Tabs.Content value="login">
           <LoginForm />
         </Tabs.Content>
-        <ResetPassword />
       </div>
     </Tabs.Root>
   )

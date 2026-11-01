@@ -14,19 +14,20 @@ import { Portal } from "@ark-ui/react/portal";
 import { dialogVariant } from "@/shared/ui/dialog";
 import { QrCode } from "@ark-ui/react/qr-code";
 import { qrCodeVariant } from "@/shared/ui/qr-code";
+import { translate } from "@/shared/locales/helpers";
 
-const STATUSES: Record<Payment["status"], { title: string, color: string }> = {
-  "canceled": {
-    title: "Отменен", color: "text-yellow-500"
-  },
-  "pending": {
-    title: "В ожидании оплаты", color: "text-neutral-50"
-  },
-  "succeeded": {
-    title: "Оплачен", color: "text-green-500"
-  },
-  "waitingForCapture": {
-    title: "В ожидании", color: "text-neutral-50"
+const getStatus = (status: Payment["status"]): { title: string, color: string } => {
+  switch (status) {
+    case "canceled":
+      return { title: translate["store.order.state.canceled"](), color: "text-yellow-500" }
+    case "pending":
+      return { title: translate["store.order.state.pending"](), color: "text-neutral-50" }
+    case "succeeded":
+      return { title: translate["store.order.state.succeeded"](), color: "text-green-500" }
+    case "waitingForCapture":
+      return { title: translate["store.order.state.waiting-for-capture"](), color: "text-neutral-50" }
+    default:
+      return { title: translate["store.order.state.pending"](), color: "text-neutral-50" }
   }
 }
 
@@ -83,7 +84,7 @@ const OrderDetails = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-2 w-full">
       <div className="flex flex-col w-full">
         <Typography className='font-semibold text-white text-xl'>
-          Ссылка для оплаты:
+          {translate["store.order.pay-link"]()}
         </Typography>
         <div className="flex items-center relative cursor-pointer w-fit gap-2 bg-neutral-700 rounded-lg py-2 px-3 text-base">
           <AutoWidthInput value={data.pay_url} />
@@ -91,7 +92,7 @@ const OrderDetails = reatomComponent(({ ctx }) => {
             <Icon name="sprite:copy" className="size-4 text-neutral-400 group-hover:text-neutral-50" />
           </button>
         </div>
-        {ctx.spy(isCopiedAtom) && <p className="text-green-500 text-base mt-1">Скопировано</p>}
+        {ctx.spy(isCopiedAtom) && <p className="text-green-500 text-base mt-1">{translate["store.order.copied"]()}</p>}
       </div>
     </div>
   )
@@ -155,14 +156,14 @@ const Order = reatomComponent(({ ctx }) => {
   if (!data) return null
 
   const payload = data.payload;
-  const status = STATUSES[data.status]
+  const status = getStatus(data.status)
 
   return (
     <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start w-full">
       <div className="flex flex-col w-full h-full gap-2">
         <div className="flex items-center justify-start gap-2">
           <Typography className='font-semibold text-white text-2xl'>
-            Заказ
+            {translate["store.order.title"]()}
           </Typography>
           <div className="flex items-center justify-center px-2 py-1 bg-neutral-50 rounded-md">
             <span className="font-semibold text-neutral-950">
@@ -171,13 +172,13 @@ const Order = reatomComponent(({ ctx }) => {
           </div>
         </div>
         <Typography className="font-semibold text-xl">
-          Статус: <span className={`font-normal text-base ${status.color}`}>
+          {translate["store.order.status"]()}: <span className={`font-normal text-base ${status.color}`}>
             {status.title}
           </span>
         </Typography>
         <div className="flex flex-col">
           <Typography className="font-semibold text-xl">
-            Содержимое:
+            {translate["store.order.content"]()}
           </Typography>
           <span>{payload}</span>
         </div>

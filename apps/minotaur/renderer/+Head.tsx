@@ -1,6 +1,15 @@
 import { env } from "@/shared/env";
+import { usePageContext } from "vike-react/usePageContext";
+
+const OG_LOCALES: Record<string, string> = {
+  ru: "ru_RU",
+  en: "en_US",
+};
 
 export default function HeadDefault() {
+  const pageCtx = usePageContext();
+  const ogLocale = OG_LOCALES[pageCtx.locale] ?? "ru_RU";
+
   return (
     <>
       <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
@@ -18,7 +27,7 @@ export default function HeadDefault() {
       survival, smp, fasberry project, minecraft fasberry, minecraft server play"/>
       <meta name="author" content="Fasberry Project Team" />
       <meta name="format-detection" content="email=yes, address=yes, telephone=yes" />
-      <meta property="og:locale" content="ru_RU" />
+      <meta property="og:locale" content={ogLocale} />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="Fasberry Project" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />

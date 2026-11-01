@@ -25,19 +25,23 @@ const landCardVariants = tv({
 })
 
 const LandCard = ({ members, name, title, ulid, details: { banner } }: LandSimilar) => {
+  const owner = members[0];
+
   return (
     <Link href={createLink("land", ulid)} className={landCardVariants().base()}>
       <div className={landCardVariants().child()}>
-        <div className="flex items-center gap-2 w-full">
-          <Avatar
-            nickname={members[0].nickname}
-            url={members[0].avatar}
-            className="h-6 w-6"
-          />
-          <Typography className="text-base sm:text-lg truncate">
-            {members[0].nickname}
-          </Typography>
-        </div>
+        {owner && (
+          <div className="flex items-center gap-2 w-full">
+            <Avatar
+              nickname={owner.nickname}
+              url={owner.avatar}
+              className="h-6 w-6"
+            />
+            <Typography className="text-base sm:text-lg truncate">
+              {owner.nickname}
+            </Typography>
+          </div>
+        )}
         <Typography className="text-base sm:text-xl truncate font-semibold">
           {name}
         </Typography>

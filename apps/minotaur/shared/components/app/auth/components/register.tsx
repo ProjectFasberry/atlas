@@ -2,13 +2,12 @@ import { NicknameInput, PasswordInput } from "./auth"
 import { reatomComponent } from "@reatom/npm-react"
 import { auth, type AuthFindoutType, authState } from "../models/auth.model"
 import { Input } from "@/shared/ui/input"
-import { type JSX, type ReactNode, useState } from "react"
+import { type JSX, type ReactNode } from "react"
 import { Button } from "@/shared/ui/button"
-import { SeedPhrase, SeedPhraseFooter, SeedPhraseHeader, SeedPhraseBody } from "@/shared/ui/seed-phrase"
 import { Icon } from "@/shared/ui/icon"
 import {
   type AuthRegisterType,
-  registerNavigationModel, register, registerSeedPhraseModel, registerState, findoutSelectedTypeAtom,
+  registerNavigationModel, register, registerState, findoutSelectedTypeAtom,
   createFindoutOptions
 } from "../models/register.model"
 import { IconLoader } from "@/shared/ui/icon-loader"
@@ -163,67 +162,6 @@ const RegisterStartInput = () => (
   </>
 )
 
-const RegisterSeedPhraseConfirm = reatomComponent(({ ctx }) => {
-  const words = ctx.spy(registerSeedPhraseModel.state.repeatWords)
-  const [isHidden, setIsHidden] = useState(true);
-
-  return (
-    <SeedPhrase
-      words={words}
-      isEditable={true}
-      isHidden={isHidden}
-      className="gap-6"
-      onUpdateWord={(idx, value) => registerSeedPhraseModel.events.updateRepeatWords(ctx, value, idx)}
-    >
-      <SeedPhraseHeader onChangeVisibilityStatus={v => setIsHidden(v)}>
-        <p className="text-neutral-400">
-          {translate["auth.register.seed-phrase.startTitle"]()}
-        </p>
-      </SeedPhraseHeader>
-      <SeedPhraseBody />
-    </SeedPhrase>
-  )
-}, "RegisterSeedPhraseConfirm")
-
-const RegisterSeedPhraseSave = reatomComponent(({ ctx }) => {
-  const words = ctx.spy(registerSeedPhraseModel.state.words)
-  const [isHidden, setIsHidden] = useState(true);
-
-  return (
-    <div className="flex flex-col w-full gap-4">
-      <SeedPhrase
-        isEditable={false}
-        words={words}
-        isHidden={isHidden}
-        className="gap-6"
-      >
-        <SeedPhraseHeader onChangeVisibilityStatus={v => setIsHidden(v)}>
-          <p className="text-neutral-400">
-            {translate["auth.register.seed-phrase.saveTitle"]()}
-          </p>
-        </SeedPhraseHeader>
-        <SeedPhraseBody />
-        <SeedPhraseFooter>
-          <div className="flex items-center justify-end w-full">
-            <Button
-              type="button"
-              background="default"
-              className="gap-2"
-              onClick={() => register.downloadPhrase(ctx)}
-            >
-              {translate["auth.register.seed-phrase.download"]()}
-              <Icon name='sprite:download' className="size-4" />
-            </Button>
-          </div>
-          <p className="text-neutral-400 text-xs text-center">
-            {translate["auth.register.seed-phrase.warning"]()}
-          </p>
-        </SeedPhraseFooter>
-      </SeedPhrase>
-    </div>
-  )
-}, "RegisterSeedPhraseSave")
-
 const RegisterConfirmLoading = () => {
   return (
     <>
@@ -242,8 +180,6 @@ const RegisterConfirmLoading = () => {
 const RegisterConfirmError = reatomComponent(({ ctx }) => {
   const handleToBack = () => {
     spawn(ctx, (spawnCtx) => {
-      registerNavigationModel.back(spawnCtx)
-      registerNavigationModel.back(spawnCtx)
       registerNavigationModel.back(spawnCtx)
     })
   }
@@ -352,8 +288,6 @@ const RegisterNavigation = reatomComponent(({ ctx }) => {
 
 const STEP_COMPONENTS: Record<AuthRegisterType, ReactNode> = {
   "start-input": <RegisterStartInput />,
-  "seed-phrase-save": <RegisterSeedPhraseSave />,
-  "seed-phrase-confirm": <RegisterSeedPhraseConfirm />,
   "confirm": <RegisterConfirm />
 };
 

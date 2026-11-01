@@ -26,21 +26,6 @@ export const createEs = (path: string, init: EventSourceInit) => {
   return new EventSource(`${env.VITE_API_URL}/${path}`, init)
 };
 
-export function downloadFile(content: BlobPart, fileName: string) {
-  const blob = new Blob([content], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-
-  link.click();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 100);
-}
-
 const softwareRenderers = [
   'swiftshader',
   'llvmpipe',

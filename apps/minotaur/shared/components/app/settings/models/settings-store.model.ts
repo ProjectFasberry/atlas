@@ -9,6 +9,7 @@ import { currentUserState } from "@/shared/models/current-user/index.model";
 import { nicknameSchema } from "@/shared/schemas/auth";
 import { DIALOG_DELAY } from "@/shared/consts/index";
 import { getExistNickname } from "@/shared/models/shared.model";
+import { translate } from "@/shared/locales/helpers";
 
 type CartItem = ExtractApiData<"getStoreCartList">["data"]["data"][number]
 
@@ -40,9 +41,9 @@ onConnect(storeGlobalRecipientAtom, (ctx) => {
   initToDefault(ctx);
 });
 
-const ERRORS: Record<string, string> = {
-  "NOT_FOUND": "Такой игрок не зарегистрирован"
-}
+const getRecipientError = (message: string) => message === "NOT_FOUND"
+  ? translate["settings.store.recipient-not-found"]()
+  : translate["settings.errors.title"]()
 
 export const changeLocalRecipientState = atom(null, "changeLocalRecipientState").pipe(
   withAssign((_, name) => ({
@@ -84,7 +85,7 @@ export const changeLocalRecipient = atom(null, "changeLocalRecipient").pipe(
         res.cb(ctx)
 
         changeLocalRecipientState.isOpen.reset(ctx)
-        toast.success("Изменения сохранены");
+        toast.success(translate["settings.store.saved"]());
 
         await sleep(DIALOG_DELAY)
 
@@ -98,7 +99,7 @@ export const changeLocalRecipient = atom(null, "changeLocalRecipient").pipe(
         logError(e)
 
         if (e instanceof Error) {
-          const message = ERRORS[e.message] ?? "Произошла ошибка"
+          const message = getRecipientError(e.message)
           changeLocalRecipientState.error(ctx, message)
         }
       }
@@ -159,7 +160,7 @@ export const changeGlobalRecipient = atom(null, "changeGlobalRecipient").pipe(
         logError(e)
 
         if (e instanceof Error) {
-          const message = ERRORS[e.message] ?? "Произошла ошибка"
+          const message = getRecipientError(e.message)
           changeGlobalRecipientState.error(ctx, message)
         }
       }

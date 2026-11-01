@@ -1,9 +1,9 @@
-import { useUpdate } from '@reatom/npm-react';
+import { useCtx, useIsomorphicEffect, useUpdate } from '@reatom/npm-react';
 import { reatomContext } from '@reatom/npm-react'
 import { type PropsWithChildren } from 'react'
 import { usePageContext } from 'vike-react/usePageContext'
 import { Footer } from '@/shared/components/app/layout/components/footer';
-import { app } from '@/shared/models/app/index.model';
+import { app, syncIsMobile } from '@/shared/models/app/index.model';
 import { ErrorBoundaryProvider } from './error-boundary';
 import { Global } from './global';
 import { useCreateCtx } from '@/shared/lib/reatom/index';
@@ -13,6 +13,16 @@ const Sync = () => {
   const pageCtx = usePageContext()
   return useUpdate((ctx) => app.sync(ctx, pageCtx), [pageCtx])
 }
+
+const MobileSync = () => {
+  const ctx = useCtx();
+
+  useIsomorphicEffect(() => {
+    syncIsMobile(ctx);
+  }, [ctx]);
+
+  return null;
+};
 
 const AppProvider = ({ children }: PropsWithChildren) => {
   useUpdate((ctx) => app.init(ctx), []);
@@ -44,6 +54,7 @@ export const WrapperChild = ({ children }: PropsWithChildren) => {
   return (
     <ReatomProvider>
       <ErrorBoundaryProvider>
+        <MobileSync />
         <Sync />
         <AppProvider>
           {children}

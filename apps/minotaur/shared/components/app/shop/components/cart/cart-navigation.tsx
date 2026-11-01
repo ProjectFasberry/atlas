@@ -3,21 +3,23 @@ import { BackButton } from "@/shared/ui/back-button"
 import { Button } from "@/shared/ui/button"
 import { usePageContext } from "vike-react/usePageContext"
 import { navigate } from "vike/client/router"
+import { translate } from "@/shared/locales/helpers"
 
-const STORE_BADGES = [
-  { title: "Корзина", value: "" },
-  { title: "Заказы", value: "/orders" },
-  { title: "Пополнить счет", value: "/topup", variant: "active" },
+const getStoreBadges = () => [
+  { title: translate["cart.nav.cart"](), value: "" },
+  { title: translate["cart.nav.orders"](), value: "/orders" },
+  { title: translate["cart.nav.top-up"](), value: "/topup", variant: "active" },
 ] as const;
 
 export const CartNavigation = () => {
   const pageCtx = usePageContext()
   const isActive = (path: string) => pageCtx.urlPathname === path;
+  const badges = getStoreBadges();
 
   return (
     <div className={scrollableVariant({ className: "flex items-center overflow-x-auto scrollbar-h-2 gap-1 w-full" })}>
       <BackButton href="/store" />
-      {STORE_BADGES.map((badge) => (
+      {badges.map((badge) => (
         <Button
           key={badge.value}
           background={isActive(`/store/cart${badge.value}`) ? "white" : "default"}

@@ -5,6 +5,7 @@ import { dayjs } from "@/shared/lib/dayjs"
 import { createPageModel } from "@/shared/lib/events"
 import { logout } from "@/shared/components/app/auth/models/logout.model"
 import { banned } from "@/shared/components/app/auth/models/banned.model"
+import { translate } from "@/shared/locales/helpers"
 
 type Banned = {
   reason: string
@@ -21,7 +22,7 @@ const BannedActionButton = reatomComponent(({ ctx }) => {
       disabled={isDisabled}
       className='bg-neutral-50 text-red font-semibold text-lg'
     >
-      Выйти из аккаунта
+      {translate["banned.logout"]()}
     </Button>
   );
 }, "BannedActionButton")
@@ -30,23 +31,23 @@ const Banned = reatomComponent(({ ctx }) => {
   const data = ctx.spy(banned.fetch.dataAtom)
   if (!data) return null;
 
-  const expires = data.expires ? dayjs(data.expires).format('DD.MM.YYYY HH:mm') : "никогда"
+  const expires = data.expires ? dayjs(data.expires).format('DD.MM.YYYY HH:mm') : translate["banned.never"]()
 
   return (
     <div className="flex flex-col gap-y-4 justify-center h-full items-center relative">
       <Typography color="gray" className="text-md font-semibold">
-        Соединение потеряно
+        {translate["banned.connection-lost"]()}
       </Typography>
       <div className="flex flex-col items-center gap-y-4">
         <Typography className="text-xl font-semibold text-red">
-          Вы были заблокированы
+          {translate["banned.title"]()}
         </Typography>
         <div className="flex flex-col items-center">
           <Typography className="text-lg font-semibold text-red">
-            Причина: <span className="text-neutral-50">{data?.reason ?? "не указана"}</span>
+            {translate["banned.reason"]()}: <span className="text-neutral-50">{data?.reason ?? translate["banned.reason-not-specified"]()}</span>
           </Typography>
           <Typography className="text-lg font-semibold text-red">
-            Разбан:{' '}
+            {translate["banned.unban"]()}:{' '}
             <span className="text-neutral-50">
               {expires}
             </span>

@@ -76,7 +76,7 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
           <Dialog.Backdrop className={dialogVariant.backdrop()} />
           <DialogPositioner className={dialogVariant.positioner()}>
             <Dialog.Content className={dialogVariant.content("w-1/4!")}>
-              <Dialog.Title className={dialogVariant.title()}>Изменение пароля</Dialog.Title>
+              <Dialog.Title className={dialogVariant.title()}>{translate["settings.account.change-password-title"]()}</Dialog.Title>
               <form
                 className="flex flex-col gap-6 w-full inert:opacity-60 inert:pointer-events-none"
                 onSubmit={e => changePass.handle(ctx, e)}
@@ -120,12 +120,12 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
   )
 }, "ChangePassword")
 
-const INFO_ACTIONS_LIST = [
+const getInfoActions = () => [
   {
-    label: "Скопировать UUID",
+    label: translate["settings.account.uuid-copy"](),
     action: (value: string) => action(async (ctx) => {
       await navigator.clipboard.writeText(value);
-      toast.success(translate["shared.copyed-to-clipboard"]())
+      toast.success(translate["shared.copy.success"]())
     }),
     value: "copy-uuid"
   }
@@ -135,6 +135,7 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
   if (!currentUser) return null;
 
   const { nickname, avatar, meta, uuid } = currentUser;
+  const infoActions = getInfoActions();
 
   return (
     <div className="flex flex-col gap-4 bg-neutral-800 rounded-xl p-4 w-full h-full">
@@ -144,7 +145,7 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
           {nickname}
         </div>
         <Menu.Root
-          onSelect={({ value }) => INFO_ACTIONS_LIST.find(d => d.value === value)?.action(uuid)(ctx)}
+          onSelect={({ value }) => infoActions.find(d => d.value === value)?.action(uuid)(ctx)}
         >
           <Menu.Trigger className={menuVariant.trigger()}>
             <Icon name="sprite:dots" className="size-[22px] text-neutral-400" />
@@ -152,7 +153,7 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
           <Portal>
             <Menu.Positioner>
               <Menu.Content className={menuVariant.content()}>
-                {INFO_ACTIONS_LIST.map((item) => (
+                {infoActions.map((item) => (
                   <Menu.Item key={item.value} value={item.value} className={menuVariant.item()}>
                     {item.label}
                   </Menu.Item>
@@ -164,10 +165,10 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
       </div>
       <div className="flex flex-col w-full gap-1">
         <span>
-          Регистрация: {dayjs(meta.reg_date.toString()).format("DD.MM.YYYY")}
+          {translate["settings.account.registration"]()}: {dayjs(meta.reg_date.toString()).format("DD.MM.YYYY")}
         </span>
         <span>
-          Роль: {meta.role.name}
+          {translate["settings.account.role"]()}: {meta.role.name}
         </span>
       </div>
     </div>

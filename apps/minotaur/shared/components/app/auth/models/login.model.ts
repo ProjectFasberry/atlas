@@ -1,6 +1,6 @@
 import { client } from "@/shared/lib/client-wrapper";
 import { invariant } from "@/shared/lib/utils";
-import { atom } from "@reatom/framework";
+import { atom, action } from "@reatom/framework";
 import { type AsyncCtx, reatomAsync, spawn, withAssign, withDataAtom, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { onEvent } from "@reatom/web";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
@@ -39,6 +39,7 @@ export const loginState = atom(null, "loginState").pipe(
   withAssign((_, name) => ({
     qr: atom(null, `${name}.qr`).pipe(
       withAssign((_, name) => ({
+        generation: atom(0, `${name}.generation`),
         socket: atom<WebSocket | null>(null, `${name}.socket`).pipe(withReset()),
         url: atom<string | null>(null, `${name}.qrUrl`).pipe(withReset()),
         token: atom<string | null>(null, `${name}.token`).pipe(withReset()),
@@ -141,11 +142,15 @@ export const login = atom(null, "login").pipe(
     qr: atom(null, `${name}.qr`).pipe(
       withAssign((_, name) => ({
         generate: reatomAsync(async (ctx) => {
+          const generation = ctx.get(loginState.qr.generation);
           const visitorId = await login.getVisitorId();
 
           const res = await client
             .post<QRGeneratePayload>("auth/login/qr/generate", { json: { visitorId } })
             .exec();
+
+          // The request may finish after the QR view was closed.
+          if (ctx.get(loginState.qr.generation) !== generation) return;
 
           const pdUrl = new URL(`${env.VITE_API_URL}/auth/login/qr/verify`)
           pdUrl.searchParams.append("token", res.token)
@@ -213,6 +218,16 @@ export const login = atom(null, "login").pipe(
             ctx.controller.abort()
           })
         }, `${name}.events`),
+        close: action((ctx) => {
+          const socket = ctx.get(loginState.qr.socket)
+          socket?.close()
+
+          loginState.qr.generation(ctx, (state) => state + 1)
+          loginState.qr.socket.reset(ctx)
+          loginState.qr.url.reset(ctx)
+          loginState.qr.token.reset(ctx)
+          loginState.qr.status.reset(ctx)
+        }, `${name}.close`),
         verify: atom(null, `${name}.verify`).pipe(
           withAssign((_, name) => ({
             validateToken: reatomAsync(async (ctx, token: string) => {
@@ -302,10 +317,20 @@ export const authLoginVariantAtom = atom<AuthLoginVariant>("password", "authLogi
   })),
 );
 
-export const showResetPasswordAtom = atom((ctx) =>
-  ctx.spy(authState.type) === "login" && ctx.spy(authLoginVariantAtom) === "password",
-  "showResetPassword",
-);
+authLoginVariantAtom.onChange((ctx, state) => {
+  if (state !== "qr") login.qr.close(ctx)
+});
+
+authState.type.onChange((ctx, state) => {
+  if (state !== "login") {
+    login.qr.close(ctx)
+    return;
+  }
+
+  if (ctx.get(authLoginVariantAtom) === "qr") {
+    login.qr.generate(ctx);
+  }
+});
 
 export const authLoginQRIsErrorAtom = atom((ctx) =>
   ctx.spy(login.qr.verify.confirm.errorAtom) || ctx.spy(login.qr.verify.decline.errorAtom),

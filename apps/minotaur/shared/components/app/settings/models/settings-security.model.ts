@@ -4,6 +4,7 @@ import { atom, reatomAsync, withAssign, withCache, withErrorAtom, withReset, wit
 import { action } from "@reatom/framework";
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 import { toast } from "sonner";
+import { translate } from "@/shared/locales/helpers";
 
 export type SessionPayload = ExtractApiData<"getAuthSessionCurrent">["data"]
 export type SesssionsPayload = ExtractApiData<"getAuthSessionList">["data"];
@@ -81,16 +82,16 @@ export const sessions = atom(null, "sessions").pipe(
 
         if (e.message === 'INSUFFICIENT_PERMISSION_BY_TIME') {
           alertDialog.open(ctx, {
-            dialogTitle: "Произошла ошибка",
-            description: "Ради безопасности, вы не сможете выйти из сессии. Подождите несколько часов и повторите попытку",
-            confirmLabel: "Ок",
+            dialogTitle: translate["settings.errors.title"](),
+            description: translate["settings.sessions.forbidden"](),
+            confirmLabel: translate["settings.sessions.ok"](),
             withCancel: false
           })
 
           return;
         }
 
-        toast.error("Произошла ошибка")
+        toast.error(translate["settings.errors.title"]())
       }
     }).pipe(
       withStatusesAtom(),
@@ -101,7 +102,7 @@ export const sessions = atom(null, "sessions").pipe(
 
       if (!isConfirmed) {
         alertDialog.open(ctx, {
-          title: "Вы точно хотите выйти из всех сессий?",
+          title: translate["settings.sessions.end-all-confirm"](),
           onConfirm: () => {
             sessionsState.isConfirmed(ctx, true)
             return sessions.terminateAll(ctx)
@@ -129,16 +130,16 @@ export const sessions = atom(null, "sessions").pipe(
 
         if (e.message === 'INSUFFICIENT_PERMISSION_BY_TIME') {
           alertDialog.open(ctx, {
-            dialogTitle: "Произошла ошибка",
-            description: "Ради безопасности, вы не сможете выйти из остальных сессий. Подождите несколько часов и повторите попытку",
-            confirmLabel: "Ок",
+            dialogTitle: translate["settings.errors.title"](),
+            description: translate["settings.sessions.forbidden-rest"](),
+            confirmLabel: translate["settings.sessions.ok"](),
             withCancel: false
           })
 
           return;
         }
 
-        toast.error("Произошла ошибка")
+        toast.error(translate["settings.errors.title"]())
       }
     }).pipe(
       withStatusesAtom(),

@@ -2,6 +2,7 @@ import { isEmptyArray } from "@/shared/lib/utils";
 import { pageState } from "@/shared/models/page-context.model";
 import { PageLoader } from "@/shared/ui/page-loader";
 import { reatomComponent, useAtom } from "@reatom/npm-react";
+import { atom, type Ctx } from "@reatom/framework";
 import { Typography } from "@/shared/ui/typography"
 import { player } from "@/shared/components/app/player/models/player.model";
 import { createPageModel } from "@/shared/lib/events";
@@ -36,17 +37,34 @@ const PageHeaderWrapper = ({ children, href }: PropsWithChildren & Partial<{ hre
   )
 }
 
+const lastNicknameAtom = atom<string | null>(null, "player-rates.lastNickname")
+
+const loadRates = (ctx: Ctx, nickname: Maybe<string>) => {
+  if (!nickname || ctx.get(lastNicknameAtom) === nickname) return;
+
+  // The model keeps its route-params subscription after the page unmounts,
+  // so ignore navigations that are not the rates route.
+  if (!ctx.get(pageState.urlPathname)?.endsWith("/rates")) return;
+
+  lastNicknameAtom(ctx, nickname);
+  player.rate.refetchAll(ctx, nickname)
+}
+
 const page = createPageModel({
   name: "player-rates",
   hooks: {
     onConnect: (ctx) => {
-      const nickname = ctx.get(pageState.routeParams).nickname;
-      player.rate.refetchAll(ctx, nickname)
+      loadRates(ctx, ctx.get(pageState.routeParams).nickname)
+    },
+    onSpy: (ctx, _, routeParams) => {
+      loadRates(ctx, routeParams.nickname)
     },
     onDisconnect: (ctx) => {
       player.rate.fetchList.abort(ctx)
+      lastNicknameAtom(ctx, null)
     },
-  }
+  },
+  spyedAtom: pageState.routeParams
 })
 
 export default function Page() {

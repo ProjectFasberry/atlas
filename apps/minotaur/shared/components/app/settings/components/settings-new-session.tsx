@@ -67,9 +67,10 @@ const ConnectNewVerifyIdle = reatomComponent(({ ctx }) => {
     <>
       <div className="flex text-base text-neutral-400 w-full text-center leading-5">
         <Typography>
-          Новый запрос на вход с устройства&nbsp;
-          <span className="font-semibold">{browser}</span>&nbsp;из&nbsp;<span className="font-semibold">{geo.city} {geo.country}</span>.
-          Подтвердите, что это вы.
+          {translate["settings.devices.new-session.request"]({
+            browser,
+            location: `${geo.city} ${geo.country}`
+          })}
         </Typography>
       </div>
       <div className="flex flex-col sm:flex-row mt-4 items-center gap-2 w-full justify-center">

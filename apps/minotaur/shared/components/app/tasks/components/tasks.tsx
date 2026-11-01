@@ -76,7 +76,8 @@ const TaskItemSkeleton = () => {
 const TaskItem = (
   { title, description, reward_value, action_type, action_value, reward_currency }: TaskItemProps
 ) => {
-  const action = ACTION[action_type](action_value!)
+  const renderAction = ACTION[action_type];
+  const action = action_value && renderAction ? renderAction(action_value) : null;
 
   return (
     <div className={taskItemVariant().base()}>
