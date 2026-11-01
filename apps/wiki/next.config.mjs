@@ -6,6 +6,8 @@ const directory = path.dirname(fileURLToPath(import.meta.url));
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  // the shared kit ships TypeScript sources
+  transpilePackages: ['@repo/ui'],
   output: 'standalone',
   // the app lives in a pnpm workspace, so tracing has to start at the monorepo root
   outputFileTracingRoot: path.join(directory, '../..'),

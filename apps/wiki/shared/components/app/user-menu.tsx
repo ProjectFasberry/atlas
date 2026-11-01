@@ -4,9 +4,10 @@ import { Menu } from '@ark-ui/react/menu';
 import { Portal } from '@ark-ui/react/portal';
 import { reatomComponent } from '@reatom/npm-react';
 import { IconPencil } from '@tabler/icons-react';
+import { Avatar, Chip } from '@repo/ui';
 import { m } from '@/paraglide/messages';
 import { $locale } from '@/shared/models/locale.model';
-import { DEFAULT_AVATAR, $userMenuOpen, $viewer, setUserMenuOpen } from '@/shared/models/viewer.model';
+import { $userMenuOpen, $viewer, setUserMenuOpen } from '@/shared/models/viewer.model';
 
 /**
  * Signed-in user badge: the head of the player skin, and the trigger of the content menu
@@ -23,33 +24,15 @@ export const UserMenu = reatomComponent(({ ctx }) => {
       <Menu.Trigger
         aria-label={m['user.menu']({}, { locale })}
         className="
-          relative flex size-8 items-center justify-center overflow-hidden rounded-sm border
-          border-fd-border bg-fd-muted transition hover:border-fd-primary
+          relative block size-8 rounded-sm transition hover:opacity-90
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fd-ring
         "
       >
-        {viewer.avatar ? (
-          <img
-            ref={(image) => {
-              // the request may have failed before hydration, when onError does not fire
-              if (image?.complete && image.naturalWidth === 0) image.src = DEFAULT_AVATAR;
-            }}
-            src={viewer.avatar}
-            onError={(event) => {
-              event.currentTarget.onerror = null;
-              event.currentTarget.src = DEFAULT_AVATAR;
-            }}
-            alt=""
-            width={32}
-            height={32}
-            loading="eager"
-            className="size-8 object-cover [image-rendering:pixelated]"
-          />
-        ) : (
-          <span className="text-sm font-semibold uppercase text-fd-muted-foreground">
-            {viewer.nickname.slice(0, 1)}
-          </span>
-        )}
+        <Avatar
+          url={viewer.avatar}
+          nickname={viewer.nickname}
+          className="size-8 border-fd-border bg-fd-muted"
+        />
       </Menu.Trigger>
 
       <Portal>
@@ -70,15 +53,10 @@ export const UserMenu = reatomComponent(({ ctx }) => {
                 className="outline-none"
                 aria-label={m['layout.editor-badge']({}, { locale })}
               >
-                <span
-                  className="
-                    inline-flex items-center gap-1.5 rounded-full border border-fd-primary/30
-                    bg-fd-primary/10 px-2.5 py-1 text-xs font-medium text-fd-primary
-                  "
-                >
+                <Chip className="border-fd-primary/30 bg-fd-primary/10 text-fd-primary">
                   <IconPencil size={13} stroke={2} aria-hidden />
                   {m['layout.editor-badge']({}, { locale })}
-                </span>
+                </Chip>
               </Menu.Item>
             ) : null}
           </Menu.Content>
