@@ -2,11 +2,10 @@ import { headers } from 'next/headers';
 import { cache } from 'react';
 import { getServerEnv } from '@/lib/env/server';
 import { http } from '@/lib/utils/http';
+import { DEFAULT_AVATAR } from '@/shared/models/viewer.model';
 
 export type Editor = { id: string; name: string };
 
-/** Steve head from the public volume, the same fallback the app uses when a skin is missing. */
-export const DEFAULT_AVATAR = 'https://volume.fasberry.fun/static/fallback/steve_head.png';
 
 /** Who is signed in by the session cookie, and whether that user may edit. */
 export type Viewer = { nickname: string; canEdit: boolean; avatar: string | null };

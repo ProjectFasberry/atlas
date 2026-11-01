@@ -6,7 +6,7 @@ import { reatomComponent } from '@reatom/npm-react';
 import { IconPencil } from '@tabler/icons-react';
 import { m } from '@/paraglide/messages';
 import { $locale } from '@/shared/models/locale.model';
-import { $userMenuOpen, $viewer, setUserMenuOpen } from '@/shared/models/viewer.model';
+import { DEFAULT_AVATAR, $userMenuOpen, $viewer, setUserMenuOpen } from '@/shared/models/viewer.model';
 
 /**
  * Signed-in user badge: the head of the player skin, and the trigger of the content menu
@@ -30,10 +30,19 @@ export const UserMenu = reatomComponent(({ ctx }) => {
       >
         {viewer.avatar ? (
           <img
+            ref={(image) => {
+              // the request may have failed before hydration, when onError does not fire
+              if (image?.complete && image.naturalWidth === 0) image.src = DEFAULT_AVATAR;
+            }}
             src={viewer.avatar}
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = DEFAULT_AVATAR;
+            }}
             alt=""
             width={32}
             height={32}
+            loading="eager"
             className="size-8 object-cover [image-rendering:pixelated]"
           />
         ) : (
