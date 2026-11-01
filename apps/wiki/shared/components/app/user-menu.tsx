@@ -1,14 +1,16 @@
 'use client';
 
+import { Menu } from '@ark-ui/react/menu';
+import { Portal } from '@ark-ui/react/portal';
 import { reatomComponent } from '@reatom/npm-react';
 import { IconPencil } from '@tabler/icons-react';
 import { m } from '@/paraglide/messages';
 import { $locale } from '@/shared/models/locale.model';
-import { $userMenuOpen, $viewer, toggleUserMenu } from '@/shared/models/viewer.model';
+import { $userMenuOpen, $viewer, setUserMenuOpen } from '@/shared/models/viewer.model';
 
 /**
- * Signed-in user badge: the head of the player skin. It is also the trigger of the
- * dropdown that holds the editor chip, so the header stays quiet for readers.
+ * Signed-in user badge: the head of the player skin, and the trigger of the content menu
+ * (ark-ui, the same one the app uses). Readers see nothing here.
  */
 export const UserMenu = reatomComponent(({ ctx }) => {
   const viewer = ctx.spy($viewer);
@@ -17,12 +19,8 @@ export const UserMenu = reatomComponent(({ ctx }) => {
   if (!viewer) return null;
 
   return (
-    <div className="relative" data-user-menu="">
-      <button
-        type="button"
-        onClick={() => toggleUserMenu(ctx)}
-        aria-haspopup="menu"
-        aria-expanded={open}
+    <Menu.Root open={open} onOpenChange={({ open: next }) => setUserMenuOpen(ctx, next)}>
+      <Menu.Trigger
         aria-label={m['user.menu']({}, { locale })}
         className="
           relative flex size-8 items-center justify-center overflow-hidden rounded-full
@@ -43,33 +41,40 @@ export const UserMenu = reatomComponent(({ ctx }) => {
             {viewer.nickname.slice(0, 1)}
           </span>
         )}
-      </button>
+      </Menu.Trigger>
 
-      {open ? (
-        <div
-          role="menu"
-          aria-label={viewer.nickname}
-          className="
-            absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border
-            border-fd-border bg-fd-popover p-1.5 text-fd-popover-foreground shadow-lg
-          "
-        >
-          <div className="truncate px-2.5 py-2 text-sm font-semibold">{viewer.nickname}</div>
-          {viewer.canEdit ? (
-            <div className="flex items-center px-1 pb-1">
-              <span
-                className="
-                  inline-flex items-center gap-1.5 rounded-full border border-fd-primary/30
-                  bg-fd-primary/10 px-2.5 py-1 text-xs font-medium text-fd-primary
-                "
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content
+            className="
+              z-50 min-w-56 rounded-xl border border-fd-border bg-fd-popover p-1.5
+              text-fd-popover-foreground shadow-lg outline-none
+              data-[state=open]:animate-in data-[state=open]:fade-in
+              data-[state=closed]:animate-out data-[state=closed]:fade-out
+            "
+          >
+            <div className="truncate px-2.5 py-2 text-sm font-semibold">{viewer.nickname}</div>
+            {viewer.canEdit ? (
+              <Menu.Item
+                value="editor"
+                closeOnSelect={false}
+                className="outline-none"
+                aria-label={m['layout.editor-badge']({}, { locale })}
               >
-                <IconPencil size={13} stroke={2} aria-hidden />
-                {m['layout.editor-badge']({}, { locale })}
-              </span>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+                <span
+                  className="
+                    inline-flex items-center gap-1.5 rounded-full border border-fd-primary/30
+                    bg-fd-primary/10 px-2.5 py-1 text-xs font-medium text-fd-primary
+                  "
+                >
+                  <IconPencil size={13} stroke={2} aria-hidden />
+                  {m['layout.editor-badge']({}, { locale })}
+                </span>
+              </Menu.Item>
+            ) : null}
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu.Root>
   );
 });
