@@ -11,6 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Return static welcome HTML */
         get: operations["getIndex"];
         put?: never;
         post?: never;
@@ -1140,23 +1141,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/server-ip": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get server IP */
-        get: operations["getServer-ip"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/servers-with-map": {
         parameters: {
             query?: never;
@@ -1166,6 +1150,40 @@ export interface paths {
         };
         /** Get servers with map */
         get: operations["getServers-with-map"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/launcher": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Launcher builds */
+        get: operations["getLauncher"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/launcher/{platform}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download launcher */
+        get: operations["getLauncherByPlatform"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1293,6 +1311,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/wiki/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who may edit the wiki */
+        get: operations["getWikiAccess"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/misc/currencies": {
         parameters: {
             query?: never;
@@ -1333,6 +1368,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getMiscById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/static/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get presigned content manifest */
+        get: operations["getStaticManifest"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1487,6 +1539,57 @@ export interface paths {
         put?: never;
         /** Generate game code */
         post: operations["postAuthLoginGameGenerate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/client/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Launcher login */
+        post: operations["postAuthClientLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/client/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Validate launcher session */
+        get: operations["getAuthClientValidate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/client/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Launcher logout */
+        post: operations["postAuthClientLogout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4937,30 +5040,6 @@ export interface operations {
             };
         };
     };
-    "getServer-ip": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            ip: (string | null) | null;
-                        };
-                    };
-                };
-            };
-        };
-    };
     "getServers-with-map": {
         parameters: {
             query?: never;
@@ -4987,6 +5066,49 @@ export interface operations {
                 };
             };
         };
+    };
+    getLauncher: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            artifacts: {
+                                /**
+                                 * @default windows-x86_64
+                                 * @enum {string}
+                                 */
+                                platform: "windows-x86_64" | "darwin-aarch64";
+                                url: (string | null) | null;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getLauncherByPlatform: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                platform: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
     };
     "getRandom-fact": {
         parameters: {
@@ -5213,6 +5335,33 @@ export interface operations {
             };
         };
     };
+    getWikiAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            canEdit: boolean;
+                            id: (string | null) | null;
+                            name: (string | null) | null;
+                            nickname: (string | null) | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     getMiscCurrencies: {
         parameters: {
             query?: never;
@@ -5295,6 +5444,16 @@ export interface operations {
                 };
             };
         };
+    };
+    getStaticManifest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
     };
     postAuthLoginBasic: {
         parameters: {
@@ -5664,6 +5823,83 @@ export interface operations {
                 };
             };
         };
+    };
+    postAuthClientLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    nickname: string;
+                    password: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    nickname: string;
+                    password: string;
+                };
+                "multipart/form-data": {
+                    nickname: string;
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                            token: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_EXISTS
+                         * @enum {string}
+                         */
+                        error: "NOT_EXISTS" | "PASSWORD_OR_LOGIN_INCORRECT";
+                    };
+                };
+            };
+        };
+    };
+    getAuthClientValidate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postAuthClientLogout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
     };
     "postAuthInvalidate-session": {
         parameters: {
