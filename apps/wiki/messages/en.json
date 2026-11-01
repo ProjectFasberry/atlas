@@ -16,6 +16,9 @@
   "language": {
     "toggle": "Switch language"
   },
+  "user": {
+    "menu": "Profile menu"
+  },
   "editor": {
     "edit": "Edit",
     "title-label": "Page title",

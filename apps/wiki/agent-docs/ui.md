@@ -20,6 +20,10 @@ The goal is to match `app.fasberry.fun`: 80px tall.
 #nd-subnav [data-header-body] { height: 5rem; }
 ```
 
+The right side of the header is `shared/ui/header-controls.tsx`: the language switch, the theme
+switch and, for a signed-in user, the skin-head badge (`shared/components/app/user-menu.tsx`) whose
+dropdown holds the "Editor" chip. The badge is filled from the server through `$viewer`.
+
 `lib/ui/layout.tsx` defines `nav.title`: the `/favicon.svg` image at 40x40, the name
 `Fasberry` in PIXY and a small `wiki` under it (`subscript`), like on the main site. The same
 file holds the Fumadocs translations (`i18nProvider(translations)`).

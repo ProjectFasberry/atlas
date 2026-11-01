@@ -39,7 +39,8 @@ the public bucket (`volume.fasberry.fun`). Editor uploads go to `wiki_images`; a
 ## Editing
 
 The backend decides who may edit, using the session cookie. With access granted an "Edit" button
-appears and the "Editor" badge shows in the corner. Editing happens in place - title, description
+appears and your skin head shows in the header, the "Editor" chip sits in its menu. Editing
+happens in place - title, description
 and body with headings, lists, quotes, links, images (up to 8 MB) and tables; every save goes into
 the revision history.
 

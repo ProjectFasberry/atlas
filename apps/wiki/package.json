@@ -19,6 +19,7 @@
     "translate:content": "node scripts/translate-content.mjs"
   },
   "dependencies": {
+    "@ark-ui/react": "5.36.2",
     "@reatom/core": "3.10.3",
     "@reatom/framework": "3.4.68",
     "@reatom/npm-react": "3.10.6",
