@@ -23,8 +23,8 @@ export const UserMenu = reatomComponent(({ ctx }) => {
       <Menu.Trigger
         aria-label={m['user.menu']({}, { locale })}
         className="
-          relative flex size-8 items-center justify-center overflow-hidden rounded-full
-          bg-fd-muted ring-1 ring-fd-border transition hover:ring-fd-primary
+          relative flex size-8 items-center justify-center overflow-hidden rounded-sm border
+          border-fd-border bg-fd-muted transition hover:border-fd-primary
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fd-ring
         "
       >
