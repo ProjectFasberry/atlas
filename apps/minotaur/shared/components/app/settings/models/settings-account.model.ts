@@ -4,6 +4,30 @@ import { action, atom, reatomAsync, withAssign, withErrorAtom, withReset, withSt
 import { settings, } from "./settings.model"
 import { toast } from "sonner"
 import { isError } from "@/shared/lib/utils"
+import { passwordSchema } from "@/shared/schemas/auth"
+import { translate } from "@/shared/locales/helpers"
+
+/** The API answers with machine codes; the modal shows human texts. */
+const CHANGE_PASSWORD_ERRORS: Record<string, string> = {
+  PASSWORD_OR_LOGIN_INCORRECT: translate["auth.shared.errors.password-or-login-incorrect"](),
+  PASSWORD_IS_UNSAFE: translate["auth.shared.errors.password-is-unsafe"](),
+  NOT_FOUND: translate["auth.shared.errors.not-exists"](),
+}
+
+function firstIssueMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    try {
+      const issues = JSON.parse(String((error as { message: unknown }).message))
+      const message = Array.isArray(issues) ? issues[0]?.message : null
+
+      if (typeof message === "string") return message
+    } catch {
+      // not a serialized zod error, fall through
+    }
+  }
+
+  return "Некорректный пароль"
+}
 
 export const settingsAccountModel = () => {
   const deleteAccount = atom(null, "deleteAccount").pipe(
@@ -30,7 +54,7 @@ export const settingsAccountModel = () => {
         },
         onReject: (_, e) => {
           if (isError(e)) {
-            toast.error(e.message)
+            toast.error(CHANGE_PASSWORD_ERRORS[e.message] ?? e.message)
           }
         }
       }).pipe(
@@ -80,7 +104,7 @@ export const settingsAccountModel = () => {
         },
         onReject: (_, e) => {
           if (isError(e)) {
-            toast.error(e.message)
+            toast.error(CHANGE_PASSWORD_ERRORS[e.message] ?? e.message)
           }
         }
       }).pipe(
@@ -99,6 +123,13 @@ export const settingsAccountModel = () => {
         }
 
         const repeatPass = ctx.get(changePassState.newPassRepeat);
+
+        const parsed = passwordSchema.safeParse(newPass)
+
+        if (!parsed.success) {
+          changePass.submit.errorAtom(ctx, new Error(firstIssueMessage(parsed.error)))
+          return;
+        }
 
         if (currentPass === newPass) {
           changePass.submit.errorAtom(ctx, new Error("Новый пароль должен отличаться"))

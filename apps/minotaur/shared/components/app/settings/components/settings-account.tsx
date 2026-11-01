@@ -36,9 +36,24 @@ const SettingsMainDeleteAccount = reatomComponent(({ ctx }) => {
 }, "DeleteAccount")
 
 const CHANGE_PASSWORD_FIELDS = [
-  { placeholder: translate["settings.account.sections.password-and-authentication.current-password"](), value: changePassState.currentPass },
-  { placeholder: translate["settings.account.sections.password-and-authentication.new-password"](), value: changePassState.newPass },
-  { placeholder: translate["settings.account.sections.password-and-authentication.repeat-password"](), value: changePassState.newPassRepeat }
+  {
+    type: "password",
+    autoComplete: "current-password",
+    placeholder: translate["settings.account.sections.password-and-authentication.current-password"](),
+    value: changePassState.currentPass
+  },
+  {
+    type: "password",
+    autoComplete: "new-password",
+    placeholder: translate["settings.account.sections.password-and-authentication.new-password"](),
+    value: changePassState.newPass
+  },
+  {
+    type: "password",
+    autoComplete: "new-password",
+    placeholder: translate["settings.account.sections.password-and-authentication.repeat-password"](),
+    value: changePassState.newPassRepeat
+  }
 ]
 
 const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
@@ -71,7 +86,11 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
                   {CHANGE_PASSWORD_FIELDS.map((field, idx) => (
                     <Input
                       key={idx}
+                      type={field.type}
+                      autoComplete={field.autoComplete}
                       placeholder={field.placeholder}
+                      minLength={6}
+                      maxLength={32}
                       required
                       value={ctx.spy(field.value)}
                       onChange={e => field.value(ctx, e.target.value)}
