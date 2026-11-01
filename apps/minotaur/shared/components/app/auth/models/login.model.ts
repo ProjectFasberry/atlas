@@ -86,6 +86,10 @@ export const login = atom(null, "login").pipe(
             return;
           }
 
+          // CAP tokens are single use: drop it right away, so the next attempt
+          // asks for a new one instead of sending a burned token.
+          if (token) authState.token.reset(ctx);
+
           authState.isProcessing(ctx, true);
 
           const { success, error, data: json } = loginSchema.safeParse({

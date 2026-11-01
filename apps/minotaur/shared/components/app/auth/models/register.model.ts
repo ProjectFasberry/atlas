@@ -108,6 +108,9 @@ export const register = atom(null, "register").pipe(
           return false;
         }
 
+        // CAP tokens are single use.
+        if (token) authState.token.reset(ctx);
+
         authState.isProcessing(ctx, true);
         register.submit(ctx, token);
 
@@ -186,6 +189,8 @@ export const register = atom(null, "register").pipe(
           registerState.type(ctx, "confirm");
 
           const token = ctx.get(authState.token);
+
+          if (token) authState.token.reset(ctx);
           register.submit(spawnCtx, token);
         }
 
