@@ -25,7 +25,7 @@ export const createMainHeaderLinks = () => ([
     childs: [
       { name: translate["header.links.account"](), href: APP_URL, },
       { name: translate["header.links.map"](), href: `${APP_URL}/map`, },
-      { name: translate["header.links.wiki"](), href: "/wiki", },
+      { name: translate["header.links.wiki"](), href: "https://wiki.fasberry.fun", },
       { name: translate["header.links.modpack"](), href: "/modpack", },
     ],
   },

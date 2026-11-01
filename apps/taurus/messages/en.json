@@ -99,29 +99,19 @@
     }
   },
   "start": {
-    "copy-ip": "Copy IP",
-    "not-available": "not available",
-    "loading": "loading...",
     "template": {
-      "server-name": "Server name",
-      "server-mc": "Minecraft Server",
-      "server-addr": "Server address",
-      "rp-enabled": "Resource Packs: Enabled",
-      "rp-tip": "The server uses a resource pack. This must be left enabled!",
-      "done": "Done",
       "register": "Register",
       "register-project": "on the project.",
       "register-after": "After registering, make sure you have successfully logged into the forum and the personal dashboard.",
       "steps": {
         "title": "How to start playing",
-        "login": "Log into the Minecraft client using the username you specified during registration",
-        "login-tip-pirate": "If using a cracked client, I recommend:",
-        "login-tip-license": "If using a licensed client, I recommend:",
-        "luckily-game": "Have a great game!"
+        "luckily-game": "Have a great game!",
+        "download": "The server is only reachable through the Fasberry launcher. Download it and sign in with the nickname you used to register.",
+        "download-windows": "Download for Windows",
+        "download-macos": "Download for macOS",
+        "download-hint": "dev build, 2.3 MB, Windows 10/11 x64. The macOS build is coming later.",
+        "download-macos-soon": "macOS - soon"
       }
-    },
-    "shared": {
-      "click": "*click"
     }
   },
   "error-page": {
@@ -164,9 +154,6 @@
     "support": {
       "title": "Support",
       "description": "Help develop the Fasberry project by supporting us! Your contribution will go toward developing servers, improving the gaming experience, and creating unique content for players."
-    },
-    "wiki": {
-      "not-found": "Article not found"
     },
     "start-play": {
       "title": "Start Playing",

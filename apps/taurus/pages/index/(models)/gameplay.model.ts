@@ -34,7 +34,7 @@ export const createIdeas = () => ([
     image: getStaticObject("images", "custom-armor.webp"),
     link: {
       title: translate["gameplay.shared.get-more"](),
-      href: "/wiki/resourcepack"
+      href: "https://wiki.fasberry.fun/"
     },
     description: translate["gameplay.4.description"](),
     type: "module"
@@ -44,7 +44,7 @@ export const createIdeas = () => ([
     image: getStaticObject("images", "emotes-preview.webp"),
     link: {
       title: translate["gameplay.shared.get-more"](),
-      href: "/wiki/emotes"
+      href: "https://wiki.fasberry.fun/"
     },
     description: translate["gameplay.5.description"](),
     type: "module"
