@@ -1,7 +1,7 @@
 import { isMarkdownPreferred, rewritePath } from 'fumadocs-core/negotiation';
 import { type NextRequest, NextResponse } from 'next/server';
-import { detectLocale, LOCALE_COOKIE } from '@/lib/i18n';
-import { docsContentRoute } from '@/lib/shared';
+import { docsContentRoute } from '@/lib/content/routes';
+import { detectLocale, LOCALE_COOKIE } from '@/lib/i18n/locale';
 import { isLocale } from '@/paraglide/runtime';
 
 const { rewrite: rewriteMarkdown } = rewritePath(

@@ -1,8 +1,8 @@
 import { defineTranslations } from 'fumadocs-core/i18n';
 import { uiTranslations } from 'fumadocs-ui/i18n';
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import { appName } from '@/lib/content/routes';
 import { HeaderControls } from '@/shared/ui/header-controls';
-import { appName } from './shared';
 
 /** Library defaults (English), used for every locale except ru. */
 export const defaultTranslations = defineTranslations().extend(uiTranslations());

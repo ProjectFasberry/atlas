@@ -1,4 +1,4 @@
-import { siteUrl } from '@/lib/shared';
+import { publicEnv } from '@/lib/env/public';
 
 export const SITE_NAME = 'Fasberry Wiki';
 export const SITE_LOCALE = 'ru_RU';
@@ -27,7 +27,7 @@ export const SOCIAL_LINKS = ['https://t.me/fasberry'];
 
 export const ORGANIZATION = {
   '@type': 'Organization',
-  '@id': `${siteUrl}/#organization`,
+  '@id': `${publicEnv.siteUrl}/#organization`,
   name: SITE_PUBLISHER,
   url: SITE_PUBLISHER_URL,
   sameAs: SOCIAL_LINKS,

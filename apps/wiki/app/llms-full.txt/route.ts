@@ -1,6 +1,6 @@
 import { llms } from 'fumadocs-core/source';
-import { getPageMarkdown } from '@/lib/pages';
-import { source } from '@/lib/source';
+import { getPageMarkdown } from '@/lib/content/pages';
+import { source } from '@/lib/content/source';
 
 export const dynamic = 'force-dynamic';
 

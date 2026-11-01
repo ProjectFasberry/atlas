@@ -1,5 +1,5 @@
-import { siteUrl } from '@/lib/shared';
-import { ORGANIZATION, SITE_LANGUAGE, SITE_NAME } from './site';
+import { publicEnv } from '@/lib/env/public';
+import { ORGANIZATION, SITE_LANGUAGE, SITE_NAME } from '@/lib/seo/site';
 
 type ArticleJsonLdInput = {
   title: string;
@@ -16,17 +16,17 @@ export function homeJsonLd(description: string) {
     '@graph': [
       {
         '@type': 'WebSite',
-        '@id': `${siteUrl}/#website`,
+        '@id': `${publicEnv.siteUrl}/#website`,
         name: SITE_NAME,
-        url: siteUrl,
+        url: publicEnv.siteUrl,
         inLanguage: SITE_LANGUAGE,
         description,
-        publisher: { '@id': `${siteUrl}/#organization` },
+        publisher: { '@id': `${publicEnv.siteUrl}/#organization` },
         potentialAction: {
           '@type': 'SearchAction',
           target: {
             '@type': 'EntryPoint',
-            urlTemplate: `${siteUrl}/api/search?query={search_term_string}`,
+            urlTemplate: `${publicEnv.siteUrl}/api/search?query={search_term_string}`,
           },
           'query-input': 'required name=search_term_string',
         },
@@ -50,7 +50,7 @@ export function articleJsonLd({ title, description, url, image, updatedAt }: Art
         inLanguage: SITE_LANGUAGE,
         dateModified: updatedAt.toISOString(),
         image,
-        isPartOf: { '@id': `${siteUrl}/#website` },
+        isPartOf: { '@id': `${publicEnv.siteUrl}/#website` },
         publisher: ORGANIZATION,
       },
       ORGANIZATION,

@@ -4,14 +4,14 @@
 
 PostgreSQL. Connection from `DATABASE_URL`, or from the standard `PG*` variables
 (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`) when the password cannot be put into
-a URI without escaping. `lib/db.ts` keeps one pool per process (`WIKI_DB_POOL_MAX`, 8 by default).
+a URI without escaping. `lib/db/index.ts` keeps one pool per process (`WIKI_DB_POOL_MAX`, 8 by default).
 
-Schema: `lib/schema.ts` (drizzle `pgTable` definitions). Migrations are generated into `drizzle/`
+Schema: `lib/db/schema.ts` (drizzle `pgTable` definitions). Migrations are generated into `drizzle/`
 and applied by the application on start (`drizzle-orm` migrator, journal table
 `public.wiki_migrations`), so a fresh database and a fresh container need no manual step. The
 image ships `drizzle/`; `WIKI_MIGRATIONS_DIR` overrides its location.
 
-Queries go through drizzle (`lib/db.ts` exposes `database()`, `getDb()` and the schema), so a row
+Queries go through drizzle (`lib/db/index.ts` exposes `database()`, `getDb()` and the schema), so a row
 type comes from `typeof wikiPages.$inferSelect` rather than a hand-written interface.
 
 ### `wiki_pages`
@@ -31,7 +31,7 @@ type comes from `typeof wikiPages.$inferSelect` rather than a hand-written inter
 
 Edit history written by the editor: `id` (identity), `slug` (FK to `wiki_pages`, `ON DELETE
 CASCADE`), `title`, `description`, `html`, `created_at`, `author`. Written in the same transaction
-as the page update (`savePage` in `lib/pages.ts`). There is no rollback UI yet - the data is there.
+as the page update (`savePage` in `lib/content/pages.ts`). There is no rollback UI yet - the data is there.
 
 ### `wiki_images`
 
@@ -52,18 +52,23 @@ pnpm db:export                    # PostgreSQL -> content/seed.json
 
 - `sync-wiki.mjs` calls `WIKI_API_URL` (default `https://api.fasberry.fun`) for
   `/wiki/categories` and `/wiki/category/{slug}`, converts TipTap JSON into HTML/markdown and
-  downloads images into `public/images/wiki/<slug>/`. An unavailable image is replaced with a
-  placeholder and the reason goes to `content/wiki-sync-report.json` (not tracked by git).
-  The `--skip-images` flag skips images.
+  writes pages into PostgreSQL. Images stay in the public bucket: the script only normalises
+  legacy addresses (`volume.fasberry.su`, local MinIO) to `volume.fasberry.fun` and reports the
+  skipped nodes in `content/wiki-sync-report.json` (not tracked by git).
 - `db-import.mjs` reads the local `content/seed.json` (ignored by git); if `content/docs/*.mdx` exists next to it (the old
   migration), it uses those. Without `--force` it does not overwrite pages with `source = 'editor'`.
 - `db-export.mjs` writes a snapshot of `wiki_pages` into `content/seed.json` (local, not in git). Images from
   `wiki_images` do not go into the snapshot - a full backup is a `pg_dump`.
-- `drizzle-kit generate` (`pnpm db:generate`) writes a new migration from `lib/schema.ts`;
+- `drizzle-kit generate` (`pnpm db:generate`) writes a new migration from `lib/db/schema.ts`;
   `drizzle-kit migrate` (`pnpm db:migrate`) applies the pending ones by hand, which the app does
   on start anyway.
 
 ## Environment variables
+
+Every server variable is declared once in `lib/env/server.ts` (zod 4) and read through
+`getServerEnv()`: the schema is parsed on first use, so a build without secrets passes and a broken
+deploy fails with a readable message. Client values live in `lib/env/public.ts` (`publicEnv.siteUrl`),
+because `process.env.NEXT_PUBLIC_*` has to be read literally to be inlined.
 
 | Variable | Where | Meaning |
 | --- | --- | --- |

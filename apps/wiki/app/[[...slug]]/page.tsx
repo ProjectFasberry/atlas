@@ -2,11 +2,18 @@ import { DocsPage } from 'fumadocs-ui/layouts/notebook/page';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getEditor } from '@/lib/auth';
-import { getLocale } from '@/lib/i18n';
-import { getLocalizedPage, getPage, pageDescription, pageUrl, renderPageHtml } from '@/lib/pages';
+import {
+  getLocalizedPage,
+  getPage,
+  pageDescription,
+  pageUrl,
+  renderPageHtml,
+} from '@/lib/content/pages';
+import { getPageImageUrl, getPageMarkdownUrl } from '@/lib/content/routes';
+import { publicEnv } from '@/lib/env/public';
+import { getLocale } from '@/lib/i18n/locale';
 import { articleJsonLd, homeJsonLd } from '@/lib/seo/jsonld';
 import { pageMetadata } from '@/lib/seo/metadata';
-import { getPageImageUrl, getPageMarkdownUrl, siteUrl } from '@/lib/shared';
 import { WikiPage } from '@/shared/components/wiki/wiki-page';
 import { pageIcon } from '@/shared/ui/page-icons';
 
@@ -23,9 +30,9 @@ export default async function Page(props: PageProps<'/[[...slug]]'>) {
   const { html, toc } = renderPageHtml(page);
   const markdownUrl = getPageMarkdownUrl(slug).url;
   const editor = await getEditor();
-  const url = `${siteUrl}${pageUrl(slug)}`;
+  const url = `${publicEnv.siteUrl}${pageUrl(slug)}`;
   const description = pageDescription(page);
-  const image = `${siteUrl}${getPageImageUrl(slug).url}`;
+  const image = `${publicEnv.siteUrl}${getPageImageUrl(slug).url}`;
 
   const jsonLd =
     slug === ''

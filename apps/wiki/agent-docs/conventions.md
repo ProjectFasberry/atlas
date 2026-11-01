@@ -5,7 +5,7 @@
 - TypeScript, function components, named exports.
 - Imports use the `@/` alias (see `tsconfig.json`).
 - Styling is Tailwind v4 + Fumadocs tokens (`bg-fd-card`, `text-fd-muted-foreground`,
-  `border-fd-border`, `ring-fd-ring`); classes are joined with `cn` from `lib/cn.ts`.
+  `border-fd-border`, `ring-fd-ring`); classes are joined with `cn` from `lib/utils/cn.ts`.
 - Comments explain "why", not "what", and follow the style of the surrounding code.
 - Keep changes minimal, do not refactor neighbouring code.
 
@@ -38,11 +38,11 @@ selected tab, drafts) goes to atoms as well. The locale follows the same rule: `
 
 ## Database
 
-- Drizzle ORM, never raw SQL in application code: `const db = await database()` from `lib/db.ts`,
-  tables from `lib/schema.ts`. Types come from `typeof wikiPages.$inferSelect`.
+- Drizzle ORM, never raw SQL in application code: `const db = await database()` from `lib/db/index.ts`,
+  tables from `lib/db/schema.ts`. Types come from `typeof wikiPages.$inferSelect`.
 - The pool and the drizzle instance are cached on `globalThis`, one per process.
 - Writes that touch more than one row go through `db.transaction` (see `savePage`).
-- `lib/schema.ts` is the source of truth. After changing it run `pnpm db:generate`, commit the new
+- `lib/db/schema.ts` is the source of truth. After changing it run `pnpm db:generate`, commit the new
   file in `drizzle/`; migrations are applied by the app on start (`public.wiki_migrations`).
 - `content/` is local only (`/content/` in `.gitignore`): `seed.json` is an export without
   images; a full backup is `pg_dump`.
@@ -70,7 +70,8 @@ make -C apps/wiki build BUILDER=im   # linux/amd64, pushes registry.fasberry.fun
 
 The app lives in the pnpm workspace, so the build context is the repository root and
 `next.config.mjs` sets `outputFileTracingRoot` to it. Dependencies come from the root
-`pnpm-lock.yaml`; `apps/wiki` is excluded from the root biome config for now.
+`pnpm-lock.yaml`. Biome is switched off for this app for now: the root config excludes
+`apps/wiki` and there is no local config, so `pnpm lint` here checks nothing.
 
 `BUILDER=im` is a docker buildx builder over ssh to the `i-m` host (`ssh://i-m`,
 `docker-container` driver), so the image is built natively on x86 instead of QEMU on the arm64
@@ -104,5 +105,5 @@ Notes:
 ## Checks
 
 - `pnpm --filter wiki type-check` - `next typegen` + `tsc --noEmit`.
-- Quick check after deploy: `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3006/`
+- Quick check after deploy: `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3007/`
 - Test the theme animation in Chromium and Firefox separately: the paths differ.

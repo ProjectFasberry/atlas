@@ -1,8 +1,8 @@
 import { asc } from 'drizzle-orm';
 import { dynamicLoader } from 'fumadocs-core/source';
+import { database } from '@/lib/db';
+import { wikiPages } from '@/lib/db/schema';
 import { pageIcon, sectionIcon } from '@/shared/ui/page-icons';
-import { database } from './db';
-import { wikiPages } from './schema';
 
 /**
  * Fumadocs source over the database: virtual files are built from `wiki_pages`,

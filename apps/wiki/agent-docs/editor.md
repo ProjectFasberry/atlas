@@ -52,7 +52,7 @@ Extensions: `StarterKit` (h2/h3 headings only, `link.openOnClick: false`),
 
 ## Sanitizing
 
-`lib/html.ts`, `sanitizeContent`: a tag allowlist (paragraphs, h2-h4, inline formatting, code/pre,
+`lib/content/html.ts`, `sanitizeContent`: a tag allowlist (paragraphs, h2-h4, inline formatting, code/pre,
 blockquote, lists, links, img, hr, figure, tables, sup/sub). Attributes are only `href/title/
 target/rel` on links and `src/alt/width/height/loading` on images, schemes are `http/https/mailto/tel`.
 External links get `target="_blank"` and `rel="noopener noreferrer"`.

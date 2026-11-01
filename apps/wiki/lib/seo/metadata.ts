@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import { siteUrl } from '@/lib/shared';
-import { m } from '@/paraglide/messages';
-import type { Locale } from '@/paraglide/runtime';
+import { publicEnv } from '@/lib/env/public';
 import {
   DEFAULT_OG_IMAGE,
   OG_SIZE,
@@ -9,14 +7,16 @@ import {
   SITE_LOCALE,
   SITE_NAME,
   SITE_PUBLISHER,
-} from './site';
+} from '@/lib/seo/site';
+import { m } from '@/paraglide/messages';
+import type { Locale } from '@/paraglide/runtime';
 
 /** Metadata of the whole site, applied by the root layout. */
 export function buildRootMetadata(locale: Locale): Metadata {
   const description = m['seo.description']({}, { locale });
 
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase: new URL(publicEnv.siteUrl),
     applicationName: SITE_NAME,
     title: {
       default: SITE_NAME,
@@ -24,7 +24,7 @@ export function buildRootMetadata(locale: Locale): Metadata {
     },
     description,
     keywords: SITE_KEYWORDS,
-    authors: [{ name: SITE_PUBLISHER, url: siteUrl }],
+    authors: [{ name: SITE_PUBLISHER, url: publicEnv.siteUrl }],
     creator: SITE_PUBLISHER,
     publisher: SITE_PUBLISHER,
     category: 'games',
@@ -33,7 +33,7 @@ export function buildRootMetadata(locale: Locale): Metadata {
       type: 'website',
       siteName: SITE_NAME,
       locale: SITE_LOCALE,
-      url: siteUrl,
+      url: publicEnv.siteUrl,
       title: SITE_NAME,
       description,
       images: [{ url: DEFAULT_OG_IMAGE, ...OG_SIZE, alt: SITE_NAME }],

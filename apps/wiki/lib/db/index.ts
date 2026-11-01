@@ -2,7 +2,8 @@ import path from 'node:path';
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from 'pg';
-import * as schema from './schema';
+import * as schema from '@/lib/db/schema';
+import { getServerEnv } from '@/lib/env/server';
 
 export type Database = NodePgDatabase<typeof schema>;
 
@@ -15,24 +16,10 @@ type Global = typeof globalThis & {
 /**
  * Connection settings come from DATABASE_URL, or from the standard PG* variables
  * (PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE) when the password cannot be put
- * into a URI without escaping.
+ * into a URI without escaping. Both come validated from `lib/env/server`.
  */
 export function connectionConfig(): pg.PoolConfig {
-  const url = process.env.DATABASE_URL || process.env.WIKI_DATABASE_URL;
-  if (url) return { connectionString: url };
-
-  const { PGHOST, PGUSER, PGDATABASE } = process.env;
-  if (PGHOST && PGUSER && PGDATABASE) {
-    return {
-      host: PGHOST,
-      port: Number(process.env.PGPORT || 5432),
-      user: PGUSER,
-      password: process.env.PGPASSWORD,
-      database: PGDATABASE,
-    };
-  }
-
-  throw new Error('DATABASE_URL or PG* variables are not set');
+  return getServerEnv().database;
 }
 
 export function getPool() {
@@ -41,7 +28,7 @@ export function getPool() {
 
   const pool = new pg.Pool({
     ...connectionConfig(),
-    max: Number(process.env.WIKI_DB_POOL_MAX || 8),
+    max: getServerEnv().poolMax,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 5_000,
     application_name: 'fasberry-wiki',
@@ -66,7 +53,7 @@ export function getDb(): Database {
  */
 async function runMigrations(db: Database) {
   await migrate(db, {
-    migrationsFolder: process.env.WIKI_MIGRATIONS_DIR || path.join(process.cwd(), 'drizzle'),
+    migrationsFolder: getServerEnv().migrationsDir ?? path.join(process.cwd(), 'drizzle'),
     migrationsSchema: 'public',
     migrationsTable: 'wiki_migrations',
   });

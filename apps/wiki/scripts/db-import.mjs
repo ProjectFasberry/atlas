@@ -11,7 +11,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { marked } from 'marked';
-import { wikiPages } from '../lib/schema.ts';
+import { wikiPages } from '../lib/db/schema.ts';
 import { htmlToMarkdown, jsxToHtml } from './lib/content.mjs';
 import { openDb, upsertPage } from './lib/db.mjs';
 

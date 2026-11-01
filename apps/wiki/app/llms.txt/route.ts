@@ -1,5 +1,5 @@
 import { llms } from 'fumadocs-core/source';
-import { source } from '@/lib/source';
+import { source } from '@/lib/content/source';
 
 export const dynamic = 'force-dynamic';
 

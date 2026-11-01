@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { getEditor } from '@/lib/auth';
 import { database } from '@/lib/db';
-import { wikiImages } from '@/lib/schema';
+import { wikiImages } from '@/lib/db/schema';
 
 export const dynamic = 'force-dynamic';
 

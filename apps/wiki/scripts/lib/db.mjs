@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
-import * as schema from '../../lib/schema.ts';
+import * as schema from '../../lib/db/schema.ts';
 
 export const ROOT = process.cwd();
 

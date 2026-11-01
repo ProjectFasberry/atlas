@@ -1,5 +1,5 @@
 import { action, atom } from '@reatom/framework';
-import { baseLocale, isLocale, type Locale } from '@/paraglide/runtime';
+import { baseLocale, type Locale } from '@/paraglide/runtime';
 
 /** Locale of the current render: set on the server pass, read by every component. */
 export const $locale = atom<Locale>((baseLocale as Locale) ?? 'ru', 'locale');
@@ -12,13 +12,7 @@ export const setLocale = action((ctx, locale: Locale) => {
 export const LOCALE_COOKIE = 'locale';
 export const LOCALE_MAX_AGE = 60 * 60 * 24 * 365;
 
-/** Reads the language from `document.cookie`, used by the client-side switch. */
-export function readLocaleCookie(): Locale | null {
-  const match = document.cookie.match(new RegExp(`(?:^|; )${LOCALE_COOKIE}=([^;]+)`));
-  const value = match?.[1];
-  return isLocale(value) ? value : null;
-}
-
 export function writeLocaleCookie(locale: Locale) {
+  // biome-ignore lint/suspicious/noDocumentCookie: CookieStore is not supported everywhere
   document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${LOCALE_MAX_AGE}; samesite=lax`;
 }

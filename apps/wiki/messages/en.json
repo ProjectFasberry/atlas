@@ -9,7 +9,12 @@
     "editor-badge-title": "Editing is allowed"
   },
   "theme": {
-    "toggle": "Switch theme"
+    "toggle": "Switch theme",
+    "light": "Light theme",
+    "dark": "Dark theme"
+  },
+  "language": {
+    "toggle": "Switch language"
   },
   "editor": {
     "edit": "Edit",
@@ -43,5 +48,23 @@
   },
   "seo": {
     "description": "Fasberry wiki: server mechanics, economy, account - everything players and developers need."
+  },
+  "footer": {
+    "about": {
+      "title": "About the project",
+      "news": "News",
+      "status": "Status"
+    },
+    "info": {
+      "title": "Information",
+      "contacts": "Contacts",
+      "privacy": "Privacy"
+    },
+    "resources": {
+      "title": "Resources",
+      "status": "Server status",
+      "faq": "FAQ"
+    },
+    "warning": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
   }
 }

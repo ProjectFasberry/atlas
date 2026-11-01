@@ -20,7 +20,7 @@ The goal is to match `app.fasberry.fun`: 80px tall.
 #nd-subnav [data-header-body] { height: 5rem; }
 ```
 
-`lib/layout.shared.tsx` defines `nav.title`: the `/favicon.svg` image at 40x40, the name
+`lib/ui/layout.tsx` defines `nav.title`: the `/favicon.svg` image at 40x40, the name
 `Fasberry` in PIXY and a small `wiki` under it (`subscript`), like on the main site. The same
 file holds the Fumadocs translations (`i18nProvider(translations)`).
 

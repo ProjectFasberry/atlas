@@ -1,7 +1,7 @@
 import { revalidatePath } from 'next/cache';
-import { after, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getEditor } from '@/lib/auth';
-import { getPage, pageUrl, savePage } from '@/lib/pages';
+import { getPage, pageUrl, savePage } from '@/lib/content/pages';
 
 export const dynamic = 'force-dynamic';
 

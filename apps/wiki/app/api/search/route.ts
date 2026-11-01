@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { listPages, pagePlainText, pageUrl } from '@/lib/pages';
+import { listLocalizedPages, pagePlainText, pageUrl } from '@/lib/content/pages';
+import { getLocale } from '@/lib/i18n/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,11 @@ export async function GET(request: Request) {
 
   const terms = query.split(/\s+/).filter(Boolean);
 
-  const results = (await listPages())
+  // the index follows the reading locale: titles and text come from the translation
+  // the page itself would show, so search never mixes languages in one locale
+  const pages = await listLocalizedPages(await getLocale());
+
+  const results = pages
     .map((page) => {
       const title = page.title.toLowerCase();
       const description = page.description.toLowerCase();

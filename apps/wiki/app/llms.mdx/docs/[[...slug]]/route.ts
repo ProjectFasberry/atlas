@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getPage, pageUrl } from '@/lib/pages';
+import { getPage, pageUrl } from '@/lib/content/pages';
 
 export const dynamic = 'force-dynamic';
 

@@ -10,7 +10,6 @@
  * changed (source hash) or `--force` is passed.
  */
 import crypto from 'node:crypto';
-import { marked } from 'marked';
 import pg from 'pg';
 import sanitizeHtml from 'sanitize-html';
 import Turndown from 'turndown';

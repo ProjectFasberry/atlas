@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
-import { http } from '@/lib/http';
+import { getServerEnv } from '@/lib/env/server';
+import { http } from '@/lib/utils/http';
 
 export type Editor = { id: string; name: string };
 
@@ -25,11 +26,13 @@ type AccessPayload = {
  * token never leaves the server.
  */
 export async function getEditor(): Promise<Editor | null> {
-  if (process.env.WIKI_EDITOR_OPEN === '1') {
+  const env = getServerEnv();
+
+  if (env.editorOpen) {
     return { id: 'local', name: 'local' };
   }
 
-  const checkUrl = process.env.WIKI_AUTH_CHECK_URL;
+  const checkUrl = env.authCheckUrl;
   if (!checkUrl) return null;
 
   const cookie = (await headers()).get('cookie');

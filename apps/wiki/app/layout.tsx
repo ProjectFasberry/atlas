@@ -4,13 +4,14 @@ import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import { Inter } from 'next/font/google';
 import { getEditor } from '@/lib/auth';
-import { cn } from '@/lib/cn';
-import { getLocale } from '@/lib/i18n';
-import { baseOptions, defaultTranslations, translations } from '@/lib/layout.shared';
-import { getPageTree } from '@/lib/pages';
+import { getPageTree } from '@/lib/content/pages';
+import { getLocale } from '@/lib/i18n/locale';
 import { buildRootMetadata } from '@/lib/seo/metadata';
 import { getServerTheme } from '@/lib/theme';
+import { baseOptions, defaultTranslations, translations } from '@/lib/ui/layout';
+import { cn } from '@/lib/utils/cn';
 import { m } from '@/paraglide/messages';
+import { Footer } from '@/shared/components/app/footer';
 import { LocaleSync } from '@/shared/components/app/locale-sync';
 import { ReatomProvider } from '@/shared/components/app/reatom-provider';
 import { SidebarLinks } from '@/shared/ui/sidebar-links';
@@ -64,6 +65,7 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
             >
               {children}
             </DocsLayout>
+            <Footer />
             {editor ? (
               <span
                 title={`${m['layout.editor-badge-title']({}, { locale })}${editor.name ? `: ${editor.name}` : ''}`}

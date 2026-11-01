@@ -38,6 +38,7 @@ function commitTheme(theme: Theme) {
   root.style.colorScheme = theme;
 
   // the next server render reads this cookie and puts the class on <html> itself
+  // biome-ignore lint/suspicious/noDocumentCookie: CookieStore is not supported everywhere
   document.cookie = `${THEME_COOKIE}=${theme}; path=/; max-age=${COOKIE_MAX_AGE}; samesite=lax`;
 }
 

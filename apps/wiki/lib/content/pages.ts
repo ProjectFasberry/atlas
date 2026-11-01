@@ -1,16 +1,16 @@
 import { asc, eq } from 'drizzle-orm';
 import type { Root } from 'fumadocs-core/page-tree';
-import { database } from './db';
-import { sanitizeContent, stripHtml, toMarkdown, withHeadingIds } from './html';
+import { sanitizeContent, stripHtml, toMarkdown, withHeadingIds } from '@/lib/content/html';
+import { source } from '@/lib/content/source';
+import { database } from '@/lib/db';
 import {
   type WikiPage,
   wikiPages,
   wikiPageTranslations,
   wikiRevisions,
   wikiSectionTranslations,
-} from './schema';
-import { source } from './source';
-import { getTranslation, isTranslationLocale, sourceHash } from './translate';
+} from '@/lib/db/schema';
+import { getTranslation, isTranslationLocale, sourceHash } from '@/lib/i18n/translations';
 
 export type PageRow = WikiPage;
 
@@ -49,6 +49,35 @@ export async function getLocalizedPage(slug: string, locale?: string): Promise<W
   };
 }
 
+/**
+ * Every page in the requested locale: the same freshness rule as `getLocalizedPage`,
+ * but one query for all translations, so the search index does not go page by page.
+ */
+export async function listLocalizedPages(locale?: string): Promise<WikiPage[]> {
+  const pages = await listPages();
+  if (!locale || !isTranslationLocale(locale)) return pages;
+
+  const db = await database();
+  const translations = await db
+    .select()
+    .from(wikiPageTranslations)
+    .where(eq(wikiPageTranslations.locale, locale));
+  const bySlug = new Map(translations.map((row) => [row.slug, row]));
+
+  return pages.map((page) => {
+    const translation = bySlug.get(page.slug);
+    if (!translation || translation.sourceHash !== sourceHash(page)) return page;
+
+    return {
+      ...page,
+      title: translation.title.trim(),
+      description: translation.description.trim(),
+      html: translation.html,
+      markdown: translation.markdown,
+    };
+  });
+}
+
 /** The sidebar tree comes from the fumadocs source, which reads the same rows. */
 export async function getPageTree(locale?: string): Promise<Root> {
   const tree = (await source.get()).pageTree;
@@ -66,8 +95,8 @@ export async function getPageTree(locale?: string): Promise<Root> {
       .where(eq(wikiSectionTranslations.locale, locale)),
   ]);
 
-  const titleBySlug = new Map(titles.map((row) => [row.slug, row.title]));
-  const titleBySection = new Map(sections.map((row) => [row.section, row.title]));
+  const titleBySlug = new Map(titles.map((row) => [row.slug, row.title.trim()]));
+  const titleBySection = new Map(sections.map((row) => [row.section, row.title.trim()]));
 
   const children = tree.children.map((node) => {
     if (node.type === 'separator') {

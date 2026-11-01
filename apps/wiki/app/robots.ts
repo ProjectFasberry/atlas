@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next';
-import { siteUrl } from '@/lib/shared';
+import { publicEnv } from '@/lib/env/public';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', '/og/', '/llms.mdx/'] }],
-    sitemap: `${siteUrl}/sitemap.xml`,
-    host: siteUrl,
+    sitemap: `${publicEnv.siteUrl}/sitemap.xml`,
+    host: publicEnv.siteUrl,
   };
 }

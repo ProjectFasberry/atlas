@@ -33,11 +33,11 @@ import {
   MarkdownCopyButton,
 } from 'fumadocs-ui/layouts/notebook/page';
 import { type ReactNode, useRef } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@/lib/utils/cn';
 import { m } from '@/paraglide/messages';
+import { ArticleHtml } from '@/shared/components/wiki/article-html';
 import { $locale } from '@/shared/models/locale.model';
 import { $draft, $saveState, uploadImage } from '@/shared/models/wiki-page.model';
-import { ArticleHtml } from './article-html';
 
 type Props = {
   slug: string;

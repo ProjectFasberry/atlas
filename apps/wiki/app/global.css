@@ -52,6 +52,26 @@
   --color-fd-ring: #4ade80;
 }
 
+/*
+ * Apple-like segmented control (theme and language switches): a soft grey track,
+ * a white thumb with a small shadow, muted labels outside the thumb.
+ */
+:root {
+  --seg-track: rgb(118 118 128 / 0.12);
+  --seg-thumb: #ffffff;
+  --seg-thumb-foreground: #1c1c1e;
+  --seg-muted: rgb(60 60 67 / 0.6);
+  --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.12), 0 3px 1px rgb(0 0 0 / 0.04);
+}
+
+.dark {
+  --seg-track: rgb(118 118 128 / 0.32);
+  --seg-thumb: #636366;
+  --seg-thumb-foreground: #ffffff;
+  --seg-muted: rgb(235 235 245 / 0.6);
+  --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.4), 0 3px 1px rgb(0 0 0 / 0.16);
+}
+
 /* Fumadocs overrides the sidebar separately in the dark theme */
 .dark #nd-sidebar {
   --color-fd-muted: #171b1a;

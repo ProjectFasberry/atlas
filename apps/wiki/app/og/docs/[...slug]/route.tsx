@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { notFound } from 'next/navigation';
 import { ImageResponse } from 'next/og';
-import { getPage, pageDescription } from '@/lib/pages';
+import { getPage, pageDescription } from '@/lib/content/pages';
 
 export const dynamic = 'force-dynamic';
 

@@ -6,16 +6,16 @@
  *   WIKI_API_URL=https://api.fasberry.fun pnpm sync:wiki
  *
  * The script pulls /wiki/categories and /wiki/category/{slug}, converts TipTap JSON
- * into HTML/markdown and writes pages straight into PostgreSQL. Images are
- * downloaded into public/images/wiki/<slug>/; when an image is unavailable an empty
- * placeholder stays in its place and the reason goes to content/wiki-sync-report.json.
+ * into HTML/markdown and writes pages straight into PostgreSQL. Images stay in the
+ * public bucket: legacy addresses are normalised to volume.fasberry.fun and the
+ * skipped nodes are listed in content/wiki-sync-report.json.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { eq } from 'drizzle-orm';
 import ky from 'ky';
 import { marked } from 'marked';
-import { wikiPages } from '../lib/schema.ts';
+import { wikiPages } from '../lib/db/schema.ts';
 import { htmlToMarkdown, jsxToHtml } from './lib/content.mjs';
 import { openDb, upsertPage } from './lib/db.mjs';
 

@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { database } from '@/lib/db';
-import { wikiImages } from '@/lib/schema';
+import { wikiImages } from '@/lib/db/schema';
 
 export const dynamic = 'force-dynamic';
 

@@ -5,7 +5,8 @@ Articles live in PostgreSQL and are rendered on every request, so an edit shows 
 
 ## Stack
 
-Next.js 16 (App Router), React 19, [Fumadocs](https://fumadocs.dev) for layout and search,
+Next.js 16 (App Router), React 19, [Fumadocs](https://fumadocs.dev) for the layout and docs
+primitives,
 Drizzle ORM over PostgreSQL, [TipTap](https://tiptap.dev) for the editor, Reatom for state,
 `ky` for HTTP.
 Node 22 or newer.
@@ -28,7 +29,7 @@ Migrations from `drizzle/` are applied on start, so an empty database needs no s
 | `pnpm sync:wiki` | pulls articles from the Fasberry backend |
 | `pnpm db:import` | loads the local `content/seed.json` snapshot |
 | `pnpm db:export` | writes the current database into `content/seed.json` |
-| `pnpm db:generate` | writes a new migration from `lib/schema.ts` |
+| `pnpm db:generate` | writes a new migration from `lib/db/schema.ts` |
 | `pnpm db:migrate` | applies pending migrations by hand (the app does this on start) |
 
 `content/` is local only and ignored by git. Images are not in the repository: articles point at
@@ -70,6 +71,9 @@ no key), the site serves a translation when its `source_hash` still matches the 
 falls back to Russian otherwise. `--force` re-translates, `--slug <slug>` limits the run.
 
 ## Settings
+
+Server variables are declared once in `lib/env/server.ts` and read through `getServerEnv()`
+(zod validation, parsed on first use); client values live in `lib/env/public.ts`.
 
 | Variable | Purpose |
 | --- | --- |

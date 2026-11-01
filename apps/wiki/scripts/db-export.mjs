@@ -11,7 +11,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { asc } from 'drizzle-orm';
-import { wikiPages } from '../lib/schema.ts';
+import { wikiPages } from '../lib/db/schema.ts';
 import { openDb } from './lib/db.mjs';
 
 async function main() {

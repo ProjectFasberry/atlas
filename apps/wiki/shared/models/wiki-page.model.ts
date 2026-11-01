@@ -1,6 +1,6 @@
 import { action, atom, reatomAsync } from '@reatom/framework';
 import { withAssign } from '@reatom/primitives';
-import { http } from '@/lib/http';
+import { http } from '@/lib/utils/http';
 
 export type PageDraft = {
   slug: string;
