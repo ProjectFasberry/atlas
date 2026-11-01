@@ -1,7 +1,7 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
 import { Button } from "@/shared/ui/button";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { Icon } from "@/shared/ui/icon"
 import { balance, balanceState } from "../models/balance.model";
 import { navigate } from "vike/client/router";
@@ -14,7 +14,7 @@ import NumberFlow from '@number-flow/react'
 import { translate } from "@/shared/locales/helpers";
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu";
-import clsx from "clsx";
+import { clsx } from "cnfast";
 
 const cardImage = getStaticImage("arts/steve_night.jpg")
 
@@ -48,7 +48,7 @@ const BalanceServerSelect = reatomComponent(({ ctx }) => {
         </Button>
       </Menu.Trigger>
       <Menu.Positioner>
-        <Menu.Content className={menuVariant.content({ className: "min-w-[140px]" })}>
+        <Menu.Content className={menuVariant.content("min-w-[140px]")}>
           <Menu.Arrow className={menuVariant.arrow()}>
             <Menu.ArrowTip className={menuVariant.arrowTip()} />
           </Menu.Arrow>

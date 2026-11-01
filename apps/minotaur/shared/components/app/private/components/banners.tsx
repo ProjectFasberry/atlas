@@ -79,7 +79,7 @@ const BannerListItem = reatomComponent<BannerSingle>(({ ctx, id, title, descript
             <Portal>
               <Dialog.Backdrop className={dialogVariant.backdrop()} />
               <Dialog.Positioner className={dialogVariant.positioner()}>
-                <Dialog.Content className={dialogVariant.content({ className: "overflow-hidden w-1/3" })}>
+                <Dialog.Content className={dialogVariant.content("overflow-hidden w-1/3")}>
                   <div className="flex flex-col justify-center w-full h-full items-center">
                     <Typography className='font-semibold'>
                       {title}

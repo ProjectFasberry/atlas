@@ -125,7 +125,7 @@ const OrderQR = ({ url }: { url: string }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content({ className: "flex p-0 items-center justify-center" })}>
+          <Dialog.Content className={dialogVariant.content("flex p-0 items-center justify-center")}>
             <QrCode.Root
               defaultValue={url}
               encoding={{ ecc: 'M' }}

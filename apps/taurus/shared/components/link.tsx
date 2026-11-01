@@ -13,30 +13,20 @@ export const Link = (props: LinkProps) => {
   const [local, rest] = splitProps(props, ["href", "locale", "class", "className"]);
 
   const initWithLocale = !!local.locale;
-  const currentLocale = () => local.locale ?? pageContext.locale;
-
-  const computedHref = () => {
-    let path = local.href;
-    const loc = currentLocale();
-    if (loc && loc !== "ru") {
-      path = '/' + loc + path;
-    }
-    return path;
-  };
 
   const pathname = () => pageContext.urlPathname;
 
   const isActive = () => {
-    const hrefVal = computedHref();
+    const hrefVal = local.href
     return hrefVal ? (hrefVal === "/" ? pathname() === hrefVal : pathname().startsWith(hrefVal)) : false;
   };
 
-  const isIdentity = () => computedHref() === pathname();
+  const isIdentity = () => local.href === pathname();
   const linkStyle = (): JSX.CSSProperties => isIdentity() && !initWithLocale ? { "pointer-events": 'none' } : {};
 
   return (
     <a
-      href={computedHref()}
+      href={local.href}
       data-state={isActive() ? "active" : "inactive"}
       style={linkStyle()}
       onClick={(e) => {

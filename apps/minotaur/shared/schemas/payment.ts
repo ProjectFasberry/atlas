@@ -1,3 +1,4 @@
+// todo: use openapi-to-zod schema generation
 import * as z from "zod";
 import { nicknameSchema } from "./auth";
 import { editorFieldSchema } from "./news";

@@ -1,17 +1,20 @@
 import { useConfig } from 'vike-react/useConfig'
-import { wrapTitle } from "@/shared/lib/utils"
-import { getStaticImage } from '@/shared/lib/volume-helpers'
+import { wrapTitle } from "@/shared/lib/helpers"
+import { getStaticImage } from '@/shared/lib/helpers'
 import { type PageContextServer } from 'vike/types'
 import { logRouting } from '@/shared/lib/log'
+import { translate } from '@/shared/locales/helpers'
 
-const title = wrapTitle(`Рейтинги игроков`)
-const previewImage = getStaticImage("arts/adventure-in-blossom.jpg")
+const image = getStaticImage("arts/adventure-in-blossom.jpg")
 
 function metadata() {
+  const title = wrapTitle(translate["ratings.page.title"]())
+  const description = translate["ratings.page.description"]()
+
   return {
     title,
-    description: "Актуальные рейтинги игроков в разных категориях",
-    image: previewImage,
+    description,
+    image,
   }
 }
 

@@ -1,7 +1,7 @@
 import { Icon, type IconName } from "@/shared/ui/icon"
 import {
-  settings, SETTINGS_NAVIGATION, settingsNavigationItemIsActiveAtom,
-  type SettingsNavigation, type SettingsNavigationNode, type SettingsParent
+  settings, settingsNavigationListAtom, settingsNavigationItemIsActiveAtom,
+  type SettingsNavigation, type SettingsNavigationNode
 } from "../models/settings.model"
 import { tv } from "tailwind-variants"
 import { reatomComponent } from "@reatom/npm-react"
@@ -10,7 +10,7 @@ import { type Ctx, spawn } from "@reatom/framework"
 
 type SettingsNavigationItem = { icon: IconName, className?: string }
 
-const SETTINGS_NAVIGATION_ICONS: Partial<Record<SettingsParent, Record<string, SettingsNavigationItem>>> = {
+const SETTINGS_NAVIGATION_ICONS: Partial<Record<string, Record<string, SettingsNavigationItem>>> = {
   main: {
     account: { icon: "sprite:user-circle" },
     devices: { icon: "sprite:device-desktop" },
@@ -19,7 +19,8 @@ const SETTINGS_NAVIGATION_ICONS: Partial<Record<SettingsParent, Record<string, S
     store: { icon: "sprite:building-store" }
   },
   app: {
-    appearance: { icon: "sprite:aspect-ratio" }
+    appearance: { icon: "sprite:aspect-ratio" },
+    language: { icon: "sprite:language" }
   },
   account: {
     logout: {
@@ -40,14 +41,14 @@ const navigationItemNodeVariant = tv({
   }
 })
 
-type Handler = (ctx: Ctx, node: SettingsNavigationNode, parent: SettingsParent) => void;
+type Handler = (ctx: Ctx, node: SettingsNavigationNode, parent: string) => void;
 
 const AS_EVENTS: Record<NonNullable<SettingsNavigationNode["as"]>, Handler> = {
   "button": (ctx, node) => spawn(ctx, (spawnCtx) => node.cb?.(spawnCtx)),
   "link": (ctx, node, parent) => settings.navigate(ctx, parent, node.value)
 }
 
-const NavigationItemNode = reatomComponent<{ parent: SettingsParent, node: SettingsNavigationNode }>(({
+const NavigationItemNode = reatomComponent<{ parent: string, node: SettingsNavigationNode }>(({
   ctx, node, parent
 }) => {
   const isActive = ctx.spy(settingsNavigationItemIsActiveAtom(parent, node.value))
@@ -62,13 +63,13 @@ const NavigationItemNode = reatomComponent<{ parent: SettingsParent, node: Setti
       onClick={() => AS_EVENTS[node.as ?? "link"](ctx, node, parent)}
       className={navigationItemNodeVariant({ variant, className })}
     >
-      {iconName && <Icon name={iconName} className="size-5"  />}
+      {iconName && <Icon name={iconName} className="size-5" />}
       {node.title}
     </Button>
   )
 }, "NavigationItemNode")
 
-const NavigationItem = ({ parent, title, nodes }: SettingsNavigation & { parent: SettingsParent }) => {
+const NavigationItem = ({ parent, title, nodes }: SettingsNavigation & { parent: string }) => {
   return (
     <div className="flex flex-col gap-2">
       {title && (
@@ -85,9 +86,10 @@ const NavigationItem = ({ parent, title, nodes }: SettingsNavigation & { parent:
   )
 }
 
-const SettingsNavigationList = () => Object.entries(SETTINGS_NAVIGATION).map(([key, section]) => (
-  <NavigationItem key={key} parent={key as SettingsParent} {...section} />
-))
+const SettingsNavigationList = reatomComponent(({ ctx }) =>
+  ctx.spy(settingsNavigationListAtom).map(([key, section]) => <NavigationItem key={key} parent={key} {...section} />)
+)
+
 export const SettingsNavigationDesktop = () => {
   return (
     <div className="flex flex-col w-full gap-6">

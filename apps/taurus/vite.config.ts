@@ -5,9 +5,11 @@ import path from "node:path";
 import vikeSolid from "vike-solid/vite";
 import svg from '@neodx/svg/vite';
 import { cloudflare } from '@cloudflare/vite-plugin'
-import { visualizer } from 'rollup-plugin-visualizer';
+import { analyzer, unstableRolldownAdapter } from 'vite-bundle-analyzer'
+import { paraglideVitePlugin } from "@inlang/paraglide-js";
+import utwm from 'unplugin-tailwindcss-mangle/vite'
 
-type Stage = "prod" | "dev";
+type Stage = "prod" | "staging";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -27,6 +29,7 @@ export default defineConfig(({ mode }) => {
         }
       }),
       tailwindcss(),
+      utwm(),
       svg({
         inputRoot: 'assets/svg',
         output: 'public/sprites',
@@ -34,11 +37,19 @@ export default defineConfig(({ mode }) => {
         metadata: 'shared/sprite.gen.ts',
         resetColors: false
       }),
-      !isProd && visualizer({
-        filename: 'dist/bundle-stats.html',
-        gzipSize: true,
-        brotliSize: true,
+      paraglideVitePlugin({
+        project: "./project.inlang",
+        outdir: "./paraglide",
+        strategy: ["cookie", "preferredLanguage", "baseLocale"],
       }),
+      unstableRolldownAdapter(
+        analyzer({
+          enabled: !isProd,
+          analyzerMode: 'static',
+          fileName: path.resolve(__dirname, "./dist/bundle-stats.html"),
+          openAnalyzer: false
+        })
+      ),
       {
         name: "log-on-client",
         configResolved(resolvedConfig) {
@@ -57,6 +68,7 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       rolldownOptions: {
         output: {
+          chunkFileNames: `${!isProd ? "[name]-" : ""}[hash].js`,
           codeSplitting: {
             groups: [
               {
@@ -82,6 +94,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./"),
+        "tailwind-variants": path.resolve(__dirname, "./node_modules/tailwind-variants/dist/lite")
       },
       tsconfigPaths: true
     },

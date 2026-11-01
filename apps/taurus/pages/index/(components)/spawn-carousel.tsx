@@ -1,13 +1,7 @@
 import { createSignal, Index } from "solid-js"
 import { Carousel } from '@ark-ui/solid/carousel'
 import { SPAWN_IMAGES } from "../(models)/spawn-carousel.model"
-import {
-  carouselIndicatorGroupVariant,
-  carouselIndicatorVariant,
-  carouselItemGroupVariant,
-  carouselItemVariant,
-  carouselRootVariant,
-} from "@/shared/ui/carousel"
+import { carouselVariant } from "@/shared/ui/carousel"
 
 export const SpawnCarousel = () => {
   const [selected, setSelected] = createSignal(0)
@@ -15,19 +9,20 @@ export const SpawnCarousel = () => {
   return (
     <Carousel.Root
       slideCount={SPAWN_IMAGES.length}
-      class={carouselRootVariant()}
+      class={carouselVariant.root()}
       page={selected()}
       allowMouseDrag={true}
       onPageChange={(details) => setSelected(details.page)}
       loop
       autoplay
       slidesPerPage={1.4}
+      snapType="proximity"
       spacing={"16px"}
     >
-      <Carousel.ItemGroup class={carouselItemGroupVariant()}>
+      <Carousel.ItemGroup class={carouselVariant.itemGroup()}>
         <Index each={SPAWN_IMAGES}>
           {(image, idx) => (
-            <Carousel.Item index={idx} class={carouselItemVariant()}>
+            <Carousel.Item index={idx} class={carouselVariant.item()}>
               <img
                 src={image()}
                 draggable={false}
@@ -40,9 +35,9 @@ export const SpawnCarousel = () => {
         </Index>
       </Carousel.ItemGroup>
       <div class="absolute bottom-4 flex items-center justify-center right-0 left-0">
-        <Carousel.IndicatorGroup class={carouselIndicatorGroupVariant()}>
+        <Carousel.IndicatorGroup class={carouselVariant.indicatorGroup()}>
           <Index each={SPAWN_IMAGES}>
-            {(_, idx) => <Carousel.Indicator class={carouselIndicatorVariant()} index={idx} />}
+            {(_, idx) => <Carousel.Indicator class={carouselVariant.indicator()} index={idx} />}
           </Index>
         </Carousel.IndicatorGroup>
       </div>

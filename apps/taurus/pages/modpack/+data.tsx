@@ -1,30 +1,28 @@
-import { client } from "@/shared/api/client"
-import { wrapClient } from "@/shared/lib/api"
 import { getUrl, wrapTitle } from "@/shared/lib/helpers"
 import { useConfig } from "vike-solid/useConfig"
 import type { PageContext } from "vike/types"
-import type { Modpacks } from "./(models)/modpack.model"
-import { HTTPError } from "ky"
+import { translate } from "@/shared/locales/helpers"
+import { mainClient } from "@/shared/api/client"
 
 export type Data = Awaited<ReturnType<typeof data>>
 
 export async function data(pageCtx: PageContext) {
   const config = useConfig()
-  const headers = pageCtx.headers
-  if (!headers) return;
 
-  const title = wrapTitle("Модпаки")
+  const headers = pageCtx.headers ?? undefined;
 
-  const data = await wrapClient<Modpacks>(() => client("modpack/list", { headers }))
+  const title = wrapTitle(translate["pages.modpack.title"]())
+  const description = translate["pages.modpack.description"]()
+
+  const data = await mainClient.GET("/modpack/list", { headers })
+    .then(r => r.data?.data ?? [])
     .catch(async (e) => {
-      if (e instanceof HTTPError) {
-        console.error(await e.response.json())
-      }
       throw e;
     })
 
   config({
     title,
+    description,
     Head: (
       <>
         <link rel="canonical" href={getUrl(pageCtx)} />

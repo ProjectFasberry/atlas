@@ -1,3 +1,4 @@
+// todo: use openapi-to-zod schema generation
 import * as z from "zod";
 
 export type Json = JsonValue;

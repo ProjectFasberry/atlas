@@ -4,7 +4,10 @@ import { withAssign, withReset } from "@reatom/framework";
 import { clientInstance } from "../../api/client";
 import { parseWrappedJson } from '../../lib/client-wrapper';
 import { withSsr } from "../ssr";
-import { invariant } from '@/shared/lib/invariant';
+import { invariant } from "@/shared/lib/utils";
+import type { PageContextServer } from 'vike/types';
+import { redirect } from 'vike/abort';
+import { isError } from "@/shared/lib/utils";
 
 export type MePayload = ExtractApiData<"getMe">['data'];
 
@@ -37,6 +40,18 @@ export const currentUser = atom(null, "currentUser").pipe(
       const nickname = ctx.get(currentUserState)?.nickname;
       invariant(nickname, "Current user nickname is not defined");
       return nickname;
+    }),
+    defineCurrentUserError: action((_, pageCtx: PageContextServer, e: unknown) => {
+      if (!isError(e)) return;
+
+      const msg = e.message;
+      const cb = CURRENT_USER_CALLBACK_MAP[msg as keyof typeof CURRENT_USER_CALLBACK_MAP];
+
+      if (cb) {
+        cb(pageCtx)
+      } else {
+        console.warn("Unexpected error", msg)
+      }
     })
   }))
 )
@@ -55,4 +70,12 @@ export async function getMe(init: RequestInit) {
   })
 
   return parseWrappedJson<MePayload>(res)
+}
+
+export const CURRENT_USER_CALLBACK_MAP: Record<"BANNED", (pageCtx: PageContextServer) => void> = {
+  "BANNED": ({ urlParsed: { pathname } }) => {
+    if (!pathname.includes('/banned')) {
+      throw redirect("/banned");
+    }
+  }
 }

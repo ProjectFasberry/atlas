@@ -1,17 +1,40 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "verification": {
+    "initial": "I'm not a robot",
+    "verifying": "Verifying...",
+    "verified": "Verification passed",
+    "verify": "Verify",
+    "error": "Verification error",
+    "wasm-required": "WASM is not supported",
+    "solved": "Verification passed"
+  },
   "shared": {
-    "404.title": "Page not found",
-    "500.title": "Something went wrong",
+    "error-page": {
+      "404": {
+        "title": "Page not found",
+        "description": "Could not find the requested resource"
+      },
+      "500": {
+        "title": "Something went wrong",
+        "description": "An error occurred"
+      },
+      "to-back": "Back to safety",
+      "not-available": "Service unavailable",
+      "check-status": "Check status"
+    },
     "change-lang": {
       "title": "Change language"
     },
     "empty": "empty",
     "back": "back",
-    "next": "next",
+    "error": "Error",
+    "retry": "Retry",
+    "next": "continue",
+    "nickname": "Nickname",
     "lands": {
       "list": {
-        "showMore": "show more"
+        "showMore": "view list"
       },
       "single": {
         "attributes": {
@@ -20,19 +43,21 @@
         }
       }
     },
+    "copyed-to-clipboard": "Copied to clipboard",
+    "available-languages": "Available languages",
     "news": {
       "single": {
-        "showMore": "more"
+        "showMore": "read more"
       }
     },
     "header": {
       "links": {
         "main": {
-          "value": "Main",
-          "label": "Go to main"
+          "value": "Home",
+          "label": "Go to homepage"
         },
         "ratings": {
-          "value": "Ratings",
+          "value": "Rating",
           "label": "Go to ratings"
         },
         "store": {
@@ -41,117 +66,177 @@
         },
         "map": {
           "value": "Map",
-          "label": "Go to map"
+          "label": "Go to world map"
         },
         "lands": {
-          "value": "Lands",
-          "label": "Go to lands"
+          "value": "Regions",
+          "label": "Go to regions"
         }
       },
       "menu": {
         "cart": "Cart",
-        "orders": "Orders",
+        "orders": "Purchases",
         "tasks": "Tasks",
         "referrals": "Referrals",
-        "private": "System panel",
+        "private": "Control panel",
         "settings": "Settings",
         "logout": "Log out"
       },
-      "authorizeTitle": "Sign in"
+      "authorizeTitle": "Login",
+      "logotype": "Go to homepage"
     },
     "footer": {
       "about": {
-        "title": "About project",
+        "title": "About the project",
         "news": "News",
         "status": "Status"
       },
       "info": {
-        "title": "Info",
+        "title": "Information",
         "contacts": "Contacts",
         "privacy": "Privacy"
       },
       "resources": {
         "title": "Resources",
-        "status": "Servers status",
+        "status": "Server status",
         "faq": "FAQ"
       },
-      "warning": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT ENDORSED OR ASSOCIATED WITH MOJANG OR MICROSOFT."
+      "warning": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
     }
   },
   "index": {
+    "page": {
+      "title": "Home",
+      "description": "Official application of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20.1+. Play at: {IP}"
+    },
     "news": "News",
     "latest-events": "Latest events",
-    "lands": "Server lands",
+    "lands": "Server territories",
     "intro": {
-      "title": "Welcome",
+      "title": "Welcome!",
       "subtitle": "Fasberry Project",
-      "description": "Join the Fasberry community, grow, and spend time in warm and cozy company!",
-      "actionButton": "Start play",
+      "description": "Join the Fasberry community, grow, and spend time in a warm and friendly environment!",
+      "actionButton": "Start playing",
       "statusLabel": "playing now"
     }
   },
   "auth": {
+    "page": {
+      "title": "Authorization",
+      "description": "Join the best Minecraft project. Registration on the Fasberry project"
+    },
     "navigation": {
       "auth": {
-        "loginTitle": "Sign in",
-        "regTitle": "Sign up",
-        "recoveryTitle": "I forgot password"
+        "loginTitle": "Login",
+        "regTitle": "Registration",
+        "recoveryTitle": "I forgot my password"
       }
     },
     "login": {
-      "otherVariantsTitle": "Other login variants",
+      "otherVariantsTitle": "Other login methods",
       "variants": {
-        "basic": "With password",
-        "qr": "With QR"
+        "basic": "Via password",
+        "qr": "Via QR"
       },
       "qr": {
         "steps": {
-          "1": "1. Open Fasberry on the mobile",
-          "2": "2. Go to Settings > Security > Connect device",
+          "1": "1. Open Fasberry on your phone",
+          "2": "2. Go to Settings > Security > Link Device",
           "3": "3. Point your phone at the QR code on the screen"
         }
       },
       "submit": "Sign in"
     },
     "register": {
-      "success": "You have successfully registered for the Fasberry project!",
+      "success": "You have successfully registered on the Fasberry project!",
       "error": "Something went wrong",
       "toLogin": "Go to login",
       "placeholders": {
-        "findoutOther": "Example: Telegram channel",
+        "findoutOther": "For example: Telegram channel",
         "findout": "How did you hear about the project?"
       },
       "findout": {
-        "referrer": "From the player",
+        "referrer": "From another player",
         "custom": "Other"
       },
-      "acceptRulesTitle": "I agree to the terms of",
+      "in-progress": "Registering",
+      "in-progress-subtitle": "this will take a little time...",
+      "to-back": "Go back",
+      "acceptRulesTitle": "I agree with the",
       "acceptRulesPrivacy": "privacy policy",
-      "acceptRulesProcessing": "user agreement",
+      "acceptRulesProcessing": "terms of service",
       "acceptRulesProject": "project rules",
       "seed-phrase": {
-        "startTitle": "Enter the missing words to confirm you have saved the phrase",
-        "saveTitle": "Save the phrase in a secret place. You will need it if you want to restore access to your account",
+        "title": "Seed phrase",
+        "startTitle": "Enter the missing words to confirm that you saved the phrase",
+        "saveTitle": "Store the phrase in a secure place. You will need it if you want to recover access to your account",
         "download": "Download",
-        "warning": "Before showing your phrase, make sure no one is around you."
+        "warning": "Before revealing your phrase, make sure no one is nearby."
       }
     },
     "shared": {
       "placeholders": {
         "nickname": "Nickname",
         "password": "Password"
+      },
+      "errors": {
+        "authorization-disabled": "Authorization is disabled",
+        "ip-restricted": "IP restrictions apply",
+        "not-exists": "Such a player is not registered",
+        "password-or-login-incorrect": "Incorrect nickname or login",
+        "password-is-unsafe": "Password is too simple",
+        "user-exists": "Such a player is already registered",
+        "token-not-found": "Verification is required"
       }
     }
   },
+  "recovery": {
+    "page": {
+      "title": "Recovery",
+      "description": "Recover your account using your recovery phrase"
+    },
+    "guide": {
+      "title": "To recover your password, you need to enter 12 words (seed phrase)",
+      "subtitle": "These words were provided during account registration",
+      "action": "I lost my seed phrase"
+    },
+    "input-nickname": "Enter nickname",
+    "input-nickname-tip": "Nickname must be entered exactly",
+    "confirm": "Confirm",
+    "new-password": "New password",
+    "repeat-password": "Repeat password"
+  },
   "ratings": {
-    "title": "Server ratings",
-    "goTo": "Go to rating"
+    "page": {
+      "title": "Player rankings",
+      "description": "Current player rankings across different categories"
+    },
+    "title": "Server rankings",
+    "goTo": "View leaderboard"
+  },
+  "rating": {
+    "page": {
+      "title": "{type} ranking, server {server}"
+    }
   },
   "land": {
-    "not-found": "It looks like this region no longer exists"
-  },
-  "lands": {
-    "title": "Lands"
+    "not-found": "It seems this region no longer exists",
+    "editing": {
+      "save-changes": "Save changes",
+      "delete": "Delete"
+    },
+    "edit": "Editing",
+    "view": "View",
+    "members": "Members",
+    "links": "Links",
+    "banner": "Banner",
+    "point": "marker",
+    "points": "Markers",
+    "similar-lands": "Similar regions",
+    "test": {
+      "test-item": "This region may be a test region",
+      "not-impl": "Not added yet... coming soon"
+    }
   },
   "default": {
     "not-found": "Resource not found"
@@ -159,11 +244,11 @@
   "player": {
     "not-found": "Player not found",
     "lands": {
-      "title": "Lands"
+      "title": "Territories"
     },
     "seems-like-players": {
-      "title": "Seems like players",
-      "notShow": "Not show"
+      "title": "Similar players",
+      "notShow": "Do not show"
     },
     "activity": {
       "online": "Online",
@@ -181,10 +266,21 @@
     "purchases": {
       "title": "Purchases",
       "subtitle": "Your purchase history is displayed here",
-      "goTo": "Go"
+      "goTo": "Go to"
+    }
+  },
+  "lands": {
+    "title": "Territories",
+    "page": {
+      "title": "Territories",
+      "description": "Server territories"
     }
   },
   "store": {
+    "page": {
+      "title": "Store",
+      "description": "Support our Fasberry server by purchasing ranks, unique items, and in-game currency. Enhance your gameplay and help the project grow!"
+    },
     "title": "Store",
     "buy": "Buy",
     "inCart": "In cart",
@@ -197,25 +293,162 @@
         "label": "Item type",
         "variants": {
           "all": "All",
-          "donate": "Donates",
+          "donate": "Ranks",
           "event": "Events"
         }
       },
       "wallet": {
-        "label": "Wallet",
+        "label": "Currency",
         "variants": {
           "all": "All",
-          "charism": "Charism",
+          "charism": "Charisma",
           "belkoin": "Belkoin"
         }
       }
     },
     "item": {
-      "not-found": "Store item not found"
+      "not-found": "Item not found"
     }
   },
+  "cart": {
+    "page": {
+      "title": "Cart",
+      "description": ""
+    }
+  },
+  "parkour": {
+    "player": "player",
+    "map": "map",
+    "score": "score",
+    "time": "time",
+    "charism": "charisma",
+    "belkoin": "belkoin",
+    "chunks": "chunks",
+    "lands": "territories",
+    "type": "type",
+    "playtime": "total time",
+    "reputation": "reputation"
+  },
   "map": {
-    "title": "Select the server",
-    "goTo": "Go"
+    "page": {
+      "title": "Game map",
+      "description": "List of available web maps for Fasberry game servers"
+    },
+    "title": "Choose a server",
+    "goTo": "Go to"
+  },
+  "news": {
+    "page": {
+      "title": "News",
+      "description": "Fasberry project news"
+    }
+  },
+  "referrals": {
+    "page": {
+      "title": "Referrals",
+      "description": "Referrals page description"
+    }
+  },
+  "tasks": {
+    "page": {
+      "title": "Tasks",
+      "description": "Tasks page description"
+    }
+  },
+  "support": {
+    "page": {
+      "title": "Support",
+      "description": "Support page description"
+    }
+  },
+  "settings": {
+    "main": "General settings",
+    "app": "Application settings",
+    "account": {
+      "title": "Account",
+      "sections": {
+        "information": {
+          "title": "Information",
+          "description": "Basic account information"
+        },
+        "password-and-authentication": {
+          "title": "Password and authentication",
+          "description": "Change your account password",
+          "change-password": "Change password",
+          "current-password": "Current password",
+          "new-password": "New password",
+          "repeat-password": "Confirm new password",
+          "confirm": "Confirm"
+        },
+        "delete-account": {
+          "title": "Delete account",
+          "description": "Deletion will also affect game data linked to this account",
+          "confirm": "Delete account"
+        }
+      }
+    },
+    "devices": {
+      "title": "Devices",
+      "sections": {
+        "sessions": {
+          "title": "Sessions",
+          "description": "Active sessions of your account",
+          "current-session": "Current session",
+          "active-sessions": "Active sessions",
+          "end-all-sessions": "Log out of all other sessions",
+          "end-this-session": "Log out of session"
+        },
+        "add-device": {
+          "title": "Link a device to your account by scanning a QR code",
+          "start": "Link device",
+          "confirming": "Confirm new login",
+          "scanning-qr": "Scanning QR code",
+          "it-is-not-me": "This is not me",
+          "it-is-me": "This is me",
+          "token-expired": "Token has expired or does not exist",
+          "request-confirmed": "Request accepted",
+          "request-confirmed-description": "You can now close this window",
+          "request-rejected": "Request rejected",
+          "request-rejected-description": "You can now close this window"
+        }
+      }
+    },
+    "connections": {
+      "title": "Connections",
+      "sections": {
+        "add-connection": {
+          "title": "Add accounts to your profile"
+        }
+      }
+    },
+    "store": {
+      "title": "Store",
+      "sections": {
+        "change-recipient": {
+          "title": "Change recipient",
+          "current-recipient": "Current recipient",
+          "current-recipient-description": "Recipient assigned to all items added to the cart.",
+          "save": "Save"
+        }
+      }
+    },
+    "appearance": {
+      "title": "Personalization",
+      "sections": {
+        "seems-like-players": {
+          "title": "Show similar players",
+          "description": "Show similar profiles below the main information."
+        },
+        "balance-animation": {
+          "description": "Numbers will change smoothly when the balance increases or decreases."
+        }
+      }
+    },
+    "language": {
+      "title": "Language"
+    },
+    "logout": {
+      "title": "Log out"
+    }
   }
 }

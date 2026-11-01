@@ -1,5 +1,5 @@
-import clsx from 'clsx';
-import { type ComponentProps, forwardRef, useMemo } from 'react';
+import { clsx } from 'cnfast';
+import { type ComponentProps, useMemo } from 'react';
 import { type SpritePrepareConfig, sprites, type SpritesMeta } from '../types/gen/icon/sprite.gen';
 
 /** Icon props extending SVG props and requiring specific icon name */
@@ -30,50 +30,48 @@ export type IconName = {
   [Key in keyof SpritesMeta]: `${Key}:${SpritesMeta[Key]}`;
 }[keyof SpritesMeta];
 
-export const Icon = forwardRef<SVGSVGElement, IconProps>(
-  ({ name, className, invert, ...props }, ref) => {
-    const {
-      symbol: { viewBox, width, height },
-      href
-    } = useMemo(() => getIconMeta(name), [name]);
-    const scaleX = width > height;
-    const scaleY = width < height;
+export const Icon = ({ name, className, invert, ref, ...props }: IconProps) => {
+  const {
+    symbol: { viewBox, width, height },
+    href
+  } = useMemo(() => getIconMeta(name), [name]);
+  const scaleX = width > height;
+  const scaleY = width < height;
 
-    return (
-      <svg
-        className={clsx(
-          {
-            /**
-             * We want to control the icon's size based on its aspect ratio because we're scaling it
-             * by the maximum value of width and height to prevent layout explosion.
-             *
-             * Also, different classes were chosen to avoid CSS overrides collisions.
-             *
-             * @see https://github.com/secundant/neodx/issues/92
-             */
-            'icon-x': invert ? scaleY : scaleX,
-            'icon-y': invert ? scaleX : scaleY,
-            icon: width === height
-          },
-          className
-        )}
-        // pass actual viewBox because of a browser inconsistencies if we don't
-        viewBox={viewBox}
-        // prevent icon from being focused when using keyboard navigation
-        focusable="false"
-        // hide icon from screen readers
-        aria-hidden
-        // pass through ref and other props
-        ref={ref}
-        {...props}
-      >
-        {/* External sprites href will be "<base url>/<file name>#<symbol name>",
+  return (
+    <svg
+      className={clsx(
+        {
+          /**
+           * We want to control the icon's size based on its aspect ratio because we're scaling it
+           * by the maximum value of width and height to prevent layout explosion.
+           *
+           * Also, different classes were chosen to avoid CSS overrides collisions.
+           *
+           * @see https://github.com/secundant/neodx/issues/92
+           */
+          'icon-x': invert ? scaleY : scaleX,
+          'icon-y': invert ? scaleX : scaleY,
+          icon: width === height
+        },
+        className
+      )}
+      // pass actual viewBox because of a browser inconsistencies if we don't
+      viewBox={viewBox}
+      // prevent icon from being focused when using keyboard navigation
+      focusable="false"
+      // hide icon from screen readers
+      aria-hidden
+      // pass through ref and other props
+      ref={ref}
+      {...props}
+    >
+      {/* External sprites href will be "<base url>/<file name>#<symbol name>",
       while the inlined one will be just "#<symbol name>" */}
-        <use href={href} />
-      </svg>
-    );
-  }
-);
+      <use href={href} />
+    </svg>
+  );
+};
 
 /** Safe wrapper for extracting icon metadata */
 const getIconMeta = (name: IconName) => {

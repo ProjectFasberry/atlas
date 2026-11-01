@@ -1,6 +1,6 @@
 import { StoreFilterList, StoreFiltersSheet, StoreSearch } from "@/shared/components/app/shop/components/filters/store-filters";
 import { StoreList } from "@/shared/components/app/shop/components/items/store-list";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { appState } from "@/shared/models/app/index.model";
 import { PageHeaderImage } from "@/shared/ui/header-image";

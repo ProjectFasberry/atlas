@@ -52,7 +52,7 @@ export const ReferralsList = reatomComponent(({ ctx }) => {
   if (!data) return <Noop />
 
   return (
-    <div className="flex flex-wrap gap-4 w-full h-fit">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">
       {data.map((referral) => (
         <ReferralListItem key={referral.id} {...referral} />
       ))}

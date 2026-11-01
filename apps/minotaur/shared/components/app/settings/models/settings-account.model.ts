@@ -3,7 +3,7 @@ import { client } from "@/shared/lib/client-wrapper"
 import { action, atom, reatomAsync, withAssign, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework"
 import { settings, } from "./settings.model"
 import { toast } from "sonner"
-import { isError } from "@/shared/lib/helpers"
+import { isError } from "@/shared/lib/utils"
 
 export const settingsAccountModel = () => {
   const deleteAccount = atom(null, "deleteAccount").pipe(

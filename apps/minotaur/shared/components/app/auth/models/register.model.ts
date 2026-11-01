@@ -2,27 +2,28 @@ import {
   action, atom, reatomAsync, spawn, withAssign, withDataAtom, withReset, withStatusesAtom,
   type AtomMut
 } from "@reatom/framework";
-import { invariant } from "@/shared/lib/invariant";
+import { invariant } from "@/shared/lib/utils";
 import { registerSchema } from "@/shared/schemas/auth";
 import { client } from "@/shared/lib/client-wrapper";
 import { auth, type AuthFindoutType, authState, defineError } from "./auth.model";
-import { pof } from "../../../../models/shared.model";
 import { logError } from "@/shared/lib/log";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { createPhraseModel } from "./seed-phrase.model";
 import { createNavigationModel } from "./navigation.model";
 import { authSecurity } from "./auth-security.model";
 import { getExistNickname } from "@/shared/models/shared.model";
-import { spyOptionAtom } from "@/shared/models/app/utils";
+import { maybeSpyOptionAtom } from "@/shared/models/app/utils";
 import { translate } from "@/shared/locales/helpers";
 import * as z from "zod";
-import { downloadFile } from "@/shared/lib/utils";
+import { downloadFile } from "@/shared/lib/helpers";
 
-export type AuthRegisterType = |
-  "start-input" |
-  "seed-phrase-save" |
-  "seed-phrase-confirm" |
-  "confirm"
+export const AUTH_REGISTER_TYPE = [
+  "start-input",
+  "seed-phrase-save",
+  "seed-phrase-confirm",
+  "confirm",
+] as const;
+export type AuthRegisterType = typeof AUTH_REGISTER_TYPE[number];
 
 const fieldsOnlyRegisterSchema = z.intersection(
   registerSchema.omit({ hash: true }),
@@ -98,11 +99,12 @@ export const register = atom(null, "register").pipe(
           return false;
         }
 
-        const pofIsActive = spyOptionAtom(ctx, "flags", "isPof", true)
-        const token = ctx.get(pof.token);
+        const pofIsActive = maybeSpyOptionAtom(ctx, "flags", "isPof", true)
+        const token = ctx.get(authState.token);
 
-        if (!token && pofIsActive) {
-          pof.showTokenVerifySectionAtom(ctx, true);
+        if (pofIsActive && !token) {
+          authState.isProcessing(ctx, true);
+          auth.defineCap(ctx)
           return false;
         }
 
@@ -174,7 +176,7 @@ export const register = atom(null, "register").pipe(
       authState.type(ctx, "login")
       auth.resetAuthState(ctx)
       register.resetRegisterState(ctx)
-      pof.token.reset(ctx);
+      authState.token.reset(ctx);
     }),
     next: action((ctx) => {
       spawn(ctx, (spawnCtx) => {
@@ -183,7 +185,7 @@ export const register = atom(null, "register").pipe(
         if (skipPhrase) {
           registerState.type(ctx, "confirm");
 
-          const token = ctx.get(pof.token);
+          const token = ctx.get(authState.token);
           register.submit(spawnCtx, token);
         }
 
@@ -227,11 +229,11 @@ export const registerNavigationModel = createNavigationModel({
   typeAtom: registerState.type as AtomMut<string>
 })
 
-export const FINDOUT_OPTIONS: { title: string; value: AuthFindoutType }[] = [
+export const createFindoutOptions = (): { title: string; value: AuthFindoutType }[] => ([
   { title: translate["auth.register.findout.referrer"](), value: "referrer" },
   { title: translate["auth.register.findout.custom"](), value: "custom" },
-];
+])
 
 export const findoutSelectedTypeAtom = atom((ctx) =>
-  FINDOUT_OPTIONS.find((d) => d.value === ctx.spy(authState.fields.findoutType)) ?? null,
+  createFindoutOptions().find((d) => d.value === ctx.spy(authState.fields.findoutType)) ?? null,
 );

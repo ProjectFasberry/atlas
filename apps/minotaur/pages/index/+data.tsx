@@ -1,25 +1,24 @@
 import { type PageContextServer } from "vike/types";
 import { useConfig } from 'vike-react/useConfig'
-import { wrapTitle } from "@/shared/lib/utils";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { wrapTitle } from "@/shared/lib/helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { logRouting } from "@/shared/lib/log";
 import { env } from "@/shared/env";
 import { getNews, newsState } from "@/shared/components/app/news/models/news.model";
 import { createCtx, type Ctx } from "@reatom/framework";
 import { snapshots } from "@/shared/models/ssr";
 import { eventsState, getEvents } from "@/shared/components/app/events/models/events.model";
+import { translate } from "@/shared/locales/helpers";
 
-const previewImage = getStaticImage("arts/8332de192322939.webp")
-const title = wrapTitle("Главная")
-const description = `
-  Официальное приложение майнкрафт-проекта Fasberry.
-  Жанр: RP, RPG, полу-ванила. 1.20.1+. Играть: ${`play.${env.VITE_MAIN_DOMAIN}`}.
-`
+const image = getStaticImage("arts/8332de192322939.webp")
 
 function metadata(pageCtx: PageContextServer) {
+  const title = wrapTitle(translate["index.page.title"]())
+  const description = translate["index.page.description"]({ IP: `play.${env.VITE_MAIN_DOMAIN}` });
+
   return {
     title,
-    image: previewImage,
+    image,
     description,
     Head: (
       <>

@@ -1,7 +1,7 @@
 import { reatomComponent } from "@reatom/npm-react";
 import { createStorageModel } from "../models/storage.model";
 import { Skeleton } from "@/shared/ui/skeleton";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { Portal } from "@ark-ui/react/portal";
 import { Menu } from "@ark-ui/react/menu";
 import { menuVariant } from "@/shared/ui/menu";
@@ -149,7 +149,7 @@ export const storageModel = ({
           </Menu.Trigger>
           <Portal>
             <Menu.Positioner>
-              <Menu.Content className={menuVariant.content({ className: "min-w-[340px]" })}>
+              <Menu.Content className={menuVariant.content("min-w-[340px]")}>
                 <StorageContent />
               </Menu.Content>
             </Menu.Positioner>

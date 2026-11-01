@@ -1,7 +1,7 @@
 import { Link } from "@/shared/components/config/link/link";
 import { reatomComponent } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { useData } from "vike-react/useData";
 import { type Data, type OrderSingleGamePayload } from "@/pages/store/order/@id/+data";
 import { createLink } from "@/shared/components/config/link/link.model";

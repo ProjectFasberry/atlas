@@ -61,7 +61,7 @@ const OrdersFilterDropdown = reatomComponent<OrdersFilterDropdownProps>(({ ctx, 
                   key={item.value}
                   value={item.value}
                   data-state={current === item.value ? "active" : "inactive"}
-                  className={menuVariant.item({ className: "data-[state=active]:text-green-600 data-[state=inactive]:text-neutral-50"})}
+                  className={menuVariant.item("data-[state=active]:text-green-600 data-[state=inactive]:text-neutral-50")}
                 >
                   <Typography>
                     {item.title}

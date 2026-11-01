@@ -7,7 +7,7 @@ import { client, withJsonBody } from "@/shared/lib/client-wrapper";
 import { getRecipient } from "../../settings/models/settings-store.model";
 import { navigate } from "vike/client/router";
 import { withSsr } from "@/shared/models/ssr";
-import { invariant } from "@/shared/lib/invariant";
+import { invariant } from "@/shared/lib/utils";
 import { storeItem } from "./store-item.model";
 import { storeItems } from "./store.model";
 import { getIsAuthed } from "@/shared/models/app/utils";

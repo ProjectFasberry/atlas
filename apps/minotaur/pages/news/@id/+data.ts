@@ -1,7 +1,7 @@
 import { client } from "@/shared/lib/client-wrapper";
 import { logRouting } from "@/shared/lib/log";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
-import { wrapTitle } from "@/shared/lib/utils";
+import { getStaticImage } from "@/shared/lib/helpers";
+import { getNotExistUrlByEntity, wrapTitle } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { render } from "vike/abort";
 import { type PageContextServer } from "vike/types";
@@ -12,13 +12,15 @@ import { newsSingleState } from "@/shared/components/app/news/models/news-single
 export type Data = Awaited<ReturnType<typeof data>>;
 export type News = ExtractApiData<"getNewsById">["data"]
 
+const image = (url: News["imageUrl"]) => getStaticImage(url.slice(1));
+
 function metadata(
   news: News
 ) {
   return {
     title: wrapTitle(news.title),
     description: news.description.slice(0, 256),
-    image: getStaticImage(news.imageUrl!.slice(1))
+    image: image(news.imageUrl)
   }
 }
 
@@ -31,7 +33,7 @@ async function init(ctx: Ctx, pageCtx: PageContextServer) {
     return null;
   })
 
-  if (!news) throw render("/not-exist")
+  if (!news) throw render(getNotExistUrlByEntity("default"))
 
   return newsSingleState.data(ctx, news)!
 }

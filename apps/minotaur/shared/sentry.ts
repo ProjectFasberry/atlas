@@ -1,6 +1,6 @@
 import { env } from "./env";
 import type { BrowserOptions } from "@sentry/browser";
-import { invariant } from "./lib/invariant";
+import { invariant } from "./lib/utils";
 import type { Client } from "@sentry/core";
 
 const baseOptions: BrowserOptions = {

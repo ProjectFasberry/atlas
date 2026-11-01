@@ -15,7 +15,7 @@ import {
 import "dayjs/locale/ru";
 import { Typography } from "@/shared/ui/typography"
 import { atom } from "@reatom/framework";
-import dayjs from "@/shared/lib/create-dayjs"
+import { dayjs } from "@/shared/lib/dayjs"
 import { createLink } from "@/shared/components/config/link/link.model";
 
 const ratingCardVariants = tv({

@@ -7,11 +7,11 @@ import { spawn } from "@reatom/framework";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { tv } from "tailwind-variants";
 import { ErrorBlock } from "@/shared/ui/error-block";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { Icon } from "@/shared/ui/icon";
 import { Button } from "@/shared/ui/button";
 import { DeleteButton } from "./ui";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { Noop } from "@/shared/ui/noop";
 
 const modpackItemVariant = tv({

@@ -5,6 +5,7 @@ import { Button } from "@/shared/ui/button";
 import { SettingsContentWrapper, SettingsSection } from "./ui";
 import { Icon } from "@/shared/ui/icon"
 import { currentUserState } from "@/shared/models/current-user/index.model";
+import { translate } from "@/shared/locales/helpers";
 
 const GlobalRecipient = reatomComponent(({ ctx }) => {
   const oldRecipient = ctx.spy(changeGlobalRecipientState.oldRecipient) ?? ""
@@ -18,14 +19,14 @@ const GlobalRecipient = reatomComponent(({ ctx }) => {
 
   return (
     <SettingsSection
-      title="Текущий получатель"
-      description="Получатель, который присваивается всем добавленным товарам в корзину."
+      title={translate["settings.store.sections.change-recipient.current-recipient"]()}
+      description={translate["settings.store.sections.change-recipient.current-recipient-description"]()}
     >
       <form onSubmit={handle} className="flex items-start w-full min-w-0 justify-between gap-2">
         <div className="flex flex-col flex-1 gap-1 w-[70%]">
           <Input
             value={newRecipient ?? oldRecipient}
-            placeholder="Введите никнейм"
+            placeholder={translate["shared.nickname"]()}
             onChange={e => changeGlobalRecipientState.newRecipient(ctx, e.target.value)}
             maxLength={32}
             variant={error ? "danger" : "default"}
@@ -54,7 +55,7 @@ const GlobalRecipient = reatomComponent(({ ctx }) => {
             isLoading={ctx.spy(changeGlobalRecipient.submit.statusesAtom).isPending}
             disabled={!ctx.spy(changeGlobalRecipientIsValidAtom) || ctx.spy(changeGlobalRecipient.submit.statusesAtom).isPending}
           >
-            Сохранить
+            {translate["settings.store.sections.change-recipient.save"]()}
           </Button>
         </div>
       </form>
@@ -64,7 +65,7 @@ const GlobalRecipient = reatomComponent(({ ctx }) => {
 
 export const SettingsStore = () => {
   return (
-    <SettingsContentWrapper title="Магазин">
+    <SettingsContentWrapper title={translate["settings.store.title"]()}>
       <GlobalRecipient />
     </SettingsContentWrapper>
   )

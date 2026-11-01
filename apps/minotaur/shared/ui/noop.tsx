@@ -1,4 +1,4 @@
-import clsx from "clsx"
+import { clsx } from "cnfast"
 import { translate } from "../locales/helpers"
 import { Typography } from "./typography"
 

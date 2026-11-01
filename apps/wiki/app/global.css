@@ -1,0 +1,341 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+@font-face {
+  font-family: "PIXY";
+  src: url("/fonts/PIXY.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Fasberry palette, based on the docs.particle.ai reference (Mintlify mint theme):
+ * white background, calm green #0D9373 in the light theme and #4ADE80 in the dark one.
+ */
+:root {
+  --color-fd-background: #ffffff;
+  --color-fd-foreground: #0a0e0d;
+  --color-fd-muted: #f3f7f6;
+  --color-fd-muted-foreground: #707473;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #0a0e0d;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #0a0e0d;
+  --color-fd-border: #dee2e2;
+  --color-fd-primary: #0d9373;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-secondary: #eef2f1;
+  --color-fd-secondary-foreground: #252928;
+  --color-fd-accent: #eef2f1;
+  --color-fd-accent-foreground: #171b1a;
+  --color-fd-ring: #0d9373;
+}
+
+.dark {
+  --color-fd-background: #0a0d0d;
+  --color-fd-foreground: #e7ebea;
+  --color-fd-muted: #171b1a;
+  --color-fd-muted-foreground: #9ea3a2;
+  --color-fd-popover: #121616;
+  --color-fd-popover-foreground: #e7ebea;
+  --color-fd-card: #121616;
+  --color-fd-card-foreground: #e7ebea;
+  --color-fd-border: #262b2a;
+  --color-fd-primary: #4ade80;
+  --color-fd-primary-foreground: #0a0d0d;
+  --color-fd-secondary: #1f2423;
+  --color-fd-secondary-foreground: #e7ebea;
+  --color-fd-accent: #1f2423;
+  --color-fd-accent-foreground: #dce3e1;
+  --color-fd-ring: #4ade80;
+}
+
+/*
+ * Apple-like segmented control (theme and language switches): a soft grey track,
+ * a white thumb with a small shadow, muted labels outside the thumb.
+ */
+:root {
+  --seg-track: rgb(118 118 128 / 0.12);
+  --seg-thumb: #ffffff;
+  --seg-thumb-foreground: #1c1c1e;
+  --seg-muted: rgb(60 60 67 / 0.6);
+  --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.12), 0 3px 1px rgb(0 0 0 / 0.04);
+}
+
+.dark {
+  --seg-track: rgb(118 118 128 / 0.32);
+  --seg-thumb: #636366;
+  --seg-thumb-foreground: #ffffff;
+  --seg-muted: rgb(235 235 245 / 0.6);
+  --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.4), 0 3px 1px rgb(0 0 0 / 0.16);
+}
+
+/* Fumadocs overrides the sidebar separately in the dark theme */
+.dark #nd-sidebar {
+  --color-fd-muted: #171b1a;
+  --color-fd-secondary: #1f2423;
+  --color-fd-muted-foreground: #9ea3a2;
+  --color-fd-primary: #4ade80;
+  --color-fd-primary-foreground: #0a0d0d;
+}
+
+html {
+  scrollbar-gutter: stable;
+  background-color: var(--color-fd-background);
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* Header as on app.fasberry.fun: 80px tall */
+#nd-notebook-layout:has(#nd-subnav) {
+  --fd-header-height: 5rem;
+}
+
+#nd-subnav [data-header-body] {
+  height: 5rem;
+}
+
+/* Sidebar: soft rounding and a visible active item */
+#nd-sidebar a {
+  border-radius: 0.5rem;
+}
+
+#nd-sidebar a[data-active="true"] {
+  font-weight: 500;
+}
+
+/* Theme switch: the new colour unfolds as a circle from the click point.
+   Chromium - View Transitions: the browser takes a snapshot, the old content stays
+   outside the circle and the new one appears inside, so nothing disappears.
+   The new snapshot mask has three layers: a disc with a feathered edge, a ring at the
+   border and noise; the noise is intersected with the ring only (mask-composite), so
+   the grain lives on the circle edge. Geometry is animated by the registered property
+   --theme-reveal-size (radii inside gradient stops, no mask-size - that is what used
+   to flicker).
+   Firefox - a cover in the old colour with the circle cut out (in Gecko masks on
+   ::view-transition-* do not render), its radius is written by lib/models/theme.ts. */
+:root {
+  --theme-reveal-x: 50%;
+  --theme-reveal-y: 50%;
+  --theme-reveal-r: 0px;
+  /* width of the blurred circle edge */
+  --theme-reveal-feather: 150px;
+  --theme-reveal-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@property --theme-reveal-size {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes fd-theme-reveal {
+  from {
+    --theme-reveal-size: 0px;
+  }
+  to {
+    --theme-reveal-size: var(--theme-reveal-radius);
+  }
+}
+
+::view-transition-old(root) {
+  animation: none;
+}
+
+::view-transition-new(root) {
+  animation: fd-theme-reveal 620ms cubic-bezier(0.33, 0, 0.2, 1) both;
+  -webkit-mask-image:
+    radial-gradient(
+      circle at var(--theme-reveal-x) var(--theme-reveal-y),
+      #000 0,
+      #000 calc(var(--theme-reveal-size) - var(--theme-reveal-feather)),
+      transparent var(--theme-reveal-size)
+    ),
+    radial-gradient(
+      circle at var(--theme-reveal-x) var(--theme-reveal-y),
+      transparent calc(var(--theme-reveal-size) - 210px),
+      #000 calc(var(--theme-reveal-size) - 150px),
+      #000 calc(var(--theme-reveal-size) - 12px),
+      transparent var(--theme-reveal-size)
+    ), var(--theme-reveal-noise);
+  mask-image:
+    radial-gradient(
+      circle at var(--theme-reveal-x) var(--theme-reveal-y),
+      #000 0,
+      #000 calc(var(--theme-reveal-size) - var(--theme-reveal-feather)),
+      transparent var(--theme-reveal-size)
+    ),
+    radial-gradient(
+      circle at var(--theme-reveal-x) var(--theme-reveal-y),
+      transparent calc(var(--theme-reveal-size) - 210px),
+      #000 calc(var(--theme-reveal-size) - 150px),
+      #000 calc(var(--theme-reveal-size) - 12px),
+      transparent var(--theme-reveal-size)
+    ), var(--theme-reveal-noise);
+  -webkit-mask-repeat: no-repeat, no-repeat, repeat;
+  mask-repeat: no-repeat, no-repeat, repeat;
+  -webkit-mask-size:
+    100% 100%,
+    100% 100%,
+    120px 120px;
+  mask-size:
+    100% 100%,
+    100% 100%,
+    120px 120px;
+  -webkit-mask-composite: source-over, source-in, source-over;
+  mask-composite: add, intersect, add;
+}
+
+/* --- Firefox and others: a cover in the old colour with the circle cut out --- */
+.theme-reveal-cover,
+.theme-reveal-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  contain: layout paint;
+  --theme-reveal-x: 50%;
+  --theme-reveal-y: 50%;
+  --theme-reveal-radius: 1px;
+  --theme-reveal-color: #ffffff;
+}
+
+.theme-reveal-cover {
+  z-index: 9997;
+  background-image: radial-gradient(
+    circle var(--theme-reveal-radius) at var(--theme-reveal-x) var(--theme-reveal-y),
+    transparent 0,
+    transparent calc(var(--theme-reveal-radius) - var(--theme-reveal-feather)),
+    var(--theme-reveal-color) var(--theme-reveal-radius)
+  );
+}
+
+/* grain along the edge: a ring in the old theme colour, cut out by noise */
+.theme-reveal-grain {
+  z-index: 9998;
+  opacity: 0.55;
+  background-image: radial-gradient(
+    circle var(--theme-reveal-radius) at var(--theme-reveal-x) var(--theme-reveal-y),
+    transparent 0,
+    transparent calc(var(--theme-reveal-radius) - 210px),
+    var(--theme-reveal-color) calc(var(--theme-reveal-radius) - 150px),
+    var(--theme-reveal-color) calc(var(--theme-reveal-radius) - 12px),
+    transparent var(--theme-reveal-radius)
+  );
+  -webkit-mask-image: var(--theme-reveal-noise);
+  mask-image: var(--theme-reveal-noise);
+  -webkit-mask-size: 120px 120px;
+  mask-size: 120px 120px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+}
+
+/* Grain over the page - a barely visible film of noise */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Wiki editor: typography inside the TipTap content area */
+.wiki-editor-content {
+  min-height: 60vh;
+  outline: none;
+}
+
+.wiki-editor-content > * + * {
+  margin-top: 0.85em;
+}
+
+.wiki-editor-content h2 {
+  margin-top: 1.6em;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.wiki-editor-content h3 {
+  margin-top: 1.3em;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.wiki-editor-content ul {
+  padding-left: 1.4em;
+  list-style: disc;
+}
+
+.wiki-editor-content ol {
+  padding-left: 1.4em;
+  list-style: decimal;
+}
+
+.wiki-editor-content li + li {
+  margin-top: 0.3em;
+}
+
+.wiki-editor-content blockquote {
+  border-left: 3px solid var(--color-fd-border);
+  padding-left: 1em;
+  color: var(--color-fd-muted-foreground);
+}
+
+.wiki-editor-content code {
+  border-radius: 0.3rem;
+  background: var(--color-fd-muted);
+  padding: 0.1rem 0.3rem;
+  font-size: 0.9em;
+}
+
+.wiki-editor-content pre {
+  overflow: auto;
+  border-radius: 0.5rem;
+  background: var(--color-fd-muted);
+  padding: 1rem;
+}
+
+.wiki-editor-content img {
+  height: auto;
+  max-width: 100%;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+}
+
+.wiki-editor-content a {
+  color: var(--color-fd-primary);
+  text-decoration: underline;
+}
+
+/* Images in articles: content is plain HTML now, not a WikiImage component */
+article img {
+  height: auto;
+  max-width: 100%;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+}
+
+.wiki-editor-content table,
+article table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.wiki-editor-content th,
+.wiki-editor-content td,
+article th,
+article td {
+  border: 1px solid var(--color-fd-border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}

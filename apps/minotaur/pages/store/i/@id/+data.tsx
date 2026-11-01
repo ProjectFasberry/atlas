@@ -1,6 +1,6 @@
 import { type PageContextServer } from "vike/types";
 import { useConfig } from 'vike-react/useConfig'
-import { wrapTitle } from "@/shared/lib/utils";
+import { getNotExistUrlByEntity, wrapTitle } from "@/shared/lib/helpers";
 import { render } from "vike/abort";
 import { cart } from "@/shared/components/app/shop/models/store-cart.model";
 import { logRouting } from "@/shared/lib/log";
@@ -39,14 +39,13 @@ export async function data(pageCtx: PageContextServer) {
 
   const config = useConfig()
   const headers = pageCtx.headers ?? undefined
-  const id = pageCtx.routeParams.id;
 
-  const result = await getStoreItem(id, { headers }).catch((e) => {
+  const result = await getStoreItem(pageCtx.routeParams.id, { headers }).catch((e) => {
     console.error(e)
     return null;
   })
-  
-  if (!result) throw render("/not-exist?type=store-item")
+
+  if (!result) throw render(getNotExistUrlByEntity("store.item"))
 
   config(metadata(result, pageCtx))
 

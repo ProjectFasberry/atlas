@@ -4,38 +4,46 @@ import { usePageContext } from "vike-react/usePageContext";
 
 type LinkProps = ComponentPropsWithRef<"a"> & {
   href: string,
-  locale?: string
+  locale?: string,
+  active?: boolean;
 }
 
-export const Link = ({ href, locale, className, ...props }: LinkProps) => {
-  const { urlPathname: pathname, ...pageCtx } = usePageContext()
+const normalize = (p: string) => (p || "/").replace(/\/+$/, "") || "/";
 
-  const targetLocale = locale ?? pageCtx.locale;
-  const initWithLocale = !!locale;
+export const Link = ({ href, locale, className, active, ...props }: LinkProps) => {
+  const pageCtx = usePageContext();
+  const pathname = pageCtx.urlPathname ?? "/";
 
-  let finalHref = href.startsWith('/') ? href : `/${href}`;
+  const finalHref =
+    href.startsWith("/")
+      ? locale
+        ? `/${locale}${href}`
+        : href
+      : locale
+        ? `/${locale}/${href}`
+        : `/${href}`;
 
-  if (targetLocale !== "ru") {
-    finalHref = `/${targetLocale}${finalHref === '/' ? '' : finalHref}`;
-  }
+  const normalizedPathname = normalize(pathname);
+  const normalizedHref = normalize(finalHref);
 
-  const normalizedPathname = pathname.replace(/\/$/, "") || "/";
-  const normalizedHref = finalHref.replace(/\/$/, "") || "/";
+  const isActive =
+    active ?? normalizedPathname === normalizedHref;
 
-  const isActive = normalizedPathname === normalizedHref;
-  const isIdentity = pathname === finalHref;
+  const isIdentity = normalizedPathname === normalizedHref;
 
   return (
     <a
       href={finalHref}
       data-state={isActive ? "active" : "inactive"}
-      style={isIdentity && !initWithLocale ? { pointerEvents: 'none' } : {}}
+      aria-current={isActive ? "page" : undefined}
       onClick={(e) => {
-        if (isIdentity && !initWithLocale) {
+        if (isIdentity) {
           e.preventDefault();
         }
       }}
-      className={tv({ base: `data-[state=active]:is-active` })({ className })}
+      className={tv({
+        base: "data-[state=active]:is-active flex items-center gap-2"
+      })({ className })}
       {...props}
     />
   );

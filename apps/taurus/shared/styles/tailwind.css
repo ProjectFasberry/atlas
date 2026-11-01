@@ -3,7 +3,7 @@
 
 @import "./editor.css";
 
-@source "../../../../packages/ui/**/*.{ts,tsx}";
+@source "../../../../pkgs/ui/**/*.{ts,tsx}";
 
 @plugin "tailwind-scrollbar" {
   nocompatible: true;

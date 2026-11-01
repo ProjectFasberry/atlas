@@ -3,12 +3,12 @@ import { type PropsWithChildren } from "react";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import { errorBoundary } from "../models/error.model";
 import { Icon } from "@/shared/ui/icon"
-import { spyOptionAtom } from "@/shared/models/app/utils";
+import { maybeSpyOptionAtom } from "@/shared/models/app/utils";
 import { reatomComponent } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography";
 
 const ErrorFallback = reatomComponent<FallbackProps>(({ ctx, error, resetErrorBoundary }) => {
-  const stage = spyOptionAtom(ctx, "state", "stage", "prod")
+  const stage = maybeSpyOptionAtom(ctx, "state", "stage", "prod")
 
   return (
     <div className="flex flex-col gap-4 h-dvh responsive mx-auto w-full items-center justify-center">

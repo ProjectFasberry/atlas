@@ -1,6 +1,6 @@
 import { reatomComponent } from "@reatom/npm-react";
 import {
-  isCheckedAtom, userIsSelectedAtom, type PrivatedUser, users, usersControl, usersControlState, usersDataArrAtom
+  isCheckedAtom, userIsSelectedAtom, type PrivatedUser, users, usersRestrict, usersRestrictState, usersDataArrAtom
 } from "../../models/users.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { tv } from "tailwind-variants";
@@ -10,13 +10,14 @@ import { Avatar } from "../../../../../ui/avatar";
 import { Typography } from "@/shared/ui/typography"
 import { UserActionsChangeRoleLocal } from "./users.change-role";
 import { UserActionsWrapper } from "./users.restrict";
-import { Checkbox } from "@/shared/ui/checkbox";
+import { checkboxVariant } from "@/shared/ui/checkbox";
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu";
 import { Portal } from "@ark-ui/react/portal";
 import { atom } from "@reatom/framework";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { Noop } from "@/shared/ui/noop";
+import { Checkbox } from "@ark-ui/react/checkbox";
 
 const userItemVariant = tv({
   base: `flex flex-col rounded-lg w-full px-4 border`,
@@ -37,7 +38,7 @@ const userItemVariant = tv({
 
 const coordsAtom = atom({ x: 0, y: 0 }, "coords");
 
-usersControlState.selectedUser.onChange((ctx, state) => {
+usersRestrictState.selectedUser.onChange((ctx, state) => {
   const isOpen = !!state;
 
   if (isOpen) {
@@ -48,13 +49,13 @@ usersControlState.selectedUser.onChange((ctx, state) => {
 })
 
 export const UsersItemMenu = reatomComponent(({ ctx }) => {
-  const nickname = ctx.spy(usersControlState.selectedUser);
+  const nickname = ctx.spy(usersRestrictState.selectedUser);
   const coords = ctx.spy(coordsAtom);
 
   return (
     <Menu.Root
       open={!!nickname}
-      onOpenChange={({ open }) => !open && usersControlState.selectedUser.reset(ctx)}
+      onOpenChange={({ open }) => !open && usersRestrictState.selectedUser.reset(ctx)}
     >
       <Portal>
         {nickname && (
@@ -67,7 +68,7 @@ export const UsersItemMenu = reatomComponent(({ ctx }) => {
               zIndex: 9999,
             }}
           >
-            <Menu.Content className={menuVariant.content({ className: "min-w-40" })}>
+            <Menu.Content className={menuVariant.content("min-w-40")}>
               <Menu.Arrow className={menuVariant.arrow()}>
                 <Menu.ArrowTip className={menuVariant.arrowTip()} />
               </Menu.Arrow>
@@ -82,10 +83,14 @@ export const UsersItemMenu = reatomComponent(({ ctx }) => {
 
 const UsersItemCheckbox = reatomComponent<{ nickname: string }>(({ ctx, nickname }) => {
   return (
-    <Checkbox
+    <Checkbox.Root
       checked={ctx.spy(isCheckedAtom(nickname))}
-      onCheckedChange={v => usersControl.select.single(ctx, v, nickname)}
-    />
+      onCheckedChange={(details) => usersRestrict.select.single(ctx, details.checked, nickname)}
+      className={checkboxVariant.root()}
+    >
+      <Checkbox.Control className={checkboxVariant.control()} />
+      <Checkbox.HiddenInput />
+    </Checkbox.Root>
   )
 }, 'UsersItemCheckbox')
 
@@ -98,7 +103,7 @@ const UsersItem = reatomComponent<PrivatedUser>(({ ctx, player, role, avatar, ni
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    usersControlState.selectedUser(ctx, nickname);
+    usersRestrictState.selectedUser(ctx, nickname);
     coordsAtom(ctx, { x: e.clientX, y: e.clientY });
   };
 

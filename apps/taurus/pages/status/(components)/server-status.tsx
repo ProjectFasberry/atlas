@@ -1,14 +1,14 @@
 import { For, mergeProps, onMount, onCleanup, Show } from "solid-js";
 import { type PlayerStatusProps, serverStatus } from "../(models)/server-status.model";
 import { useAtom, useCtx } from "@reatom/npm-solid-js";
-import { pageState } from "@/shared/models/global.model";
+import { pageState } from "@/shared/models/page.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Dialog } from '@ark-ui/solid/dialog';
 import { Typography } from "@/shared/ui/typography";
 import { Link } from "@/shared/components/link";
 import { env } from "@/shared/env";
 import { Portal } from "solid-js/web";
-import { dialogBackdropVariant, dialogTitleVariant } from "@/shared/ui/dialog";
+import { dialogVariant } from "@/shared/ui/dialog";
 
 const APP_URL = env.VITE_APP_URL
 
@@ -64,10 +64,10 @@ const PlayerStatus = (props: PlayerStatusProps) => {
         </div>
       </Dialog.Trigger>
       <Portal>
-        <Dialog.Backdrop class={dialogBackdropVariant()} />
+        <Dialog.Backdrop class={dialogVariant.backdrop()} />
         <Dialog.Positioner>
           <Dialog.Content class="justify-center !max-w-xl">
-            <Dialog.Title class={dialogTitleVariant()}>{props.nickname}</Dialog.Title>
+            <Dialog.Title class={dialogVariant.title()}>{props.nickname}</Dialog.Title>
             <div class="flex flex-col items-center gap-8 w-full">
               <PlayerStatusImage type="full" nickname={props.nickname} />
               <div class="flex flex-col gap-2 w-full">

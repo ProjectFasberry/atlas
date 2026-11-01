@@ -6,8 +6,8 @@ import svg from '@neodx/svg/vite';
 import tsconfigPaths from 'vite-tsconfig-paths'
 import path from "node:path"
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
-import { visualizer } from "rollup-plugin-visualizer";
 import { SVG_OPTIONS } from "./shared/consts/svg";
+import { analyzer } from 'vite-bundle-analyzer'
 
 type Stage = "staging" | "prod"
 
@@ -20,7 +20,7 @@ type StageOpts = Partial<BuildEnvironmentOptions> & Partial<{
 const STAGES: Partial<Record<Stage, StageOpts>> = {
   "staging": {
     sourcemap: true,
-    minify: "esbuild",
+    minify: false,
     chunksHashing: true,
     chunksGroping: true,
     visualizer: true
@@ -37,7 +37,7 @@ const STAGES: Partial<Record<Stage, StageOpts>> = {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd()) as ImportMetaEnv;
 
-  const host = env.VITE_APP_HOST ?? "0.0.0.0"
+  const host = process.env.NODE_ENV === 'development' ? "0.0.0.0" : new URL(env.VITE_API_URL).hostname;
   const port = Number(env.VITE_APP_PORT)
 
   const previewAndServerOpts: PreviewOptions = {
@@ -80,12 +80,12 @@ export default defineConfig(({ mode }) => {
       paraglideVitePlugin({
         project: "./project.inlang",
         outdir: "./paraglide",
-        strategy: ["url", "baseLocale"]
+        strategy: ["cookie", "preferredLanguage", "baseLocale"]
       }),
-      visualizerIsEnabled && visualizer({
-        filename: "dist/bundleStats.html",
-        template: "treemap",
-        gzipSize: true
+      analyzer({
+        enabled: visualizerIsEnabled,
+        analyzerMode: 'static',
+        openAnalyzer: true
       }),
     ],
     ssr: {
@@ -101,11 +101,29 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             if (!id.includes('node_modules')) return;
 
-            if (id.includes('@scure/bip39/wordlists/english.js')) return 'english-wordlist';
-            if (id.includes('tweakpane')) return 'devonly';
-            if (['reatom', 'zod', 'ky'].some(lib => id.includes(`node_modules/${lib}`))) return 'core-vendor';
-            if (id.includes('@monaco-editor') || id.includes('tiptap')) return 'editor';
-            if (id.includes('zag-js') || id.includes('ark-ui')) return 'uikit-new';
+            if (
+              id.includes('node_modules/react/') ||
+              id.includes('node_modules/react-dom/') ||
+              id.includes('node_modules/scheduler/')
+            ) {
+              return 'react-core';
+            }
+
+            if (id.includes('@scure/bip39/wordlists/english.js')) {
+              return 'english-wordlist';
+            }
+            if (id.includes('tweakpane')) {
+              return 'devonly';
+            }
+            if (['@reatom', 'reatom', 'zod', 'ky'].some(lib => id.includes(`node_modules/${lib}`))) {
+              return 'core-vendor';
+            }
+            if (["@tiptap", "tiptap"].some(lib => id.includes(`node_modules/${lib}`))) {
+              return 'editor';
+            }
+            if (id.includes('zag-js') || id.includes('ark-ui')) {
+              return 'uikit-new';
+            }
           }
         }
       }
@@ -125,7 +143,8 @@ export default defineConfig(({ mode }) => {
 
             return this.resolve(updatedId, importer, { skipSelf: true, ...options });
           }
-        }
+        },
+        { find: "tailwind-variants", replacement: path.resolve(__dirname, './node_modules/tailwind-variants/dist/lite') }
       ]
     },
     preview: {

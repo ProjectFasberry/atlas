@@ -1,10 +1,7 @@
 import { BProgress } from '@bprogress/core';
-import type { PageContextClient } from 'vike/types';
 
-export const onPageTransitionStart = async (pageCtx: Partial<PageContextClient>) => {
-  if (!pageCtx.urlPathname?.includes("/wiki")) {
-    document.querySelector("body")?.classList.add("page-is-transitioning");
-  }
+export const onPageTransitionStart = async () => {
+  document.querySelector("body")?.classList.add("page-is-transitioning");
 
   BProgress.start()
 };

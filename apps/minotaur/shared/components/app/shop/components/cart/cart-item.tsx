@@ -6,33 +6,46 @@ import { createLink } from "@/shared/components/config/link/link.model"
 import { storeItem } from "../../models/store-item.model"
 import { cart, cartDataItemIsSelectAtom, type CartItem as CartItemProps } from "../../models/store-cart.model"
 import { changeLocalRecipient } from "../../../settings/models/settings-store.model"
-import { Checkbox } from "@/shared/ui/checkbox"
 import { getCurrencies } from "@/shared/models/shared.model"
+import { Checkbox } from "@ark-ui/react/checkbox"
+import { CheckboxIndicatorIcon, checkboxVariant } from "@/shared/ui/checkbox"
 
 const CartItemRemoveFromCart = reatomComponent<{ id: number }>(({ ctx, id }) => {
   return (
     <Button
       title="Удалить"
       background="default"
-      className="h-8 p-0 aspect-square"
+      size="headless"
+      className="h-8 min-h-8 aspect-square"
       onClick={() => cart.removeItem(ctx, id)}
       disabled={ctx.spy(cart.removeItem.statusesAtom).isPending}
     >
-      <Icon name="sprite:trash" className="size-5" />
+      <Icon name="sprite:trash" className="size-4" />
     </Button>
   )
 }, "CartItemRemoveFromCart")
 
 const CartItemUpdateSelectStatus = reatomComponent<{ id: number }>(({ ctx, id }) => {
+  const checked = ctx.spy(cartDataItemIsSelectAtom(id));
+  console.log({ checked });
+
   return (
-    <Checkbox
-      withIndicator
-      variant="filled"
-      className="absolute top-3 left-3 p-0 w-5 h-5"
-      checked={ctx.spy(cartDataItemIsSelectAtom(id))}
-      onCheckedChange={(value) => value && storeItem.updateSelectedStatus(ctx, id)}
-      disabled={ctx.spy(storeItem.updateSelectedStatus.statusesAtom).isPending}
-    />
+    <div className="absolute z-2 top-3 left-3">
+      <Checkbox.Root
+        id={String(id)}
+        checked={checked}
+        onCheckedChange={(e) => storeItem.updateSelectedStatus(ctx, id)}
+        className={checkboxVariant.root()}
+        disabled={ctx.spy(storeItem.updateSelectedStatus.statusesAtom).isPending}
+      >
+        <Checkbox.Control className={checkboxVariant.control({ variant: "filled", size: "medium" })}>
+          <Checkbox.Indicator className={checkboxVariant.indicator()}>
+            <CheckboxIndicatorIcon />
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.HiddenInput />
+      </Checkbox.Root>
+    </div>
   )
 }, "CartItemUpdateSelectStatus")
 
@@ -50,14 +63,14 @@ export const CartItem = reatomComponent<CartItemProps>(({
         border border-neutral-800"
     >
       <CartItemUpdateSelectStatus id={id} />
-      <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-        <div className="flex items-center select-none min-h-12 min-w-12 h-12 w-12 justify-center overflow-hidden rounded-lg">
+      <div className="flex items-center relative gap-2 sm:gap-4 min-w-0 flex-1">
+        <div className="flex items-center justify-center overflow-hidden min-h-12 min-w-12 size-12">
           <img
             src={imageUrl}
-            draggable={false}
             width={56}
             height={56}
             alt=""
+            className="select-none w-full h-full"
           />
         </div>
         <div className="flex flex-col justify-center w-full gap-2">
@@ -72,10 +85,11 @@ export const CartItem = reatomComponent<CartItemProps>(({
           <div className="flex items-center gap-1">
             <Button
               background="default"
-              className="p-0 h-8 aspect-square"
+              size="headless"
+              className="h-8 min-h-8 aspect-square"
               onClick={() => changeLocalRecipient.openDialog(ctx, item)}
             >
-              <Icon name="sprite:gift" className="size-5" />
+              <Icon name="sprite:gift" className="size-4" />
             </Button>
             <CartItemRemoveFromCart id={id} />
           </div>

@@ -56,7 +56,7 @@ export const ChangeRecipientDialog = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content({ className: "w-lg" })}>
+          <Dialog.Content className={dialogVariant.content("w-lg")}>
             <form onSubmit={handle} className="flex flex-col gap-4 w-full h-full">
               <div className="flex flex-col gap-1 w-full">
                 <Typography className="font-semibold leading-tight">

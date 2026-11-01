@@ -1,4 +1,4 @@
-import { getStaticImage } from "../lib/volume-helpers";
+import { getStaticImage } from "../lib/helpers";
 
 export const expImage = getStaticImage("minecraft/icons/experience_big.webp")
 

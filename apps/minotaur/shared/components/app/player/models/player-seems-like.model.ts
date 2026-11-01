@@ -2,7 +2,7 @@ import { reatomAsync, withDataAtom, withErrorAtom, withStatusesAtom } from "@rea
 import { playerState } from "./player.model";
 import { action, atom, withAssign } from "@reatom/framework";
 import { toast } from "sonner";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { client } from "@/shared/lib/client-wrapper";
 import { withSsr } from "@/shared/models/ssr";
 import { setCookie } from "@/shared/lib/cookie-utils";

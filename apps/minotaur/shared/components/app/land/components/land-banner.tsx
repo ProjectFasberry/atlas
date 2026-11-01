@@ -85,7 +85,7 @@ export const LandBannerWithEditing = reatomComponent(({ ctx }) => {
         className="hidden"
         type="file"
         multiple={false}
-        onChange={(e) => landEditing.banner.s(ctx, e)}
+        onChange={(e) => landEditing.banner.apply(ctx, e)}
       />
     </div>
   )

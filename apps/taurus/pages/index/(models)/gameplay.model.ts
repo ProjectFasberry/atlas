@@ -1,64 +1,65 @@
 import { getStaticObject } from "@/shared/lib/helpers";
+import { translate } from "@/shared/locales/helpers";
 import { action, atom, withAssign } from "@reatom/framework";
 
-export const IDEAS = [
+export const createIdeas = () => ([
   {
-    title: "Геймплей",
+    title: translate["gameplay.1.title"](),
     image: getStaticObject("images", "steve-alex.webp"),
-    description: "Выживайте, создавайте поселения и города, общайтесь с игроками, создавайте себя",
+    description: translate["gameplay.1.description"](),
     type: "full"
   },
   {
-    title: "Персонализация",
+    title: translate["gameplay.2.title"](),
     image: getStaticObject("images", "wild-west.webp"),
     link: {
-      title: "Узнать больше",
+      title: translate["gameplay.shared.get-more"](),
       href: "/wiki/profile"
     },
-    description: "Создайте себе свой стиль: новые эмоции, частицы и питомцы",
+    description: translate["gameplay.2.description"](),
     type: "full"
   },
   {
-    title: "Квесты",
+    title: translate["gameplay.3.title"](),
     image: getStaticObject("images", "casino-barebones.webp"),
     link: {
-      title: "Узнать больше",
+      title: translate["gameplay.shared.get-more"](),
       href: "/wiki/quests"
     },
-    description: "Квесты - неотъемлемая часть геймплея, если вы хотите быстро заработать",
+    description: translate["gameplay.3.description"](),
     type: "full"
   },
   {
-    title: "Ресурспак",
+    title: translate["gameplay.4.title"](),
     image: getStaticObject("images", "custom-armor.webp"),
     link: {
-      title: "Узнать больше",
-      href: "/wiki/resourcepack"
+      title: translate["gameplay.shared.get-more"](),
+      href: "https://wiki.fasberry.fun/"
     },
-    description: "Ресурспак добавляет новые предметы: броню, инструменты, оружие и мебель.",
+    description: translate["gameplay.4.description"](),
     type: "module"
   },
   {
-    title: "Эмоции",
+    title: translate["gameplay.5.title"](),
     image: getStaticObject("images", "emotes-preview.webp"),
     link: {
-      title: "Узнать больше",
-      href: "/wiki/emotes"
+      title: translate["gameplay.shared.get-more"](),
+      href: "https://wiki.fasberry.fun/"
     },
-    description: "Сервер поддерживает кастомные движения игрока",
+    description: translate["gameplay.5.description"](),
     type: "module"
   }
-]
+]);
 
 export const selectedKeyAtom = atom(0, "selectedKey").pipe(
   withAssign((atom) => ({
     prev: action((ctx) => {
       const current = ctx.get(atom);
-      atom(ctx, (current - 1 + IDEAS.length) % IDEAS.length);
+      atom(ctx, (current - 1 + createIdeas.length) % createIdeas.length);
     }),
     next: action((ctx) => {
       const current = ctx.get(atom);
-      atom(ctx, (current + 1) % IDEAS.length);
+      atom(ctx, (current + 1) % createIdeas.length);
     })
   }))
 )

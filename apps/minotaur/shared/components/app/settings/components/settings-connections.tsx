@@ -13,7 +13,8 @@ import { Dialog } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { dialogVariant } from "@/shared/ui/dialog";
 import type { PlayerSocialsItem } from "../../player/models/socials.model";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
+import { translate } from "@/shared/locales/helpers";
 
 const {
   getConnectionStatusAtom,
@@ -42,7 +43,7 @@ const ConnectionsAddDialog = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content({ className: "max-w-[600px]" })}>
+          <Dialog.Content className={dialogVariant.content("max-w-[600px]")}>
             <div className="flex flex-col w-full">
               {isLoading ? (
                 <IconLoader />
@@ -142,10 +143,10 @@ export const SettingsMainConnections = () => {
   useUpdate(onMainConnections, []);
 
   return (
-    <SettingsContentWrapper title="Подключения">
+    <SettingsContentWrapper title={translate["settings.connections.title"]()}>
       <div className="flex flex-col gap-1">
         <Typography className="text-lg leading-5 font-semibold">
-          Добавьте аккаунты к своему профилю
+          {translate["settings.connections.sections.add-connection.title"]()}
         </Typography>
         <Typography color="gray" className="text-sm">
         </Typography>

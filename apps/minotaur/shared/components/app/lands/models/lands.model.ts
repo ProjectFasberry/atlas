@@ -1,4 +1,4 @@
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { client, withQueryParams } from "@/shared/lib/client-wrapper";
 import { logError } from "@/shared/lib/log";
 import { pageState } from "@/shared/models/page-context.model";

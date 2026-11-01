@@ -9,16 +9,13 @@ import { createListCollection, Select } from "@ark-ui/react/select"
 import { type SetAtom } from "@reatom/framework"
 import { reatomComponent } from "@reatom/npm-react"
 import { Icon } from "@/shared/ui/icon"
-import { usersManagementModel, type CreateUserVariant } from "../../models/users.model"
+import {
+  CREATE_USER_FIELDS, CREATE_USER_OPTIONS, CREATE_USER_ROLE_OPTIONS, DELETE_USER_FIELDS,
+  usersAuth, usersAuthState, type CreateUserField, type CreateUserVariant,
+  type DeleteUserField
+} from "../../models/users.model"
 
-const {
-  CREATE_USER_FIELDS, CREATE_USER_OPTIONS, CREATE_USER_ROLE_OPTIONS,
-  createUser, createUserState,
-  deleteUser, deleteUserState, DELETE_USER_FIELDS,
-  onValueChange
-} = usersManagementModel();
-
-const CreateUserFormField = reatomComponent<{ field: typeof CREATE_USER_FIELDS[number] }>(({ ctx, field }) => {
+const CreateUserFormField = reatomComponent<{ field: CreateUserField }>(({ ctx, field }) => {
   if (field.type === 'input') {
     return (
       <Input
@@ -49,7 +46,7 @@ const CreateUserFormField = reatomComponent<{ field: typeof CREATE_USER_FIELDS[n
     <Select.Root
       collection={collection}
       value={value}
-      onValueChange={({ value }) => onValueChange(ctx, value, field)}
+      onValueChange={({ value }) => usersAuth.onValueChange(ctx, value, field)}
       className="w-full"
       multiple={field.multiple}
     >
@@ -92,11 +89,12 @@ const CreateUserFormField = reatomComponent<{ field: typeof CREATE_USER_FIELDS[n
 }, "CreateUserFormField")
 
 const CreateUserForm = reatomComponent(({ ctx }) => {
-  const error = ctx.spy(createUser.submit.errorAtom);
+  const error = ctx.spy(usersAuth.createUser.submit.errorAtom);
+  const isLoading = ctx.spy(usersAuth.createUser.submit.statusesAtom).isPending;
 
   return (
     <form
-      onSubmit={(e) => createUser.handle(ctx, e)}
+      onSubmit={(e) => usersAuth.createUser.submit(ctx, e)}
       className="flex flex-col gap-4 w-full"
     >
       <div className="flex flex-col gap-2 w-full">
@@ -107,9 +105,7 @@ const CreateUserForm = reatomComponent(({ ctx }) => {
         type="submit"
         background="white"
         className="font-semibold"
-        withSpinner
-        isLoading={ctx.spy(createUser.submit.statusesAtom).isPending}
-        disabled={ctx.spy(createUser.submit.statusesAtom).isPending}
+        disabled={isLoading}
       >
         Создать
       </Button>
@@ -120,8 +116,8 @@ const CreateUserForm = reatomComponent(({ ctx }) => {
 const CreateUser = reatomComponent(({ ctx }) => {
   return (
     <Dialog.Root
-      open={ctx.spy(createUserState.isOpen)}
-      onOpenChange={({ open }) => createUserState.isOpen(ctx, open)}
+      open={ctx.spy(usersAuthState.createUser.isOpen)}
+      onOpenChange={({ open }) => usersAuthState.createUser.isOpen(ctx, open)}
     >
       <Dialog.Trigger asChild>
         <Button background="default" className="text-sm font-semibold">
@@ -131,7 +127,7 @@ const CreateUser = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content({ className: "w-1/4" })}>
+          <Dialog.Content className={dialogVariant.content("w-1/4")}>
             <DialogTitle className={dialogVariant.title()}>Создание юзера</DialogTitle>
             <CreateUserForm />
             <DialogClose />
@@ -142,7 +138,7 @@ const CreateUser = reatomComponent(({ ctx }) => {
   )
 }, "CreateUser")
 
-const DeleteUserFormField = reatomComponent<{ field: typeof DELETE_USER_FIELDS[number] }>(({ ctx, field }) => {
+const DeleteUserFormField = reatomComponent<{ field: DeleteUserField }>(({ ctx, field }) => {
   return (
     <Input
       value={ctx.spy(field.value)}
@@ -154,11 +150,11 @@ const DeleteUserFormField = reatomComponent<{ field: typeof DELETE_USER_FIELDS[n
 }, "DeleteUserFormField");
 
 const DeleteUserForm = reatomComponent(({ ctx }) => {
-  const error = ctx.spy(deleteUser.submit.errorAtom);
+  const error = ctx.spy(usersAuth.deleteUser.submit.errorAtom);
 
   return (
     <form
-      onSubmit={e => deleteUser.handle(ctx, e)}
+      onSubmit={e => usersAuth.deleteUser.submit(ctx, e)}
       className="flex flex-col gap-4 w-full"
     >
       <div className="flex flex-col gap-2 w-full">
@@ -170,8 +166,8 @@ const DeleteUserForm = reatomComponent(({ ctx }) => {
         background="white"
         className="font-semibold"
         withSpinner
-        isLoading={ctx.spy(deleteUser.submit.statusesAtom).isPending}
-        disabled={ctx.spy(deleteUser.submit.statusesAtom).isPending}
+        isLoading={ctx.spy(usersAuth.deleteUser.submit.statusesAtom).isPending}
+        disabled={ctx.spy(usersAuth.deleteUser.submit.statusesAtom).isPending}
       >
         Удалить
       </Button>
@@ -182,8 +178,8 @@ const DeleteUserForm = reatomComponent(({ ctx }) => {
 const DeleteUser = reatomComponent(({ ctx }) => {
   return (
     <Dialog.Root
-      open={ctx.spy(deleteUserState.isOpen)}
-      onOpenChange={({ open }) => deleteUserState.isOpen(ctx, open)}
+      open={ctx.spy(usersAuthState.deleteUser.isOpen)}
+      onOpenChange={({ open }) => usersAuthState.deleteUser.isOpen(ctx, open)}
     >
       <Dialog.Trigger asChild>
         <Button background="default" className="text-sm font-semibold">
@@ -193,7 +189,7 @@ const DeleteUser = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content({ className: "w-1/4" })}>
+          <Dialog.Content className={dialogVariant.content("w-1/4")}>
             <DialogTitle className={dialogVariant.title()}>Удаление юзера</DialogTitle>
             <DeleteUserForm />
             <DialogClose />

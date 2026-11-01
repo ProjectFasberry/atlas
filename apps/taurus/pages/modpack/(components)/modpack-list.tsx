@@ -2,6 +2,7 @@ import { Typography } from '@/shared/ui/typography';
 import { Button } from '@/shared/ui/button';
 import { ErrorBoundary, For, Show } from 'solid-js';
 import { type Modpack, type Modpacks } from '../(models)/modpack.model';
+import { translate } from '@/shared/locales/helpers';
 
 const ModpackItem = (props: Modpack) => {
   return (
@@ -18,7 +19,7 @@ const ModpackItem = (props: Modpack) => {
             class='w-full md:w-1/2'
           >
             <Button class="py-0.5 text-sm sm:text-base w-full">
-              Скачать
+              {translate["modpack.download"]()}
             </Button>
           </a>
         </div>
@@ -30,16 +31,18 @@ const ModpackItem = (props: Modpack) => {
 const ModpackError = () => (
   <div class="flex flex-col gap-2 w-full items-center justify-cenetr">
     <Typography class="text-red text-2xl">
-      Ошибка загрузки модпаков
+      {translate["modpack.error"]()}
     </Typography>
     <span class="truncate text-sm text-neutral-400">
-      Повторите попытку позже
+      {translate["modpack.retry-later"]()}
     </span>
   </div>
 )
 
 const ModpackListEmpty = () => (
-  <Typography class="text-neutral-400 text-2xl">Модпаков еще нет</Typography>
+  <Typography class="text-neutral-400 text-2xl">
+    {translate["modpack.empty"]()}
+  </Typography>
 )
 
 export const ModpackList = (props: { data?: Modpacks }) => {

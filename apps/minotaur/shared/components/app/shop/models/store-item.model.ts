@@ -1,4 +1,4 @@
-import { reatomAsync, withStatusesAtom } from "@reatom/framework";
+import { reatomAsync, withInit, withReset, withStatusesAtom } from "@reatom/framework";
 import { action, atom } from "@reatom/framework";
 import { cart, cartState } from "./store-cart.model";
 import { logError } from "@/shared/lib/log";
@@ -6,7 +6,11 @@ import { client, withJsonBody } from "@/shared/lib/client-wrapper";
 import { withSsr } from "@/shared/models/ssr";
 import { withAssign } from "@reatom/framework";
 import { type SelectItemToCartOptions, storeItemsState } from "./store.model";
-import { invariant } from "@/shared/lib/invariant";
+import { invariant } from "@/shared/lib/utils";
+import { appState } from "@/shared/models/app/index.model";
+import { renderToHTMLString } from "@tiptap/static-renderer";
+import { editorExtensions } from "@/shared/components/config/editor/editor.model";
+import type { JSONContent } from "@tiptap/react";
 
 export type StoreItem = ExtractApiData<"getStoreItems">["data"]["data"][number]
 
@@ -23,9 +27,55 @@ type UpdateItemStatusOptions =
 
 export const storeItemState = atom(null, "storeItemState").pipe(
   withAssign((_, name) => ({
-    data: atom<StoreItem | null>(null, `${name}.data`).pipe(withSsr(`${name}.data`))
+    data: atom<StoreItem | null>(null, `${name}.data`).pipe(withSsr(`${name}.data`)),
+    isExpanded: atom(false, `${name}.isExpanded`).pipe(
+      withInit((ctx, target) => {
+        const isMobile = ctx.get(appState.current.isMobile);
+
+        if (!isMobile) {
+          return true;
+        }
+
+        return target(ctx)
+      }),
+      withReset(),
+      withSsr(`${name}.isExpanded`)
+    ),
   }))
 )
+
+export const selectedDonateDataAtom = atom((ctx) => {
+  const data = ctx.spy(storeItemState.data)
+  if (!data) return null;
+
+  const rawData = data.content as JSONContent;
+
+  const getContent = () => {
+    const isExpanded = ctx.spy(storeItemState.isExpanded)
+
+    if (!isExpanded) {
+      const content = rawData.content?.slice(0, 1);
+      return { ...rawData, content }
+    };
+
+    return rawData
+  }
+
+  const html = renderToHTMLString({
+    extensions: editorExtensions,
+    content: getContent()
+  })
+
+  return html
+})
+
+appState.current.isMobile.onChange((ctx, state) => {
+  if (state) {
+    storeItemState.isExpanded(ctx, false)
+  } else {
+    storeItemState.isExpanded(ctx, true)
+  }
+})
 
 export const storeItem = atom(null, "storeItem").pipe(
   withAssign((_, name) => ({

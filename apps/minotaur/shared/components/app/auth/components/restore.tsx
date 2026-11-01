@@ -8,6 +8,7 @@ import { type ReactNode } from "react";
 import { spawn } from "@reatom/framework";
 import { Link } from "@/shared/components/config/link/link";
 import { Input } from "@/shared/ui/input";
+import { translate } from "@/shared/locales/helpers";
 
 const RestoreSeedPhrase = reatomComponent(({ ctx }) => {
   const words = ctx.spy(restoreSeedPhraseModel.state.words);
@@ -16,10 +17,10 @@ const RestoreSeedPhrase = reatomComponent(({ ctx }) => {
     <>
       <div className="flex flex-col gap-1 w-full">
         <Typography className="text-base sm:text-lg font-medium leading-5">
-          Для восстановления пароля вам потребуется ввести 12 слов (сид-фраза)
+          {translate["recovery.guide.title"]()}
         </Typography>
         <span className="text-neutral-400 text-sm leading-4">
-          Эти слова были выданы при регистрации аккаунта
+          {translate["recovery.guide.subtitle"]()}
         </span>
       </div>
       <SeedPhrase
@@ -29,7 +30,9 @@ const RestoreSeedPhrase = reatomComponent(({ ctx }) => {
         <SeedPhraseBody />
       </SeedPhrase>
       <div className="flex items-center justify-center w-full">
-        <Link href="/support">Я потерял сид-фразу</Link>
+        <Link href="/support">
+          {translate["recovery.guide.action"]()}
+        </Link>
       </div>
     </>
   )
@@ -40,10 +43,10 @@ const RestoreNickname = () => {
     <>
       <div className="flex flex-col gap-1 w-full">
         <Typography className="text-base sm:text-lg font-medium leading-5">
-          Введите никнейм
+          {translate["recovery.input-nickname"]()}
         </Typography>
         <span className="text-neutral-400 text-sm leading-4">
-          Никнейм должен быть указан точно
+          {translate["recovery.input-nickname-tip"]()}
         </span>
       </div>
       <NicknameInput />
@@ -56,22 +59,22 @@ const RestoreSetNewPassword = reatomComponent(({ ctx }) => {
     <>
       <div className="flex flex-col gap-1 w-full">
         <Typography className="text-base sm:text-lg font-medium leading-5">
-          Введите никнейм
+          {translate["recovery.input-nickname"]()}
         </Typography>
         <span className="text-neutral-400 text-sm leading-4">
-          Никнейм должен быть указан точно
+          {translate["recovery.input-nickname-tip"]()}
         </span>
       </div>
       <div className="flex flex-col w-full gap-1">
         <Input
-          placeholder="Новый пароль"
+          placeholder={translate["recovery.new-password"]()}
           value={ctx.spy(restoreState.setNewPassword.value)}
           onChange={e => restoreState.setNewPassword.value(ctx, e.target.value)}
           type="password"
           maxLength={64}
         />
         <Input
-          placeholder="Повторите пароль"
+          placeholder={translate["recovery.repeat-password"]()}
           value={ctx.spy(restoreState.setNewPassword.repeatValue)}
           onChange={e => restoreState.setNewPassword.repeatValue(ctx, e.target.value)}
           type="password"
@@ -119,7 +122,7 @@ const RestoreContinue = reatomComponent(({ ctx }) => {
       disabled={!canGoNext}
       onClick={() => spawn(ctx, (spawnCtx) => restoreNavigationModel.next(spawnCtx))}
     >
-      Подтвердить
+      {translate["recovery.confirm"]()}
     </Button>
   )
 }, "RestoreContinue")
@@ -141,7 +144,7 @@ export const RestoreForm = reatomComponent(({ ctx }) => {
 
   return (
     <form
-      className="flex flex-col gap-4 w-full p-3 sm:p-4 lg:p-6 max-w-xl rounded-lg bg-neutral-900 inert:opacity-70 inert:pointer-events-none"
+      className="flex flex-col gap-4 w-full p-3 sm:p-4 lg:p-6 max-w-xl rounded-lg bg-neutral-900 withInert"
       inert={false}
       onSubmit={handleSubmit}
     >

@@ -1,6 +1,6 @@
-export type Locale = (typeof locales)[number]
+import type { Locale } from "@/paraglide/runtime"
 
-const locales = ["ru", "en"] as const
-const localeDefault: Locale = locales[0]
-
-export { locales, localeDefault };
+export const LOCALES_MAP: Record<Locale, string> = {
+  "en": "English",
+  "ru": "Russian",
+}

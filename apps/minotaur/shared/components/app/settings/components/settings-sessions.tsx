@@ -6,10 +6,11 @@ import { Portal } from "@ark-ui/react/portal";
 import { menuVariant } from "@/shared/ui/menu";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Noop } from "@/shared/ui/noop";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { Typography } from "@/shared/ui/typography";
 import { Icon, type IconName } from "@/shared/ui/icon"
 import { spawn } from "@reatom/framework";
+import { translate } from "@/shared/locales/helpers";
 
 const PLATFORM_ICONS: Record<string, IconName> = {
   "desktop": "sprite:device-desktop",
@@ -55,7 +56,7 @@ const SessionItem = reatomComponent<{ session: SessionPayload, type: "current" |
             className="self-start text-sm font-semibold w-fit"
             onClick={() => spawn(ctx, (spawnCtx) => sessions.terminateAll(spawnCtx))}
           >
-            Выйти из остальных сессий
+            {translate["settings.devices.sections.sessions.end-all-sessions"]()}
           </Button>
         </>
       ) : (
@@ -75,7 +76,7 @@ const SessionItem = reatomComponent<{ session: SessionPayload, type: "current" |
               <Menu.Content className={menuVariant.content()}>
                 <Menu.Item asChild value="terminate">
                   <Button variant="danger" className="self-start text-sm font-semibold w-fit" >
-                    Выйти из сессии
+                    {translate["settings.devices.sections.sessions.end-this-session"]()}
                   </Button>
                 </Menu.Item>
               </Menu.Content>
@@ -93,7 +94,7 @@ const SessionsListActive = reatomComponent(({ ctx }) => {
   }
 
   const data = ctx.spy(sessionsState.activeList);
-  if (!data || isEmptyArray(data)) return <Noop title="пусто" />
+  if (!data || isEmptyArray(data)) return <Noop />
 
   return data.map((session, idx) => <SessionItem key={idx} session={session} type="active" />)
 }, "SessionsListActive")
@@ -104,7 +105,7 @@ const SessionsListCurrent = reatomComponent(({ ctx }) => {
   }
 
   const current = ctx.spy(sessionsState.current)
-  if (!current) return <Noop title="пусто" />
+  if (!current) return <Noop />
 
   return <SessionItem session={current} type="current" />
 }, "SessionsListCurrent")
@@ -115,11 +116,15 @@ export const SessionsList = () => {
   return (
     <div className="flex flex-col gap-6 w-full">
       <div className="flex flex-col gap-2 w-full">
-        <p className="text-sm font-medium leading-4">Текущая сессия</p>
+        <p className="text-sm font-medium leading-4">
+          {translate["settings.devices.sections.sessions.current-session"]()}
+        </p>
         <SessionsListCurrent />
       </div>
       <div className="flex flex-col gap-2 w-full">
-        <p className="text-sm font-medium leading-4">Активные сессии</p>
+        <p className="text-sm font-medium leading-4">
+          {translate["settings.devices.sections.sessions.active-sessions"]()}
+        </p>
         <SessionsListActive />
       </div>
     </div>

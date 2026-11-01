@@ -1,7 +1,7 @@
 import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { createMemo, For, Show } from "solid-js";
 import { tv } from "tailwind-variants";
-import { IDEAS, selectedKeyAtom } from "../(models)/gameplay.model";
+import { createIdeas, selectedKeyAtom } from "../(models)/gameplay.model";
 import { Typography } from "@/shared/ui/typography";
 import { Link } from "@/shared/components/link";
 import { atom } from "@reatom/framework";
@@ -47,7 +47,7 @@ const previewLink = tv({
 export const IdeaPreviewCard = () => {
   const [selectedAtom] = useAtom(selectedKeyAtom)
 
-  const idea = createMemo(() => IDEAS[selectedAtom()]);
+  const idea = createMemo(() => createIdeas()[selectedAtom()]);
   const variant = idea().type as "module" | "full"
 
   return (
@@ -117,7 +117,7 @@ const Item = (props: { idx: number, title: string }) => {
 
 export const IdeasList = () => {
   return (
-    <For each={IDEAS}>
+    <For each={createIdeas()}>
       {(preview, idx) => <Item idx={idx()} title={preview.title} />}
     </For>
   )

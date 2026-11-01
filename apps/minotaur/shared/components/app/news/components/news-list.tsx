@@ -2,7 +2,7 @@ import { news, newsAllDataArrAtom, newsNotFoundTitleAtom } from "../models/news-
 import { NotFound } from "@/shared/ui/not-found"
 import { reatomComponent } from "@reatom/npm-react"
 import { PageLoader } from "@/shared/ui/page-loader"
-import { isEmptyArray } from "@/shared/lib/helpers"
+import { isEmptyArray } from "@/shared/lib/utils"
 import { Typography } from "@/shared/ui/typography"
 import { Link } from "@/shared/components/config/link/link"
 import { ErrorBlock } from "@/shared/ui/error-block"

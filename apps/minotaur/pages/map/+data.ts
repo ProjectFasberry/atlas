@@ -1,17 +1,20 @@
 import { logRouting } from "@/shared/lib/log";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
-import { wrapTitle } from "@/shared/lib/utils";
+import { getStaticImage } from "@/shared/lib/helpers";
+import { wrapTitle } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { type PageContext } from "vike/types";
+import { translate } from "@/shared/locales/helpers";
 
-const title = wrapTitle(`Карта`);
-const previewImage = getStaticImage("arts/wide.jpg");
+const image = getStaticImage("arts/wide.jpg");
 
 function metadata() {
+  const title = wrapTitle(translate["map.page.title"]());
+  const description = translate["map.page.description"]();
+
 	return {
 		title,
-		description: "Список доступных веб-карт игровых серверов проекта Fasberry",
-		image: previewImage,
+		description,
+		image,
 	};
 }
 

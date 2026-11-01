@@ -1,6 +1,6 @@
 import { client, withQueryParams } from "@/shared/lib/client-wrapper";
 import { logError } from "@/shared/lib/log";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { action, atom, reatomAsync, withAssign, withCache, withDataAtom, withStatusesAtom } from "@reatom/framework";
 import { withSearchParamsPersist } from "@reatom/url";
 

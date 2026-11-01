@@ -1,17 +1,18 @@
 import { Link } from "@/shared/components/config/link/link";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { type ReactNode } from "react";
 import { usePageContext } from "vike-react/usePageContext";
 import { Icon } from "@/shared/ui/icon"
+import { translate } from "@/shared/locales/helpers";
 
 const Back = () => {
   return (
     <Link href="/">
       <Button className="gap-2 md:w-max bg-neutral-50 text-neutral-950">
         <Typography className='text-center font-semibold'>
-          В безопасное место
+          {translate["shared.error-page.to-back"]()}
         </Typography>
         <Icon name="sprite:arrow-right" className="size-[18px]" />
       </Button>
@@ -23,7 +24,7 @@ const NotFoundPage = () => {
   return (
     <>
       <Typography className="text-xl lg:text-2xl text-center font-semibold">
-        Не удалось найти нужный ресурс
+        {translate["shared.error-page.404.description"]()}
       </Typography>
     </>
   )
@@ -36,7 +37,7 @@ const ErrorPage = () => {
   return (
     <>
       <Typography className="text-xl lg:text-2xl text-center font-semibold">
-        Произошла ошибка
+        {translate["shared.error-page.500.description"]()}
       </Typography>
       {import.meta.env.DEV && (
         <span className="text-red text-[12px]">{msg}</span>

@@ -7,7 +7,8 @@ import { pageState } from "@/shared/models/page-context.model";
 import { Input } from "@/shared/ui/input";
 import { Vaul, VaulContent, VaulHeader, VaulTrigger } from "@/shared/ui/vaul";
 import { translate } from "@/shared/locales/helpers";
-import { Checkbox } from "@/shared/ui/checkbox";
+import { CheckboxIndicatorIcon, checkboxVariant } from "@/shared/ui/checkbox";
+import { Checkbox } from "@ark-ui/react/checkbox";
 
 export const StoreSearch = reatomComponent(({ ctx }) => {
   const searchQuery = ctx.spy(pageState.isClientside)
@@ -52,14 +53,19 @@ const StoreFilterItem = reatomComponent<Omit<Filter, "atom">>(({
       </Typography>
       <div className='flex flex-col gap-2 w-full'>
         {filters.map((filter, idx) => (
-          <Checkbox
+          <Checkbox.Root
             key={idx}
             id={getUniqueFilterId(origin, filter.value)}
+            className={checkboxVariant.root("bg-neutral-800 px-2 h-8 rounded-lg w-full")}
             checked={ctx.spy(filterIsAppliedAtom({ origin, currValue: filter.value }))}
-            onCheckedChange={(open) => handle(updater, open, filter.value)}
-            label={filter.name}
-            className="bg-neutral-800 h-8 rounded-lg w-full"
-          />
+            onCheckedChange={(e) => handle(updater, e.checked, filter.value)}
+          >
+            <Checkbox.Control className={checkboxVariant.control({ variant: "filled" })} />
+            <Checkbox.Label className={checkboxVariant.label()}>
+              {filter.name}
+            </Checkbox.Label>
+            <Checkbox.HiddenInput />
+          </Checkbox.Root>
         ))}
       </div>
     </div>

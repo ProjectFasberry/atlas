@@ -2,7 +2,7 @@ import { listenBackOnce } from "@/shared/lib/events"
 import { action, atom, withAssign, withReset } from "@reatom/framework"
 import type { TrackFunction } from "@yudiel/react-qr-scanner"
 import { login } from "../../auth/models/login.model"
-import { isError } from "@/shared/lib/helpers"
+import { isError } from "@/shared/lib/utils"
 import { toast } from "sonner"
 
 export const scanState = atom(null, "scanState").pipe(

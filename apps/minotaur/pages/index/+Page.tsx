@@ -29,7 +29,7 @@ const Socials = reatomComponent(({ ctx }) => {
           }}
         >
           <div className="flex items-center gap-2 sm:gap-4">
-            <img src={item.img} alt="TG" width={36} height={36} />
+            <img src={item.img} loading="lazy" alt="" width={36} height={36} />
             <Typography className="truncate font-semibold text-lg lg:text-xl">
               {item.title}
             </Typography>

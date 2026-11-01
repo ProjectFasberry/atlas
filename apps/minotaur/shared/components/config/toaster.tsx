@@ -1,4 +1,4 @@
-import { getStaticImage } from "@/shared/lib/volume-helpers"
+import { getStaticImage } from "@/shared/lib/helpers"
 import { ClientOnly } from "vike-react/ClientOnly"
 import { Toaster as ToasterInit } from "sonner"
 

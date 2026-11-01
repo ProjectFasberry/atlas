@@ -6,59 +6,54 @@ import { withHistory } from "@/shared/lib/reatom/helpers";
 import { withSsr } from "@/shared/models/ssr";
 import { logError } from "@/shared/lib/log";
 import { client, withQueryParams } from "@/shared/lib/client-wrapper";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmpty, isEmptyArray } from "@/shared/lib/utils";
 import type { PageContextServer } from "vike/types";
 import { render } from "vike/abort";
+import { getNotExistUrlByEntity } from "@/shared/lib/helpers";
 
 export type Land = ExtractApiData<"getServerLandsByUlid">["data"]
 type LandExtended = Land & {
   points?: { [key: string]: { x: number, y: number } }
 }
 
-export const landAtom = atom<LandExtended | null>(null, "land").pipe(withReset(), withSsr("land"));
+export const landState = atom(null, "landState").pipe(
+  withAssign((_, name) => ({
+    data: atom<LandExtended | null>(null, `${name}.data`).pipe(withReset(), withSsr(`${name}.data`))
+  }))
+)
 
-export const landParamAtom = atom<string>((ctx) => {
-  const state = ctx.spy(landAtom);
-  if (!state) return "";
-  return state.ulid;
-}, "landParamAtom").pipe(withHistory());
+export const landParamAtom = atom<string | null>((ctx) => ctx.spy(landState.data)?.ulid ?? null, "landParamAtom").pipe(
+  withHistory()
+);
 
 export const landOwnerAtom = atom<string | null>((ctx) => {
-  const state = ctx.spy(landAtom);
-  if (!state || state.members.length === 0) return null;
-
-  return state.members[0].nickname;
-}, "landOwner").pipe(withReset());
+  const members = ctx.spy(landState.data)?.members;
+  if (!members || isEmpty(members)) return null;
+  return members[0].nickname;
+}, "landOwner")
 
 export const landIsMemberAtom = atom<boolean>((ctx) => {
   const currentUser = ctx.spy(currentUserState);
   if (!currentUser) return false;
-  const state = ctx.spy(landAtom);
-  if (!state) return false;
 
-  return state.members.some((exist) => exist.nickname === currentUser.nickname);
-}, "landIsMemberAtom").pipe(withReset());
+  const members = ctx.spy(landState.data)?.members;
+  if (!members || isEmpty(members)) return false;
 
-export const landIsOwnerAtom = atom((ctx) => {
+  return members.some((exist) => exist.nickname === currentUser.nickname);
+}, "landIsMemberAtom")
+
+export const landIsOwnerAtom = atom<boolean>((ctx) => {
   const currentUser = ctx.spy(currentUserState);
   if (!currentUser) return false;
+
   const owner = ctx.spy(landOwnerAtom)
   if (!owner) return false;
 
   return currentUser.nickname === owner;
-}, "landIsOwnerAtom").pipe(withReset());
+}, "landIsOwnerAtom")
 
-export const landBannerAtom = atom((ctx) => {
-  const state = ctx.spy(landAtom);
-  if (!state) return null;
-  return state.details.banner
-}, "landBanner").pipe(withReset());
-
-export const landGalleryAtom = atom<string[]>((ctx) => {
-  const state = ctx.spy(landAtom);
-  if (!state) return [];
-  return state.details.gallery ?? [];
-}, "landGalleryAtom").pipe(withReset());
+export const landBannerAtom = atom<string | null>((ctx) => ctx.spy(landState.data)?.details.banner ?? null, "landBanner")
+export const landGalleryAtom = atom<string[]>((ctx) => ctx.spy(landState.data)?.details.gallery ?? [], "landGalleryAtom")
 
 export const land = atom(null, "lands").pipe(
   withAssign((_, name) => ({
@@ -74,16 +69,22 @@ export const land = atom(null, "lands").pipe(
         return null;
       })
 
-      if (!land) throw render("/not-exist?type=land")
+      if (!land) throw render(getNotExistUrlByEntity("land"))
 
-      const result = landAtom(ctx, { ...land, points: { ["init"]: { x: 412.12, y: 65.6 } } })
-      return result!;
+      const item = {
+        ...land,
+        points: { ["init"]: { x: 412.12, y: 65.6 } }
+      };
+
+      landState.data(ctx, item)
+      return item
     }),
     fetchSimilar: reatomAsync(async (ctx) => {
       const nickname = ctx.get(landOwnerAtom)
       if (!nickname) return;
 
       const exclude = ctx.get(landParamAtom);
+      if (!exclude) return;
 
       return await ctx.schedule(() => client
         .get<ExtractApiData<"getServerLandsList">["data"]>(`server/lands/similar`, {

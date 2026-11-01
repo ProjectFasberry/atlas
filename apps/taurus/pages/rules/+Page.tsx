@@ -8,6 +8,7 @@ import { WrapperTitle } from "@/shared/ui/wrapper-title";
 import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import { Rules } from "./(components)/rules-list";
 import { RulesTags } from "./(components)/rules-tags";
+import { translate } from "@/shared/locales/helpers";
 
 const url = getStaticObject("backgrounds", "rules_background.png")
 
@@ -23,16 +24,16 @@ export default function Page() {
           <div class="flex flex-col gap-6 w-full lg:max-w-3xl items-start justify-start">
             <div class="flex flex-col gap-2 lg:max-w-3xl">
               <h1 class={sectionVariantChild().title({ className: "text-gold" })}>
-                Правила проекта
+                {translate["rules.title"]()}
               </h1>
               <Typography color="white" class={sectionVariantChild().subtitle()}>
-                Правила созданы для чего? Чтобы их не нарушать!
+                {translate["rules.subtitle"]()}
               </Typography>
             </div>
             <Link href="#rules-list" class={sectionVariantChild().action()}>
               <Button class="w-full px-6 py-0.5 gap-2">
                 <Typography color="white" class="text-lg">
-                  Список правил
+                  {translate["rules.action-text"]()}
                 </Typography>
               </Button>
             </Link>
@@ -46,7 +47,7 @@ export default function Page() {
           >
             <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2">
               <Typography title="Актуальные теги" color="white" class="text-md lg:text-lg xl:text-xl">
-                Актуальные теги:
+                {translate["rules.tags.title"]()}
               </Typography>
               <div class="flex flex-wrap gap-2">
                 <RulesTags />

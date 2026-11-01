@@ -1,22 +1,22 @@
-import { reatomComponent } from "@reatom/npm-react";
-import { lazy } from "react";
+import { lazy, type ComponentType } from "react";
 import { ClientOnly } from "vike-react/ClientOnly";
-import { Widgets } from "../../widgets/components/widgets";
-import { userState } from "@/shared/models/app/index.model";
+import { entries } from "@reatom/framework"
 
-const Settings = lazy(() => import("@/shared/components/app/settings/components/settings").then(d => ({ default: d.Settings })))
-const Toaster = lazy(() => import("@/shared/components/config/toaster").then(d => ({ default: d.Toaster })))
-const AlertDialog = lazy(() => import("@/shared/components/config/alert-dialog/alert-dialog").then(d => ({ default: d.AlertDialog })))
+const _IMPORTS = {
+  "Settings": () => import("@/shared/components/app/settings/components/settings").then((m) => ({ default: m.Settings })),
+  "Toaster": () => import("@/shared/components/config/toaster").then((m) => ({ default: m.Toaster })),
+  "AlertDialog": () => import("@/shared/components/config/alert-dialog/alert-dialog").then((m) => ({ default: m.AlertDialog })),
+  "Cap": () => import("../../../config/cap/components/cap").then((m) => ({ default: m.Cap })),
+  "Widgets": () => import("../../widgets/components/widgets").then((m) => ({ default: m.Widgets })),
+}
 
-export const Global = reatomComponent(({ ctx }) => {
-  const isAuthed = ctx.spy(userState.isAuthed)
+const LAZY_COMPONENTS: Array<{ key: string; Component: ComponentType<any> }> =
+  entries(_IMPORTS).map(([key, cb]) => ({ key, Component: lazy(cb) }));
 
+export const Global = () => {
   return (
     <ClientOnly>
-      <Widgets />
-      <AlertDialog />
-      {isAuthed && <Settings />}
-      <Toaster />
+      {LAZY_COMPONENTS.map(({ key, Component }) => <Component key={key} />)}
     </ClientOnly>
   )
-}, "Global")
+}

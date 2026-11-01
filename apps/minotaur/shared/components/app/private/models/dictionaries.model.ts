@@ -5,7 +5,7 @@ import { actions, compareChanges, notifyAboutRestrictRole } from "./actions.mode
 import { withAssign, withReset } from "@reatom/framework";
 import { withUndo } from '@reatom/undo'
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 
 export type DictionariesItem = {
   value: string;

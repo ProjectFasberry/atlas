@@ -18,7 +18,7 @@ const SettingsDialog = reatomComponent(({ ctx }) => {
         <Dialog.Backdrop className={dialogVariant.backdrop()} style={dialogBaseStyle} />
         <Dialog.Positioner className={dialogVariant.positioner()} >
           <Dialog.Content
-            className={dialogVariant.content({ className: "p-0 sm:p-0 h-2/3" })}
+            className={dialogVariant.content("p-0 sm:p-0 h-2/3")}
             style={dialogBaseStyle}
           >
             <div className="flex items-start w-full min-h-0 h-full">

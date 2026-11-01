@@ -1,5 +1,6 @@
 import { Link } from "@/shared/components/link";
 import { getStaticObject } from "@/shared/lib/helpers";
+import { translate } from "@/shared/locales/helpers";
 import { Typography } from "@/shared/ui/typography";
 import { usePageContext } from "vike-solid/usePageContext";
 
@@ -9,13 +10,13 @@ const NotFound = () => {
   return (
     <>
       <Typography class="text-white text-base md:text-xl text-center font-normal">
-        Не удалось найти нужный ресурс.
+        {translate["error-page.404"]()}
       </Typography>
       <Link href="/">
         <button
           class="md:w-max mt-6 raised-slot-button text-center text-neutral-800 text-base md:text-xl py-1 px-4 md:px-6"
         >
-          Вернуться в безопасное место
+         {translate["error-page.to-safety-host"]()}
         </button>
       </Link>
     </>
@@ -28,7 +29,7 @@ const Error = () => {
       <button
         class="bg-neutral-600 md:w-max mt-6 raised-slot-button text-center text-base md:text-xl py-1 px-4 md:px-6"
       >
-        Вернуться в безопасное место
+        {translate["error-page.to-safety-host"]()}
       </button>
     </Link>
   )
@@ -46,7 +47,7 @@ export default function Page() {
     >
       <div class="flex flex-col items-center gap-y-2">
         <Typography class="text-neutral-400 text-base md:text-xl font-normal">
-          Отключено
+          {translate["error-page.title"]()}
         </Typography>
         {is404 ? <NotFound /> : <Error />}
       </div>

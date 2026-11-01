@@ -85,10 +85,10 @@ export const Footer = reatomComponent(({ ctx }) => {
                 {translate["shared.footer.info.title"]()}
               </Typography>
               <div className="flex flex-col gap-1 min-w-0 *:truncate">
-                <a href={createLandingUrl("/info/contacts")}>
+                <a href="/contacts" target="_blank">
                   {translate["shared.footer.info.contacts"]()}
                 </a>
-                <a href={createLandingUrl("/info/privacy")}>
+                <a href="/privacy" target="_blank">
                   {translate["shared.footer.info.privacy"]()}
                 </a>
               </div>

@@ -11,12 +11,13 @@ import { Avatar } from "@/shared/ui/avatar"
 import { Menu } from "@ark-ui/react/menu"
 import { menuVariant } from "@/shared/ui/menu"
 import { Icon } from "@/shared/ui/icon"
-import dayjs from "@/shared/lib/create-dayjs"
+import { dayjs } from "@/shared/lib/dayjs"
 import { settingsAccountModel } from "../models/settings-account.model"
 import { Input } from "@/shared/ui/input"
 import { toast } from "sonner"
 import { action } from "@reatom/framework"
 import { ErrorBlock } from "@/shared/ui/error-block"
+import { translate } from "@/shared/locales/helpers"
 
 const { deleteAccount, changePass, changePassState } = settingsAccountModel()
 
@@ -28,16 +29,16 @@ const SettingsMainDeleteAccount = reatomComponent(({ ctx }) => {
       disabled={ctx.spy(deleteAccount.submit.statusesAtom).isPending}
     >
       <Typography className="leading-5 font-semibold">
-        Удалить аккаунт
+        {translate["settings.account.sections.delete-account.confirm"]()}
       </Typography>
     </Button>
   )
 }, "DeleteAccount")
 
 const CHANGE_PASSWORD_FIELDS = [
-  { placeholder: "Текущий пароль", value: changePassState.currentPass },
-  { placeholder: "Новый пароль", value: changePassState.newPass },
-  { placeholder: "Подтверждение нового пароля", value: changePassState.newPassRepeat }
+  { placeholder: translate["settings.account.sections.password-and-authentication.current-password"](), value: changePassState.currentPass },
+  { placeholder: translate["settings.account.sections.password-and-authentication.new-password"](), value: changePassState.newPass },
+  { placeholder: translate["settings.account.sections.password-and-authentication.repeat-password"](), value: changePassState.newPassRepeat }
 ]
 
 const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
@@ -50,7 +51,7 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
         className="w-fit font-semibold"
         onClick={() => changePass.before(ctx)}
       >
-        Изменить пароль
+        {translate["settings.account.sections.password-and-authentication.change-password"]()}
       </Button>
       <Dialog.Root
         open={ctx.spy(changePassState.isOpen)}
@@ -59,7 +60,7 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
         <Portal>
           <Dialog.Backdrop className={dialogVariant.backdrop()} />
           <DialogPositioner className={dialogVariant.positioner()}>
-            <Dialog.Content className={dialogVariant.content({ className: "w-1/4!" })}>
+            <Dialog.Content className={dialogVariant.content("w-1/4!")}>
               <Dialog.Title className={dialogVariant.title()}>Изменение пароля</Dialog.Title>
               <form
                 className="flex flex-col gap-6 w-full inert:opacity-60 inert:pointer-events-none"
@@ -83,11 +84,11 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
                 <div className="flex items-center w-full *:w-full gap-2">
                   <Dialog.CloseTrigger asChild>
                     <Button type="button" background="default" className="font-semibold">
-                      Назад
+                      {translate["shared.back"]()}
                     </Button>
                   </Dialog.CloseTrigger>
                   <Button type="submit" background="white" className="font-semibold">
-                    Подтвердить
+                    {translate["settings.account.sections.password-and-authentication.confirm"]()}
                   </Button>
                 </div>
               </form>
@@ -105,7 +106,7 @@ const INFO_ACTIONS_LIST = [
     label: "Скопировать UUID",
     action: (value: string) => action(async (ctx) => {
       await navigator.clipboard.writeText(value);
-      toast.success("Скопировано в буфер обмена")
+      toast.success(translate["shared.copyed-to-clipboard"]())
     }),
     value: "copy-uuid"
   }
@@ -156,25 +157,25 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
 
 const ACCOUNT_SECTIONS: SettingsSectionItem[] = [
   {
-    title: "Информация",
-    description: "Основная информация об аккаунте",
+    title: translate["settings.account.sections.information.title"](),
+    description: translate["settings.account.sections.information.description"](),
     children: <SettingsMainInfo />
   },
   {
-    title: "Пароль и аутенфикация",
-    description: "Изменение пароля от аккаунта",
+    title: translate["settings.account.sections.password-and-authentication.title"](),
+    description: translate["settings.account.sections.password-and-authentication.description"](),
     children: <SettingsMainChangePassword />
   },
   {
-    title: "Удаление аккаунта",
-    description: "Удаление затронет в том числе игровые данные, привязанные к этому аккаунту",
+    title: translate["settings.account.sections.delete-account.title"](),
+    description: translate["settings.account.sections.delete-account.description"](),
     children: <SettingsMainDeleteAccount />
   },
 ]
 
 export const SettingsAccount = () => {
   return (
-    <SettingsContentWrapper title="Аккаунт">
+    <SettingsContentWrapper title={translate["settings.account.title"]()}>
       <div className="flex flex-col gap-8 w-full h-full">
         {ACCOUNT_SECTIONS.map((section, idx) => <SettingsSection key={idx} {...section} />)}
       </div>

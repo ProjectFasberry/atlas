@@ -3,7 +3,7 @@ import {
   action, atom, batch, reatomAsync, reatomMap, sleep,
   withAssign, withCache, withConcurrency, withDataAtom, withErrorAtom, withStatusesAtom
 } from "@reatom/framework"
-import { getNews, type NewsParams } from "./news.model"
+import { getNews, type PublicNewsParams } from "./news.model"
 import { createViewerModel } from "@/shared/models/shared.model"
 import { DEFAULT_SOFT_DELAY } from "@/shared/consts"
 
@@ -47,7 +47,7 @@ export const news = atom(null, "news").pipe(
       news.fetch(ctx)
     }),
     fetch: reatomAsync(async (ctx) => {
-      const opts: Partial<NewsParams> = {
+      const opts: Partial<PublicNewsParams> = {
         asc: ctx.get(newsState.filters.asc),
         searchQuery: ctx.get(newsState.filters.searchQuery),
         endCursor: ctx.get(newsState.filters.endCursor) ?? undefined

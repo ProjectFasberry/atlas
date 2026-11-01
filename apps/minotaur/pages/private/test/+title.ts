@@ -1,3 +1,3 @@
-import { wrapTitle } from "@/shared/lib/utils";
+import { wrapTitle } from "@/shared/lib/helpers";
 
 export default wrapTitle("Тестовое")

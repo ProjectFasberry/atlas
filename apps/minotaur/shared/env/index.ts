@@ -1,17 +1,13 @@
 export const env = {
-  VITE_APP_HOST: import.meta.env.VITE_APP_HOST,
+  VITE_APP_URL: import.meta.env.VITE_APP_URL,
   VITE_APP_PORT: import.meta.env.VITE_APP_PORT,
   VITE_API_URL: import.meta.env.VITE_API_URL,
   VITE_PANEL_API_URL: import.meta.env.VITE_PANEL_API_URL,
-  VITE_API_HOST: import.meta.env.VITE_API_HOST,
   VITE_LANDING_URL: import.meta.env.VITE_LANDING_URL,
   VITE_MAIN_DOMAIN: import.meta.env.VITE_MAIN_DOMAIN,
-  VITE_STATUS_URL: import.meta.env.VITE_STATUS_URL,
-  VITE_APP_URL: import.meta.env.VITE_APP_URL,
   VITE_VOLUME_URL: import.meta.env.VITE_VOLUME_URL,
   VITE_CAP_URL: import.meta.env.VITE_CAP_URL,
   VITE_CAP_SITE_KEY: import.meta.env.VITE_CAP_SITE_KEY,
   VITE_APAY_TAG: import.meta.env.VITE_APAY_TAG,
-  VITE_FORWARDED_FOR: import.meta.env.VITE_FORWARDED_FOR,
   VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
 }

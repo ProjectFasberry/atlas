@@ -8,7 +8,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!apps/taurus", "!apps/minotaur/shared/styles/*"]
+		"includes": ["**", "!apps/taurus", "!apps/minotaur/shared/styles/*", "!apps/wiki"]
 	},
 	"formatter": {
 		"enabled": true,

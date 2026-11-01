@@ -85,8 +85,11 @@ web_modules/
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
-# Neodx/svg generated
-/shared/types/gen/icon/sprite.gen.ts
+# The @neodx/svg sprite meta generated
+/shared/types/gen/icon/
 
-# Visualizer file
-/stats.html
+# Old translation files
+/messages/_*.json
+
+# Old snapshots
+.old/

@@ -6,7 +6,7 @@ import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Icon } from "@/shared/ui/icon"
 import { belkoinImage, charismImage } from "@/shared/consts/images";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import React, { type ReactNode } from "react";
 import { type Ctx, spawn } from "@reatom/framework";
 import { IconLoader } from "@/shared/ui/icon-loader";
@@ -220,7 +220,7 @@ const TopupValue = reatomComponent(({ ctx }) => {
         onValueChange={({ value }) => topupState.wallet(ctx, value[0])}
         className="min-w-36"
       >
-        <Select.Control className={selectVariant.control({ className: "w-full" })}>
+        <Select.Control className={selectVariant.control("w-full")}>
           <Select.Trigger className={selectVariant.trigger()}>
             <Select.ValueText className="w-fit">
               <TopUpTarget img={WALLETS_IMGS[ctx.spy(topupState.wallet)]} />

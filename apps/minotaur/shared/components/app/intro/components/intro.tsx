@@ -1,4 +1,4 @@
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { onConnect, sleep } from "@reatom/framework";
 import { reatomComponent } from "@reatom/npm-react";
 import { Button } from "@/shared/ui/button";

@@ -1,19 +1,19 @@
 import { type ComponentPropsWithRef } from "react"
-import { cn } from "../lib/cn"
+import { clsx } from "cnfast"
 
 const ALIGN = {
   "top": "object-top",
   "center": "object-center"
 }
 
-export const PageHeaderImage = ({ 
-  img, className, imgAlign = "top", ...props 
-}: { 
+export const PageHeaderImage = ({
+  img, className, imgAlign = "top", ...props
+}: {
   img: string, imgAlign?: "top" | "center" } & ComponentPropsWithRef<"div">
 ) => {
   return (
     <div
-      className={cn("flex select-none flex-col items-center justify-end relative overflow-hidden h-[180px] rounded-xl w-full", className)}
+      className={clsx("flex select-none flex-col items-center justify-end relative overflow-hidden h-[180px] rounded-xl w-full", className)}
       {...props}
     >
       <img

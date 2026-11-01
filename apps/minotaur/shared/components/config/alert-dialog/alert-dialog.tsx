@@ -74,7 +74,7 @@ export const AlertDialog = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} style={dialogBaseStyle} />
         <Dialog.Positioner className={dialogVariant.positioner()} style={dialogBaseStyle} >
-          <Dialog.Content className={dialogVariant.content({ className: "w-lg" })} style={dialogBaseStyle} >
+          <Dialog.Content className={dialogVariant.content("w-lg")} style={dialogBaseStyle} >
             <Dialog.Title className={dialogVariant.title()}>
               {opts?.dialogTitle ?? "Подтверждение действия"}
             </Dialog.Title>

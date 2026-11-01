@@ -1,13 +1,14 @@
 import { Link } from '@/shared/components/link';
 import { getStaticObject } from '@/shared/lib/helpers';
 import { For } from 'solid-js';
+import { translate } from '../locales/helpers';
 
-const FOOTER_LINKS = [
-  { name: 'Конфиденциальность', href: 'privacy' },
-  { name: 'Соглашение', href: 'terms' },
-  { name: 'Контакты', href: 'contacts' },
-  { name: 'Благодарности', href: 'credits' },
-];
+const createFooterLinks = () => ([
+  { name: translate["footer.links.privacy"](), href: 'privacy' },
+  { name: translate["footer.links.terms"](), href: 'terms' },
+  { name: translate["footer.links.contacts"](), href: 'contacts' },
+  { name: translate["footer.links.credits"](), href: 'credits' },
+]);
 
 const bedrockImage = getStaticObject("minecraft", "static/bedrock.webp")
 
@@ -18,13 +19,13 @@ export const Footer = () => {
       style={{ "background-size": '160px', "background-image": `url(${bedrockImage})` }}
     >
       <div class="flex flex-col justify-center items-center lg:flex-row responsive gap-2 mx-auto">
-        <For each={FOOTER_LINKS}>
+        <For each={createFooterLinks()}>
           {(item, idx) => (
             <>
               <Link href={`/info/${item.href}`}>
                 <p>{item.name}</p>
               </Link>
-              {idx() < FOOTER_LINKS.length - 1 &&
+              {idx() < createFooterLinks.length - 1 &&
                 <span class="text-neutral-400 hidden lg:block mx-2">&</span>
               }
             </>
@@ -33,7 +34,7 @@ export const Footer = () => {
       </div>
       <div class="flex flex-col items-center justify-center gap-2 responsive mx-auto">
         <p class="text-center">
-          Fasberry Project. Оригинальные права принадлежат Mojang AB.
+          {translate["footer.copyright"]()}
         </p>
       </div>
     </footer>

@@ -1,12 +1,15 @@
 import { reatomComponent } from "@reatom/npm-react";
-import { auth, authState } from "../models/auth.model";
+import { auth, authIsDisabledAtom, authState, type AuthType } from "../models/auth.model";
 import { Input } from "@/shared/ui/input"
-import { env } from "@/shared/env";
-import { CapWidget } from "@better-captcha/react/provider/cap-widget";
-import { pof } from "../../../../models/shared.model";
-import { Icon } from "@/shared/ui/icon"
+import { Icon, type IconName } from "@/shared/ui/icon"
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { translate } from "@/shared/locales/helpers";
+import { tabsTriggerVariants } from "@/shared/ui/tabs"
+import { Tabs } from '@ark-ui/react/tabs'
+import { Link } from "@/shared/components/config/link/link";
+import { showResetPasswordAtom } from "../models/login.model";
+import { LoginForm } from "./login";
+import { RegisterForm } from "./register";
 
 export const NicknameInput = reatomComponent(({ ctx }) => (
   <Input
@@ -25,14 +28,27 @@ export const NicknameInput = reatomComponent(({ ctx }) => (
   />
 ), "Nickname")
 
-const PasswordVisibility = reatomComponent(({ ctx }) => (
-  <div
-    className="flex *:m-auto hover:text-neutral-50 duration-150 ease text-neutral-400 absolute p-1 right-0 top-1/2 -translate-1/2"
-    onClick={() => authState.settings.showPassword(ctx, (state) => !state)}
-  >
-    {ctx.spy(authState.settings.showPassword) ? <Icon name="sprite:eye" className="size-[18px]" /> : <Icon name="sprite:eye-off" className="size-[18px]" />}
-  </div>
-), "PasswordVisibility")
+const PASSWORD_VISIBILITY_ICONS: Record<string, IconName> = {
+  "show": "sprite:eye",
+  "hide": "sprite:eye-off"
+}
+
+const PasswordVisibility = reatomComponent(({ ctx }) => {
+  const variant = ctx.spy(authState.settings.showPassword) ? "show" : "hide";
+
+  return (
+    <button
+      type="button"
+      className="absolute right-0 top-1/2 -translate-1/2"
+      onClick={() => authState.settings.showPassword(ctx, (state) => !state)}
+    >
+      <Icon
+        name={PASSWORD_VISIBILITY_ICONS[variant]}
+        className="duration-150 ease-in size-5 hover:text-neutral-50 text-neutral-400"
+      />
+    </button>
+  )
+}, "PasswordVisibility")
 
 export const PasswordInput = reatomComponent(({ ctx }) => (
   <div className="flex relative items-center justify-between w-full">
@@ -54,34 +70,52 @@ export const PasswordInput = reatomComponent(({ ctx }) => (
 
 export const AuthError = reatomComponent(({ ctx }) => {
   const error = ctx.spy(authState.globalError)
-  if (!error) return null;
-  return <ErrorBlock title={error} />
+  return error ? <ErrorBlock title={error} /> : null
 }, "AuthError")
 
-const getCapUrl = () => `${env.VITE_CAP_URL}/${env.VITE_CAP_SITE_KEY}/`;
-
-const CAP_OPTIONS = {
-  i18nInitialState: "Я человек",
-  i18nVerifyingLabel: "Проверка...",
-  i18nVerifyingAriaLabel: "Проверка...",
-  i18nVerifiedAriaLabel: "Пройдено",
-  i18nVerifyAriaLabel: "Пройти",
-  i18nErrorAriaLabel: "Ошибка",
-  i18nErrorLabel: "Ошибка",
-  i18nWasmDisabled: "У вас отключен WASM",
-  i18nSolvedLabel: "Пройдено",
-}
-
-// TODO: make CapWidget global
-export const Verify = reatomComponent(({ ctx }) => {
-  if (!ctx.spy(pof.showTokenVerifySectionAtom)) return null;
+export const ResetPassword = reatomComponent(({ ctx }) => {
+  if (!ctx.spy(showResetPasswordAtom)) return null;
 
   return (
-    <CapWidget
-      endpoint={getCapUrl()}
-      options={CAP_OPTIONS}
-      onSolve={(value) => auth.solve(ctx, value)}
-      onError={(e) => authState.globalError(ctx, e instanceof Error ? e.message : e)}
-    />
+    <Link href="/auth/restore" className='flex items-center justify-center w-full text-sm text-neutral-400'>
+      {translate["auth.navigation.auth.recoveryTitle"]()}
+    </Link>
   )
-}, "Verify")
+}, "ResetPassword")
+
+const createAuthVariants = () => ([
+  { label: translate["auth.navigation.auth.loginTitle"](), value: "login" },
+  { label: translate["auth.navigation.auth.regTitle"](), value: "register" }
+])
+
+export const Auth = reatomComponent(({ ctx }) => {
+  return (
+    <Tabs.Root
+      inert={ctx.spy(authIsDisabledAtom)}
+      value={ctx.spy(authState.type)}
+      onValueChange={(details) => {
+        authState.type(ctx, details.value as AuthType)
+      }}
+      className="flex flex-col gap-4 w-full p-3 sm:p-4 lg:p-6 max-w-lg rounded-lg bg-neutral-900 withInert"
+    >
+      <Tabs.List
+        className="flex flex-col sm:flex-row min-h-24 h-24 sm:min-h-fit sm:h-fit w-full gap-2 *:h-10 *:w-full"
+      >
+        {createAuthVariants().map((item) => (
+          <Tabs.Trigger key={item.value} value={item.value} className={tabsTriggerVariants()}>
+            {item.label}
+          </Tabs.Trigger >
+        ))}
+      </Tabs.List>
+      <div className="flex flex-col gap-6 min-w-0 w-full h-full">
+        <Tabs.Content value="register">
+          <RegisterForm />
+        </Tabs.Content>
+        <Tabs.Content value="login">
+          <LoginForm />
+        </Tabs.Content>
+        <ResetPassword />
+      </div>
+    </Tabs.Root>
+  )
+}, "Auth")

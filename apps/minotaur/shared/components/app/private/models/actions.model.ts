@@ -1,4 +1,4 @@
-import { isError } from "@/shared/lib/helpers";
+import { isError } from "@/shared/lib/utils";
 import { action, atom, withAssign, type AtomState } from "@reatom/framework"
 import { isDeepEqual, reatomRecord, withReset } from "@reatom/framework"
 import { toast } from "sonner";

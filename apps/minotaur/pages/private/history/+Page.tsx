@@ -1,6 +1,6 @@
 import { useAtom } from "@reatom/npm-react"
 import { createPageModel } from "@/shared/lib/events"
-import { createEs } from "@/shared/lib/utils"
+import { createEs } from "@/shared/lib/helpers"
 import { history, historyState } from "@/shared/components/app/private/models/history.model"
 import { HistoryList } from "@/shared/components/app/private/components/history"
 

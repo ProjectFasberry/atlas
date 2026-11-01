@@ -1,5 +1,5 @@
 import { reatomComponent } from "@reatom/npm-react"
-import { usersControlState, usersControl, USER_ACTIONS } from "../../models/users.model"
+import { usersRestrictState, usersRestrict, USER_ACTIONS, usersControl, type UserAction } from "../../models/users.model"
 import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import type { AtomMut } from "@reatom/framework"
@@ -11,27 +11,38 @@ type UserActionsWrapperProps =
   | { type: "single", nickname: string }
   | { type: "global", nickname?: never }
 
-const ActionInput = reatomComponent<{ atom: AtomMut<string | null>, label: string }>(({ ctx, atom, label }) => (
+type ActionInputProps = {
+  atom: AtomMut<string | null>,
+  label: string
+}
+const ActionInput = reatomComponent<ActionInputProps>(({ ctx, atom, label }) => (
   <Input
     value={ctx.spy(atom) ?? ""}
     onChange={e => atom(ctx, e.target.value)}
     placeholder={label}
+    className="text-sm!"
   />
 ), "ActionInput")
 
-const ActionButton = reatomComponent<UserActionsWrapperProps & {
-  eventGroup: string, label?: string, isMenuItem?: boolean
-}>(({ ctx, type, label, eventGroup, nickname, isMenuItem }) => {
-  const isPending = ctx.spy(usersControl.submit.statusesAtom).isPending
-
-  const handleClick = () => {
-    usersControl.before(ctx, type === 'single' ? [nickname] : [], eventGroup)
-  }
+type ActionButtonProps = {
+  group: string,
+  event: string,
+  label?: string,
+  node: UserActionsWrapperProps
+}
+const ActionButton = reatomComponent<{ item: ActionButtonProps, isMenuItem?: boolean }>(({ ctx, item, isMenuItem }) => {
+  const isPending = ctx.spy(usersRestrict.submit.statusesAtom).isPending
+  const label = item.label ?? "Применить";
 
   if (isMenuItem) {
     return (
-      <Menu.Item value={eventGroup} className={menuVariant.item()} onClick={handleClick} disabled={isPending}>
-        {label ?? "Применить"}
+      <Menu.Item
+        value={item.event}
+        className={menuVariant.item()}
+        onClick={() => usersControl.start(ctx, item.event, item.group, item.node.nickname)}
+        disabled={isPending}
+      >
+        {label}
       </Menu.Item>
     )
   }
@@ -41,28 +52,31 @@ const ActionButton = reatomComponent<UserActionsWrapperProps & {
       background="white"
       className="h-8 text-sm font-semibold"
       disabled={isPending}
-      withSpinner
-      isLoading={isPending}
-      onClick={handleClick}
+      onClick={() => usersControl.start(ctx, item.event, item.group, item.node.nickname)}
     >
-      {label ?? "Применить"}
+      {label}
     </Button>
   )
 }, "ActionButton")
 
-const ActionMenuNode = reatomComponent<UserActionsWrapperProps & {
-  item: NonNullable<typeof USER_ACTIONS[number]["childs"]>[number]
-}>(({ item, ...props }) => {
+type ActionMenuNodeProps = UserActionsWrapperProps & {
+  item: UserAction
+};
+const ActionMenuNode = ({ item, ...node }: ActionMenuNodeProps) => {
   if (item.childs) {
     return (
-      <Menu.Root key={item.type}>
-        <Menu.TriggerItem className={menuVariant.item()}>
-          {item.label}
-        </Menu.TriggerItem>
+      <Menu.Root key={item.group}>
+        <Menu.TriggerItem className={menuVariant.item()}>{item.label}</Menu.TriggerItem>
         <Portal>
           <Menu.Positioner>
             <Menu.Content className={menuVariant.content()}>
-              {item.childs.map((child) => <ActionMenuNode key={child.type} item={child} {...props} />)}
+              {item.childs.map((child, idx) => (
+                <ActionMenuNode
+                  key={idx}
+                  item={{ ...child, group: item.group }}
+                  {...node}
+                />
+              ))}
             </Menu.Content>
           </Menu.Positioner>
         </Portal>
@@ -72,19 +86,25 @@ const ActionMenuNode = reatomComponent<UserActionsWrapperProps & {
 
   if (item.fields) {
     return (
-      <Menu.Root key={item.type}>
-        <Menu.TriggerItem className={menuVariant.item()}>
-          {item.label}
-        </Menu.TriggerItem>
+      <Menu.Root key={item.group}>
+        <Menu.TriggerItem className={menuVariant.item()}>{item.label}</Menu.TriggerItem>
         <Portal>
           <Menu.Positioner>
             <Menu.Content className={menuVariant.content()}>
               <div className="flex flex-col gap-1 w-full">
-                {item.fields.map(({ value, label }: any) => (
+                {item.fields.map(({ value, label }) => (
                   // @ts-expect-error
-                  <ActionInput key={value} atom={usersControlState.fields[value]} label={label} />
+                  <ActionInput key={value} atom={usersRestrictState.fields[value]} label={label} />
                 ))}
-                <ActionButton eventGroup={item.type} {...props} />
+                {"event" in item && (
+                  <ActionButton
+                    item={{
+                      ...item,
+                      node,
+                      event: item.event as string,
+                    }}
+                  />
+                )}
               </div>
             </Menu.Content>
           </Menu.Positioner>
@@ -93,11 +113,18 @@ const ActionMenuNode = reatomComponent<UserActionsWrapperProps & {
     )
   }
 
+  const event = "event" in item ? item.event as string : undefined
+  if (!event) return null;
+
   return (
-    <ActionButton key={item.type} isMenuItem eventGroup={item.type} label={item.label} {...props} />
+    <ActionButton
+      key={item.group}
+      isMenuItem
+      item={{ ...item, node, event }}
+    />
   )
-}, "ActionMenuNode")
+}
 
 export const UserActionsWrapper = (props: UserActionsWrapperProps) => (
-  USER_ACTIONS.map((group) => <ActionMenuNode key={group.type} item={group} {...props} />)
+  USER_ACTIONS.map((group) => <ActionMenuNode key={group.group} item={group} {...props} />)
 )

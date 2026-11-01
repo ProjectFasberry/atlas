@@ -1,5 +1,5 @@
 import { withLocalStorage } from "@reatom/persist-web-storage";
-import { registerNavigationModel, registerSeedPhraseModel } from "../models/register.model";
+import { AUTH_REGISTER_TYPE, registerNavigationModel, registerSeedPhraseModel, registerState } from "../models/register.model";
 import { authState } from "../models/auth.model";
 import { action, atom, withAssign } from "@reatom/framework";
 import { login } from "../models/login.model";
@@ -58,6 +58,13 @@ export const startAuthWidget = action(async (ctx) => {
       value
     });
 
+    // todo: change the buttons to select component
+    AUTH_REGISTER_TYPE.forEach((type) => {
+      authFolder
+        .addButton({ title: `Register as ${type}`, })
+        .on("click", () => registerState.type(ctx, type))
+    })
+
     const un = ctx.subscribe(nicknameAtom, (state) => {
       value = state
       regBtn.title = `Register as ${value}`
@@ -75,5 +82,5 @@ export const startAuthWidget = action(async (ctx) => {
     return unsub
   })
 
-  return () => result?.()
+  return result
 }, "startAuthWidget")

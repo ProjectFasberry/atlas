@@ -1,13 +1,18 @@
 import { logRouting } from "@/shared/lib/log";
 import { getIsAuthed } from "@/shared/models/app/utils";
-import { wrapTitle } from "@/shared/lib/utils";
+import { wrapTitle } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { redirect } from "vike/abort";
 import { type PageContext } from "vike/types";
+import { translate } from "@/shared/locales/helpers";
 
 function metadata() {
+  const title = wrapTitle(translate["referrals.page.title"]());
+  const description = translate["referrals.page.description"]();
+
   return {
-    title: wrapTitle("Рефералы")
+    title,
+    description
   }
 }
 

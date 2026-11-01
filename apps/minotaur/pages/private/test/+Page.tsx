@@ -1,9 +1,33 @@
-import { EditorTest } from "@/shared/components/config/editor/editor"
+import { locales } from "@/paraglide/runtime"
+import { EditorMenuBar } from "@/shared/components/config/editor/editor"
+import { EDITOR_DEFAULT_CONTENT, editorExtensions, editorState } from "@/shared/components/config/editor/editor.model"
 import { Link } from "@/shared/components/config/link/link"
-import { locales } from "@/shared/locales"
 import { translate } from "@/shared/locales/helpers"
 import { Typography } from "@/shared/ui/typography"
+import { reatomComponent } from "@reatom/npm-react"
+import { EditorContent, useEditor } from "@tiptap/react"
 import { usePageContext } from "vike-react/usePageContext"
+
+const EditorTest = reatomComponent(({ ctx }) => {
+  const editor = useEditor({
+    extensions: editorExtensions,
+    content: EDITOR_DEFAULT_CONTENT,
+    onUpdate: ({ editor }) => {
+      let value = editor.getHTML();
+      editorState.content(ctx, value)
+    },
+  })
+
+  return (
+    <div className="flex flex-col gap-6 w-full h-full">
+      <EditorMenuBar editor={editor} />
+      <EditorContent editor={editor} />
+      <button onClick={() => console.log(editor.getJSON())}>
+        get JSON
+      </button>
+    </div>
+  )
+}, "EditorPreview")
 
 export default function Page() {
   const pageCtx = usePageContext()

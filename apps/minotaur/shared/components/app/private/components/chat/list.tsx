@@ -1,6 +1,6 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { chatHistory, chatHistoryState } from "../../models/chat.model";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { ChatMessage } from "./message";
 import { ErrorBlock } from "@/shared/ui/error-block";

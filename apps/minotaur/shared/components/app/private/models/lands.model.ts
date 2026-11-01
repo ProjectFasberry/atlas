@@ -1,7 +1,7 @@
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 import { createLink } from "@/shared/components/config/link/link.model";
 import { client } from "@/shared/lib/client-wrapper";
-import { isError } from "@/shared/lib/helpers";
+import { isError } from "@/shared/lib/utils";
 import { logError } from "@/shared/lib/log";
 import { atom, reatomAsync, withAssign, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { toast } from "sonner";

@@ -6,7 +6,7 @@ import { env } from '@/shared/env';
 import { action, atom, withAssign } from '@reatom/framework';
 import type { Editor, EditorStateSnapshot } from '@tiptap/react';
 
-export const DEFAULT_SELECTORS = {
+const DEFAULT_SELECTORS = {
   isBold: false,
   canBold: false,
   isItalic: false,

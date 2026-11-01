@@ -3,12 +3,10 @@ import { Typography } from "@/shared/ui/typography"
 import { Link } from "@/shared/components/config/link/link"
 import { NotFound } from "@/shared/ui/not-found"
 import { tv } from "tailwind-variants"
-import { newsState } from "../models/news.model"
-import { isEmptyArray } from "@/shared/lib/helpers"
+import { newsState, type PublicNewsSingle } from "../models/news.model"
+import { isEmptyArray } from "@/shared/lib/utils"
 import { translate } from "@/shared/locales/helpers"
 import { createLink } from "@/shared/components/config/link/link.model"
-
-type NewsPayload = ExtractApiData<"getNewsList">["data"]
 
 const newsItemVariant = tv({
   base: `
@@ -21,7 +19,7 @@ const newsItemVariant = tv({
   }
 })
 
-const NewsItem = ({ id, title, imageUrl }: NewsPayload["data"][number]) => {
+const NewsItem = ({ id, title, imageUrl }: PublicNewsSingle) => {
   return (
     <div className={newsItemVariant().base()}>
       <img

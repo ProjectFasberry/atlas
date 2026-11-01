@@ -12,11 +12,12 @@ import type { ReactNode } from "react"
 import { spawn } from "@reatom/framework"
 import { createPortal } from "react-dom"
 import { IconLoader } from "@/shared/ui/icon-loader"
+import { translate } from "@/shared/locales/helpers"
 
 const ConnectNewVerifyExpiredOrNotfound = () => {
   return (
     <Typography className="text-center text-neutral-400 font-semibold">
-      Токен устарел или не существует
+      {translate["settings.devices.sections.add-device.token-expired"]()}
     </Typography>
   )
 }
@@ -26,8 +27,12 @@ const ConnectNewVerifyConfirmed = () => {
     <div className="flex flex-col gap-4 w-full items-center justify-center">
       <Icon name="sprite:check" className="size-8 text-green-600" />
       <div className="flex flex-col text-sm items-center justify-center w-full">
-        <Typography className="font-semibold">Запрос принят</Typography>
-        <span className="text-neutral-400">Теперь вы можете закрыть это окно</span>
+        <Typography className="font-semibold">
+          {translate["settings.devices.sections.add-device.request-confirmed"]()}
+        </Typography>
+        <Typography color="gray">
+          {translate["settings.devices.sections.add-device.request-confirmed-description"]()}
+        </Typography>
       </div>
     </div>
   )
@@ -38,8 +43,12 @@ const ConnectNewVerifyDeclined = () => {
     <div className="flex flex-col gap-4 w-full items-center justify-center">
       <Icon name='sprite:x' className="size-8 text-red-600" />
       <div className="flex flex-col text-sm items-center justify-center w-full">
-        <Typography className="font-semibold">Запрос отклонён</Typography>
-        <Typography color="gray">Теперь вы можете закрыть это окно</Typography>
+        <Typography className="font-semibold">
+          {translate["settings.devices.sections.add-device.request-rejected"]()}
+        </Typography>
+        <Typography color="gray">
+          {translate["settings.devices.sections.add-device.request-rejected-description"]()}
+        </Typography>
       </div>
     </div>
   )
@@ -70,7 +79,7 @@ const ConnectNewVerifyIdle = reatomComponent(({ ctx }) => {
           onClick={() => spawn(ctx, (spawnCtx) => login.qr.verify.confirm(spawnCtx))}
           disabled={isPending}
         >
-          Это я
+          <Typography>{translate["settings.devices.sections.add-device.it-is-me"]()}</Typography>
         </Button>
         <Button
           variant="danger"
@@ -78,7 +87,7 @@ const ConnectNewVerifyIdle = reatomComponent(({ ctx }) => {
           onClick={() => spawn(ctx, (spawnCtx) => login.qr.verify.decline(spawnCtx))}
           disabled={isPending}
         >
-          Это не я
+          <Typography>{translate["settings.devices.sections.add-device.it-is-not-me"]()}</Typography>
         </Button>
       </div>
     </>
@@ -131,7 +140,7 @@ const ScanReader = reatomComponent(({ ctx }) => {
         </div>
         <div className="flex items-center justify-center">
           <Typography>
-            Сканирование QR кода
+            {translate["settings.devices.sections.add-device.scanning-qr"]()}
           </Typography>
         </div>
         <div />
@@ -166,7 +175,9 @@ const ConnectNewConfirmDialog = reatomComponent(({ ctx }) => {
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
           <Dialog.Content className={dialogVariant.content()}>
-            <Dialog.Title className={dialogVariant.title()}>Подтверждение нового входа</Dialog.Title>
+            <Dialog.Title className={dialogVariant.title()}>
+              {translate["settings.devices.sections.add-device.confirming"]()}
+            </Dialog.Title>
             <div className="flex items-center justify-center w-full h-full">
               <ConnectNewVerifyLogin />
             </div>
@@ -182,7 +193,7 @@ export const ConnectNewSession = reatomComponent(({ ctx }) => {
   return (
     <div className="flex flex-col gap-2 w-full">
       <Typography className="leading-5">
-        Привяжи устройство к аккаунту, отсканировав QR-код
+        {translate["settings.devices.sections.add-device.title"]()}
       </Typography>
       <Button
         background="white"
@@ -190,7 +201,7 @@ export const ConnectNewSession = reatomComponent(({ ctx }) => {
         onClick={() => scan.start(ctx)}
       >
         <Icon name="sprite:qrcode" className="size-4" />
-        Привязать устройство
+        {translate["settings.devices.sections.add-device.start"]()}
       </Button>
       <ScanReader />
       <ConnectNewConfirmDialog />

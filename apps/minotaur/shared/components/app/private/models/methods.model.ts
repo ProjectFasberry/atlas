@@ -1,7 +1,7 @@
 import { client, withJsonBody } from "@/shared/lib/client-wrapper";
 import { action, atom, reatomAsync, reatomMap, withAssign, withCache, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { notifyAboutRestrictRole } from "./actions.model";
-import { invariant } from "@/shared/lib/invariant";
+import { invariant } from "@/shared/lib/utils";
 
 export type PrivatedMethodsPayload = ExtractApiData<"getPrivatedStoreMethodsList">["data"]
 

@@ -32,7 +32,8 @@ export const BackButton = ({
     <Button
       background="default"
       onClick={handle}
-      className="min-h-8 h-8 sm:min-h-8 sm:h-8 p-0 aspect-square w-fit"
+      size="headless"
+      className="min-h-8 h-8 sm:min-h-8 sm:h-8 aspect-square w-fit"
     >
       <Icon name={icon} className="size-4 sm:size-5 text-neutral-400" />
     </Button>

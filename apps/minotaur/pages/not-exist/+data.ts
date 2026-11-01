@@ -1,39 +1,32 @@
 import { logRouting } from "@/shared/lib/log";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { useConfig } from "vike-react/useConfig";
 import { type PageContextServer } from "vike/types";
-import { m } from "@/paraglide/messages.js";
+import { getNotExistType, wrapTitle } from "@/shared/lib/helpers";
+import { translate } from "@/shared/locales/helpers";
 
 export type Data = Awaited<ReturnType<typeof data>>;
 
-const previewImage = getStaticImage("arts/sand-camel.jpg")
+const image = getStaticImage("arts/sand-camel.jpg")
 
-function metadata(title: string) {
+function metadata(pageCtx: PageContextServer) {
+  const type = getNotExistType(pageCtx.urlParsed.search)
+  const title = wrapTitle(translate[`${type}.not-found`]());
+
   return {
     title,
-    image: previewImage
+    image
   }
 }
 
-const TITLE = {
-  "player": "Игрок не найден",
-  "land": "Похоже этого региона уже нет",
-  "store.item": "Товар не найден",
-  "default": "Ресурс не найден"
-} as const;
-
-type TitleType = keyof typeof TITLE
-
 export async function data(pageCtx: PageContextServer) {
   logRouting(pageCtx.urlPathname, "data");
-  
-  const type = pageCtx.urlParsed.search["type"] as TitleType | undefined ?? "default"
-  const title = m[`${type}.not-found`]()
 
   const config = useConfig()
-  config(metadata(title));
+  const meta = metadata(pageCtx);
+  config(meta);
 
   return {
-    title
+    title: meta.title
   }
 }

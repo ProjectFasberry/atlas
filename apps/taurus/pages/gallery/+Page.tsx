@@ -10,6 +10,7 @@ import { useAtom } from "@reatom/npm-solid-js";
 import { For } from "solid-js";
 import { GalleryItemDialog } from "./(components)/gallery-carousel";
 import { GALLERY_LIST, selectedKeyAtom } from "./(models)/gallery.model";
+import { translate } from "@/shared/locales/helpers";
 
 const CommunityGallery = () => {
   const [_, update] = useAtom(selectedKeyAtom)
@@ -39,16 +40,16 @@ export default function GalleryPage() {
           <div class="flex flex-col gap-6 w-full lg:max-w-3xl items-start justify-center">
             <div class="flex flex-col gap-2 lg:max-w-3xl">
               <h1 class={sectionVariantChild().title({ className: "text-gold" })}>
-                Галерея
+                {translate["gallery.title"]()}
               </h1>
               <Typography color="white" class={sectionVariantChild().subtitle()}>
-                Здесь игровые фотокарточки
+                {translate["gallery.description"]()}
               </Typography>
             </div>
             <Link href="#commuinity" class={sectionVariantChild().action()}>
               <Button class="w-full px-6 py-0.5 gap-2">
                 <Typography color="white" class="text-lg">
-                  К месту событий
+                  {translate["gallery.action-text"]()}
                 </Typography>
               </Button>
             </Link>

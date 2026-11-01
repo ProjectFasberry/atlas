@@ -1,9 +1,9 @@
 import { type PageContextServer } from "vike/types";
 import { useConfig } from "vike-react/useConfig";
-import { wrapTitle } from "@/shared/lib/utils";
+import { wrapTitle } from "@/shared/lib/helpers";
 import { logRouting } from "@/shared/lib/log";
 import { player, playerSsrModel } from "@/shared/components/app/player/models/player.model";;
-import dayjs from "@/shared/lib/create-dayjs"
+import { dayjs } from "@/shared/lib/dayjs"
 import { createCtx, type Ctx } from "@reatom/framework";
 import { playerLands } from "@/shared/components/app/player/models/player-lands.model";
 import { snapshots } from "@/shared/models/ssr";

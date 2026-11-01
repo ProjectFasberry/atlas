@@ -3,7 +3,7 @@ import { Typography } from "@/shared/ui/typography";
 import { reatomComponent } from "@reatom/npm-react";
 import { usePageContext } from "vike-react/usePageContext";
 import { Avatar } from "@/shared/ui/avatar";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { Icon } from "@/shared/ui/icon";
 import { renderToHTMLString } from "@tiptap/static-renderer";
 import type { JSONContent } from "@tiptap/react";

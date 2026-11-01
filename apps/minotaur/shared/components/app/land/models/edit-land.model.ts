@@ -1,4 +1,5 @@
 import { logError } from "@/shared/lib/log"
+import { translate } from "@/shared/locales/helpers"
 import { reatomAsync, withErrorAtom, withStatusesAtom } from "@reatom/framework"
 import { action, atom } from "@reatom/framework"
 import { withAssign, withReset } from "@reatom/framework"
@@ -8,6 +9,8 @@ type NewLandChangesKeys = "banner" | "gallery"
 
 export const landEditingState = atom(null, "landEditingState").pipe(
   withAssign((_, name) => ({
+    // Modes:
+    // 0 - view, 1 - editing
     mode: atom<0 | 1>(0, `${name}.mode`).pipe(withReset()),
     personalization: atom(null, `${name}.personalization`).pipe(
       withAssign((_, name) => ({
@@ -21,9 +24,6 @@ export const landEditingState = atom(null, "landEditingState").pipe(
 
 export const landEditing = atom(null, "landEditing").pipe(
   withAssign((_, name) => ({
-    cancel: action((ctx) => {
-      landEditing.resetFull(ctx)
-    }, `${name}.cancel`),
     resetFull: action((ctx) => {
       landEditingState.mode.reset(ctx)
       landEditingState.changes.reset(ctx)
@@ -32,27 +32,22 @@ export const landEditing = atom(null, "landEditing").pipe(
     }),
     banner: atom(null, `${name}.banner`).pipe(
       withAssign((_, name) => ({
-        s: action((ctx, e: React.FormEvent<HTMLInputElement>) => {
+        apply: action((ctx, e: React.FormEvent<HTMLInputElement>) => {
           const value = e.currentTarget.files ? e.currentTarget.files[0] : null
 
           if (value) {
             const url = URL.createObjectURL(value)
             landEditingState.changes(ctx, (state) => ({ ...state, "banner": [url] }))
           }
-        }, `${name}.s`)
+        }, `${name}.apply`)
       }))
     ),
     submit: reatomAsync(async (ctx) => {
-      const isChanges = ctx.get(changesIsExistAtom)
+      const isChanges = ctx.get(changesIsExistsAtom)
       if (!isChanges) return null;
 
-      const changes = ctx.get(landEditingState.changes)
-
-      toast.warning("Not implemented. Soon...")
+      toast.warning(translate["land.test.not-impl"]())
       return null;
-      // return await ctx.schedule(async () => {
-      //
-      // })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -60,8 +55,8 @@ export const landEditing = atom(null, "landEditing").pipe(
 
         landEditing.resetFull(ctx)
       },
-      onReject: (ctx, e) => {
-        logError(e)
+      onReject: (_, e) => {
+        logError(e, { type: "combined" })
       }
     }).pipe(
       withStatusesAtom(),
@@ -70,10 +65,9 @@ export const landEditing = atom(null, "landEditing").pipe(
   }))
 )
 
-export const changesIsExistAtom = atom((ctx) => {
-  const state = ctx.spy(landEditingState.changes)
-  const flatValues = Object.values(state).flat()
-  return Object.keys(state).length > 0 && flatValues.length > 0
+export const changesIsExistsAtom = atom<boolean>((ctx) => {
+  const state: Record<string, string[]> = ctx.spy(landEditingState.changes);
+  return Object.values(state).some(arr => arr.length > 0);
 }, "changesIsExist")
 
 landEditingState.changes.onChange((ctx, state) => {
@@ -88,11 +82,12 @@ landEditingState.changes.onChange((ctx, state) => {
   }
 })
 
-export const landActionTitleAtom = atom((ctx) => ctx.spy(landEditingState.mode) === 0 ? "Редактирование" : "Просмотр")
+export const landActionTitleAtom = atom((ctx) => ctx.spy(landEditingState.mode) === 0
+  ? translate["land.edit"]() : translate["land.view"]()
+)
 
 export const bannerEditIsAllowedAtom = atom((ctx) => {
-  const isEdit = ctx.spy(landEditingState.mode) === 1
-  const newBanner = ctx.spy(landEditingState.personalization.bannerUrl)
-
-  return isEdit && !newBanner
+  const isEditMode = ctx.spy(landEditingState.mode) === 1
+  const newBannerIsExist = ctx.spy(landEditingState.personalization.bannerUrl)
+  return isEditMode && !newBannerIsExist
 })

@@ -1,14 +1,17 @@
 import { getUrl, wrapTitle } from '@/shared/lib/helpers';
+import { translate } from '@/shared/locales/helpers';
 import { useConfig } from 'vike-solid/useConfig';
 import type { PageContextServer } from 'vike/types';
 
 export async function data(pageCtx: PageContextServer) {
   const config = useConfig()
 
-  const title = wrapTitle("Галерея");
+  const title = wrapTitle(translate['pages.gallery.title']());
+  const description = translate['pages.gallery.description']();
 
   config({
     title,
+    description,
     Head: (
       <>
         <link rel="canonical" href={getUrl(pageCtx)} />

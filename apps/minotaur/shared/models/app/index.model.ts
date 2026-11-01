@@ -1,9 +1,11 @@
 import { action, atom, withAssign, connectLogger, type Unsubscribe, withInit, type Ctx, createLogBatched, type AtomCache } from "@reatom/framework";
 import type { PageContext } from "vike/types";
 import { withSsr } from "../ssr";
-import { detectHardwareAcceleration, detectMobile, parseBoolean } from "../../lib/utils";
+import { parseBoolean } from "../../lib/utils";
+import { detectMobile } from "@/shared/lib/helpers";
+import { detectHardwareAcceleration } from "@/shared/lib/helpers";
 import { ENVIRONMENT } from "../../consts";
-import { getIsAuthed, spyOptionAtom } from "./utils";
+import { getIsAuthed, maybeSpyOptionAtom } from "./utils";
 import { snapshots } from "../ssr";
 import { pageState } from "../page-context.model";
 import { logger } from "@/shared/lib/logger";
@@ -14,8 +16,7 @@ export const APP_DICTIONARIES_KEY = "appState.dict" as const;
 export const MOBILE_BREAKPOINT = 1024 - 1
 
 export type AppOptionsPayload = ExtractApiData<"getAppOptions">["data"]
-export type AppSpecifiedOptions = { country: Nullable<string> }
-export type AppOptionsPayloadExtend = AppOptionsPayload & { specified: AppSpecifiedOptions }
+export type AppOptionsPayloadExtend = AppOptionsPayload
 export type AppDictionaries = Record<string, string>
 
 let DEVTOOLS_ENABLED = true;
@@ -44,15 +45,15 @@ export const userState = atom(null, "userState").pipe(
   withAssign((_, name) => ({
     geo: atom(null, `${name}.geo`).pipe(
       withAssign((_, name) => ({
-        country: atom((ctx) => spyOptionAtom(ctx, "specified", "country", "ru"), `${name}.country`)
+        country: atom((ctx) => null, `${name}.country`)
       }))
     ),
-    isAuthed: atom((ctx, snapshot?: Snapshot) => {
+    isAuthed: atom((ctx) => {
       if (ENVIRONMENT === 'server') {
-        return getIsAuthed(snapshot)
+        return getIsAuthed()
       }
-      return spyOptionAtom(ctx, "flags", "isAuthed", false)
-    })
+      return maybeSpyOptionAtom(ctx, "flags", "isAuthed", false)
+    }, `${name}.isAuthed`)
   }))
 )
 
@@ -60,7 +61,7 @@ export const getDevModulesInfo = (ctx: Ctx) => {
   const isMobile = ctx.get(appState.inited.isMobile)
   if (isMobile) return;
 
-  const stage = spyOptionAtom(ctx, "state", "stage", "prod")
+  const stage = maybeSpyOptionAtom(ctx, "state", "stage", "prod")
   const ALLOWED_STAGE: typeof stage[] = ["staging"];
 
   return {

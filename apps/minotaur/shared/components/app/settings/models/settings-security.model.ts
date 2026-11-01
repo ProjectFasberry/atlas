@@ -1,4 +1,4 @@
-import { isEmptyArray, isError } from "@/shared/lib/helpers";
+import { isEmptyArray, isError } from "@/shared/lib/utils";
 import { client } from "@/shared/lib/client-wrapper";
 import { atom, reatomAsync, withAssign, withCache, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { action } from "@reatom/framework";

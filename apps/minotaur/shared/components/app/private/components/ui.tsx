@@ -8,7 +8,7 @@ import { Icon } from "@/shared/ui/icon"
 import { reatomComponent } from "@reatom/npm-react";
 import { type ActionParent, type ActionType, actions, getIsSelectedActionAtom } from "../models/actions.model";
 import type { ComponentPropsWithoutRef } from "react";
-import clsx from "clsx"
+import { clsx } from "cnfast"
 
 type ButtonProps = ComponentPropsWithoutRef<"button">
 

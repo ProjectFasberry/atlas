@@ -1,11 +1,11 @@
-import { Editor, EditorContent, useEditor, useEditorState } from "@tiptap/react"
+import { Editor, useEditorState } from "@tiptap/react"
 import { tv } from "tailwind-variants"
 import { scrollableVariant } from "@/shared/consts/style-variants"
 import { reatomComponent } from "@reatom/npm-react"
 import { Icon } from "@/shared/ui/icon"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
-import { EDITOR_DEFAULT_CONTENT, editorBar, editorBarState, editorExtensions, editorSelectors, editorState } from "./editor.model"
+import { editorBar, editorBarState, editorSelectors } from "./editor.model"
 
 const controlVariant = tv({
   base: `
@@ -351,24 +351,3 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
     </>
   )
 }, "EditorMenuBar")
-
-export const EditorTest = reatomComponent(({ ctx }) => {
-  const editor = useEditor({
-    extensions: editorExtensions,
-    content: EDITOR_DEFAULT_CONTENT,
-    onUpdate: ({ editor }) => {
-      let value = editor.getHTML();
-      editorState.content(ctx, value)
-    },
-  })
-
-  return (
-    <div className="flex flex-col gap-6 w-full h-full">
-      <EditorMenuBar editor={editor} />
-      <EditorContent editor={editor} />
-      <button onClick={() => console.log(editor.getJSON())}>
-        get JSON
-      </button>
-    </div>
-  )
-}, "EditorPreview")

@@ -1,7 +1,7 @@
 import { reatomComponent, useAtom } from "@reatom/npm-react"
 import { Button } from "@/shared/ui/button"
 import { Typography } from "@/shared/ui/typography"
-import dayjs from "@/shared/lib/create-dayjs"
+import { dayjs } from "@/shared/lib/dayjs"
 import { createPageModel } from "@/shared/lib/events"
 import { logout } from "@/shared/components/app/auth/models/logout.model"
 import { banned } from "@/shared/components/app/auth/models/banned.model"

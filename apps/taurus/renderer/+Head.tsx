@@ -1,7 +1,8 @@
 import { env } from "@/shared/env";
 import { getStaticObject } from "@/shared/lib/helpers";
+import { translate } from "@/shared/locales/helpers";
 
-const bgImage = getStaticObject("backgrounds", "donate_background.png")
+const image = getStaticObject("backgrounds", "donate_background.png")
 
 export default function HeadDefault() {
   return (
@@ -19,19 +20,19 @@ export default function HeadDefault() {
         survival, smp, fasberry project, minecraft fasberry, minecraft server play"/>
       <meta name="author" content="Fasberry Team" />
       <meta name="format-detection" content="email=yes, address=yes, telephone=yes" />
-      <meta name="description" content={`Официальная страница майнкрафт-проекта Fasberry. Жанр: RP, RPG, полу-ванила. 1.20+. Играть: play.${env.VITE_MAIN_DOMAIN}`} />
+      <meta name="description" content={`${translate["pages.global.description"]({ ip: `play.${env.VITE_MAIN_DOMAIN}` })}`} />
       <meta property="og:title" content="Fasberry" />
-      <meta property="og:description" content="Сколько топовых майнкрафт-серверов вы знаете? Теперь знаете на один больше" />
+      <meta property="og:description" content={translate["pages.global.description-global"]()} />
       <meta property="og:locale" content="ru_RU" />
       <meta property="og:type" content="website" />
-      <meta property="og:site_name" content="Официальный сайт майнкрафт сервера Fasberry." />
-      <meta property="og:image" content={bgImage} />
+      <meta property="og:site_name" content={translate["pages.global.site_name"]()} />
+      <meta property="og:image" content={image} />
       <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta name="twitter:title" content="Fasberry" />
-      <meta name="twitter:description" content="Сколько топовых майнкрафт-серверов вы знаете? Теперь знаете на один больше" />
-      <meta name="twitter:image" content={bgImage} />
+      <meta name="twitter:description" content={translate["pages.global.description-global"]()} />
+      <meta name="twitter:image" content={image} />
       <meta property="twitter:image:type" content="image/jpeg" />
       <meta property="twitter:image:width" content="1200" />
       <meta property="twitter:image:height" content="630" />

@@ -1,22 +1,11 @@
 import { Carousel } from "@ark-ui/solid/carousel"
 import { GALLERY_LIST, selectedKeyAtom } from "../(models)/gallery.model"
 import { useAtom } from "@reatom/npm-solid-js"
-import {
-  carouselIndicatorGroupVariant,
-  carouselIndicatorVariant,
-  carouselItemGroupVariant,
-  carouselItemVariant,
-  carouselRootVariant
-} from "@/shared/ui/carousel"
+import { carouselVariant } from "@/shared/ui/carousel"
 import { Index } from "solid-js"
 import { Dialog } from "@ark-ui/solid/dialog"
 import { Portal } from "solid-js/web"
-import {
-  dialogBackdropVariant,
-  DialogClose,
-  dialogContentVariant,
-  dialogPositionerVariant
-} from "@/shared/ui/dialog"
+import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 
 const CarouselGallery = () => {
   const [selectedAtom, setSelectedAtom] = useAtom(selectedKeyAtom)
@@ -27,15 +16,15 @@ const CarouselGallery = () => {
       draggable={false}
       page={selectedAtom()}
       onPageChange={(details) => setSelectedAtom(details.page)}
-      class={carouselRootVariant()}
+      class={carouselVariant.root()}
       allowMouseDrag={true}
       loop
       spacing={"16px"}
     >
-      <Carousel.ItemGroup class={carouselItemGroupVariant()}>
+      <Carousel.ItemGroup class={carouselVariant.itemGroup()}>
         <Index each={GALLERY_LIST}>
           {(image, idx) => (
-            <Carousel.Item index={idx} class={carouselItemVariant()}>
+            <Carousel.Item index={idx} class={carouselVariant.item()}>
               <img
                 loading="lazy"
                 src={image()}
@@ -49,9 +38,9 @@ const CarouselGallery = () => {
         </Index>
       </Carousel.ItemGroup>
       <div class="absolute bottom-4 flex items-center justify-center right-0 left-0">
-        <Carousel.IndicatorGroup class={carouselIndicatorGroupVariant()}>
+        <Carousel.IndicatorGroup class={carouselVariant.indicatorGroup()}>
           <Index each={GALLERY_LIST}>
-            {(_, idx) => <Carousel.Indicator index={idx} class={carouselIndicatorVariant()} />}
+            {(_, idx) => <Carousel.Indicator index={idx} class={carouselVariant.indicator()} />}
           </Index>
         </Carousel.IndicatorGroup>
       </div>
@@ -68,10 +57,10 @@ export const GalleryItemDialog = (props: { image: string }) => {
         />
       </Dialog.Trigger>
       <Portal>
-        <Dialog.Backdrop class={dialogBackdropVariant()} />
-        <Dialog.Positioner class={dialogPositionerVariant()}>
+        <Dialog.Backdrop class={dialogVariant.backdrop()} />
+        <Dialog.Positioner class={dialogVariant.positioner()}>
           <Dialog.Content
-            class={dialogContentVariant({
+            class={dialogVariant.content({
               className: `p-0! max-h-[720px] max-w-[1280px] panel-reset`
             })}
           >

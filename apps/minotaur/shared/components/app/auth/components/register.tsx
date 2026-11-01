@@ -1,7 +1,6 @@
 import { NicknameInput, PasswordInput } from "./auth"
 import { reatomComponent } from "@reatom/npm-react"
 import { auth, type AuthFindoutType, authState } from "../models/auth.model"
-import { env } from "@/shared/env"
 import { Input } from "@/shared/ui/input"
 import { type JSX, type ReactNode, useState } from "react"
 import { Button } from "@/shared/ui/button"
@@ -9,16 +8,19 @@ import { SeedPhrase, SeedPhraseFooter, SeedPhraseHeader, SeedPhraseBody } from "
 import { Icon } from "@/shared/ui/icon"
 import {
   type AuthRegisterType,
-  registerNavigationModel, register, registerSeedPhraseModel, registerState, findoutSelectedTypeAtom, FINDOUT_OPTIONS
+  registerNavigationModel, register, registerSeedPhraseModel, registerState, findoutSelectedTypeAtom,
+  createFindoutOptions
 } from "../models/register.model"
 import { IconLoader } from "@/shared/ui/icon-loader"
 import { spawn } from "@reatom/framework"
 import { translate } from "@/shared/locales/helpers"
-import { Checkbox } from "@/shared/ui/checkbox"
 import { Select, createListCollection } from '@ark-ui/react/select'
 import { Portal } from "@ark-ui/react/portal"
 import { selectVariant, selectContentBaseStyle } from "@/shared/ui/select"
 import { Typography } from "@/shared/ui/typography"
+import { getLocale } from "@/paraglide/runtime"
+import { Checkbox } from "@ark-ui/react/checkbox"
+import { checkboxVariant } from "@/shared/ui/checkbox"
 
 const FindoutReferrerInput = reatomComponent(({ ctx }) => (
   <Input
@@ -56,8 +58,8 @@ const FINDOUT_COMPONENTS: Record<AuthFindoutType, ReactNode> = {
   "custom": <FindoutOtherInput />
 }
 
-const collection = createListCollection({
-  items: FINDOUT_OPTIONS
+const FINDOUT_COLLECTION = createListCollection({
+  items: createFindoutOptions()
 })
 
 const FindoutOptions = reatomComponent(({ ctx }) => {
@@ -65,7 +67,7 @@ const FindoutOptions = reatomComponent(({ ctx }) => {
 
   return (
     <Select.Root
-      collection={collection}
+      collection={FINDOUT_COLLECTION}
       value={currentItem ? [currentItem.value] : []}
       onValueChange={({ value }) => authState.fields.findoutType(ctx, value[0] as AuthFindoutType)}
       className="flex flex-col gap-1 w-full"
@@ -89,7 +91,7 @@ const FindoutOptions = reatomComponent(({ ctx }) => {
         <Select.Positioner>
           <Select.Content className={selectVariant.content()} style={selectContentBaseStyle}>
             <Select.ItemGroup className={selectVariant.itemGroup()}>
-              {FINDOUT_OPTIONS.map((item) => (
+              {createFindoutOptions().map((item) => (
                 <Select.Item key={item.value} item={item} className={selectVariant.item()}>
                   <Select.ItemText className={selectVariant.itemText()}>
                     {item.title}
@@ -111,32 +113,35 @@ const FindoutOptions = reatomComponent(({ ctx }) => {
 const FindoutComponent = reatomComponent(({ ctx }) => {
   const data = ctx.spy(authState.fields.findoutType)
   if (!data) return null;
-  return FINDOUT_COMPONENTS[data]
+  return FINDOUT_COMPONENTS?.[data] ?? null;
 }, "FindoutComponent")
 
 const PrivacyTerms = reatomComponent(({ ctx }) => {
   return (
-    <div className="inline-flex items-start">
-      <Checkbox
+    <div className="inline-flex gap-2 items-start">
+      <Checkbox.Root
         id="rules"
         checked={ctx.spy(authState.fields.acceptRules)}
-        onCheckedChange={v => authState.fields.acceptRules(ctx, v)}
-        className="flex items-center relative"
-      />
+        onCheckedChange={(e) => typeof e.checked === 'boolean' && authState.fields.acceptRules(ctx, e.checked)}
+        className={checkboxVariant.root()}
+      >
+        <Checkbox.Control className={checkboxVariant.control({ variant: "filled" })} />
+        <Checkbox.HiddenInput />
+      </Checkbox.Root>
       <label
-        lang="ru"
+        lang={getLocale()}
         className="select-none relative -top-1 text-sm [&_a]:text-green-500 [&_a]:inline [hyphens:auto]"
         htmlFor="checkbox:rules:input"
       >
         {translate["auth.register.acceptRulesTitle"]()}
-        <a href="/legal/terms" target="_blank">
+        <a href="/privacy" target="_blank">
           &nbsp;{translate["auth.register.acceptRulesPrivacy"]()}
         </a>,
-        <a href="/legal/privacy" target="_blank">
+        <a href="/terms" target="_blank">
           &nbsp;{translate["auth.register.acceptRulesProcessing"]()}&nbsp;
         </a>
         и
-        <a href={`${env.VITE_LANDING_URL}/rules`} target="_blank">
+        <a href="/rules" target="_blank">
           &nbsp;{translate["auth.register.acceptRulesProject"]()}
         </a>.
       </label>
@@ -225,16 +230,24 @@ const RegisterConfirmLoading = () => {
       <IconLoader className="size-9" />
       <div className="flex flex-col gap-1 justify-center items-center w-full">
         <Typography className="text-xl font-semibold">
-          Регистрируем
+          {translate["auth.register.in-progress"]()}
         </Typography>
         <Typography color="gray" className="text-sm">
-          это займет немного времени...
+          {translate["auth.register.in-progress-subtitle"]()}
         </Typography>
       </div>
     </>
   )
 }
 const RegisterConfirmError = reatomComponent(({ ctx }) => {
+  const handleToBack = () => {
+    spawn(ctx, (spawnCtx) => {
+      registerNavigationModel.back(spawnCtx)
+      registerNavigationModel.back(spawnCtx)
+      registerNavigationModel.back(spawnCtx)
+    })
+  }
+
   return (
     <>
       <div className="flex flex-col gap-2 w-full items-center justify-center">
@@ -246,16 +259,10 @@ const RegisterConfirmError = reatomComponent(({ ctx }) => {
       <Button
         background="default"
         type="button"
-        onClick={() => {
-          spawn(ctx, (spawnCtx) => {
-            registerNavigationModel.back(spawnCtx)
-            registerNavigationModel.back(spawnCtx)
-            registerNavigationModel.back(spawnCtx)
-          })
-        }}
+        onClick={handleToBack}
         className="font-semibold"
       >
-        Вернуться
+        {translate["auth.register.to-back"]()}
       </Button>
     </>
   )
@@ -322,7 +329,8 @@ const RegisterContinue = reatomComponent(({ ctx }) => {
   return (
     <Button
       type="button"
-      className="w-full bg-green-600 capitalize font-semibold transition-none"
+      background="positive"
+      className="w-full capitalize font-semibold transition-none"
       disabled={!canGoNext || ctx.spy(registerNavigationModel.next.statusesAtom).isPending}
       onClick={() => register.next(ctx)}
     >

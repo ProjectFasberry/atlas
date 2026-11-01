@@ -1,16 +1,21 @@
-import { type PageContext } from "vike/types";
-import { localeDefault } from ".";
 import { m } from "@/paraglide/messages.js";
+import type { PageContext } from "vike/types";
+import { type Locale, baseLocale } from "@/paraglide/runtime";
 
-export function getUrlWithLocale(pageCtx: PageContext, pathname: string) {
-  const locale = pageCtx.locale
-  let url;
-  if (locale === localeDefault) {
-    url = pathname
-  } else {
-    url = `/${pageCtx.locale}${pathname}`
-  }
-  return url
-}
-
+/**
+ * Alias for the translate function from paraglide
+ */
 export const translate = m;
+
+/**
+ * Helper for the prerendered pages
+ */
+const getBaseLocale = (isPrerendering: boolean) =>
+  isPrerendering ? "ru" : baseLocale
+
+export const getLocaleByRuntime = (pageCtx: PageContext): Locale => {
+  // Locale from the derive payload
+  // @ts-expect-error
+  return pageCtx?.["runtime"]?.["elysia"]?.["locale"] as Maybe<Locale>
+    ?? getBaseLocale(pageCtx.isPrerendering);
+}

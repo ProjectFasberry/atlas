@@ -1,8 +1,9 @@
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { type ComponentPropsWithoutRef, createContext, type PropsWithChildren, type ReactNode, useContext, useRef } from 'react';
-import { cn } from '../lib/cn';
 import { Icon } from "@/shared/ui/icon"
+import { clsx } from 'cnfast';
+import { translate } from '../locales/helpers';
 
 type SeedPhraseContextType = {
   words: string[];
@@ -44,7 +45,7 @@ const SeedPhraseHeader = ({
     <div className="flex justify-between w-full items-start">
       <div className="flex flex-col">
         <h2 className="text-xl font-bold text-white">
-          Секретная фраза
+          {translate["auth.register.seed-phrase.title"]()}
         </h2>
         {children}
       </div>
@@ -52,9 +53,10 @@ const SeedPhraseHeader = ({
         <Button
           type="button"
           background='default'
+          size="small"
           disabled={!isOneWordFilled}
           onClick={() => onChangeVisibilityStatus?.(!isHidden)}
-          className="p-2 aspect-square *:size-4"
+          className="aspect-square *:size-4"
         >
           {isHidden ? <Icon name="sprite:eye" /> : <Icon name="sprite:eye-off" />}
         </Button>
@@ -84,7 +86,7 @@ const SeedPhrase = ({
         isHidden
       }}
     >
-      <div className={cn("flex flex-col w-full", className)}>
+      <div className={clsx("flex flex-col w-full", className)}>
         {children}
       </div>
     </seedPhraseCtx.Provider>

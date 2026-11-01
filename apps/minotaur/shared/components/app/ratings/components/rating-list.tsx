@@ -13,31 +13,29 @@ import { type AtomState } from "@reatom/framework";
 import { ratingsState, ratings } from "../models/ratings.model";
 import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/ui/table"
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
 import { Avatar } from "../../../../ui/avatar";
 import { Link } from "@/shared/components/config/link/link";
-import dayjs from "@/shared/lib/create-dayjs"
+import { dayjs } from "@/shared/lib/dayjs"
 import { PageLoader } from "@/shared/ui/page-loader";
 import { Noop } from "@/shared/ui/noop";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { createLink } from "@/shared/components/config/link/link.model";
+import { translate } from "@/shared/locales/helpers";
 
 const RatingListParkourHeaderU = () => {
   return (
     <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-[64px]">#</TableHead>
-      <TableHead>Игрок</TableHead>
-      <TableHead>Карта</TableHead>
-      <TableHead className="text-right">Счет</TableHead>
+      <TableHead className="w-10">#</TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.player"]()}
+      </TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.map"]()}
+      </TableHead>
+      <TableHead className="text-right capitalize">
+        {translate["parkour.score"]()}
+      </TableHead>
     </TableRow>
   )
 }
@@ -45,9 +43,13 @@ const RatingListParkourHeaderU = () => {
 const RatingListCharismHeaderU = () => {
   return (
     <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-[64px]">#</TableHead>
-      <TableHead>Игрок</TableHead>
-      <TableHead className="text-right">Харизмы</TableHead>
+      <TableHead className="w-10">#</TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.player"]()}
+      </TableHead>
+      <TableHead className="text-right capitalize">
+        {translate["parkour.charism"]()}
+      </TableHead>
     </TableRow>
   )
 }
@@ -55,9 +57,13 @@ const RatingListCharismHeaderU = () => {
 const RatingListBelkoinHeaderU = () => {
   return (
     <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-[64px]">#</TableHead>
-      <TableHead>Игрок</TableHead>
-      <TableHead className="text-right">Белкоинов</TableHead>
+      <TableHead className="w-10">#</TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.player"]()}
+      </TableHead>
+      <TableHead className="text-right capitalize">
+        {translate["parkour.belkoin"]()}
+      </TableHead>
     </TableRow>
   )
 }
@@ -65,7 +71,7 @@ const RatingListBelkoinHeaderU = () => {
 const TableRowsSkeleton = () => {
   return (
     <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-[64px]">
+      <TableHead className="w-10">
         <Skeleton className="h-8 w-8" />
       </TableHead>
       <TableHead>
@@ -81,9 +87,13 @@ const TableRowsSkeleton = () => {
 const RatingListReputationHeaderU = () => {
   return (
     <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-[64px]">#</TableHead>
-      <TableHead>Игрок</TableHead>
-      <TableHead className="text-right">Репутация</TableHead>
+      <TableHead className="w-10">#</TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.player"]()}
+      </TableHead>
+      <TableHead className="text-right capitalize">
+        {translate["parkour.reputation"]()}
+      </TableHead>
     </TableRow>
   )
 }
@@ -91,9 +101,13 @@ const RatingListReputationHeaderU = () => {
 const RatingListPlaytimeHeaderU = () => {
   return (
     <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-[64px]">#</TableHead>
-      <TableHead>Игрок</TableHead>
-      <TableHead className="text-right">Суммарное время</TableHead>
+      <TableHead className="w-10">#</TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.player"]()}
+      </TableHead>
+      <TableHead className="text-right capitalize">
+        {translate["parkour.playtime"]()}
+      </TableHead>
     </TableRow>
   )
 }
@@ -101,10 +115,16 @@ const RatingListPlaytimeHeaderU = () => {
 const RatingListLandsHeaderU = () => {
   return (
     <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-[64px]">#</TableHead>
-      <TableHead>Территория</TableHead>
-      <TableHead>Чанков</TableHead>
-      <TableHead className="text-right">Тип</TableHead>
+      <TableHead className="w-10">#</TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.lands"]()}
+      </TableHead>
+      <TableHead className="capitalize">
+        {translate["parkour.chunks"]()}
+      </TableHead>
+      <TableHead className="text-right capitalize">
+        {translate["parkour.type"]()}
+      </TableHead>
     </TableRow>
   )
 }
@@ -236,7 +256,7 @@ const UserHead = ({ nickname, avatar }: { nickname: string, avatar: string }) =>
         className="w-6 h-6"
         url={avatar}
       />
-      <span className="font-semibold text-base">
+      <span className="font-semibold text-base truncate min-w-0">
         {nickname}
       </span>
     </Link>
@@ -295,7 +315,7 @@ export const Ratings = reatomComponent(({ ctx }) => {
   const error = ctx.spy(ratings.fetch.errorAtom);
   if (error) return <ErrorBlock title={error.message} />
 
-  if (!ctx.spy(ratingsState.data)) return <Noop  />
+  if (!ctx.spy(ratingsState.data)) return <Noop />
 
   return (
     <Table>
@@ -306,12 +326,6 @@ export const Ratings = reatomComponent(({ ctx }) => {
       <TableBody>
         <RatingTableBody />
       </TableBody>
-      {/* <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
-      </TableFooter> */}
     </Table>
   )
 }, "Ratings")

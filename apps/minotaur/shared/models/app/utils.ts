@@ -42,12 +42,13 @@ export function getIsAuthed(snapshot?: Snapshot): boolean {
 * Client-only
 *
 * @constructor
+* @param {Ctx} ctx - is reatom context
 * @param {AppOptionsPayloadExtend} parentKey - is parent key
 * @param {AppOptionsPayloadExtend[K]} nestedKey - is nested key
 * @param {string} nestedKey2 - is nested key
 * @param {unknown} defaultValue - fallback value
 */
-export function spyOptionAtom<
+export function maybeSpyOptionAtom<
 	K extends keyof AppOptionsPayloadExtend,
 	S extends keyof AppOptionsPayloadExtend[K]
 >(

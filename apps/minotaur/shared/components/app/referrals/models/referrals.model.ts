@@ -19,6 +19,6 @@ export const referrals = atom(null, "referrals").pipe(
       withStatusesAtom(),
       withErrorAtom()
     ),
-    getReferralIp: (v: string) => `${env.VITE_APP_URL}/auth?type=register&referrer=${v}`
+    getReferralIp: (nickname: string) => `${env.VITE_APP_URL}/auth?type=register&referrer=${nickname}`
   }))
 )

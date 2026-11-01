@@ -1,8 +1,6 @@
 import { Link } from "@/shared/components/config/link/link"
-import { navigationModel } from "../models/navigation.model"
+import { createHeaderLinks } from "../models/navigation.model"
 import { Icon } from "@/shared/ui/icon";
-
-const { HEADERS_LINKS } = navigationModel();
 
 export const MobileBottomBar = () => {
   return (
@@ -13,7 +11,7 @@ export const MobileBottomBar = () => {
       "
     >
       <div className="flex items-center justify-between w-full gap-1">
-        {HEADERS_LINKS.map(link => (
+        {createHeaderLinks().map(link => (
           <Link
             key={link.title}
             aria-label={link.label}

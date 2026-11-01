@@ -1,15 +1,15 @@
 import { useConfig } from 'vike-solid/useConfig';
 import type { PageContextServer } from 'vike/types';
 import { getStaticObject, getUrl, wrapTitle } from '@/shared/lib/helpers';
+import { translate } from '@/shared/locales/helpers';
 
-const bgImage = getStaticObject("community", "dragon_dead.webp")
-
-const description = `Помогите развитию проекта Fasberry, поддержав нас! Ваш вклад пойдет на развитие серверов,
-улучшение игрового опыта и создание уникального контента для игроков.`
+const image = getStaticObject("community", "dragon_dead.webp")
 
 export async function data(pageCtx: PageContextServer) {
-  const config = useConfig()
-  const title = wrapTitle(`Поддержка`);
+  const config = useConfig();
+
+  const title = wrapTitle(translate["pages.support.title"]());
+  const description = translate["pages.support.description"]()
 
   config({
     title,
@@ -22,13 +22,13 @@ export async function data(pageCtx: PageContextServer) {
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={title} />
-        <meta property="og:image" content={bgImage} />
+        <meta property="og:image" content={image} />
         <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={bgImage} />
+        <meta name="twitter:image" content={image} />
         <meta property="twitter:image:type" content="image/jpeg" />
         <meta property="twitter:image:width" content="1200" />
         <meta property="twitter:image:height" content="630" />

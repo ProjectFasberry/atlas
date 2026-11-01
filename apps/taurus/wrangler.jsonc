@@ -1,7 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "compatibility_date": "2026-03-09",
+  "compatibility_date": "2026-05-28",
   "name": "landing",
   "main": "vike:server-entry",
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
 }

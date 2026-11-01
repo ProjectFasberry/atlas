@@ -4,7 +4,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { tv } from "tailwind-variants";
 import { getHistoryItemStatusAtom, history, type HistoryPayload } from "../models/history.model";
 import { getFromDictionary } from "@/shared/models/app/utils";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { SectionWrapper } from "./ui";
 
 const historyListItemVariant = tv({

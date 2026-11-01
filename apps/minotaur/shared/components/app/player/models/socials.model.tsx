@@ -1,6 +1,6 @@
 import { client } from "@/shared/lib/client-wrapper"
 import { reatomAsync, withCache, withDataAtom, withStatusesAtom } from "@reatom/framework"
-import { isEmptyArray } from "@/shared/lib/helpers"
+import { isEmptyArray } from "@/shared/lib/utils"
 import { toast } from "sonner"
 import { action, atom, withAssign } from "@reatom/framework"
 import { playerState } from "./player.model"

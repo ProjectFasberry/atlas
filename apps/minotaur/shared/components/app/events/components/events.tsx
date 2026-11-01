@@ -1,48 +1,35 @@
-import dayjs from "@/shared/lib/create-dayjs"
+import { dayjs } from "@/shared/lib/dayjs"
 import { reatomComponent } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
-import { tv } from "tailwind-variants";
-import { eventsState } from "../models/events.model";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { eventsState, type EventsSingle } from "../models/events.model";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { Noop } from "@/shared/ui/noop";
 
-type EventCardProps = ExtractApiData<"getServerEventsList">["data"][number]
-
-const eventCardVariant = tv({
-  base: `
-    flex flex-col md:flex-[0_0_calc((100%/3)-0.666rem)] flex-shrink-0 w-full
-    h-49 p-3 sm:p-4 bg-neutral-900 rounded-xl overflow-hidden justify-between
-  `,
-  slots: {
-    firstGroup: "flex items-center justify-start bg-neutral-50 rounded-md p-2 w-full truncate",
-    secondGroup: "flex flex-col justify-between h-full mt-2"
-  }
-})
-
-const EventCard = ({ content, id, title }: EventCardProps) => {
+const EventCard = ({ content, id, title }: EventsSingle) => {
   const created_at = dayjs(content.created_at.toString()).fromNow();
 
   return (
     <div
       id={id}
-      className={eventCardVariant().base()}
+      className="
+        flex flex-col justify-center md:flex-[0_0_calc((100%/3)-0.666rem)] flex-shrink-0 w-full
+        h-24 p-2 sm:p-4 bg-neutral-900 gap-2 rounded-xl overflow-hidden
+      "
     >
-      <div className={eventCardVariant().firstGroup()}>
-        <Typography className="text-neutral-950 text-base font-bold truncate">
+      <div className="flex flex-col items-center justify-center w-full h-full truncate">
+        <Typography className="text-base font-semibold truncate">
           {title}
         </Typography>
-      </div>
-      <div className={eventCardVariant().secondGroup()}>
         {content.description && (
-          <Typography className="text-base line-clamp-3">
+          <Typography className="text-sm leading-4 line-clamp-3">
             {content.description}
           </Typography>
         )}
-        <div className="flex flex-col justify-center items-end w-full">
-          <Typography color="gray" className="text-sm">
-            {created_at}
-          </Typography>
-        </div>
+      </div>
+      <div className="flex items-center justify-center w-full">
+        <Typography color="gray" className="text-[12px]">
+          {created_at}
+        </Typography>
       </div>
     </div>
   )
@@ -52,5 +39,5 @@ export const EventsList = reatomComponent(({ ctx }) => {
   const data = ctx.spy(eventsState.data);
   if (!data || isEmptyArray(data)) return <Noop />
 
-  return data.map(event => <EventCard key={event.id} {...event}/>)
+  return data.map(event => <EventCard key={event.id} {...event} />)
 }, "EventsList")

@@ -8,7 +8,7 @@ import { Skeleton } from "@/shared/ui/skeleton"
 import { tv } from "tailwind-variants"
 import { type ReactNode } from "react"
 import { belkoinImage, charismImage } from "@/shared/consts/images"
-import { getStaticImage } from "@/shared/lib/volume-helpers"
+import { getStaticImage } from "@/shared/lib/helpers"
 import { PageLoader } from "@/shared/ui/page-loader"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
@@ -152,7 +152,7 @@ const TasksFilterType = reatomComponent(({ ctx }) => {
           </Button>
         </Menu.Trigger>
         <Menu.Positioner>
-          <Menu.Content className={menuVariant.content({ className: "w-full min-w-56" })}>
+          <Menu.Content className={menuVariant.content("w-full min-w-56")}>
             {TASKS_FILTERS.map((filter) => (
               <Button
                 key={filter.value}

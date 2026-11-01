@@ -1,5 +1,8 @@
 import { currentUserState } from "@/shared/models/current-user/index.model"
-import { action, atom, reatomAsync, withAbort, withCache, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework"
+import {
+  action, atom, reatomAsync,
+  withAbort, withCache, withDataAtom, withErrorAtom, withStatusesAtom
+} from "@reatom/framework"
 import { withAssign, withReset } from "@reatom/framework"
 import { client } from "@/shared/lib/client-wrapper"
 import { createSsrModel } from "@/shared/models/ssr"
@@ -10,6 +13,7 @@ import { logError } from "@/shared/lib/log"
 import type { PageContextServer } from "vike/types"
 import { redirect } from "vike/abort"
 import { pageState } from "@/shared/models/page-context.model"
+import { getNotExistUrlByEntity } from "@/shared/lib/helpers"
 
 export const PLAYER_RATE_DATA_KEY = "playerRateState.data";
 export const PLAYER_TAGS_DATA_KEY = "playerState.tags"
@@ -22,10 +26,21 @@ export const playerSsrModel = createSsrModel({ name: "player", subscribe: false 
 
 export const playerState = atom(null, "playerState").pipe(
   withAssign((_, name) => ({
-    data: atom<Nullable<Omit<Player, "rate" | "nickname">>>(null, `${name}.data`).pipe(playerSsrModel.withSsr(`${name}.data`), withReset()),
-    nickname: atom<Nullable<string>>(null, `${name}.nickname`).pipe(playerSsrModel.withSsr(`${name}.nickname`), withReset()),
-    tags: atom<PlayerTagsPayload>([], `${name}.tags`).pipe(playerSsrModel.withSsr(PLAYER_TAGS_DATA_KEY), withReset()),
-    rate: atom<Nullable<PlayerRatePayload>>(null, `${name}.rate`).pipe(playerSsrModel.withSsr(PLAYER_RATE_DATA_KEY)),
+    data: atom<Nullable<Omit<Player, "rate" | "nickname">>>(null, `${name}.data`).pipe(
+      playerSsrModel.withSsr(`${name}.data`),
+      withReset()
+    ),
+    nickname: atom<Nullable<string>>(null, `${name}.nickname`).pipe(
+      playerSsrModel.withSsr(`${name}.nickname`),
+      withReset()
+    ),
+    tags: atom<PlayerTagsPayload>([], `${name}.tags`).pipe(
+      playerSsrModel.withSsr(PLAYER_TAGS_DATA_KEY),
+      withReset()
+    ),
+    rate: atom<Nullable<PlayerRatePayload>>(null, `${name}.rate`).pipe(
+      playerSsrModel.withSsr(PLAYER_RATE_DATA_KEY)
+    ),
   }))
 )
 
@@ -64,7 +79,7 @@ export const player = atom(null, "player").pipe(
         });
 
       if (!player) {
-        throw redirect("/not-exist?type=player")
+        throw redirect(getNotExistUrlByEntity("player"))
       };
 
       const { rate, nickname, ...base } = player;

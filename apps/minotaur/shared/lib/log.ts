@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { logger } from "./logger";
 import { ENVIRONMENT } from "../consts";
-import { isError } from "./helpers";
+import { isError } from "./utils";
 
 const EVENTS = {
   "console": null,
@@ -26,9 +26,13 @@ export function logError(e: unknown, { type = 'console' }: LogErrorParams = {}) 
   cb(e)
 }
 
+const routingLogger = logger.withTag('Routing');
+
 export function logRouting(path: string, hook: string): void {
-  if (import.meta.env.DEV || ENVIRONMENT === 'server') {
-    logger.withTag('Routing').log(`${path} called +${hook}`);
+  if (
+    (import.meta.env.DEV) || (import.meta.env.PROD && ENVIRONMENT === 'server')
+  ) {
+    routingLogger.log(`${path} called +${hook}.${ENVIRONMENT}`);
   }
 }
 

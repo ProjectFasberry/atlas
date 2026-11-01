@@ -1,5 +1,5 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
-import { land, landAtom, landBannerAtom, landGalleryAtom, landIsOwnerAtom } from "../models/land.model"
+import { land, landState, landBannerAtom, landGalleryAtom, landIsOwnerAtom } from "../models/land.model"
 import { Avatar } from "@/shared/ui/avatar"
 import { Typography } from "@/shared/ui/typography"
 import { Link } from "@/shared/components/config/link/link"
@@ -7,12 +7,11 @@ import { FormattedText } from "./land-title"
 import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button"
 import { navigate } from "vike/client/router"
-import { changesIsExistAtom, landActionTitleAtom, landEditing, landEditingState } from "../models/edit-land.model"
+import { changesIsExistsAtom, landActionTitleAtom, landEditing, landEditingState } from "../models/edit-land.model"
 import { LandBanner, LandBannerWithEditing } from "./land-banner"
 import { Carousel } from '@ark-ui/react/carousel'
-import { lazy } from "react"
 import { getDataFromSnapshot } from "@/shared/models/app/utils"
-import { isEmptyArray } from "@/shared/lib/helpers"
+import { isEmptyArray } from "@/shared/lib/utils"
 import { tv } from "tailwind-variants"
 import { carouselVariant } from "@/shared/ui/carousel"
 import { appState } from "@/shared/models/app/index.model"
@@ -21,12 +20,15 @@ import { Skeleton } from "@/shared/ui/skeleton"
 import { pageState } from "@/shared/models/page-context.model"
 import { Noop } from "@/shared/ui/noop"
 import { SummaryNumber } from "@/shared/ui/summary-number"
-
-const LandAccess = lazy(() => import("./land-access").then(m => ({ default: m.LandAccess })))
+import { translate } from "@/shared/locales/helpers"
+import type { LandSimilar } from "../../lands/models/lands.model"
+import { ENVIRONMENT } from "@/shared/consts"
+import { LandAccess } from "./land-access"
+import { ClientOnly } from "vike-react/ClientOnly"
 
 const LandGallery = reatomComponent(({ ctx }) => {
   const landGallery = ctx.spy(landGalleryAtom)
-  if (isEmptyArray(landGallery)) return null;
+  if (!landGallery || isEmptyArray(landGallery)) return null;
 
   return (
     <Carousel.Root
@@ -70,7 +72,7 @@ const LandToggleMode = reatomComponent(({ ctx }) => {
   const stage = ctx.spy(appState.options)?.state.stage
   if (stage === 'prod') return null;
 
-  const changesIsExist = ctx.spy(changesIsExistAtom)
+  const changesIsExist = ctx.spy(changesIsExistsAtom)
 
   return (
     <div
@@ -79,7 +81,7 @@ const LandToggleMode = reatomComponent(({ ctx }) => {
       inert={ctx.spy(landEditing.submit.statusesAtom).isPending}
     >
       {changesIsExist ? (
-        <Button background="white" className="aspect-square p-0" onClick={() => landEditing.cancel(ctx)}>
+        <Button background="white" className="aspect-square p-0" onClick={() => landEditing.resetFull(ctx)}>
           <Icon name="sprite:x" className="size-4" />
         </Button>
       ) : (
@@ -92,7 +94,7 @@ const LandToggleMode = reatomComponent(({ ctx }) => {
       {changesIsExist && (
         <Button background="white" onClick={() => landEditing.submit(ctx)}>
           <Typography className="text-nowrap truncate">
-            Сохранить изменения
+            {translate["land.editing.save-changes"]()}
           </Typography>
         </Button>
       )}
@@ -118,7 +120,7 @@ const membersItemVariant = tv({
 })
 
 const LandMembers = reatomComponent(({ ctx }) => {
-  const land = ctx.spy(landAtom)
+  const land = ctx.spy(landState.data)
   if (!land) return null;
 
   const { members } = land
@@ -130,7 +132,7 @@ const LandMembers = reatomComponent(({ ctx }) => {
     >
       <div className="flex items-end gap-2 w-full">
         <Typography className={sectionTitleVariant}>
-          Участники
+          {translate["land.members"]()}
         </Typography>
         <SummaryNumber value={members.length} />
       </div>
@@ -138,7 +140,7 @@ const LandMembers = reatomComponent(({ ctx }) => {
         {members.length === 0 && (
           <div className={membersItemVariant().base({ className: "border border-yellow-800" })}>
             <Typography className={membersItemVariant().nickname()}>
-              Возможно этот регион тестовый
+              {translate["land.test.test-item"]()}
             </Typography>
           </div>
         )}
@@ -178,12 +180,12 @@ const LandLinks = reatomComponent(({ ctx }) => {
       className="flex flex-col gap-2"
     >
       <Typography className="text-2xl xl:text-3xl font-semibold">
-        Ссылки
+        {translate["land.links"]()}
       </Typography>
       <div className="flex flex-col gap-1">
         <a target="_blank" href={banner} className="flex items-center gap-2 text-blue-500">
           <Typography className="text-xl">
-            Баннер
+            {translate["land.banner"]()}
           </Typography>
           <Icon name="sprite:link" className="size-6" />
         </a>
@@ -193,14 +195,11 @@ const LandLinks = reatomComponent(({ ctx }) => {
 }, "LandLinks")
 
 const LandDetails = reatomComponent(({ ctx }) => {
-  const land = ctx.spy(landAtom)
+  const land = ctx.spy(landState.data)
 
   const currentUser = getDataFromSnapshot("currentUser")
   const isAccessible = currentUser?.meta.role.id === 3
-
-  if (!land) return null;
-
-  const { ulid, members } = land;
+  console.log(ENVIRONMENT, isAccessible); // server, true
 
   const isOwner = ctx.spy(landIsOwnerAtom);
   const points = land?.points
@@ -211,24 +210,28 @@ const LandDetails = reatomComponent(({ ctx }) => {
       className="flex flex-col sm:flex-row items-start min-w-0 sm:items-center gap-1 sm:gap-4 w-full"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 min-w-0">
-        <Typography
-          className="text-base text-nowrap truncate"
-          color='gray'
-        >
-          {members.length} {members.length === 1 ? "участник" : "участников"}
-        </Typography>
+        {land?.members && (
+          <Typography
+            className="text-base text-nowrap truncate"
+            color='gray'
+          >
+            {land?.members.length} {land?.members.length === 1 ? "участник" : "участников"}
+          </Typography>
+        )}
         <Splitter className="hidden sm:inline" />
         <Typography
           className="text-base cursor-pointer hover:text-neutral-50 text-nowrap truncate"
           color='gray'
           onClick={() => navigate("#points", { overwriteLastHistoryEntry: false })}
         >
-          {points ? Object.keys(points)?.length : 0} метка
+          {points ? Object.keys(points)?.length : 0} {translate["land.point"]()}
         </Typography>
       </div>
       <div className="flex items-center gap-2 min-w-0">
         {isAccessible && (
-          <LandAccess ulid={ulid} />
+          <ClientOnly>
+            <LandAccess ulid={land?.ulid ?? ""} />
+          </ClientOnly>
         )}
         {isOwner && (
           <LandToggleMode />
@@ -239,7 +242,7 @@ const LandDetails = reatomComponent(({ ctx }) => {
 }, "LandDetails")
 
 const LandHead = reatomComponent(({ ctx }) => {
-  const land = ctx.spy(landAtom)
+  const land = ctx.spy(landState.data)
   if (!land) return null;
 
   return (
@@ -258,6 +261,25 @@ const LandSimilarSkeleton = () => (
   Array.from({ length: 6 }).map((_, idx) => <Skeleton key={idx} className="h-12 w-full" />)
 )
 
+const LandSimilarListItem = ({ ulid, name, details, title }: LandSimilar) => {
+  return (
+    <Link
+      href={createLink("land", ulid)}
+      className='flex items-center border border-neutral-800 px-4 py-2 rounded-lg gap-2 w-full'
+    >
+      <LandBanner banner={details.banner} variant="xs" />
+      <div className="flex flex-col w-full">
+        <Typography className="text-base">
+          {name}
+        </Typography>
+        {title && (
+          <FormattedText as="span" text={title} />
+        )}
+      </div>
+    </Link>
+  )
+}
+
 const LandSimilarList = reatomComponent(({ ctx }) => {
   if (!ctx.spy(pageState.isClientside) || ctx.spy(land.fetchSimilar.statusesAtom).isPending) {
     return <LandSimilarSkeleton />
@@ -269,32 +291,16 @@ const LandSimilarList = reatomComponent(({ ctx }) => {
   const data = ctx.spy(land.fetchSimilar.dataAtom)
   if (!data) return <Noop />
 
-  return data.map((land) => (
-    <Link
-      href={createLink("land", land.ulid)}
-      key={land.ulid}
-      className='flex items-center border border-neutral-800 px-4 py-2 rounded-lg gap-2 w-full'
-    >
-      <LandBanner banner={land.details.banner} variant="xs" />
-      <div className="flex flex-col w-full">
-        <Typography className="text-base">
-          {land.name}
-        </Typography>
-        {land.title && (
-          <FormattedText as="span" text={land.title} />
-        )}
-      </div>
-    </Link>
-  ))
+  return data.map((land) => <LandSimilarListItem key={land.ulid} {...land} />)
 }, "LandSimilarList")
 
 const LandSimilar = () => {
-  useUpdate(land.fetchSimilar, [landAtom]);
+  useUpdate(land.fetchSimilar, [landState.data]);
 
   return (
     <div className="flex flex-col gap-2 w-full">
       <Typography className={sectionTitleVariant}>
-        Похожие регионы
+        {translate["land.similar-lands"]()}
       </Typography>
       <div className='flex flex-col gap-1 w-full'>
         <LandSimilarList />
@@ -304,19 +310,22 @@ const LandSimilar = () => {
 }
 
 const LandPoints = reatomComponent(({ ctx }) => {
-  const land = ctx.spy(landAtom);
+  const land = ctx.spy(landState.data);
   if (!land) return null;
 
   const points = land?.points
-  if (!points || Object.keys(points).length === 0) return null;
+  if (!points) return null;
+
+  const pointsCount = Object.keys(points).length
+  if (pointsCount === 0) return null;
 
   return (
     <div id="points" className="flex flex-col gap-2">
       <div className="flex items-center gap-2 w-full">
         <Typography className={sectionTitleVariant}>
-          Метки
+          {translate["land.points"]()}
         </Typography>
-        <SummaryNumber value={Object.keys(points).length} />
+        <SummaryNumber value={pointsCount} />
       </div>
       <div className="grid grid-cols-2 w-full h-full gap-4">
         {Object.entries(points).map(([key, value]) => (

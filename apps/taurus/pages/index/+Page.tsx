@@ -3,38 +3,32 @@ import { MainWrapperPage } from "@/shared/ui/main-wrapper";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
-import { useTranslate } from "@/shared/locales/helpers";
 import { useAtom } from "@reatom/npm-solid-js";
-import { For, lazy } from "solid-js";
+import { For } from "solid-js";
 import { SpawnCarousel } from "./(components)/spawn-carousel";
 import { IdeaPreviewCard, IdeasList } from "./(components)/gameplay";
 import { getStaticObject } from "@/shared/lib/helpers";
-import { ClientOnly } from "vike-solid/ClientOnly";
-import { layoutSettingsState } from "@/shared/components/settings.model";
-
-const LayoutSettings = lazy(() => import("@/shared/components/settings").then(m => ({ default: m.LayoutSettings })))
+import { translate } from "@/shared/locales/helpers";
+import { LayoutSettings } from "@/shared/components/settings/settings";
+import { appState } from "@/shared/models/app.model";
 
 const introImage = getStaticObject("arts", "server-status-widget.webp")
 const shareImage = getStaticObject("arts", "bzzvanet-.jpg")
 
 const CONTACTS_LIST = [
-  { name: "Discord", href: "https://discord.gg/vnqfVX4frH" },
-  { name: "Telegram", href: "https://t.me/fasberry" },
+  { name: "Discord", href: "/discord" },
+  { name: "Telegram", href: "/telegram" },
 ];
 
 const Weather = () => {
-  const [data] = useAtom(layoutSettingsState.selectedWeather)
+  const [data] = useAtom(appState.selectedWeather)
   return <div class={`weather ${data()} absolute z-[1] w-full h-full top-0 right-0 left-0`} />
 }
 
 export default function Page() {
-  const translate = useTranslate().translate
-
   return (
     <MainWrapperPage variant="with_section">
-      <ClientOnly>
-        <LayoutSettings />
-      </ClientOnly>
+      <LayoutSettings />
       <div id="title" class={sectionVariant()}>
         <div class="absolute top-0 right-0 left-0 overflow-hidden h-full">
           <img
@@ -55,16 +49,16 @@ export default function Page() {
                 Fasberry Project
               </h1>
               <h2 class={sectionVariantChild().subtitle({ className: "mb-4" })}>
-                {translate("welcome.subtitle")}
+                {translate["welcome.subtitle"]()}
               </h2>
               <h3 class={sectionVariantChild().description({ className: "text-shadow-lg" })}>
-                {translate("welcome.description")}
+                {translate["welcome.description"]()}
               </h3>
             </div>
             <Link href="/start" class={sectionVariantChild().action()}>
               <Button class="w-full py-1 sm:py-1" >
                 <Typography color="white" class="text-nowrap text-sm sm:text-base text-shadow-xl">
-                  {translate("welcome.actionText")}!
+                  {translate["welcome.action-text"]()}
                 </Typography>
               </Button>
             </Link>
@@ -74,7 +68,7 @@ export default function Page() {
       <div id="features" class={sectionVariant()}>
         <div class="flex flex-col items-center mx-auto responsive gap-6 justify-center select-none relative">
           <Typography color="white" class="text-xl text-center sm:text-3xl lg:text-4xl">
-            {translate("features.title")}
+            {translate["features.title"]()}
           </Typography>
           <div class="flex items-center justify-center w-full gap-1 sm:gap-6 md:gap-4">
             <div
@@ -98,11 +92,10 @@ export default function Page() {
               class="flex flex-col backdrop-blur-sm p-4 transparent-achievement-panel w-full gap-2 z-[21] lg:w-[60%] xl:w-[70%]"
             >
               <Typography class="text-base sm:text-lg leading-6 text-center">
-                Спавн сервера
+                {translate["spawn-server.title"]()}
               </Typography>
               <Typography color="gray" class="!leading-5 text-sm sm:text-base text-center">
-                Спавном сервера является город Оффенбург, в котором можно найти много интересных и даже секретных мест,
-                персонажей, с которыми можно пообщаться и прочие активности.
+                {translate["spawn-server.subtitle"]()}
               </Typography>
             </div>
           </div>
@@ -117,18 +110,18 @@ export default function Page() {
         </div>
         <div class="flex flex-col items-center z-1 responsive gap-12 justify-center select-none relative">
           <Typography color="white" class="text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl">
-            {translate("contacts.title")}
+            {translate["contacts.title"]()}
           </Typography>
           <div class="flex flex-col gap-4 justify-center items-center lg:w-1/4 *:w-full w-full h-full">
             <For each={CONTACTS_LIST}>
               {(item) =>
-                <a href={item.href} target="_blank" rel="noreferrer">
+                <Link href={item.href} target="_blank">
                   <Button class="w-full py-0.5">
                     <Typography class="text-lg">
-                      {translate("contacts.itemTitle")} {item.name}
+                      {translate["contacts.item-title"]()} {item.name}
                     </Typography>
                   </Button>
-                </a>
+                </Link>
               }
             </For>
           </div>

@@ -4,6 +4,7 @@ import { logRouting } from "@/shared/lib/log";
 import { getOrder } from "@/shared/components/app/shop/models/store-order.model";
 import { render } from "vike/abort";
 import type { OrderSingleDefault } from "./+Page";
+import { getNotExistUrlByEntity } from "@/shared/lib/helpers";
 
 export type OrderSingleGamePayload = {
 	unique_id: string;
@@ -41,7 +42,7 @@ export const data = async (pageCtx: PageContextServer) => {
   const type = pageCtx.urlParsed.search["type"];
 
   const order: OrderSinglePayload | null = await getOrder(pageCtx.routeParams.id, { headers }, type).catch(_ => null)
-  if (!order) throw render("/not-exist")
+  if (!order) throw render(getNotExistUrlByEntity())
 
   config(metadata(order))
 

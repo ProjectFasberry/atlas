@@ -1,7 +1,7 @@
 import { getFromDictionary } from "@/shared/models/app/utils"
 import { reatomComponent } from "@reatom/npm-react"
 import { Typography } from "@/shared/ui/typography"
-import { usersRoles, usersControlState } from "../../models/users.model"
+import { usersRoles, usersRestrictState } from "../../models/users.model"
 import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button"
 import { Skeleton } from "@/shared/ui/skeleton"
@@ -11,7 +11,7 @@ import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
 
 const UserActionsChangeRoleGlobalSubmit = reatomComponent(({ ctx }) => {
-  const isDisabled = !ctx.spy(usersControlState.targetRoleId)
+  const isDisabled = !ctx.spy(usersRestrictState.targetRoleId)
     || ctx.spy(usersRoles.submit.statusesAtom).isPending
 
   return (
@@ -27,7 +27,7 @@ const UserActionsChangeRoleGlobalSubmit = reatomComponent(({ ctx }) => {
 }, "UserActionsChangeRoleGlobalSubmit")
 
 const UserActionsChangeRoleSubmit = reatomComponent<{ nickname: string }>(({ ctx, nickname }) => {
-  const isDisabled = !ctx.spy(usersControlState.targetRoleId)
+  const isDisabled = !ctx.spy(usersRestrictState.targetRoleId)
     || ctx.spy(usersRoles.submit.statusesAtom).isPending
 
   return (
@@ -97,7 +97,7 @@ export const UserActionsChangeRoleGlobal = reatomComponent(({ ctx }) => {
               Доступные роли
             </Typography>
             <div className="flex flex-col gap-1 w-full h-full">
-              <Roles onClick={(roleId) => usersControlState.targetRoleId(ctx, roleId)} />
+              <Roles onClick={(roleId) => usersRestrictState.targetRoleId(ctx, roleId)} />
             </div>
             <UserActionsChangeRoleGlobalSubmit />
           </div>
@@ -112,7 +112,7 @@ export const UserActionsChangeRoleLocal = reatomComponent<{
 }>(({
   ctx, nickname, role_id, role_name
 }) => {
-  const openedId = ctx.spy(usersControlState.selectedId)
+  const openedId = ctx.spy(usersRestrictState.selectedId)
   const isThisOpen = openedId === nickname
 
   const roleTitle = getFromDictionary(ctx, role_name)
@@ -138,8 +138,8 @@ export const UserActionsChangeRoleLocal = reatomComponent<{
             </Typography>
             <div className="flex flex-col gap-1 w-full h-full">
               <Roles
-                selectedId={ctx.spy(usersControlState.targetRoleId) ?? role_id}
-                onClick={(roleId) => usersControlState.targetRoleId(ctx, roleId)}
+                selectedId={ctx.spy(usersRestrictState.targetRoleId) ?? role_id}
+                onClick={(roleId) => usersRestrictState.targetRoleId(ctx, roleId)}
               />
             </div>
             <UserActionsChangeRoleSubmit nickname={nickname} />

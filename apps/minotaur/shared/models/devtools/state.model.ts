@@ -1,9 +1,6 @@
 import { devtoolsConfig } from "./config";
-import { getCookieClient, setCookie } from "@/shared/lib/cookie-utils";
-import { isObject } from "@reatom/framework";
 
 const DEVTOOLS_DATA_LS_KEY = "devtools-data"
-const DEVTOOLS_COORDS_COOKIE_KEY = 'devtools-coords';
 
 type NestedKeys<T> = T extends { value: any; __meta: any }
   ? never
@@ -17,46 +14,6 @@ export type DevtoolsCookieChildKey = Exclude<
   "value" | "__meta" | `${string}.value` | `${string}.__meta`
 >;
 export type DevtoolsCoords = { x: number, y: number, w: number, h: number };
-
-const createCookieStorage = <T>(key: string, maxAge = 30 * 24 * 60 * 60 * 1000) => ({
-  key,
-  set(value: Partial<T>, patch = true): Nullable<T> {
-    try {
-      let newValue: T;
-
-      if (patch) {
-        const current = this.get();
-
-        newValue = (isObject(current) && isObject(value))
-          ? { ...current, ...value }
-          : value as T;
-      } else {
-        newValue = value as T;
-      }
-
-      const stringified = JSON.stringify(newValue);
-      const rawStr = setCookie(this.key, stringified, { maxAgeMs: maxAge, path: "/" });
-
-      return rawStr ? JSON.parse(decodeURIComponent(rawStr)) : null;
-    } catch (e) {
-      console.error(`Error updating cookie [${this.key}]:`, e);
-      return null;
-    }
-  },
-  get(): Nullable<T> {
-    const rawStr = getCookieClient(this.key);
-    if (!rawStr) return null;
-
-    try {
-      return JSON.parse(decodeURIComponent(rawStr)) as T;
-    } catch (e) {
-      console.error(`Error parsing cookie [${this.key}]:`, e);
-      return null;
-    }
-  }
-});
-
-export const devtoolsCoords = createCookieStorage<DevtoolsCoords>(DEVTOOLS_COORDS_COOKIE_KEY)
 
 const setDeep = (obj: any, path: string[], value: any): any => {
   const [head, ...tail] = path;

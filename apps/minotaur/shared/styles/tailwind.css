@@ -6,7 +6,7 @@
 }
 
 :root {
-  --bprogress-color: #00AA00;
+  --bprogress-color: #00aa00;
 }
 
 @theme {
@@ -90,10 +90,23 @@
   pre {
     @apply bg-neutral-700/60 rounded-lg px-4 py-2 overflow-x-auto text-sm leading-relaxed;
   }
+
+  .withInert {
+    @apply inert:opacity-70 inert:pointer-events-none;
+  }
 }
 
 @layer components {
   .responsive {
     @apply w-full px-2 sm:px-0 max-w-[clamp(420px,80vw,1200px)];
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -150%;
+  }
+  100% {
+    left: 100%;
   }
 }

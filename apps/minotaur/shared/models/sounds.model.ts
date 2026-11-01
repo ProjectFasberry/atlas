@@ -1,4 +1,4 @@
-import { invariant } from "../lib/invariant";
+import { invariant } from "../lib/utils";
 import { type AudioPatch, definePatch, type PlayOptions } from "@web-kits/audio";
 import { action, atom, withAssign } from "@reatom/framework";
 

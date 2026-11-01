@@ -1,26 +1,26 @@
 import { client } from "@/shared/lib/client-wrapper";
-import { invariant } from "@/shared/lib/invariant";
-import { action, atom } from "@reatom/framework";
+import { invariant } from "@/shared/lib/utils";
+import { atom } from "@reatom/framework";
 import { type AsyncCtx, reatomAsync, spawn, withAssign, withDataAtom, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { onEvent } from "@reatom/web";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { type AuthErrorType, authState, defineError, isPofActiveAtom } from "./auth.model";
-import { createWsUrl } from "@/shared/lib/utils";
+import { auth, type AuthErrorType, authState, defineError, isPofActiveAtom } from "./auth.model";
+import { createWsUrl } from "@/shared/lib/helpers";
+import { getApiHost } from "@/shared/lib/helpers";
 import { env } from "@/shared/env";
-import { pof } from "../../../../models/shared.model";
 import { logError } from "@/shared/lib/log";
 import * as z from "zod";
 import { authSchema as loginSchema } from "@/shared/schemas/auth";
-import { spyOptionAtom } from "@/shared/models/app/utils";
+import { maybeSpyOptionAtom } from "@/shared/models/app/utils";
 
 export type QREventsEvent =
-	| "expired"
-	| "verified"
-	| "connected" // ws only event
-	| "declined";
+  | "expired"
+  | "verified"
+  | "connected" // ws only event
+  | "declined";
 
 export type QREventsPayload = {
-	event: QREventsEvent;
+  event: QREventsEvent;
 };
 
 type QRGeneratePayload = ExtractApiData<"postAuthLoginQrGenerate">["data"]
@@ -76,32 +76,32 @@ export const login = atom(null, "login").pipe(
     basic: atom(null, `${name}.basic`).pipe(
       withAssign((_, name) => ({
         submit: reatomAsync(async (ctx) => {
-          const pofIsActive = spyOptionAtom(ctx, "flags", "isPof", true)
-          const token = ctx.get(pof.token);
+          const pofIsActive = maybeSpyOptionAtom(ctx, "flags", "isPof", true)
+          const token = ctx.get(authState.token);
 
+          // If POF is active and no token, show the captcha for generating a token
           if (pofIsActive && !token) {
-            pof.showTokenVerifySectionAtom(ctx, true);
+            authState.isProcessing(ctx, true);
+            auth.defineCap(ctx)
             return;
           }
 
           authState.isProcessing(ctx, true);
 
-          const raw = {
+          const { success, error, data: json } = loginSchema.safeParse({
             nickname: ctx.get(authState.fields.nickname),
             password: ctx.get(authState.fields.password),
-          };
+          });
 
-          const { success, error, data } = loginSchema.safeParse(raw);
           if (!success) return error;
 
           return await client
-            .post(`auth/login/basic`, {
+            .post<ExtractApiData<"postAuthLoginBasic">["data"]>(`auth/login/basic`, {
               searchParams: {
                 token: token ?? ""
               },
-              throwHttpErrors: false,
               timeout: 10000,
-              json: data
+              json
             })
             .exec()
         }, {
@@ -120,7 +120,7 @@ export const login = atom(null, "login").pipe(
               return;
             }
 
-            login.afterEvent(ctx)
+            window.location.reload()
           },
           onReject: (ctx, e) => {
             logError(e);
@@ -134,9 +134,6 @@ export const login = atom(null, "login").pipe(
         )
       }))
     ),
-    afterEvent: action((ctx) => {
-      ctx.schedule(() => window.location.reload())
-    }),
     qr: atom(null, `${name}.qr`).pipe(
       withAssign((_, name) => ({
         generate: reatomAsync(async (ctx) => {
@@ -162,13 +159,18 @@ export const login = atom(null, "login").pipe(
           invariant(token, "Token is not defined");
 
           return await client
-            .post<{ nickname: string }>("auth/login/qr/create", {
+            .post<ExtractApiData<"postAuthLoginQrCreate">["data"]>("auth/login/qr/create", {
               searchParams: { token }
             })
             .exec()
         }, {
           name: `${name}.createSession`,
-          onFulfill: (ctx) => login.afterEvent(ctx)
+          onFulfill: () => {
+            window.location.reload()
+          },
+          onReject: (_, e) => {
+            logError(e, { type: 'combined' })
+          }
         }),
         events: reatomAsync(async (ctx, token: string) => {
           const currSocket = ctx.get(loginState.qr.socket)
@@ -179,9 +181,10 @@ export const login = atom(null, "login").pipe(
           }
 
           const wsUrl = createWsUrl({
-            host: env.VITE_API_HOST,
+            host: getApiHost(),
             isSecure: import.meta.env.PROD,
-            path: `auth/login/qr/events?token=${token}`
+            path: `auth/login/qr/events?token=${token}`,
+            port: import.meta.env.DEV ? 5104 : undefined,
           })
 
           const socket = new WebSocket(wsUrl)

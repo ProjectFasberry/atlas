@@ -6,7 +6,7 @@ import { Footer } from '@/shared/components/app/layout/components/footer';
 import { app } from '@/shared/models/app/index.model';
 import { ErrorBoundaryProvider } from './error-boundary';
 import { Global } from './global';
-import { useCreateCtx } from '@/shared/lib/reatom/helpers';
+import { useCreateCtx } from '@/shared/lib/reatom/index';
 import { ENVIRONMENT } from '@/shared/consts';
 
 const Sync = () => {
@@ -19,10 +19,10 @@ const AppProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <>
-      <div id="page-container">
+      <main id="page-container">
         {children}
         <Footer />
-      </div>
+      </main>
       <Global />
     </>
   )

@@ -1,6 +1,6 @@
 import { DEFAULT_SOFT_DELAY } from "@/shared/consts/index";
 import { client, withQueryParams } from "@/shared/lib/client-wrapper";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { reatomAsync, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { action, atom, sleep, withAssign, withConcurrency } from "@reatom/framework";
 

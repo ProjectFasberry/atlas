@@ -6,7 +6,7 @@ import { createPrivatedSectionModel } from "../models/shared.model";
 import { Input } from "@/shared/ui/input";
 import { spawn, type AtomMut } from "@reatom/framework";
 import { ButtonXSubmit, DeleteButton } from "./ui";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { Dialog } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog";
@@ -106,7 +106,7 @@ const AfterCreateApiKeyDialog = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content({ className: "sm:max-w-[480px]" })}>
+          <Dialog.Content className={dialogVariant.content("sm:max-w-[480px]")}>
             <AfterCreateApiKeyDialogContent />
             <DialogClose />
           </Dialog.Content>

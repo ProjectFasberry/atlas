@@ -1,11 +1,11 @@
 import { Link } from "@/shared/components/config/link/link"
-import { getStaticImage } from "@/shared/lib/volume-helpers"
+import { getStaticImage } from "@/shared/lib/helpers"
 import { Typography } from "@/shared/ui/typography"
 import { getItemStatus, type StoreItem as StoreItemProps, storeItem } from "../../models/store-item.model"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { pageState } from "@/shared/models/page-context.model"
 import { reatomComponent } from "@reatom/npm-react"
-import { tv } from "tailwind-variants"
+import { tv, type VariantProps } from "tailwind-variants"
 import { Button } from "@/shared/ui/button"
 import { translate } from "@/shared/locales/helpers"
 import { createLink } from "@/shared/components/config/link/link.model"
@@ -58,13 +58,35 @@ const storeItemVariant = tv({
   }
 })
 
-export const ItemPrice = reatomComponent<{ currency: string, price: string | number }>(({ ctx, currency, price }) => {
+const itemPriceVariant = tv({
+  base: "",
+  variants: {
+    size: {
+      sm: "text-sm",
+      base: "text-base",
+      large: "text-lg"
+    }
+  },
+  defaultVariants: {
+    size: "base"
+  }
+})
+
+type ItemPriceProps = {
+  currency: string,
+  price: {
+    value: string | number,
+    variant?: VariantProps<typeof itemPriceVariant>
+  }
+}
+
+export const ItemPrice = reatomComponent<ItemPriceProps>(({ ctx, price, currency }) => {
   const currencies = getCurrencies(ctx);
 
   return (
     <div className="flex items-center gap-1 text-base select-none text-nowrap font-semibold">
-      <Typography>
-        {price}
+      <Typography className={itemPriceVariant(price.variant)}>
+        {price.value}
       </Typography>
       {currencies[currency].img ? (
         <img
@@ -153,7 +175,7 @@ export const StoreItem = ({
       </div>
       <div className={storeItemVariant().footer()}>
         <div className={storeItemVariant().priceWrapper({ className: "bg-blue-600" })}>
-          <ItemPrice currency={currency} price={price} />
+          <ItemPrice currency={currency} price={{ value: price }} />
         </div>
         <ItemSelectToCart id={id} />
       </div>

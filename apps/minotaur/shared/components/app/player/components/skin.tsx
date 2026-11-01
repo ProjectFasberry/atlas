@@ -8,13 +8,14 @@ import { Icon, type IconName } from "@/shared/ui/icon"
 import { pageState } from "@/shared/models/page-context.model";
 import { Button } from "@/shared/ui/button";
 import { type SkinAnimationType, skinModel, type SkinVariant, type SkinsHistory } from "../models/skin.model";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { ReactSkinview3d } from "react-skinview3d"
 import { ClientOnly } from "vike-react/ClientOnly"
 import { appState } from "@/shared/models/app/index.model";
 import { Dialog, DialogTitle } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { dialogVariant } from "@/shared/ui/dialog";
+import { Noop } from "@/shared/ui/noop";
 
 const {
   getIsSelectSkinAtom,
@@ -27,13 +28,11 @@ const {
   SKIN_VARIANTS
 } = skinModel()
 
-const SkinRenderSkeleton = () => {
-  return (
-    <div className="flex items-center justify-center px-6 w-full rounded-lg h-[390px]">
-      <Skeleton className="w-full h-full" />
-    </div>
-  )
-}
+const SkinRenderSkeleton = () => (
+  <div className="flex items-center justify-center px-6 w-full rounded-lg h-[390px]">
+    <Skeleton className="w-full h-full" />
+  </div>
+)
 
 const SkinRender = reatomComponent(({ ctx }) => {
   useUpdate(skins.init, []);
@@ -42,8 +41,12 @@ const SkinRender = reatomComponent(({ ctx }) => {
     return <SkinRenderSkeleton />;
   }
 
-  const skinData = ctx.spy(skinsState.selected)
-  if (!skinData) return <p>ничего нет</p>
+  const skinData = ctx.spy(skinsState.selected);
+  if (!skinData) return (
+    <div className="flex items-center h-[390px] justify-center overflow-hidden w-full">
+      <Noop title="ничего нет" />
+    </div>
+  )
 
   return (
     <div className="flex items-center h-[390px] justify-center overflow-hidden w-full">
@@ -162,23 +165,22 @@ const SkinsHistoryList = reatomComponent<{ variant: "mobile" | "desktop" }>(({ c
   ))
 }, "SkinsHistoryList")
 
-const SkinMainHeadSkeleton = () => {
-  return (
-    <div className={skinHeadVariant({ status: "active", size: "medium", variant: "unbordered" })}>
-      <Skeleton className="h-full w-full" />
-    </div>
-  )
-}
+const SkinMainHeadSkeleton = () => (
+  <div className={skinHeadVariant({ status: "active", size: "medium", variant: "unbordered" })}>
+    <Skeleton className="h-full w-full" />
+  </div>
+)
+
+const FALLBACK_AVATAR = getStaticImage("fallback/steve_head.png");
 
 const Avatar = reatomComponent<{ width: number, height: number, src: string }>(({ ctx, src, ...props }) => {
   const [avatar, setAvatar] = useState<string | null>(src);
 
   return (
     <img
-      src={avatar!}
+      src={avatar ?? FALLBACK_AVATAR}
       alt=""
-      draggable={false}
-      onError={() => setAvatar(getStaticImage("fallback/steve_head.png"))}
+      onError={() => setAvatar(FALLBACK_AVATAR)}
       {...props}
     />
   )
@@ -218,11 +220,9 @@ const SkinVariantItem = reatomComponent<{ variant: SkinVariant }>(({ ctx, varian
     <Button
       onClick={() => skinsState.control.variant(ctx, variant)}
       background={ctx.spy(getSkinVariantIsActiveAtom(variant)) ? "white" : "default"}
-      className="flex items-center justify-center w-full"
+      className="flex items-center h-10 capitalize tracking-6 text-sm justify-center w-full"
     >
-      <Typography className="font-semibold capitalize tracking-6">
-        {variant}
-      </Typography>
+      {variant}
     </Button>
   )
 }, "SkinVariantItem")
@@ -304,7 +304,7 @@ const SkinControlInput = reatomComponent(({ ctx }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    void spawn(ctx, (spawnCtx) => skinsState.control.file(spawnCtx, file))
+    spawn(ctx, (spawnCtx) => skinsState.control.file(spawnCtx, file))
   }
 
   return (
@@ -326,8 +326,8 @@ const SkinControlInput = reatomComponent(({ ctx }) => {
   )
 }, 'SkinControlInput')
 
-const SkinControlContent = reatomComponent(
-  ({ ctx }) => ctx.spy(skinsState.control.file) ? <SelectedSkinData /> : <SkinControlInput />,
+const SkinControlContent = reatomComponent(({ ctx }) =>
+  ctx.spy(skinsState.control.file) ? <SelectedSkinData /> : <SkinControlInput />,
   "SkinControlContent"
 )
 
@@ -335,58 +335,67 @@ const SkinControlChangeSubmit = reatomComponent(({ ctx }) => {
   return (
     <Button
       disabled={ctx.spy(skinSubmitIsDisabledAtom)}
-      onClick={() => void spawn(ctx, (spawnCtx) => skins.control.change(spawnCtx))}
+      onClick={() => spawn(ctx, (spawnCtx) => skins.control.change(spawnCtx))}
       background="default"
+      className="text-sm font-semibold"
       withSpinner={true}
       isLoading={ctx.spy(skins.control.change.statusesAtom).isPending}
     >
-      <Typography className="font-semibold text-base">
-        Загрузить
-      </Typography>
+      Загрузить
     </Button>
   )
 }, "SkinControlChangeSubmit")
+
+const SkinSelectVariant = () => {
+  return (
+    <div className="flex gap-2 items-center justify-between w-full">
+      {SKIN_VARIANTS.map((d) => <SkinVariantItem key={d} variant={d} />)}
+    </div>
+  )
+}
+
+const SKIN_STEPS = [
+  { title: "Загрузи файл скина (в формате .png)", description: "Размер должен быть не больше 1 МБ", content: <SkinControlContent /> },
+  { title: "Выбери тип скина", content: <SkinSelectVariant /> }
+]
 
 const SkinControlChangeSkin = reatomComponent(({ ctx }) => {
   const isVisible = ctx.spy(getIsUploadAvailableAtom)
   if (!isVisible) return null;
 
   return (
-    <Dialog.Root open={ctx.spy(skinsState.control.isOpen)} onOpenChange={v => skinsState.control.isOpen(ctx, v.open)}>
+    <Dialog.Root
+      open={ctx.spy(skinsState.control.isOpen)}
+      onOpenChange={v => skinsState.control.isOpen(ctx, v.open)}
+    >
       <Dialog.Trigger asChild>
-        <Button
-          className={skinControlVariants({ variant: "default", className: "p-0 hover:bg-neutral-800" })}
-        >
-          <Icon name="sprite:upload" className="size-[18px]" />
+        <Button className={skinControlVariants({ variant: "default", className: "p-0 hover:bg-neutral-800" })}>
+          <Icon name="sprite:upload" className="size-4" />
         </Button>
       </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content({ className: "overflow-hidden h-2/3" })}>
-            <DialogTitle>
+          <Dialog.Content className={dialogVariant.content("sm:max-w-1/3 sm:max:h-2/3")}>
+            <DialogTitle className={dialogVariant.title()}>
               Загрузка скина
             </DialogTitle>
             <div className="flex flex-col gap-6 w-full">
-              <div className='flex flex-col items-start gap-2 w-full'>
-                <div className="flex flex-col">
-                  <Typography className="font-bold leading-4 tracking-6">
-                    Загрузи файл скина (в формате .png)
-                  </Typography>
-                  <Typography className="text-neutral-400 text-sm">
-                    Размер должен быть не больше 1 МБ
-                  </Typography>
+              {SKIN_STEPS.map((step, idx) => (
+                <div key={idx} className='flex flex-col items-start gap-2 w-full'>
+                  <div className="flex flex-col">
+                    <Typography className="font-bold leading-4 tracking-6">
+                      {step.title}
+                    </Typography>
+                    {step && (
+                      <Typography color="gray" className="text-sm">
+                        {step.description}
+                      </Typography>
+                    )}
+                  </div>
+                  {step.content}
                 </div>
-                <SkinControlContent />
-              </div>
-              <div className="flex flex-col items-start gap-2 w-full">
-                <Typography className="font-bold tracking-6">
-                  Выбери тип скина
-                </Typography>
-                <div className="flex bg-neutral-800 rounded-lg *:h-10 items-center *:rounded-lg justify-between p-1 w-full">
-                  {SKIN_VARIANTS.map((d) => <SkinVariantItem key={d} variant={d} />)}
-                </div>
-              </div>
+              ))}
               <SkinControlChangeSubmit />
             </div>
           </Dialog.Content>
@@ -404,8 +413,9 @@ const SkinSetButton = reatomComponent(({ ctx }) => {
     <Button
       className={skinControlVariants({ variant: "default", className: "p-0 hover:bg-neutral-800" })}
       onClick={() => skins.control.set(ctx)}
+      disabled={ctx.spy(skins.control.set.statusesAtom).isPending}
     >
-      <Icon name="sprite:plus" className="size-[18px]" />
+      <Icon name="sprite:plus" className="size-4" />
     </Button>
   )
 }, "SkinSetButton")
@@ -419,7 +429,7 @@ const SkinControlRotate = reatomComponent(({ ctx }) => {
       onClick={() => skin.animation.isRotate(ctx, (state) => !state)}
       className={skinControlVariants({ variant })}
     >
-      <Icon name="sprite:rotate" className="size-[18px]" />
+      <Icon name="sprite:rotate" className="size-4" />
     </div>
   )
 }, "SkinControlRotate")
@@ -430,22 +440,22 @@ const SKIN_ANIMATIONS: { animation: SkinAnimationType; icon: IconName }[] = [
   { animation: "flying", icon: "sprite:butterfly" },
 ];
 
-const SkinControlsList = reatomComponent(({ ctx }) => {
-  const variant = (c: typeof SKIN_ANIMATIONS[number]) => ctx.spy(skin.animation.type) === c.animation
+const SkinControlsListItem = reatomComponent<typeof SKIN_ANIMATIONS[number]>(({ ctx, animation, icon }) => {
+  const variant = (animation: typeof SKIN_ANIMATIONS[number]["animation"]) => ctx.spy(skin.animation.type) === animation
     ? "active" : "default"
 
   return (
-    SKIN_ANIMATIONS.map((control, i) => (
-      <div
-        key={i}
-        onClick={() => skin.animation.type(ctx, control.animation)}
-        className={skinControlVariants({ variant: variant(control) })}
-      >
-        <Icon name={control.icon} className="size-[18px]" />
-      </div>
-    ))
+    <div
+      onClick={() => skin.animation.type(ctx, animation)}
+      className={skinControlVariants({ variant: variant(animation) })}
+    >
+      <Icon name={icon} className="size-4" />
+    </div>
   )
-}, "SkinControlsList")
+}, "SkinControlsListItem")
+
+const SkinControlsList = () =>
+  SKIN_ANIMATIONS.map((control, i) => <SkinControlsListItem key={i} {...control} />)
 
 export const PlayerSkin = () => {
   return (

@@ -5,7 +5,7 @@ const baseConfig: Options = {
 	credentials: "include",
 	timeout: 5000,
 	headers: import.meta.env.DEV
-		? { "x-forwarded-for": env.VITE_FORWARDED_FOR }
+		? { "x-forwarded-for": "127.0.0.1" }
 		: {},
 };
 

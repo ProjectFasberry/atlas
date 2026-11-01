@@ -12,9 +12,13 @@ export const LoaderNode = ({ title, subtitle }: LoaderProps) => {
       "
     >
       <Icon name="sprite:loader-2" className="animate-spin size-10" />
-      <Typography className="font-semibold text-xl">{title}</Typography>
+      <Typography className="font-semibold text-xl">
+        {title}
+      </Typography>
       {subtitle && (
-        <Typography color="gray" className="text-sm">{subtitle}</Typography>
+        <Typography color="gray" className="text-sm">
+          {subtitle}
+        </Typography>
       )}
     </div>
   )

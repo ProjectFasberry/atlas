@@ -1,5 +1,8 @@
 import { reatomComponent } from "@reatom/npm-react"
-import { login, type AuthLoginQRStatus, loginState, type AuthLoginVariant, authLoginVariantAtom, authSubmitIsDisabledAtom } from "../models/login.model"
+import {
+  login, type AuthLoginQRStatus, loginState,
+  type AuthLoginVariant, authLoginVariantAtom, authSubmitIsDisabledAtom
+} from "../models/login.model"
 import { type ReactNode, useRef } from "react"
 import { Icon } from "@/shared/ui/icon"
 // import { Copy } from "@/shared/ui/copy"
@@ -14,7 +17,7 @@ import { qrCodeVariant } from "@/shared/ui/qr-code"
 
 const LoginVariants = reatomComponent(({ ctx }) => (
   <div className="grid grid-cols-2 auto-rows-auto gap-2 w-full [&>*:only-child]:col-span-2">
-    {ctx.spy(authLoginVariantAtom.filterVariants(LOGIN_VARIANTS)).map((variant) => (
+    {ctx.spy(authLoginVariantAtom.filterVariants(createLoginVariants())).map((variant) => (
       <Button
         key={variant.value}
         type="button"
@@ -171,14 +174,14 @@ const LoginQR = () => {
 //   )
 // }, "LoginGame")
 
-const LOGIN_VARIANTS: { title: string, value: AuthLoginVariant, component: ReactNode }[] = [
+const createLoginVariants = (): { title: string, value: AuthLoginVariant, component: ReactNode }[] => ([
   { title: translate["auth.login.variants.basic"](), value: "password", component: <LoginPassword /> },
   // { title: "Через игру", value: "game", component: <LoginGame /> },
   { title: translate["auth.login.variants.qr"](), value: "qr", component: <LoginQR /> }
-]
+])
 
 const LoginFormComponent = reatomComponent(({ ctx }) =>
-  LOGIN_VARIANTS.find(d => d.value === ctx.spy(authLoginVariantAtom))?.component, "LoginFormComponent"
+  createLoginVariants().find(d => d.value === ctx.spy(authLoginVariantAtom))?.component, "LoginFormComponent"
 )
 
 export const LoginForm = () => {

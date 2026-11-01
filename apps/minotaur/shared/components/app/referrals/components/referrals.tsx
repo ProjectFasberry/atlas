@@ -6,6 +6,8 @@ import { Icon } from "@/shared/ui/icon"
 import { toast } from "sonner";
 import { env } from "@/shared/env";
 import { action } from "@reatom/framework";
+import { translate } from "@/shared/locales/helpers";
+import { Typography } from "@/shared/ui/typography";
 
 const WIKI_REFERRALS_URL = `${env.VITE_LANDING_URL}/wiki/referals`;
 
@@ -15,32 +17,34 @@ const getReferralsLink = action(async (ctx) => {
   )
 
   await navigator.clipboard.writeText(link)
-  toast.success("Ссылка скопирована");
+  toast.success(translate["shared.copyed-to-clipboard"]());
 })
 
 export const ReferralsLink = reatomComponent(({ ctx }) => {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-2 justify-start w-full">
       <Button
-        background="white"
-        className="gap-2 sm:w-fit w-full font-semibold truncate"
+        background="positive"
+        className="gap-3 sm:w-fit w-full py-1 sm:h-10 min-h-10 justify-start"
         onClick={() => getReferralsLink(ctx)}
       >
-        <Icon name="sprite:plus" className="size-5" />
-        Пригласить игрока
+        <Icon name="sprite:plus" className="min-w-6 min-h-6 size-6 sm:min-w-5 sm:min-h-5 sm:size-5" />
+        <Typography className="leading-5 text-wrap font-semibold truncate">
+          Пригласить игрока
+        </Typography>
       </Button>
       <a
         href={WIKI_REFERRALS_URL}
         target="_blank"
-        className="flex min-w-0 sm:w-fit w-full"
+        className="
+        bg-neutral-50 text-neutral-950
+          flex min-w-0 w-full sm:w-fit px-4 rounded-xl py-1 sm:h-10 min-h-10 items-center gap-3
+        "
       >
-        <Button
-          background="default"
-          className="gap-2 flex-1 min-w-0 truncate w-full font-semibold"
-        >
-          <Icon name="sprite:book" className="size-5" />
+        <Icon name="sprite:book" className="min-w-6 min-h-6 size-6 sm:min-w-5 sm:min-h-5 sm:size-5" />
+        <Typography className="leading-5 text-wrap font-semibold truncate ">
           Как работает реферальная система
-        </Button>
+        </Typography>
       </a>
     </div>
   )

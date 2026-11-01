@@ -8,6 +8,7 @@ import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import type { JSXElement } from "solid-js";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { env } from "@/shared/env";
+import { translate } from "@/shared/locales/helpers";
 
 const LANDING_ENDPOINT = env.VITE_LANDING_ENDPOINT;
 
@@ -19,7 +20,8 @@ const steveImage = getStaticObject("support", "steve.webp");
 const Card = (props: { children: JSXElement }) => {
   return (
     <div
-      class="transparent-achievement-panel lg:gap-4 p-2 lg:p-4 flex flex-col xl:flex-row overflow-hidden md:items-center justify-center md:justify-start items-center w-full"
+      class="transparent-achievement-panel lg:gap-4 p-2 lg:p-4 flex flex-col xl:flex-row overflow-hidden
+      md:items-center justify-center md:justify-start items-center w-full"
     >
       {props.children}
     </div>
@@ -38,16 +40,16 @@ export default function Page() {
           <div class="flex flex-col gap-6 w-full lg:max-w-3xl items-start justify-start">
             <div class="flex flex-col gap-2 w-full lg:max-w-3xl">
               <h1 class={sectionVariantChild().title({ className: "text-gold" })}>
-                Поддержка проекта
+                {translate["support.title"]()}
               </h1>
               <Typography class={sectionVariantChild().subtitle()}>
-                Здесь можно узнать о способах поддержки развития проекта
+                {translate["support.subtitle"]()}
               </Typography>
             </div>
             <Link href="#support-list" class={sectionVariantChild().action()}>
               <Button class="w-full px-6 py-0.5 gap-2">
                 <Typography class="text-lg">
-                  Как поддержать?
+                  {translate["support.action-text"]()}
                 </Typography>
               </Button>
             </Link>
@@ -61,10 +63,10 @@ export default function Page() {
         <div class="flex flex-col justify-center gap-y-6 w-[90%] mx-auto">
           <div class="flex flex-col justify-center items-center mb-6">
             <Typography class="text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
-              Поддержка проекта
+              {translate["support.title"]()}
             </Typography>
             <Typography class="text-xl text-center text-gold">
-              ниже представлены пока что основные способы помочь проекту. Спасибо!
+              {translate["support.above-description"]()}
             </Typography>
           </div>
           <div class="flex flex-col sm:flex-row gap-4 w-full h-full">
@@ -79,7 +81,7 @@ export default function Page() {
               />
               <div class="flex flex-col items-center xl:items-start gap-1 md:gap-2 w-full">
                 <h2 class="text-xl lg:text-2xl xl:text-3xl">
-                  Мониторинг
+                  {translate["support.variants.monitoring.title"]()}
                 </h2>
                 <div class="flex flex-col mt-2 w-full">
                   <a
@@ -89,7 +91,7 @@ export default function Page() {
                     class="flex justify-center w-full xl:w-fit items-center button px-4 py-1"
                   >
                     <Typography class="text-nowrap">
-                      Проголосовать
+                      {translate["support.variants.monitoring.vote"]()}
                     </Typography>
                   </a>
                 </div>
@@ -106,7 +108,7 @@ export default function Page() {
               />
               <div class="flex flex-col items-center xl:items-start gap-2 w-full">
                 <h2 class='text-shadow-md text-xl lg:text-2xl xl:text-3xl'>
-                  Поделиться
+                  {translate["support.variants.repost.title"]()}
                 </h2>
                 <div
                   class="flex flex-col justify-center md:justify-start w-full gap-2 mt-2
@@ -114,12 +116,12 @@ export default function Page() {
                   "
                 >
                   <a
-                    href={`https://telegram.me/share/url?url=https%3A%2F%2F${LANDING_ENDPOINT}&text=`}
+                    href={`https://telegram.me/share/url?url=${LANDING_ENDPOINT}&text=Смотри какой крутой сервер`}
                     rel="noreferrer"
                     target="_blank"
                     class="button"
                   >
-                    <Typography class="text-nowrap">Поделиться в телеграмме</Typography>
+                    <Typography class="text-nowrap">{translate["support.variants.repost.share"]({ target: "Telegram" })}</Typography>
                   </a>
                 </div>
               </div>

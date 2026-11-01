@@ -14,7 +14,7 @@ const BalanceSettings = reatomComponent(({ ctx }) => {
           {translate["player.balance.settings.variants.animation"]()}
         </label>
         <Typography color="gray" className="text-sm">
-          Цифры будут изменяться плавно при пополнении или списании счета.
+          {translate["settings.appearance.sections.balance-animation.description"]()}
         </Typography>
       </div>
       <Switch
@@ -31,10 +31,10 @@ const SeemsLikeVisibility = reatomComponent(({ ctx }) => {
     <div className="flex items-center justify-between w-full gap-2">
       <div className="flex flex-col gap-1">
         <Typography className="text-lg leading-5 font-semibold">
-          Показывать похожих игроков
+          {translate["settings.appearance.sections.seems-like-players.title"]()}
         </Typography>
         <Typography color="gray" className="text-sm">
-          Показывать блок похожих профилей под основной информацией.
+          {translate["settings.appearance.sections.seems-like-players.description"]()}
         </Typography>
       </div>
       <Switch

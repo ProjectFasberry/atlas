@@ -1,5 +1,5 @@
 import { client } from "@/shared/lib/client-wrapper"
-import { invariant } from "@/shared/lib/invariant"
+import { invariant } from "@/shared/lib/utils"
 import { logger } from "@/shared/lib/logger"
 import { action, atom, reatomAsync, spawn, withAssign, withCache, withDataAtom, withErrorAtom, withReset, withStatusesAtom, type Ctx } from "@reatom/framework"
 import { withUndo } from "@reatom/undo"

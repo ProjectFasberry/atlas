@@ -1,7 +1,7 @@
 import { TopUpExchanges, TopupForm } from "@/shared/components/app/shop/components/wallet/top-up";
 import { topup, topupState } from "@/shared/components/app/shop/models/store-top-up.model";
 import { createPageModel } from "@/shared/lib/events";
-import { getStaticImage } from "@/shared/lib/volume-helpers";
+import { getStaticImage } from "@/shared/lib/helpers";
 import { pageState } from "@/shared/models/page-context.model";
 import { useAtom } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"

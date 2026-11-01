@@ -279,7 +279,7 @@ const CreateNewsImage = reatomComponent(({ ctx }) => {
             <Portal>
               <Dialog.Backdrop className={dialogVariant.backdrop()} />
               <Dialog.Positioner className={dialogVariant.positioner()}>
-                <Dialog.Content className={dialogVariant.content({ className: "p-0! max-h-[720px]" })}>
+                <Dialog.Content className={dialogVariant.content("p-0! max-h-[720px]")}>
                   <img
                     src={ctx.spy(createNewsStateFullImageUrlAtom)}
                     alt=""

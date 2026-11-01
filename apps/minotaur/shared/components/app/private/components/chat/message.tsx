@@ -11,7 +11,7 @@ import { Icon, type IconName } from "@/shared/ui/icon"
 import { Input } from "@/shared/ui/input";
 import { Typography } from "@/shared/ui/typography";
 import { ActionButton, DeleteButton } from "../ui";
-import dayjs from "@/shared/lib/create-dayjs";
+import { dayjs } from "@/shared/lib/dayjs";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Fragment, type ReactNode } from "react";
 import { createLink } from "@/shared/components/config/link/link.model";
@@ -215,7 +215,7 @@ export const ChatMessage = reatomComponent<ChatItem>(({
                 <Menu.Item
                   key={item.value}
                   value={item.value}
-                  className={menuVariant.item({ className: item.style?.variant === 'danger' ? "text-red" : "" })}
+                  className={menuVariant.item(item.style?.variant === 'danger' ? "text-red" : "")}
                 >
                   <Icon name={item.icon} className="size-4" />
                   {typeof item.label === 'function' ? label : <span>{label}</span>}

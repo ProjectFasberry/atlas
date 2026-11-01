@@ -1,7 +1,7 @@
 import { Icon } from "@/shared/ui/icon"
 import { useState } from "react";
 import { Button, type ButtonProps } from "./button";
-import clsx from "clsx";
+import { clsx } from "cnfast";
 import { toast } from "sonner";
 
 const CopyButton = ({ content }: { content: string }) => {

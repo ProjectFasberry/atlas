@@ -1,16 +1,26 @@
 import type { Rec } from "@reatom/framework";
 import type { PersistRecord } from "@reatom/persist";
-import type { Locale } from "./shared/locales";
 import type { JSXElement } from "solid-js";
 import 'solid-js';
 import type { operations } from "./shared/types/gen";
+import type { Locale } from "./paraglide/runtime";
 
 declare global {
   namespace Vike {
+    interface Server {
+      server: 'hono'
+    }
+
     interface PageContext {
       snapshot: Rec<PersistRecord<unknown>>,
       Page: () => JSXElement,
-      locale: Locale,
+      locale: Locale
+    }
+  }
+
+  type Env = {
+    Variables: {
+      locale: Locale
     }
   }
 

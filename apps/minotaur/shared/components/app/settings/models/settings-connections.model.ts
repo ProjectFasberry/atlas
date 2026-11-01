@@ -4,7 +4,7 @@ import {
   withCache, withDataAtom, withReset, withStatusesAtom,
   type Action, type AsyncAction
 } from "@reatom/framework";
-import { isEmptyArray } from "@/shared/lib/helpers";
+import { isEmptyArray } from "@/shared/lib/utils";
 import { client } from "@/shared/lib/client-wrapper";
 import { toast } from "sonner";
 import { env } from "@/shared/env";

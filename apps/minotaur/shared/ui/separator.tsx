@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
-import { cn } from '../lib/cn';
+import { clsx } from "cnfast";
 
 function Separator({
   className,
@@ -13,7 +13,7 @@ function Separator({
       data-slot="separator"
       decorative={decorative}
       orientation={orientation}
-      className={cn(
+      className={clsx(
         `bg-neutral-800 shrink-0
         data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full
         data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px`,

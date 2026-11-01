@@ -1,0 +1,202 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "welcome": {
+    "subtitle": "Semi-vanilla server 1.20.1 - 1.20.4",
+    "description": "A cozy, vanilla server with a pleasant atmosphere and friendly players!\nJoin with your friends to chill together!",
+    "action-text": "Start playing"
+  },
+  "features": {
+    "title": "Server Features"
+  },
+  "contacts": {
+    "title": "Project Socials",
+    "item-title": "Go to"
+  },
+  "shared": {
+    "copied-to-clipboard": "Copied to clipboard"
+  },
+  "header": {
+    "links": {
+      "home": "Home",
+      "gallery": "Gallery",
+      "rules": "Rules",
+      "support": "Support",
+      "account": "Account",
+      "map": "Map",
+      "wiki": "Wiki",
+      "modpack": "Modpack",
+      "game": "Game"
+    }
+  },
+  "footer": {
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "contacts": "Contacts",
+      "credits": "Credits"
+    },
+    "copyright": "Fasberry Project. Original rights belong to Mojang AB."
+  },
+  "spawn-server": {
+    "title": "Server Spawn",
+    "subtitle": "The server spawn is located in the town of Offenburg, where you can find many interesting and even secret places, characters to chat with, and other activities."
+  },
+  "gameplay": {
+    "1": {
+      "title": "Gameplay",
+      "description": "Survive, build settlements and towns, chat with players, and create your own identity."
+    },
+    "2": {
+      "title": "Personalization",
+      "description": "Create your own style: new emotes, particles, and pets."
+    },
+    "3": {
+      "title": "Quests",
+      "description": "Quests are an essential part of the gameplay if you want to make money fast."
+    },
+    "4": {
+      "title": "Resource Pack",
+      "description": "The resource pack adds new items: armor, tools, weapons, and furniture."
+    },
+    "5": {
+      "title": "Emotes",
+      "description": "The server supports custom player movements."
+    },
+    "shared": {
+      "get-more": "Learn more"
+    }
+  },
+  "change-language": "Change language",
+  "page-not-found": "Page not found",
+  "something-went-wrong": "Something went wrong",
+  "resource-not-found": "Resource not found",
+  "rules": {
+    "title": "Project Rules",
+    "subtitle": "What are rules made for? To not break them!",
+    "action-text": "Rule list",
+    "list": {
+      "error": "Failed to get the rule list",
+      "updated": "Updated:"
+    },
+    "tags": {
+      "title": "Current tags:"
+    }
+  },
+  "support": {
+    "title": "Project Support",
+    "subtitle": "Here you can find out how to support the development of the project",
+    "action-text": "How to support?",
+    "above-description": "Below are the primary ways to help the project for now. Thank you!",
+    "variants": {
+      "monitoring": {
+        "title": "Monitoring",
+        "vote": "Vote"
+      },
+      "repost": {
+        "title": "Share",
+        "share": "Share on {target}"
+      }
+    }
+  },
+  "start": {
+    "template": {
+      "register": "Register",
+      "register-project": "on the project.",
+      "register-after": "After registering, make sure you have successfully logged into the forum and the personal dashboard.",
+      "steps": {
+        "title": "How to start playing",
+        "luckily-game": "Have a great game!",
+        "download": "The server is only reachable through the Fasberry launcher. Download it and sign in with the nickname you used to register.",
+        "download-windows": "Download for Windows",
+        "download-macos": "Download for macOS",
+        "download-hint": "dev build, 2.3 MB, Windows 10/11 x64. The macOS build is coming later.",
+        "download-macos-soon": "macOS - soon"
+      }
+    }
+  },
+  "error-page": {
+    "title": "Disconnected",
+    "404": "Could not find the requested resource.",
+    "to-safety-host": "Return to a safe place"
+  },
+  "pages": {
+    "index": {
+      "title": "Home",
+      "description": ""
+    },
+    "gallery": {
+      "title": "Gallery",
+      "description": ""
+    },
+    "modpack": {
+      "title": "Modpack",
+      "description": ""
+    },
+    "global": {
+      "description": "Official page of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20+. Play: {ip}",
+      "description-global": "How many top Minecraft servers do you know? Now you know one more.",
+      "site_name": "Official website of the Fasberry Minecraft server."
+    },
+    "info": {
+      "credits": {
+        "title": "Credits"
+      }
+    },
+    "rules": {
+      "title": "Rules",
+      "description": "Read the rules of our Fasberry server to ensure a fair and friendly game for all participants. Respect other players and follow the established code of conduct.",
+      "description-additional": "Rules of our Fasberry server for comfortable gameplay. Follow the established standards and maintain a friendly atmosphere!"
+    },
+    "status": {
+      "title": "Server Status",
+      "description": ""
+    },
+    "support": {
+      "title": "Support",
+      "description": "Help develop the Fasberry project by supporting us! Your contribution will go toward developing servers, improving the gaming experience, and creating unique content for players."
+    },
+    "start-play": {
+      "title": "Start Playing",
+      "description": "Join the Fasberry community and help us grow! Your support matters."
+    }
+  },
+  "gallery": {
+    "title": "Gallery",
+    "description": "Here are the in-game snapshots",
+    "action-text": "To the scene of events"
+  },
+  "credits": {
+    "title": "Special Credits",
+    "sections": {
+      "images": {
+        "title": "Images",
+        "description": "bzzVanet"
+      }
+    }
+  },
+  "modpack": {
+    "title": "Modpacks",
+    "error": "Error loading modpacks",
+    "retry-later": "Please try again later",
+    "empty": "No modpacks available yet",
+    "download": "Download"
+  },
+  "languages": {
+    "title": "Language",
+    "variants": {
+      "russian": "Русский",
+      "english": "English"
+    }
+  },
+  "weathers": {
+    "title": "Weather",
+    "variants": {
+      "sunny": "Clear",
+      "rainy": "Rain",
+      "snowy": "Snow"
+    }
+  },
+  "settings": {
+    "title": "Settings"
+  }
+}
