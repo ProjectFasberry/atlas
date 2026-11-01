@@ -1,18 +1,16 @@
 import { asc, eq } from 'drizzle-orm';
 import type { Root } from 'fumadocs-core/page-tree';
-import TurndownService from 'turndown';
 import { database } from './db';
-import { sanitizeContent, stripHtml, withHeadingIds } from './html';
-import { type WikiPage, wikiPages, wikiRevisions } from './schema';
+import { sanitizeContent, stripHtml, toMarkdown, withHeadingIds } from './html';
+import {
+  type WikiPage,
+  wikiPages,
+  wikiPageTranslations,
+  wikiRevisions,
+  wikiSectionTranslations,
+} from './schema';
 import { source } from './source';
-
-const turndown = new TurndownService({
-  headingStyle: 'atx',
-  hr: '---',
-  bulletListMarker: '-',
-  codeBlockStyle: 'fenced',
-  emDelimiter: '*',
-});
+import { getTranslation, isTranslationLocale, sourceHash } from './translate';
 
 export type PageRow = WikiPage;
 
@@ -31,9 +29,63 @@ export async function getPage(slug: string): Promise<WikiPage | null> {
   return row ?? null;
 }
 
+/**
+ * Page in the requested locale: the stored translation when it is still up to date,
+ * the Russian original otherwise.
+ */
+export async function getLocalizedPage(slug: string, locale?: string): Promise<WikiPage | null> {
+  const page = await getPage(slug);
+  if (!page || !locale || !isTranslationLocale(locale)) return page;
+
+  const translation = await getTranslation(page.slug, locale);
+  if (!translation || translation.sourceHash !== sourceHash(page)) return page;
+
+  return {
+    ...page,
+    title: translation.title,
+    description: translation.description,
+    html: translation.html,
+    markdown: translation.markdown,
+  };
+}
+
 /** The sidebar tree comes from the fumadocs source, which reads the same rows. */
-export async function getPageTree(): Promise<Root> {
-  return (await source.get()).pageTree;
+export async function getPageTree(locale?: string): Promise<Root> {
+  const tree = (await source.get()).pageTree;
+  if (!locale || locale === 'ru') return tree;
+
+  const db = await database();
+  const [titles, sections] = await Promise.all([
+    db
+      .select({ slug: wikiPageTranslations.slug, title: wikiPageTranslations.title })
+      .from(wikiPageTranslations)
+      .where(eq(wikiPageTranslations.locale, locale)),
+    db
+      .select({ section: wikiSectionTranslations.section, title: wikiSectionTranslations.title })
+      .from(wikiSectionTranslations)
+      .where(eq(wikiSectionTranslations.locale, locale)),
+  ]);
+
+  const titleBySlug = new Map(titles.map((row) => [row.slug, row.title]));
+  const titleBySection = new Map(sections.map((row) => [row.section, row.title]));
+
+  const children = tree.children.map((node) => {
+    if (node.type === 'separator') {
+      const name = typeof node.name === 'string' ? node.name : '';
+      const translated = titleBySection.get(name);
+      return translated ? { ...node, name: translated } : node;
+    }
+
+    if (node.type === 'page') {
+      const slug = node.url === '/' ? '' : node.url.replace(/^\//, '');
+      const translated = titleBySlug.get(slug);
+      return translated ? { ...node, name: translated } : node;
+    }
+
+    return node;
+  });
+
+  return { ...tree, children };
 }
 
 /** Markdown of a page, used by the llms endpoints. */
@@ -44,10 +96,6 @@ export async function getPageMarkdown(slugs: string[]): Promise<string | null> {
 
 export function renderPageHtml(page: PageRow) {
   return withHeadingIds(page.html);
-}
-
-export function toMarkdown(html: string) {
-  return turndown.turndown(html).trim();
 }
 
 export type PageInput = {
@@ -102,4 +150,10 @@ export async function savePage(
 
 export function pagePlainText(page: PageRow) {
   return stripHtml(page.html);
+}
+
+/** Meta description: the stored one, otherwise the first characters of the text. */
+export function pageDescription(page: PageRow, limit = 160) {
+  const text = page.description?.trim() || pagePlainText(page);
+  return text.length > limit ? `${text.slice(0, limit).trimEnd()}...` : text;
 }

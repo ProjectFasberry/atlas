@@ -239,7 +239,7 @@ function renderContent(doc, ctx) {
     }
     if (node.type !== 'paragraph' || (node.content || []).length > 0) firstBlock = false;
     const rendered = block(node, ctx);
-    if (rendered && rendered.trim()) blocks.push(rendered);
+    if (rendered?.trim()) blocks.push(rendered);
   }
 
   return `${blocks.join('\n\n').trim()}\n`;

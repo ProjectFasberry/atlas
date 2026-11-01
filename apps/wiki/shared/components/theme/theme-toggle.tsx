@@ -3,9 +3,12 @@
 import { reatomComponent } from '@reatom/npm-react';
 import { IconMoonFilled, IconSunFilled } from '@tabler/icons-react';
 import { cn } from '@/lib/cn';
+import { m } from '@/paraglide/messages';
+import { $locale } from '@/shared/models/locale.model';
 import { $isDark, $theme } from '@/shared/models/theme.model';
 
 export const ThemeToggle = reatomComponent<{ className?: string }>(({ className, ctx }) => {
+  const locale = ctx.spy($locale);
   const isDark = ctx.spy($isDark);
 
   return (
@@ -23,7 +26,7 @@ export const ThemeToggle = reatomComponent<{ className?: string }>(({ className,
         );
       }}
       data-theme-toggle=""
-      aria-label="Сменить тему"
+      aria-label={m['theme.toggle']({}, { locale })}
       className={cn('inline-flex items-center overflow-hidden rounded-full border p-1', className)}
     >
       <IconSunFilled

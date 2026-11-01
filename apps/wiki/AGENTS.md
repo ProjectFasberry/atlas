@@ -8,6 +8,22 @@
   it before anything is staged, committed or pushed.
 - This rule overrides any earlier instruction to "commit and push the changes" in this project.
 
+## State and logic
+
+- **React hooks are not allowed for business or UI logic.** No `useState`, `useEffect`,
+  `useMemo`, `useCallback`, `useReducer` or `useContext` for state.
+- Every piece of state and every piece of logic lives in a Reatom model (`@reatom/*`): `atom`,
+  `action`, `reatomAsync`, `withAssign`, `onConnect`, `ctx.schedule`. Keep models under
+  `shared/models/` or next to the feature they belong to.
+- Components only render. Use `reatomComponent` and `ctx.spy`; `useAtom` / `useCtx` from
+  `@reatom/npm-react` are for library components that require a hook.
+- `useRef` is allowed for DOM access only (focus, measurements, file inputs, editor instance),
+  never as a state container.
+- Local UI state (open/closed, hover, selected tab, draft text) also goes to atoms, not to
+  component state.
+- The locale is an atom too: `$locale` in `shared/models/locale.model.ts`, filled once by
+  `shared/components/app/locale-sync.tsx` from the server value. No React context.
+
 ## Context
 
 Architecture, data, editor and UI documentation for agents lives in `agent-docs/`,

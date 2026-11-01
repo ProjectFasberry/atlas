@@ -11,7 +11,12 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "lint": "biome check .",
-    "type-check": "next typegen && tsc --noEmit"
+    "type-check": "next typegen && tsc --noEmit",
+    "i18n:compile": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
+    "prebuild": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
+    "predev": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
+    "pretype-check": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
+    "translate:content": "node scripts/translate-content.mjs"
   },
   "dependencies": {
     "@reatom/core": "3.10.3",
@@ -41,6 +46,8 @@
     "turndown-plugin-gfm": "^1.0.2"
   },
   "devDependencies": {
+    "@inlang/paraglide-js": "^2.29.3",
+    "@inlang/plugin-message-format": "^4.5.6",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.6.5",

@@ -9,7 +9,8 @@ type ViewTransitionDocument = Document & {
   startViewTransition?: (callback: () => void) => { finished: Promise<void> };
 };
 
-const STORAGE_KEY = 'theme';
+const THEME_COOKIE = 'theme';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 const BACKGROUND: Record<Theme, string> = {
   light: '#ffffff',
@@ -25,14 +26,8 @@ const EASING: [number, number, number, number] = [0.33, 0, 0.2, 1];
 let stopCover: (() => void) | null = null;
 let revealId = 0;
 
+/** The server already put the theme class on `<html>`, so the DOM is the source. */
 function readTheme(): Theme {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'light' || stored === 'dark') return stored;
-  } catch {
-    // private mode - read the DOM only
-  }
-
   return document.documentElement.classList.contains('light') ? 'light' : 'dark';
 }
 
@@ -42,11 +37,8 @@ function commitTheme(theme: Theme) {
   root.classList.add(theme);
   root.style.colorScheme = theme;
 
-  try {
-    localStorage.setItem(STORAGE_KEY, theme);
-  } catch {
-    // private mode - just do not remember the choice
-  }
+  // the next server render reads this cookie and puts the class on <html> itself
+  document.cookie = `${THEME_COOKIE}=${theme}; path=/; max-age=${COOKIE_MAX_AGE}; samesite=lax`;
 }
 
 /**

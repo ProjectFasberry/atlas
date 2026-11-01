@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm';
-import { bigint, customType, index, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  customType,
+  index,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 
 /** PostgreSQL bytea: drizzle has no built-in column type for it. */
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
@@ -60,3 +69,39 @@ export type WikiPage = typeof wikiPages.$inferSelect;
 export type WikiPageInsert = typeof wikiPages.$inferInsert;
 export type WikiRevisionInsert = typeof wikiRevisions.$inferInsert;
 export type WikiImage = typeof wikiImages.$inferSelect;
+
+/**
+ * Machine translations of a page, one row per locale. The Russian page stays the
+ * source of truth; `source_hash` marks a translation as stale after an edit.
+ */
+export const wikiPageTranslations = pgTable(
+  'wiki_page_translations',
+  {
+    slug: text('slug')
+      .notNull()
+      .references(() => wikiPages.slug, { onDelete: 'cascade' }),
+    locale: text('locale').notNull(),
+    title: text('title').notNull(),
+    description: text('description').notNull().default(''),
+    html: text('html').notNull(),
+    markdown: text('markdown').notNull().default(''),
+    sourceHash: text('source_hash').notNull(),
+    engine: text('engine').notNull().default('deepl'),
+    translatedAt: timestamp('translated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.slug, table.locale] })],
+);
+
+export type WikiPageTranslation = typeof wikiPageTranslations.$inferSelect;
+
+/** Sidebar group names translated once per locale. */
+export const wikiSectionTranslations = pgTable(
+  'wiki_section_translations',
+  {
+    section: text('section').notNull(),
+    locale: text('locale').notNull(),
+    title: text('title').notNull(),
+    translatedAt: timestamp('translated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.section, table.locale] })],
+);

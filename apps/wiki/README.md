@@ -59,6 +59,16 @@ The image goes to `registry.fasberry.fun/prod/wiki:latest`. On the server the se
 `/opt/main/prod/docker-compose.prod.yml`, listens on `127.0.0.1:3007` and is published by Traefik
 as `wiki.fasberry.fun`. The watchtower label rolls out a pushed `:latest` automatically.
 
+## Languages
+
+The UI is translated with [Paraglide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs).
+Messages live in `messages/ru.json` and `messages/en.json` (Russian is the base locale and the
+fallback), the locale is resolved from the `locale` cookie and then `Accept-Language`, and the
+proxy stores the detected language in that cookie for the next visit. Content from the database
+is not translated: `pnpm translate:content` fills `wiki_page_translations` (MyMemory, free,
+no key), the site serves a translation when its `source_hash` still matches the Russian page and
+falls back to Russian otherwise. `--force` re-translates, `--slug <slug>` limits the run.
+
 ## Settings
 
 | Variable | Purpose |
@@ -69,7 +79,6 @@ as `wiki.fasberry.fun`. The watchtower label rolls out a pushed `:latest` automa
 | `WIKI_MIGRATIONS_DIR` | path to `drizzle/` inside the image |
 | `WIKI_EDITOR_OPEN` | `1` opens the editor without permission checks, local only |
 | `WIKI_AUTH_CHECK_URL` | backend address that confirms permission to edit |
-| `WIKI_AUTH_COOKIE` | session cookie name, `fasberry_session` by default |
 | `NEXT_PUBLIC_SITE_URL` | site address for metadata and link previews |
 | `PORT` | server port |
 

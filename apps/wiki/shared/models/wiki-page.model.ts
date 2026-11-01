@@ -1,6 +1,6 @@
 import { action, atom, reatomAsync } from '@reatom/framework';
 import { withAssign } from '@reatom/primitives';
-import ky from 'ky';
+import { http } from '@/lib/http';
 
 export type PageDraft = {
   slug: string;
@@ -9,9 +9,12 @@ export type PageDraft = {
   html: string;
 };
 
+/** Message keys, translated at render time so the model stays locale-agnostic. */
+export type SaveError = 'no-permission' | 'save-error' | 'upload-error';
+
 export type SaveState = {
   status: 'idle' | 'saving' | 'error';
-  error: string | null;
+  error: SaveError | null;
 };
 
 /**
@@ -39,8 +42,8 @@ export const $draft = atom<PageDraft | null>(null, 'wikiPage.draft').pipe(
       $saveState(ctx, { status: 'idle', error: null });
     }, `${name}.cancel`),
 
-    fail: action((ctx, message: string) => {
-      $saveState(ctx, { status: 'error', error: message });
+    fail: action((ctx, error: SaveError) => {
+      $saveState(ctx, { status: 'error', error });
     }, `${name}.fail`),
 
     save: reatomAsync(
@@ -50,7 +53,7 @@ export const $draft = atom<PageDraft | null>(null, 'wikiPage.draft').pipe(
 
         $saveState(ctx, { status: 'saving', error: null });
 
-        const response = await ky
+        const response = await http
           .put(`/api/wiki/pages${draft.slug ? `/${draft.slug}` : ''}`, {
             json: { title: draft.title, description: draft.description, html },
             throwHttpErrors: false,
@@ -58,11 +61,7 @@ export const $draft = atom<PageDraft | null>(null, 'wikiPage.draft').pipe(
           .catch(() => null);
 
         if (!response?.ok) {
-          throw new Error(
-            response?.status === 403
-              ? 'Нет прав на редактирование'
-              : 'Не удалось сохранить страницу',
-          );
+          throw new Error(response?.status === 403 ? 'no-permission' : 'save-error');
         }
 
         return true;
@@ -80,7 +79,10 @@ export const $draft = atom<PageDraft | null>(null, 'wikiPage.draft').pipe(
         onReject: (ctx, error) => {
           $saveState(ctx, {
             status: 'error',
-            error: error instanceof Error ? error.message : 'Не удалось сохранить страницу',
+            error:
+              error instanceof Error && error.message === 'no-permission'
+                ? 'no-permission'
+                : 'save-error',
           });
         },
       },
@@ -95,11 +97,11 @@ export async function uploadImage(file: File) {
   const body = new FormData();
   body.append('file', file);
 
-  const data = await ky
+  const data = await http
     .post('/api/wiki/upload', { body })
     .json<{ url: string }>()
     .catch(() => {
-      throw new Error('Не удалось загрузить картинку');
+      throw new Error('upload-error');
     });
 
   return data.url;

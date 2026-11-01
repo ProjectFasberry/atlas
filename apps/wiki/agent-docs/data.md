@@ -72,14 +72,13 @@ pnpm db:export                    # PostgreSQL -> content/seed.json
 | `WIKI_DB_POOL_MAX` | server | pool size, `8` by default |
 | `WIKI_EDITOR_OPEN` | server | `1` opens the editor to everyone (locally, preview) |
 | `WIKI_AUTH_CHECK_URL` | server | endpoint that answers from the cookie whether editing is allowed |
-| `WIKI_AUTH_COOKIE` | server | session cookie name, `fasberry_session` by default |
 | `NEXT_PUBLIC_SITE_URL` | build | base URL for metadata, defaults to `https://wiki.fasberry.fun` |
 | `WIKI_API_URL` | `sync:wiki` | content source |
 | `PORT` | standalone | server port |
 
 Access logic lives in `lib/auth.ts`, `getEditor()`:
-`WIKI_EDITOR_OPEN=1` -> the `{id:'local'}` stub; otherwise both `WIKI_AUTH_CHECK_URL` and the
-cookie are required, the request is a `ky` GET with a 5 s timeout and `canEdit` is read from the
+`WIKI_EDITOR_OPEN=1` -> the `{id:'local'}` stub; otherwise both `WIKI_AUTH_CHECK_URL` and the incoming
+`cookie` header are required, the request is a `ky` GET with a 5 s timeout and `canEdit` is read from the
 response (including nested `data`/`user`). The httpOnly cookie of the `.fasberry.fun` domain is
 sent to the wiki too and never leaves the server.
 

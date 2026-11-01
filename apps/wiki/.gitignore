@@ -3,6 +3,7 @@
 
 # generated content
 .source
+/paraglide/
 
 # test & build
 /coverage

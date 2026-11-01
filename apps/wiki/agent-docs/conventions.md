@@ -11,13 +11,20 @@
 
 ## Reatom v3
 
+Hard rule: **no React hooks for business or UI logic**. No `useState`, `useEffect`, `useMemo`,
+`useCallback`, `useReducer` or `useContext` for state. All state and logic lives in models built
+from `@reatom/*`; components only render. `useRef` is fine for DOM access only, and `useAtom` /
+`useCtx` are for library components that require a hook. Local UI state (open/closed, hover,
+selected tab, drafts) goes to atoms as well. The locale follows the same rule: `$locale` atom in
+`shared/models/locale.model.ts`, hydrated by `locale-sync.tsx` from the server value.
+
 - Atoms are prefixed with `$`, without the `Atom` suffix; the name is the second argument:
   `atom(x, 'theme')`.
 - Actions are attached with `withAssign((_, name) => ({ ... }))`, named `${name}.action`.
 - Scope atoms derive from nullable state: `atom((ctx) => (ctx.spy($x) ?? default) === ...)`.
 - Async work is `reatomAsync` with `onFulfill` / `onReject`, no `try/catch` in components.
-- Subscriptions and derived values live inside `reatomComponent` via `ctx.spy`; no `useEffect`,
-  `useMemo` or `useCallback`.
+- Subscriptions and derived values live inside `reatomComponent` via `ctx.spy`; `reatomComponent`
+  is the default way to connect a component to a model.
 - `onConnect($atom, ...)` handles lazy initialisation on the first subscription (that is how the
   theme is read).
 - The provider is `shared/components/app/reatom-provider.tsx`.

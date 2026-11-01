@@ -46,7 +46,8 @@
 `app/layout.tsx`:
 - `export const dynamic = 'force-dynamic'` - the sidebar and permissions depend on the database
   and on a cookie;
-- an inline script in `<body>` sets the theme class before paint (no flash);
+- the theme class is rendered on `<html>` by the server from the `theme` cookie, so there is
+  no flash and no script before paint;
 - `RootProvider theme={{ enabled: false }}` - a custom theme instead of the Fumadocs one;
 - `DocsLayout tree={await getPageTree()}` with `nav.mode: 'top'` and a custom `Separator`.
 

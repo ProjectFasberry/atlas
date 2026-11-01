@@ -1,4 +1,5 @@
 import sanitizeHtml from 'sanitize-html';
+import TurndownService from 'turndown';
 
 const ALLOWED_TAGS = [
   'p',
@@ -95,4 +96,17 @@ export function withHeadingIds(html: string): { html: string; toc: TocItem[] } {
   );
 
   return { html: result, toc };
+}
+
+const turndown = new TurndownService({
+  headingStyle: 'atx',
+  hr: '---',
+  bulletListMarker: '-',
+  codeBlockStyle: 'fenced',
+  emDelimiter: '*',
+});
+
+/** HTML -> markdown, used for the `.md` versions and the llms endpoints. */
+export function toMarkdown(html: string) {
+  return turndown.turndown(html).trim();
 }

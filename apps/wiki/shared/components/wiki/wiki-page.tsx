@@ -34,6 +34,8 @@ import {
 } from 'fumadocs-ui/layouts/notebook/page';
 import { type ReactNode, useRef } from 'react';
 import { cn } from '@/lib/cn';
+import { m } from '@/paraglide/messages';
+import { $locale } from '@/shared/models/locale.model';
 import { $draft, $saveState, uploadImage } from '@/shared/models/wiki-page.model';
 import { ArticleHtml } from './article-html';
 
@@ -61,6 +63,16 @@ const extensions = [
  * the "Edit" button turns the title, description and body into a form.
  */
 export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
+  const locale = ctx.spy($locale);
+  const t = (
+    translate: (inputs: Record<string, never>, options: { locale: typeof locale }) => string,
+  ) => translate({}, { locale });
+
+  const errorText = {
+    'no-permission': t(m['editor.no-permission']),
+    'save-error': t(m['editor.save-error']),
+    'upload-error': t(m['editor.upload-error']),
+  } as const;
   const { slug, title, description, html, markdownUrl, canEdit, icon } = props;
 
   const draft = ctx.spy($draft);
@@ -93,8 +105,8 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
     try {
       const url = await uploadImage(file);
       editor?.chain().focus().setImage({ src: url, alt: file.name }).run();
-    } catch (error) {
-      $draft.fail(ctx, error instanceof Error ? error.message : 'Ошибка загрузки');
+    } catch {
+      $draft.fail(ctx, 'upload-error');
     }
   }
 
@@ -102,7 +114,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
     if (!editor) return;
 
     const previous = editor.getAttributes('link').href || 'https://';
-    const href = window.prompt('Ссылка', previous);
+    const href = window.prompt(t(m['editor.link-prompt']), previous);
     if (href === null) return;
 
     if (href.trim() === '') {
@@ -119,7 +131,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
         <input
           value={draft.title}
           onChange={(event) => $draft.patch(ctx, { title: event.target.value })}
-          aria-label="Заголовок страницы"
+          aria-label={t(m['editor.title-label'])}
           className="mb-2 w-full rounded-lg border bg-fd-card px-3 py-2 text-[1.75em] font-semibold leading-tight outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
         />
       ) : (
@@ -137,7 +149,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
               className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground"
             >
               <IconPencil size={14} stroke={1.75} aria-hidden />
-              Редактировать
+              {t(m['editor.edit'])}
             </button>
           ) : null}
         </div>
@@ -147,8 +159,8 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
         <input
           value={draft.description}
           onChange={(event) => $draft.patch(ctx, { description: event.target.value })}
-          aria-label="Описание страницы"
-          placeholder="Короткое описание"
+          aria-label={t(m['editor.description-label'])}
+          placeholder={t(m['editor.description-placeholder'])}
           className="mb-4 w-full rounded-lg border bg-fd-card px-3 py-2 text-sm text-fd-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
         />
       ) : description ? (
@@ -159,14 +171,14 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
         <div className="mt-4 flex flex-col gap-3">
           <div className="sticky top-16 z-10 flex flex-wrap items-center gap-1 rounded-lg border bg-fd-card/95 p-1.5 backdrop-blur">
             <ToolButton
-              label="Отменить"
+              label={t(m['editor.undo'])}
               disabled={!editor?.can().chain().focus().undo().run()}
               onClick={() => editor?.chain().focus().undo().run()}
             >
               <IconArrowBackUp />
             </ToolButton>
             <ToolButton
-              label="Повторить"
+              label={t(m['editor.redo'])}
               disabled={!editor?.can().chain().focus().redo().run()}
               onClick={() => editor?.chain().focus().redo().run()}
             >
@@ -176,28 +188,28 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
             <Divider />
 
             <ToolButton
-              label="Жирный"
+              label={t(m['editor.bold'])}
               active={editor?.isActive('bold') ?? false}
               onClick={() => editor?.chain().focus().toggleBold().run()}
             >
               <IconBold />
             </ToolButton>
             <ToolButton
-              label="Курсив"
+              label={t(m['editor.italic'])}
               active={editor?.isActive('italic') ?? false}
               onClick={() => editor?.chain().focus().toggleItalic().run()}
             >
               <IconItalic />
             </ToolButton>
             <ToolButton
-              label="Зачёркнутый"
+              label={t(m['editor.strike'])}
               active={editor?.isActive('strike') ?? false}
               onClick={() => editor?.chain().focus().toggleStrike().run()}
             >
               <IconStrikethrough />
             </ToolButton>
             <ToolButton
-              label="Код"
+              label={t(m['editor.code'])}
               active={editor?.isActive('code') ?? false}
               onClick={() => editor?.chain().focus().toggleCode().run()}
             >
@@ -207,35 +219,35 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
             <Divider />
 
             <ToolButton
-              label="Заголовок 2"
+              label={t(m['editor.h2'])}
               active={editor?.isActive('heading', { level: 2 }) ?? false}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
             >
               <IconH2 />
             </ToolButton>
             <ToolButton
-              label="Заголовок 3"
+              label={t(m['editor.h3'])}
               active={editor?.isActive('heading', { level: 3 }) ?? false}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
             >
               <IconH3 />
             </ToolButton>
             <ToolButton
-              label="Список"
+              label={t(m['editor.bullet-list'])}
               active={editor?.isActive('bulletList') ?? false}
               onClick={() => editor?.chain().focus().toggleBulletList().run()}
             >
               <IconList />
             </ToolButton>
             <ToolButton
-              label="Нумерованный список"
+              label={t(m['editor.ordered-list'])}
               active={editor?.isActive('orderedList') ?? false}
               onClick={() => editor?.chain().focus().toggleOrderedList().run()}
             >
               <IconListNumbers />
             </ToolButton>
             <ToolButton
-              label="Цитата"
+              label={t(m['editor.quote'])}
               active={editor?.isActive('blockquote') ?? false}
               onClick={() => editor?.chain().focus().toggleBlockquote().run()}
             >
@@ -244,14 +256,18 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
 
             <Divider />
 
-            <ToolButton label="Ссылка" active={editor?.isActive('link') ?? false} onClick={setLink}>
+            <ToolButton
+              label={t(m['editor.link'])}
+              active={editor?.isActive('link') ?? false}
+              onClick={setLink}
+            >
               <IconLink />
             </ToolButton>
-            <ToolButton label="Картинка" onClick={() => fileInput.current?.click()}>
+            <ToolButton label={t(m['editor.image'])} onClick={() => fileInput.current?.click()}>
               <IconPhotoPlus />
             </ToolButton>
             <ToolButton
-              label="Таблица"
+              label={t(m['editor.table'])}
               active={editor?.isActive('table') ?? false}
               onClick={() =>
                 editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
@@ -260,7 +276,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
               <IconTable />
             </ToolButton>
             <ToolButton
-              label="Удалить таблицу"
+              label={t(m['editor.table-remove'])}
               disabled={!(editor?.isActive('table') ?? false)}
               onClick={() => editor?.chain().focus().deleteTable().run()}
             >
@@ -286,18 +302,16 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             {saveState.error ? (
-              <span className="mr-auto text-xs text-red-500">{saveState.error}</span>
+              <span className="mr-auto text-xs text-red-500">{errorText[saveState.error]}</span>
             ) : null}
-            <span className="mr-auto text-xs text-fd-muted-foreground">
-              Выделите текст, чтобы изменить формат. Backspace удаляет выделенный блок.
-            </span>
+            <span className="mr-auto text-xs text-fd-muted-foreground">{t(m['editor.hint'])}</span>
             <button
               type="button"
               onClick={cancelEdit}
               className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors hover:bg-fd-accent"
             >
               <IconX size={16} stroke={1.75} aria-hidden />
-              Отмена
+              {t(m['editor.cancel'])}
             </button>
             <button
               type="button"
@@ -310,7 +324,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
               ) : (
                 <IconCheck size={16} stroke={1.75} aria-hidden />
               )}
-              {saveState.status === 'saving' ? 'Сохраняю…' : 'Сохранить'}
+              {saveState.status === 'saving' ? t(m['editor.saving']) : t(m['editor.save'])}
             </button>
           </div>
         </div>

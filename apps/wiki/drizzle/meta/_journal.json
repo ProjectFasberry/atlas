@@ -8,6 +8,20 @@
       "when": 1793390882532,
       "tag": "0000_freezing_vanisher",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793491675493,
+      "tag": "0001_minor_rage",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793496304998,
+      "tag": "0002_smiling_slapstick",
+      "breakpoints": true
     }
   ]
 }

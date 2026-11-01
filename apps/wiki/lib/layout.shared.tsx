@@ -1,8 +1,11 @@
 import { defineTranslations } from 'fumadocs-core/i18n';
 import { uiTranslations } from 'fumadocs-ui/i18n';
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { ThemeToggle } from '@/shared/components/theme/theme-toggle';
+import { HeaderControls } from '@/shared/ui/header-controls';
 import { appName } from './shared';
+
+/** Library defaults (English), used for every locale except ru. */
+export const defaultTranslations = defineTranslations().extend(uiTranslations());
 
 export const translations = defineTranslations().extend(uiTranslations()).add({
   'Search(search trigger)': 'Поиск',
@@ -53,7 +56,7 @@ export const translations = defineTranslations().extend(uiTranslations()).add({
 export function baseOptions(): BaseLayoutProps {
   return {
     slots: {
-      themeSwitch: ThemeToggle,
+      themeSwitch: HeaderControls,
     },
     nav: {
       title: (

@@ -36,8 +36,9 @@ Wired up in `metadata` (`app/layout.tsx`): `icons.icon` (ico + 96 png + svg),
 ## Theme switch
 
 The theme is custom, Fumadocs is disabled: `<RootProvider theme={{ enabled: false }}>`. The
-`light`/`dark` class is set by an inline script in `<body>` before paint (it reads
-`localStorage.theme`, `dark` by default), so there is no flash. The model is
+`light`/`dark` class is rendered by the server on `<html>`: `lib/theme.ts` reads the `theme`
+cookie (dark by default) and the layout puts it into `className` and `color-scheme`. No script
+runs before paint, and the switch writes the same cookie. The model is
 `shared/models/theme.model.ts`, the button is `shared/components/theme/theme-toggle.tsx`.
 
 The button passes the click coordinates (for keyboard activation - the button centre). Then
