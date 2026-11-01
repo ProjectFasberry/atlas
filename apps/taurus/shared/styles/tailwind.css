@@ -3,8 +3,6 @@
 
 @import "./editor.css";
 
-@source "../../../../pkgs/ui/**/*.{ts,tsx}";
-
 @plugin "tailwind-scrollbar" {
   nocompatible: true;
 }

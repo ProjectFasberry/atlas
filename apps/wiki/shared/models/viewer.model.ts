@@ -1,8 +1,5 @@
 import { action, atom, onConnect } from '@reatom/framework';
 
-/** Steve head from the public volume: the same fallback the app uses for a missing skin. */
-export const DEFAULT_AVATAR = 'https://volume.fasberry.fun/static/fallback/steve_head.png';
-
 /** The signed-in user, filled once by `ViewerSync` from the server value. */
 export type Viewer = { nickname: string; canEdit: boolean; avatar: string | null };
 

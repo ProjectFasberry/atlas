@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { cache } from 'react';
 import { getServerEnv } from '@/lib/env/server';
 import { http } from '@/lib/utils/http';
-import { DEFAULT_AVATAR } from '@/shared/models/viewer.model';
+import { AVATAR_FALLBACK } from '@repo/ui';
 
 export type Editor = { id: string; name: string };
 
@@ -90,5 +90,5 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   const access = await getAccess();
   if (!access) return null;
 
-  return { ...access, avatar: (await getAvatar(access.nickname)) ?? DEFAULT_AVATAR };
+  return { ...access, avatar: (await getAvatar(access.nickname)) ?? AVATAR_FALLBACK };
 });

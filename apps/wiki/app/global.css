@@ -2,6 +2,8 @@
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 
+@source "../../../pkgs/ui/src/**/*.{ts,tsx}";
+
 @font-face {
   font-family: "PIXY";
   src: url("/fonts/PIXY.ttf") format("truetype");

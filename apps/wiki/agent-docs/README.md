@@ -28,6 +28,8 @@ This directory is the entry point. Read in order:
 - The locale comes from the `locale` cookie, then `Accept-Language`; `proxy.ts` caches it and also
   serves `.md` / `Accept: text/plain` versions of a page.
 - Search is a custom route that returns the Fumadocs result shape; it indexes the current locale.
+- Reusable UI primitives (player head, chips) live in `pkgs/ui` as `@repo/ui`; the wiki gets their
+  classes through an explicit `@source` in `app/global.css`. The Solid app (taurus) does not use them.
 - UI state and logic live in Reatom models, never in React hooks (see `conventions.md`).
 
 ## Quick start

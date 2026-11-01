@@ -1,51 +1,23 @@
-import { type HTMLAttributes } from 'react';
+import { Avatar as KitAvatar } from '@repo/ui';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { getStaticImage } from '@/shared/lib/helpers';
-import { Skeleton } from './skeleton';
 
 export const avatarVariants = tv({
-  base: `relative rounded-sm select-none aspect-square border border-white/10`,
+  base: 'border-white/10',
   variants: {
     variant: {
-      default: 'min-h-16 min-w-16 w-16 h-16 max-w-16 max-h-16',
-    }
+      default: 'size-16',
+    },
   },
-})
+});
 
-type AvatarProps = HTMLAttributes<HTMLDivElement> & VariantProps<typeof avatarVariants> & {
+type AvatarProps = {
+  className?: string;
+  variant?: VariantProps<typeof avatarVariants>['variant'];
   nickname?: string;
-  url: string
-}
+  url: string;
+};
 
-const AVATAR_FALLBACK = getStaticImage("fallback/steve_head.png");
-
-export const Avatar = ({ className, variant, url, nickname, ...props }: AvatarProps) => {
-  const handleRef = (img: HTMLImageElement | null) => {
-    if (!img) return;
-
-    if (img.complete && img.naturalWidth === 0) {
-      img.src = AVATAR_FALLBACK;
-    }
-  };
-
-  return (
-    <div
-      className={avatarVariants({ variant, className })}
-      {...props}
-    >
-      <img
-        ref={handleRef}
-        src={url}
-        onError={(e) => {
-          e.currentTarget.onerror = null;
-          e.currentTarget.src = AVATAR_FALLBACK;
-        }}
-        className="absolute inset-0 w-full z-2 h-full rounded-sm"
-        loading="eager"
-        alt=""
-        crossOrigin="anonymous"
-      />
-      <Skeleton className="w-full h-full z-0 absolute inset-0 rounded-sm" />
-    </div>
-  )
-}
+/** Player head from the shared kit, the app only adds its palette and size. */
+export const Avatar = ({ className, variant, url, nickname }: AvatarProps) => (
+  <KitAvatar url={url} nickname={nickname} className={avatarVariants({ variant, className })} />
+);
