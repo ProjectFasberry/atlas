@@ -45,6 +45,7 @@ the shared `general` database.
 
 ```bash
 pnpm sync:wiki                    # Fasberry backend -> PostgreSQL
+pnpm sync:wiki --force            # also overwrite pages edited in the editor
 pnpm db:import                    # content/seed.json -> PostgreSQL
 pnpm db:import --force            # also overwrite pages edited in the editor
 pnpm db:export                    # PostgreSQL -> content/seed.json
@@ -52,7 +53,8 @@ pnpm db:export                    # PostgreSQL -> content/seed.json
 
 - `sync-wiki.mjs` calls `WIKI_API_URL` (default `https://api.fasberry.fun`) for
   `/wiki/categories` and `/wiki/category/{slug}`, converts TipTap JSON into HTML/markdown and
-  writes pages into PostgreSQL. Images stay in the public bucket: the script only normalises
+  writes pages into PostgreSQL. Without `--force` it skips pages with `source = 'editor'`, like
+  `db-import.mjs`. Images stay in the public bucket: the script only normalises
   legacy addresses (`volume.fasberry.su`, local MinIO) to `volume.fasberry.fun` and reports the
   skipped nodes in `content/wiki-sync-report.json` (not tracked by git).
 - `db-import.mjs` reads the local `content/seed.json` (ignored by git); if `content/docs/*.mdx` exists next to it (the old

@@ -105,5 +105,8 @@ Notes:
 ## Checks
 
 - `pnpm --filter wiki type-check` - `next typegen` + `tsc --noEmit`.
+- `pnpm --filter wiki test:e2e` - Playwright against a production build; see `e2e/README.md`.
+  It needs a throwaway PostgreSQL (`E2E_DATABASE_URL`, the script refuses a URL without `e2e`
+  in it) and runs its own mock backend, so the real API and session cookies are never touched.
 - Quick check after deploy: `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3007/`
 - Test the theme animation in Chromium and Firefox separately: the paths differ.

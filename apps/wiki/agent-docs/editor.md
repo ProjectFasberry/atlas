@@ -21,8 +21,13 @@ page: edits happen in place on the article, and the state lives in the Reatom mo
 
 ## Component
 
-`WikiPage` is a `reatomComponent`; props: `slug`, `title`, `description`, `html`, `markdownUrl`,
-`canEdit`, `icon`.
+`WikiPage` is a `reatomComponent`; props: `slug`, `title`, `description`, `html`, `editSource`,
+`markdownUrl`, `canEdit`, `icon`.
+
+`editSource` is the Russian row from `getPage`, while `title`/`description`/`html` may come from a
+translation. The draft is started from `editSource`, so a save from the `en` locale still writes the
+original page; edit mode shows a notice that the translation is updated separately. A draft whose
+`slug` differs from the current page is ignored, so navigating away never saves into another article.
 
 Read mode: `DocsTitle` with the icon, `DocsDescription`, an "Edit" button (only when `canEdit`),
 `MarkdownCopyButton` and the article HTML inside `DocsBody` via `dangerouslySetInnerHTML`.
@@ -47,6 +52,8 @@ Extensions: `StarterKit` (h2/h3 headings only, `link.openOnClick: false`),
   `pages` + `revisions`, then calls `revalidatePath`.
 
 `POST /api/wiki/upload`
+- the body is read with a hard cap (`content-length` fast path plus a counting stream) before the
+  multipart parser allocates it, so an oversized request is rejected with 413 early;
 - images from the MIME allowlist only, up to 8 MB, otherwise 415/413;
 - id = `randomUUID()` + extension, the bytes go into `images`, the response is `{ url }`.
 

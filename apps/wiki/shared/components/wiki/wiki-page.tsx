@@ -44,6 +44,8 @@ type Props = {
   title: string;
   description: string;
   html: string;
+  /** The Russian original: the editor always writes to it, never to a translation. */
+  editSource: { title: string; description: string; html: string };
   markdownUrl: string;
   canEdit: boolean;
   icon?: ReactNode;
@@ -73,9 +75,11 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
     'save-error': t(m['editor.save-error']),
     'upload-error': t(m['editor.upload-error']),
   } as const;
-  const { slug, title, description, html, markdownUrl, canEdit, icon } = props;
+  const { slug, title, description, html, markdownUrl, canEdit, icon, editSource } = props;
 
-  const draft = ctx.spy($draft);
+  const stored = ctx.spy($draft);
+  // the draft atom outlives navigation: ignore a draft that belongs to another page
+  const draft = stored?.slug === slug ? stored : null;
   const saveState = ctx.spy($saveState);
   const editing = draft !== null;
   const fileInput = useRef<HTMLInputElement>(null);
@@ -92,8 +96,8 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
   });
 
   function startEdit() {
-    editor?.commands.setContent(html);
-    $draft.start(ctx, { slug, title, description, html });
+    editor?.commands.setContent(editSource.html);
+    $draft.start(ctx, { slug, ...editSource });
   }
 
   function cancelEdit() {
@@ -129,6 +133,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
     <>
       {editing ? (
         <input
+          data-testid="page-title"
           value={draft.title}
           onChange={(event) => $draft.patch(ctx, { title: event.target.value })}
           aria-label={t(m['editor.title-label'])}
@@ -145,6 +150,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
           {canEdit ? (
             <button
               type="button"
+              data-testid="edit-page"
               onClick={startEdit}
               className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground"
             >
@@ -157,6 +163,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
 
       {editing ? (
         <input
+          data-testid="page-description"
           value={draft.description}
           onChange={(event) => $draft.patch(ctx, { description: event.target.value })}
           aria-label={t(m['editor.description-label'])}
@@ -169,6 +176,11 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
 
       {editing ? (
         <div className="mt-4 flex flex-col gap-3">
+          {locale !== 'ru' ? (
+            <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
+              {t(m['editor.source-locale'])}
+            </p>
+          ) : null}
           <div className="sticky top-16 z-10 flex flex-wrap items-center gap-1 rounded-lg border bg-fd-card/95 p-1.5 backdrop-blur">
             <ToolButton
               label={t(m['editor.undo'])}
@@ -296,7 +308,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
             />
           </div>
 
-          <div className="rounded-lg border bg-fd-card px-4 py-3">
+          <div data-testid="editor-content" className="rounded-lg border bg-fd-card px-4 py-3">
             <EditorContent editor={editor} />
           </div>
 
@@ -307,6 +319,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
             <span className="mr-auto text-xs text-fd-muted-foreground">{t(m['editor.hint'])}</span>
             <button
               type="button"
+              data-testid="cancel-edit"
               onClick={cancelEdit}
               className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors hover:bg-fd-accent"
             >
@@ -315,7 +328,8 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
             </button>
             <button
               type="button"
-              onClick={() => $draft.save(ctx, editor?.getHTML() ?? html)}
+              data-testid="save-page"
+              onClick={() => $draft.save(ctx, editor?.getHTML() ?? editSource.html)}
               disabled={saveState.status === 'saving'}
               className="inline-flex items-center gap-1.5 rounded-lg bg-fd-primary px-4 py-2 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
             >

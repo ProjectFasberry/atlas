@@ -16,7 +16,9 @@
     "prebuild": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
     "predev": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
     "pretype-check": "paraglide-js compile --project ./project.inlang --outdir ./paraglide",
-    "translate:content": "node scripts/translate-content.mjs"
+    "translate:content": "node scripts/translate-content.mjs",
+    "test:e2e": "pnpm build && playwright test",
+    "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
     "@ark-ui/react": "5.36.2",
@@ -48,6 +50,7 @@
   "devDependencies": {
     "@inlang/paraglide-js": "2.18.0",
     "@inlang/plugin-message-format": "4.5.6",
+    "@playwright/test": "1.55.0",
     "@tailwindcss/postcss": "4.3.3",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.6.5",
