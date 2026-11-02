@@ -4,7 +4,7 @@ import { getUrl, getStaticObject, wrapTitle } from '@/shared/lib/helpers';
 import { translate } from '@/shared/locales/helpers';
 import { mainClient } from '@/shared/api/client';
 
-const image = getStaticObject("background", "main_background.png")
+const image = getStaticObject("backgrounds", "main_background.png")
 
 export type Data = Awaited<ReturnType<typeof data>>
 
@@ -17,7 +17,7 @@ export async function data(pageCtx: PageContextServer) {
   const [tags, content] = await Promise.all([
     mainClient.GET("/rules/tags", { headers }).then(r => r.data?.data ?? []),
     mainClient.GET("/rules/list", { headers }).then(r => r.data?.data ?? []),
-  ])
+  ]).catch(() => [null, null] as const)
 
   const title = wrapTitle(translate["pages.rules.title"]());
   const description = translate["pages.rules.description"]();
@@ -50,8 +50,8 @@ export async function data(pageCtx: PageContextServer) {
 
   return {
     data: {
-      tags,
-      content
+      tags: tags ?? [],
+      content: content ?? null
     }
   }
 }

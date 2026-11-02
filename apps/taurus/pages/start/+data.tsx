@@ -3,7 +3,7 @@ import type { PageContextServer } from 'vike/types';
 import { getUrl, wrapTitle, getStaticObject } from '@/shared/lib/helpers';
 import { translate } from '@/shared/locales/helpers';
 
-const image = getStaticObject("background", "rules_background.png")
+const image = getStaticObject("backgrounds", "rules_background.png")
 
 export async function data(pageCtx: PageContextServer) {
   const config = useConfig()

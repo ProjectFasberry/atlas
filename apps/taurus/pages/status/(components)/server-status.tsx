@@ -1,5 +1,5 @@
-import { For, mergeProps, onMount, onCleanup, Show } from "solid-js";
-import { type PlayerStatusProps, serverStatus } from "../(models)/server-status.model";
+import { createEffect, For, mergeProps, onMount, onCleanup, Show } from "solid-js";
+import { type PlayerStatusProps, fetchPlayerAvatars, playerAvatars, serverStatus } from "../(models)/server-status.model";
 import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { pageState } from "@/shared/models/page.model";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -9,40 +9,39 @@ import { Link } from "@/shared/components/link";
 import { env } from "@/shared/env";
 import { Portal } from "solid-js/web";
 import { dialogVariant } from "@/shared/ui/dialog";
+import { getStaticObject } from "@/shared/lib/helpers";
 
 const APP_URL = env.VITE_APP_URL
+const FALLBACK_HEAD = getStaticObject("fallback", "steve_head.png")
 
 type PlayerStatusImageProps = { type?: "small" | "full" } & PlayerStatusProps
 
 const PlayerStatusImage = (props: PlayerStatusImageProps) => {
-  const { avatarUrl, isLoading } = { avatarUrl: null, isLoading: false }
+  const [avatars] = useAtom(playerAvatars)
   const merged = mergeProps({ type: "small" }, props);
+  const size = () => merged.type === 'small'
+    ? 'max-w-[36px] max-h-[36px]'
+    : 'max-w-[164px] max-h-[164px]'
+  const isLoading = () => !Object.hasOwn(avatars(), merged.nickname)
 
   return (
     <Show
-      when={!isLoading}
+      when={!isLoading()}
       fallback={
-        <Skeleton class={`rounded-md ${merged.type === 'small'
-          ? 'max-w-[36px] max-h-[36px]'
-          : 'max-w-[164px] max-h-[164px]'}`
-        }
-        />
+        <Skeleton class={`rounded-md ${size()}`} />
       }
     >
-      <Show when={avatarUrl} fallback={null}>
-        {(url) => (
-          <img
-            height={800}
-            width={800}
-            class={`rounded-md ${merged.type === 'small'
-              ? 'max-w-[36px] max-h-[36px]'
-              : 'max-w-[164px] max-h-[164px]'}`
-            }
-            alt=""
-            src={url()}
-          />
-        )}
-      </Show>
+      <img
+        height={800}
+        width={800}
+        class={`rounded-md ${size()}`}
+        alt=""
+        src={avatars()[merged.nickname] || FALLBACK_HEAD}
+        onError={(event) => {
+          event.currentTarget.onerror = null;
+          event.currentTarget.src = FALLBACK_HEAD;
+        }}
+      />
     </Show>
   )
 }
@@ -128,6 +127,11 @@ export const ServerStatus = () => {
 
   const [dataAtom] = useAtom(serverStatus.fetch.dataAtom)
   const [statuses] = useAtom(serverStatus.fetch.statusesAtom);
+
+  createEffect(() => {
+    const players = dataAtom()?.proxy.players ?? []
+    if (players.length > 0) fetchPlayerAvatars(ctx, players)
+  })
 
   return (
     <Show

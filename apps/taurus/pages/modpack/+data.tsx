@@ -16,9 +16,7 @@ export async function data(pageCtx: PageContext) {
 
   const data = await mainClient.GET("/modpack/list", { headers })
     .then(r => r.data?.data ?? [])
-    .catch(async (e) => {
-      throw e;
-    })
+    .catch(() => null)
 
   config({
     title,
@@ -35,6 +33,7 @@ export async function data(pageCtx: PageContext) {
   })
 
   return {
-    data
+    data: data ?? [],
+    failed: data === null,
   }
 }

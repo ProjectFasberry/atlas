@@ -95,3 +95,6 @@ web_modules/
 /devtoolsDist
 
 .tw-patch/
+
+# playwright output
+/e2e/.artifacts/

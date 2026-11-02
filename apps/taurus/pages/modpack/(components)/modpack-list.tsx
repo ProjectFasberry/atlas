@@ -45,18 +45,20 @@ const ModpackListEmpty = () => (
   </Typography>
 )
 
-export const ModpackList = (props: { data?: Modpacks }) => {
+export const ModpackList = (props: { data?: Modpacks; failed?: boolean }) => {
   return (
-    <ErrorBoundary fallback={<ModpackError />}>
-      <Show when={props.data} fallback={<ModpackListEmpty />}>
-        {(data) => (
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full xl:grid-cols-4 gap-4 grid-rows-2">
-            <For each={data()}>
-              {(modpack) => <ModpackItem {...modpack} />}
-            </For>
-          </div>
-        )}
-      </Show>
-    </ErrorBoundary>
+    <Show when={!props.failed} fallback={<ModpackError />}>
+      <ErrorBoundary fallback={<ModpackError />}>
+        <Show when={props.data} fallback={<ModpackListEmpty />}>
+          {(data) => (
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full xl:grid-cols-4 gap-4 grid-rows-2">
+              <For each={data()}>
+                {(modpack) => <ModpackItem {...modpack} />}
+              </For>
+            </div>
+          )}
+        </Show>
+      </ErrorBoundary>
+    </Show>
   );
 }
