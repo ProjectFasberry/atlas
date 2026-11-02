@@ -15,7 +15,7 @@
 		"type-check": "tsc --build",
 		"------------------": "",
 		"deploy": "wrangler deploy",
-		"deploy:all": "pnpm type-check && pnpm build:prod && pnpm deploy",
+		"deploy:all": "pnpm type-check && pnpm build:prod && pnpm run deploy",
 		"-------------------": "",
 		"prepare": "pnpm dlx tailwindcss-patch install",
 		"test:e2e": "playwright test",
