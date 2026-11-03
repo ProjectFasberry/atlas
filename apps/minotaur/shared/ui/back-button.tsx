@@ -1,5 +1,6 @@
 import { Button } from "@/shared/ui/button"
 import { Icon, type IconName } from "@/shared/ui/icon"
+import { translate } from "@/shared/locales/helpers"
 import { navigate } from "vike/client/router"
 
 type BackButtonProps = {
@@ -31,9 +32,10 @@ export const BackButton = ({
   return (
     <Button
       background="default"
+      aria-label={translate["shared.back"]()}
       onClick={handle}
       size="headless"
-      className="min-h-8 h-8 sm:min-h-8 sm:h-8 aspect-square w-fit"
+      className="min-h-11 h-11 sm:min-h-11 sm:h-11 aspect-square w-11"
     >
       <Icon name={icon} className="size-4 sm:size-5 text-neutral-400" />
     </Button>

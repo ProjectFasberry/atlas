@@ -75,7 +75,7 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
         <Portal>
           <Dialog.Backdrop className={dialogVariant.backdrop()} />
           <DialogPositioner className={dialogVariant.positioner()}>
-            <Dialog.Content className={dialogVariant.content("w-1/4!")}>
+            <Dialog.Content className={dialogVariant.content()}>
               <Dialog.Title className={dialogVariant.title()}>{translate["settings.account.change-password-title"]()}</Dialog.Title>
               <form
                 className="flex flex-col gap-6 w-full inert:opacity-60 inert:pointer-events-none"
@@ -89,13 +89,16 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
                       type={field.type}
                       autoComplete={field.autoComplete}
                       placeholder={field.placeholder}
-                      minLength={6}
-                      maxLength={32}
+                      minLength={8}
+                      maxLength={72}
                       required
                       value={ctx.spy(field.value)}
                       onChange={e => field.value(ctx, e.target.value)}
                     />
                   ))}
+                  <span className="text-xs text-neutral-400">
+                    {translate["settings.account.password-hint"]()}
+                  </span>
                 </div>
                 {error && (
                   <ErrorBlock title={error?.message} />
@@ -147,7 +150,7 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
         <Menu.Root
           onSelect={({ value }) => infoActions.find(d => d.value === value)?.action(uuid)(ctx)}
         >
-          <Menu.Trigger className={menuVariant.trigger()}>
+          <Menu.Trigger className={menuVariant.trigger()} aria-label={translate["settings.actions"]()}>
             <Icon name="sprite:dots" className="size-[22px] text-neutral-400" />
           </Menu.Trigger>
           <Portal>

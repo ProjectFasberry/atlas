@@ -121,7 +121,12 @@
       "button": "Copy",
       "success": "Copied to clipboard"
     },
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "orders-limit": "Too many orders in a row. Please wait a bit.",
+      "payment-method": "This payment method is unavailable right now."
+    }
   },
   "index": {
     "page": {
@@ -159,9 +164,14 @@
       "qr": {
         "steps": {
           "1": "1. Open Fasberry on your phone",
-          "2": "2. Go to Settings > Security > Link Device",
+          "2": "2. Open Settings > Devices > Link a device",
           "3": "3. Point your phone at the QR code on the screen"
-        }
+        },
+        "expired": "The QR code has expired",
+        "declined": "The sign-in was cancelled on the phone",
+        "refresh": "Refresh the QR code",
+        "retry": "Try again",
+        "scanned": "QR code scanned. Confirm the sign-in on the phone."
       },
       "submit": "Sign in"
     },
@@ -171,7 +181,8 @@
       "toLogin": "Go to login",
       "placeholders": {
         "findoutOther": "For example: Telegram channel",
-        "findout": "How did you hear about the project?"
+        "findout": "How did you hear about us? (optional)",
+        "password-repeat": "Repeat the password"
       },
       "findout": {
         "referrer": "From another player",
@@ -184,7 +195,10 @@
       "acceptRulesPrivacy": "privacy policy",
       "acceptRulesProcessing": "terms of service",
       "acceptRulesProject": "project rules",
-      "existing-player": "This player is already registered"
+      "existing-player": "This player is already registered",
+      "password-hint": "At least 8 characters, no spaces",
+      "password-mismatch": "Passwords do not match",
+      "nickname-hint": "Latin letters, up to 16 characters, no spaces"
     },
     "shared": {
       "placeholders": {
@@ -199,6 +213,10 @@
         "password-is-unsafe": "Password is too simple",
         "user-exists": "Such a player is already registered",
         "token-not-found": "Verification is required"
+      },
+      "password-visibility": {
+        "show": "Show password",
+        "hide": "Hide password"
       }
     }
   },
@@ -208,7 +226,9 @@
       "description": "Current player rankings across different categories"
     },
     "title": "Server rankings",
-    "goTo": "View leaderboard"
+    "goTo": "View leaderboard",
+    "sort": "Sort",
+    "empty": "The rating is empty for now"
   },
   "rating": {
     "page": {
@@ -270,7 +290,8 @@
     "page": {
       "title": "Territories",
       "description": "Server territories"
-    }
+    },
+    "empty": "No lands yet"
   },
   "store": {
     "page": {
@@ -350,7 +371,10 @@
         "pending": "Awaiting payment",
         "succeeded": "Paid",
         "waiting-for-capture": "Pending"
-      }
+      },
+      "show-qr": "Show the QR code",
+      "pay": "Pay",
+      "amount": "Amount due"
     },
     "topup": {
       "rules": {
@@ -373,7 +397,18 @@
         "charism": "Charism",
         "belkoin": "Belkoin"
       },
-      "button": "Top up"
+      "button": "Top up",
+      "review": {
+        "title": "Check the order",
+        "amount": "You top up",
+        "recipient": "Recipient",
+        "method": "Payment method",
+        "price": "Approximate amount due",
+        "warning": "This is real money. Crypto payments are irreversible. If you are under 18, ask your parents to pay for the order.",
+        "confirm": "I am 18+ or have my parents' permission",
+        "pay": "Create an invoice"
+      },
+      "total": "Amount due"
     },
     "errors": {
       "internal": "Failed to create the order",
@@ -407,7 +442,9 @@
       }
     },
     "item": {
-      "remove": "Remove"
+      "remove": "Remove",
+      "change-recipient": "Change the recipient",
+      "select": "Select the item"
     },
     "nav": {
       "cart": "Cart",
@@ -442,7 +479,8 @@
     "page": {
       "title": "News",
       "description": "Fasberry project news"
-    }
+    },
+    "sort": "Sort"
   },
   "referrals": {
     "page": {
@@ -454,7 +492,9 @@
     "page": {
       "title": "Tasks",
       "description": "Tasks page description"
-    }
+    },
+    "reward": "Reward",
+    "empty": "No tasks yet"
   },
   "support": {
     "page": {
@@ -462,7 +502,14 @@
       "description": "Support page description"
     },
     "title": "Support",
-    "in-development": "in development..."
+    "in-development": "in development...",
+    "description": "If something is broken or you need help, write to us.",
+    "discord": "Discord",
+    "telegram": "Telegram",
+    "contacts": "Contacts",
+    "report-title": "Report a player",
+    "report-description": "Describe the situation and attach a screenshot in Discord or Telegram, the moderators will look into it.",
+    "rules": "Project rules"
   },
   "settings": {
     "main": "General settings",
@@ -501,7 +548,8 @@
       "password-changed": "Password changed",
       "password-differs": "The new password must be different",
       "passwords-mismatch": "Passwords do not match",
-      "invalid-password": "Invalid password"
+      "invalid-password": "Invalid password",
+      "password-hint": "At least 8 characters, no spaces"
     },
     "devices": {
       "title": "Devices",
@@ -512,7 +560,8 @@
           "current-session": "Current session",
           "active-sessions": "Active sessions",
           "end-all-sessions": "Log out of all other sessions",
-          "end-this-session": "Log out of session"
+          "end-this-session": "Log out of session",
+          "empty": "No other active sessions"
         },
         "add-device": {
           "title": "Link a device to your account by scanning a QR code",
@@ -589,7 +638,8 @@
       "forbidden": "For security reasons you cannot end this session. Wait a few hours and try again.",
       "forbidden-rest": "For security reasons you cannot end the other sessions. Wait a few hours and try again.",
       "ok": "OK"
-    }
+    },
+    "actions": "Actions"
   },
   "banned": {
     "logout": "Sign out",
@@ -598,6 +648,8 @@
     "title": "You have been banned",
     "reason": "Reason",
     "reason-not-specified": "not specified",
-    "unban": "Unban"
+    "unban": "Unban",
+    "appeal": "Appeal the ban",
+    "rules": "Project rules"
   }
 }

@@ -15,9 +15,10 @@ const CartItemRemoveFromCart = reatomComponent<{ id: number }>(({ ctx, id }) => 
   return (
     <Button
       title={translate["cart.item.remove"]()}
+      aria-label={translate["cart.item.remove"]()}
       background="default"
       size="headless"
-      className="h-8 min-h-8 aspect-square"
+      className="h-11 min-h-11 w-11 aspect-square"
       onClick={() => cart.removeItem(ctx, id)}
       disabled={ctx.spy(cart.removeItem.statusesAtom).isPending}
     >
@@ -28,12 +29,12 @@ const CartItemRemoveFromCart = reatomComponent<{ id: number }>(({ ctx, id }) => 
 
 const CartItemUpdateSelectStatus = reatomComponent<{ id: number }>(({ ctx, id }) => {
   const checked = ctx.spy(cartDataItemIsSelectAtom(id));
-  console.log({ checked });
 
   return (
     <div className="absolute z-2 top-3 left-3">
       <Checkbox.Root
         id={String(id)}
+        aria-label={translate["cart.item.select"]()}
         checked={checked}
         onCheckedChange={(e) => storeItem.updateSelectedStatus(ctx, id)}
         className={checkboxVariant.root()}
@@ -88,7 +89,9 @@ export const CartItem = reatomComponent<CartItemProps>(({
             <Button
               background="default"
               size="headless"
-              className="h-8 min-h-8 aspect-square"
+              aria-label={translate["cart.item.change-recipient"]()}
+              title={translate["cart.item.change-recipient"]()}
+              className="h-11 min-h-11 w-11 aspect-square"
               onClick={() => changeLocalRecipient.openDialog(ctx, item)}
             >
               <Icon name="sprite:gift" className="size-4" />

@@ -35,9 +35,13 @@ const SocialCard = ({ social, value }: PlayerSocialsItem) => {
   }
 
   return (
-    <div className={socialCardVariant().base()} onClick={() => cb(value)}>
+    <button
+      type="button"
+      onClick={() => cb(value)}
+      className={socialCardVariant().base()}
+    >
       {renderContent()}
-    </div>
+    </button>
   )
 }
 

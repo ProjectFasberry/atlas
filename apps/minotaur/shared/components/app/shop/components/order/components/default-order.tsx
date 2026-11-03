@@ -9,9 +9,10 @@ import { AutoWidthInput } from "@/shared/ui/autowidth-input";
 import { defaultOrderEvents, isCopiedAtom, orderIsLoadingAtom } from "../models/default-order.model";
 import { onDisconnect } from "@reatom/framework";
 import { orderState } from "../../../models/store-order.model";
+import { Button } from "@/shared/ui/button";
 import { Dialog } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
-import { dialogVariant } from "@/shared/ui/dialog";
+import { DialogClose, dialogVariant } from "@/shared/ui/dialog";
 import { QrCode } from "@ark-ui/react/qr-code";
 import { qrCodeVariant } from "@/shared/ui/qr-code";
 import { translate } from "@/shared/locales/helpers";
@@ -101,32 +102,38 @@ const OrderDetails = reatomComponent(({ ctx }) => {
 const OrderQR = ({ url }: { url: string }) => {
   return (
     <Dialog.Root>
-      <Dialog.Trigger
-        className="flex items-center justify-center order-first sm:order-last
-        max-w-44 max-h-44 relative cursor-pointer p-0.5 group overflow-hidden rounded-md"
-      >
-        <div
-          className="flex items-center w-full h-full justify-center group-hover:opacity-100 opacity-0 absolute bg-black/60 z-[2]"
+      <div className="flex flex-col items-center gap-2">
+        <Dialog.Trigger
+          aria-label={translate["store.order.show-qr"]()}
+          className="flex items-center justify-center order-first sm:order-last
+          max-w-44 max-h-44 relative cursor-pointer p-0.5 group overflow-hidden rounded-md"
         >
-          <Icon name="sprite:eye" className="size-6" />
-        </div>
-        <QrCode.Root
-          defaultValue={url}
-          encoding={{ ecc: 'M' }}
-          className={qrCodeVariant.root({ className: "[--qr-code-size:196px]" })}
-        >
-          <QrCode.Frame className={qrCodeVariant.frame()}>
-            <QrCode.Pattern className={qrCodeVariant.pattern()} />
-          </QrCode.Frame>
-          <QrCode.Overlay className={qrCodeVariant.overlay()}>
-            <img src="/favicon.ico" alt="" draggable={false} />
-          </QrCode.Overlay>
-        </QrCode.Root>
-      </Dialog.Trigger>
+          <div
+            className="flex items-center w-full h-full justify-center group-hover:opacity-100 opacity-0 absolute bg-black/60 z-[2]"
+          >
+            <Icon name="sprite:eye" className="size-6" />
+          </div>
+          <QrCode.Root
+            defaultValue={url}
+            encoding={{ ecc: 'M' }}
+            className={qrCodeVariant.root({ className: "[--qr-code-size:196px]" })}
+          >
+            <QrCode.Frame className={qrCodeVariant.frame()}>
+              <QrCode.Pattern className={qrCodeVariant.pattern()} />
+            </QrCode.Frame>
+            <QrCode.Overlay className={qrCodeVariant.overlay()}>
+              <img src="/favicon.ico" alt="" draggable={false} />
+            </QrCode.Overlay>
+          </QrCode.Root>
+        </Dialog.Trigger>
+        <Typography className="text-xs text-neutral-400 text-center">
+          {translate["store.order.show-qr"]()}
+        </Typography>
+      </div>
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content("flex p-0 items-center justify-center")}>
+          <Dialog.Content className={dialogVariant.content("p-0 items-center justify-center")}>
             <QrCode.Root
               defaultValue={url}
               encoding={{ ecc: 'M' }}
@@ -139,6 +146,7 @@ const OrderQR = ({ url }: { url: string }) => {
                 <img src="/favicon.ico" alt="" draggable={false} />
               </QrCode.Overlay>
             </QrCode.Root>
+            <DialogClose />
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
@@ -178,11 +186,24 @@ const Order = reatomComponent(({ ctx }) => {
         </Typography>
         <div className="flex flex-col">
           <Typography className="font-semibold text-xl">
+            {translate["store.order.amount"]()}
+          </Typography>
+          <span className="text-2xl font-semibold">
+            {data.price} {data.asset}
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <Typography className="font-semibold text-xl">
             {translate["store.order.content"]()}
           </Typography>
           <span>{payload}</span>
         </div>
         <OrderDetails />
+        <a href={data.pay_url} target="_blank" rel="noreferrer" className="w-full sm:w-fit">
+          <Button background="positive" className="w-full sm:w-fit h-11 font-semibold">
+            {translate["store.order.pay"]()}
+          </Button>
+        </a>
       </div>
       <OrderQR url={data.pay_url} />
     </div>

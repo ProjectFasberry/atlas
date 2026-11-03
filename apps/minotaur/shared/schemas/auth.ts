@@ -12,21 +12,23 @@ export const nicknameSchema = z
 
 export const passwordSchema = z
 	.string()
-	.min(4, { error: "Пароль не должен содержать менее 4 символов" })
-	.max(32, { error: "Пароль не должен превышать 32 символа" })
+	.min(8, { error: "Пароль должен содержать не менее 8 символов" })
+	.max(72, { error: "Пароль не должен превышать 72 символа" })
 	.regex(/^\S*$/, {
 		error: "Пароль не должен содержать пробельные символы (пробелы, табы и т.д.)",
 	});
 
 export const referrerSchema = z.nullable(z.string());
 
+/** Login is permissive: legacy accounts may have shorter passwords than the register policy. */
 export const authSchema = z.object({
 	nickname: nicknameSchema,
-	password: z.string().min(6),
+	password: z.string().min(1, { error: "Введите пароль" }).max(72),
 });
 
 export const registerSchema = z.object({
-	...authSchema.shape,
+	nickname: nicknameSchema,
+	password: passwordSchema,
 	...z.object({
 		findout: z.string().min(1).max(128),
 		findoutType: z.enum(["custom", "referrer"]),

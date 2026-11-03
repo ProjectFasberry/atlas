@@ -1,5 +1,6 @@
 import { reatomComponent, useAtom } from "@reatom/npm-react"
 import { Button } from "@/shared/ui/button"
+import { Link } from "@/shared/components/config/link/link"
 import { Typography } from "@/shared/ui/typography"
 import { dayjs } from "@/shared/lib/dayjs"
 import { createPageModel } from "@/shared/lib/events"
@@ -55,6 +56,18 @@ const Banned = reatomComponent(({ ctx }) => {
         </div>
         <div className="w-full *:w-full">
           <BannedActionButton />
+        </div>
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+          <Link href="/support" className="w-full">
+            <Button background="default" className="w-full font-semibold">
+              {translate["banned.appeal"]()}
+            </Button>
+          </Link>
+          <a href="/rules" target="_blank" rel="noreferrer" className="w-full">
+            <Button background="default" className="w-full font-semibold">
+              {translate["banned.rules"]()}
+            </Button>
+          </a>
         </div>
       </div>
     </div>

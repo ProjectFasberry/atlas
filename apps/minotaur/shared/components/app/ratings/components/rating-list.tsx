@@ -18,7 +18,7 @@ import { Avatar } from "../../../../ui/avatar";
 import { Link } from "@/shared/components/config/link/link";
 import { dayjs } from "@/shared/lib/dayjs"
 import { PageLoader } from "@/shared/ui/page-loader";
-import { Noop } from "@/shared/ui/noop";
+import { Typography } from "@/shared/ui/typography";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { createLink } from "@/shared/components/config/link/link.model";
 import { translate } from "@/shared/locales/helpers";
@@ -232,7 +232,8 @@ const RatingsFilter = reatomComponent(({ ctx }) => {
 
   return (
     <Button
-      className='bg-neutral-800 hover:bg-neutral-700 aspect-square text-neutral-400 h-8 w-8 p-1'
+      aria-label={translate["ratings.sort"]()}
+      className='bg-neutral-800 hover:bg-neutral-700 aspect-square text-neutral-400 h-11 w-11 p-1'
       onClick={() => ratingsState.filters.asc(ctx, (state) => !state)}
     >
       {current ? <Icon name="sprite:arrow-down" /> : <Icon name="sprite:arrow-up" />}
@@ -315,7 +316,13 @@ export const Ratings = reatomComponent(({ ctx }) => {
   const error = ctx.spy(ratings.fetch.errorAtom);
   if (error) return <ErrorBlock title={error.message} />
 
-  if (!ctx.spy(ratingsState.data)) return <Noop />
+  if (!ctx.spy(ratingsState.data)) {
+    return (
+      <Typography color="gray" className="text-lg">
+        {translate["ratings.empty"]()}
+      </Typography>
+    )
+  }
 
   return (
     <>

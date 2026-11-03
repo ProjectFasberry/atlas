@@ -35,7 +35,7 @@ export const Footer = reatomComponent(({ ctx }) => {
   return (
     <div
       className="
-        flex items-center justify-center w-full pb-24 h-full lg:min-h-40 p-3 lg:p-4
+        flex items-center justify-center w-full pb-[calc(6rem+env(safe-area-inset-bottom))] h-full lg:min-h-40 p-3 lg:p-4
         bg-gradient-to-br from-green-800/40 via-green-800/50 to-green-800/40 border-t border-green-700/20
         lg:backdrop-blur-md
       "

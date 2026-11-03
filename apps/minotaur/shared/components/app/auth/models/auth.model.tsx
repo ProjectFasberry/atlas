@@ -24,6 +24,7 @@ export const authState = atom(null, "authState").pipe(
       withAssign((_, name) => ({
         nickname: atom<string>("", `${name}.nickname`).pipe(withReset()),
         password: atom<string>("", `${name}.password`).pipe(withReset()),
+        passwordRepeat: atom<string>("", `${name}.passwordRepeat`).pipe(withReset()),
         // Must be refererr nickname or other findout info
         findout: atom<Maybe<string>>(undefined, `${name}.findout`).pipe(withReset()),
         findoutType: atom<AuthFindoutType | null>(null, `${name}.findoutType`).pipe(withReset()),
@@ -69,6 +70,7 @@ export const auth = atom(null, "auth").pipe(
     resetAuthState: action((ctx) => {
       authState.fields.nickname.reset(ctx);
       authState.fields.password.reset(ctx);
+      authState.fields.passwordRepeat.reset(ctx);
       authState.fields.findout.reset(ctx);
       authState.fields.findoutType.reset(ctx);
       authState.fields.acceptRules.reset(ctx);

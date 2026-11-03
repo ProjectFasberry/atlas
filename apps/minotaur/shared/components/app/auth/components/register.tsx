@@ -33,7 +33,7 @@ const FindoutReferrerInput = reatomComponent(({ ctx }) => (
     value={ctx.spy(authState.fields.findout) ?? ""}
     onClick={() => auth.resetError(ctx)}
     onChange={e => authState.fields.findout(ctx, e.target.value)}
-    maxLength={32}
+    maxLength={16}
   />
 ), "FindoutReferrerInput")
 const FindoutOtherInput = reatomComponent(({ ctx }) => (
@@ -115,6 +115,34 @@ const FindoutComponent = reatomComponent(({ ctx }) => {
   return FINDOUT_COMPONENTS?.[data] ?? null;
 }, "FindoutComponent")
 
+const PasswordRepeatInput = reatomComponent(({ ctx }) => (
+  <Input
+    type="password"
+    autoComplete="new-password"
+    aria-label={translate["auth.register.placeholders.password-repeat"]()}
+    placeholder={translate["auth.register.placeholders.password-repeat"]()}
+    value={ctx.spy(authState.fields.passwordRepeat)}
+    onClick={() => auth.resetError(ctx)}
+    onChange={e => authState.fields.passwordRepeat(ctx, e.target.value)}
+    maxLength={72}
+  />
+), "PasswordRepeatInput")
+
+const PasswordHint = reatomComponent(({ ctx }) => {
+  const password = ctx.spy(authState.fields.password)
+  const repeat = ctx.spy(authState.fields.passwordRepeat)
+  const mismatch = repeat.length > 0 && password !== repeat
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-neutral-400">{translate["auth.register.password-hint"]()}</span>
+      {mismatch && (
+        <span className="text-xs text-red">{translate["auth.register.password-mismatch"]()}</span>
+      )}
+    </div>
+  )
+}, "PasswordHint")
+
 const PrivacyTerms = reatomComponent(({ ctx }) => {
   return (
     <div className="inline-flex gap-2 items-start">
@@ -151,8 +179,13 @@ const PrivacyTerms = reatomComponent(({ ctx }) => {
 const RegisterStartInput = () => (
   <>
     <div className="flex flex-col gap-2 w-full">
-      <NicknameInput />
+      <div className="flex flex-col gap-1 w-full">
+        <NicknameInput />
+        <span className="text-xs text-neutral-400">{translate["auth.register.nickname-hint"]()}</span>
+      </div>
       <PasswordInput />
+      <PasswordRepeatInput />
+      <PasswordHint />
       <div className="flex flex-col gap-2 w-full">
         <FindoutOptions />
         <FindoutComponent />

@@ -14,7 +14,12 @@ import { atom } from "@reatom/framework"
 import { MasonryGrid } from "@/shared/ui/masonry-grid"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { ErrorBlock } from "@/shared/ui/error-block"
-import { Noop } from "@/shared/ui/noop"
+
+const LandsEmpty = () => (
+  <Typography color="gray" className="text-lg">
+    {translate["lands.empty"]()}
+  </Typography>
+)
 
 const landCardVariants = tv({
   base: `flex items-start justify-between gap-6 duration-150 relative w-full rounded-xl p-3 sm:p-4 lg:p-6 bg-neutral-900`,
@@ -112,7 +117,7 @@ export const LandsListShorted = reatomComponent(({ ctx }) => {
   if (error) return <ErrorBlock title={error.message} />
 
   const data = ctx.spy(lands.fetch.dataAtom)
-  if (!data) return <Noop />
+  if (!data || data.length === 0) return <LandsEmpty />
 
   return (
     <div className="flex flex-col w-full gap-2">
@@ -139,7 +144,7 @@ export const LandsList = reatomComponent(({ ctx }) => {
   if (error) return <ErrorBlock title={error.message} />
 
   const data = ctx.spy(lands.fetch.dataAtom)
-  if (!data) return <Noop />
+  if (!data || data.length === 0) return <LandsEmpty />
 
   return (
     <MasonryGrid

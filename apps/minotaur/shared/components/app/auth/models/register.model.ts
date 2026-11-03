@@ -23,6 +23,14 @@ const fieldsOnlyRegisterSchema = z.intersection(
   z.object({ acceptRules: z.literal(true) })
 )
 
+/** The findout question is optional for the player: an empty answer is stored as a dash. */
+const normalizeFindout = (findout: Maybe<string>, findoutType: AuthFindoutType | null) => {
+  const answer = findout?.trim() || "-"
+  const type = answer === "-" ? "custom" : (findoutType ?? "custom")
+
+  return { findout: answer, findoutType: type }
+}
+
 export const registerState = atom(null, "registerState").pipe(
   withAssign((_, name) => ({
     type: atom<AuthRegisterType>("start-input", `${name}.type`).pipe(withReset()),
@@ -31,15 +39,24 @@ export const registerState = atom(null, "registerState").pipe(
 export const register = atom(null, "register").pipe(
   withAssign((_, name) => ({
     validators: {
-      startInputValidate: atom((ctx): boolean =>
-        fieldsOnlyRegisterSchema.safeParse({
+      startInputValidate: atom((ctx): boolean => {
+        if (ctx.spy(authState.fields.password) !== ctx.spy(authState.fields.passwordRepeat)) {
+          return false
+        }
+
+        const { findout, findoutType } = normalizeFindout(
+          ctx.spy(authState.fields.findout),
+          ctx.spy(authState.fields.findoutType),
+        )
+
+        return fieldsOnlyRegisterSchema.safeParse({
           nickname: ctx.spy(authState.fields.nickname),
           password: ctx.spy(authState.fields.password),
-          findout: ctx.spy(authState.fields.findout),
-          findoutType: ctx.spy(authState.fields.findoutType),
+          findout,
+          findoutType,
           acceptRules: ctx.spy(authState.fields.acceptRules)
         }).success
-      ),
+      }),
       confirmValidate: atom((): boolean => false)
     },
     cb: {
@@ -77,11 +94,16 @@ export const register = atom(null, "register").pipe(
     submit: reatomAsync(async (ctx, token: string | null) => {
       authState.globalError.reset(ctx)
 
+      const { findout, findoutType } = normalizeFindout(
+        ctx.get(authState.fields.findout),
+        ctx.get(authState.fields.findoutType),
+      )
+
       const base = {
         nickname: ctx.get(authState.fields.nickname),
         password: ctx.get(authState.fields.password),
-        findout: ctx.get(authState.fields.findout),
-        findoutType: ctx.get(authState.fields.findoutType)
+        findout,
+        findoutType
       }
 
       const { success, error, data } = registerSchema.safeParse(base);
