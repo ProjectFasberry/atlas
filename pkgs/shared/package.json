@@ -1,14 +1,16 @@
 {
-  "name": "@repo/shared",
-  "version": "1.0.0",
-  "private": true,
-  "license": "MIT",
-  "type": "module",
-  "scripts": {
-    "openapi:dev": "bun run openapi-typescript --redocly=./redocly.dev.yml",
-    "openapi:prod": "bun run openapi-typescript --redocly=./redocly.prod.yml"
-  },
-  "devDependencies": {
-    "openapi-typescript": "7.13.0"
-  }
+	"name": "@repo/shared",
+	"version": "1.0.0",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"openapi": "node scripts/openapi.mjs --stage prod",
+		"openapi:dev": "node scripts/openapi.mjs --stage dev",
+		"openapi:prod": "node scripts/openapi.mjs --stage prod",
+		"openapi:check": "node scripts/openapi.mjs --stage prod --check"
+	},
+	"devDependencies": {
+		"openapi-typescript": "7.13.0"
+	}
 }

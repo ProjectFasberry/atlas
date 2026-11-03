@@ -1158,6 +1158,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/launcher/session/ticket": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue a join ticket for the launcher */
+        post: operations["postLauncherSessionTicket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/launcher/session/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify and consume a join ticket (proxy gate) */
+        post: operations["postLauncherSessionVerify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/launcher/session/reconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify a reconnect pass for the proxy gate */
+        post: operations["postLauncherSessionReconnect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/launcher": {
         parameters: {
             query?: never;
@@ -1376,6 +1427,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/avatars/{file}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Player head image */
+        get: operations["getAvatarsByFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/static/manifest": {
         parameters: {
             query?: never;
@@ -1387,6 +1455,227 @@ export interface paths {
         get: operations["getStaticManifest"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/releases/download/{platform}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download the latest launcher build for a platform */
+        get: operations["getReleasesDownloadByPlatform"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/releases/{channel}/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest launcher release */
+        get: operations["getReleasesByChannelLatest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/releases/{channel}/{version}/{platform}/{file}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download a launcher release artifact */
+        get: operations["getReleasesByChannelByVersionByPlatformByFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Yggdrasil API metadata */
+        get: operations["getYggdrasil"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/authserver/authenticate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Exchange a launcher session for a game token */
+        post: operations["postYggdrasilAuthserverAuthenticate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/authserver/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh a game token */
+        post: operations["postYggdrasilAuthserverRefresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/authserver/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate a game token */
+        post: operations["postYggdrasilAuthserverValidate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/authserver/invalidate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invalidate a game token */
+        post: operations["postYggdrasilAuthserverInvalidate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/authserver/signout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign a player out (launcher owns sessions) */
+        post: operations["postYggdrasilAuthserverSignout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/sessionserver/session/minecraft/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record a client join for hasJoined */
+        post: operations["postYggdrasilSessionserverSessionMinecraftJoin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/sessionserver/session/minecraft/hasJoined": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Session check used by the proxy */
+        get: operations["getYggdrasilSessionserverSessionMinecraftHasJoined"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/sessionserver/session/minecraft/profile/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Profile by UUID */
+        get: operations["getYggdrasilSessionserverSessionMinecraftProfileById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/yggdrasil/api/profiles/minecraft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bulk profile lookup */
+        post: operations["postYggdrasilApiProfilesMinecraft"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1579,6 +1868,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/client/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change the launcher account password */
+        patch: operations["patchAuthClientPassword"];
+        trace?: never;
+    };
     "/auth/client/logout": {
         parameters: {
             query?: never;
@@ -1641,40 +1947,6 @@ export interface paths {
         get: operations["getAuthValidate-session"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/restore/validate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Validate restore */
-        post: operations["postAuthRestoreValidate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/restore/set-new-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Set new password */
-        post: operations["postAuthRestoreSet-new-password"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3052,7 +3324,6 @@ export interface operations {
                                 lower_case_nickname: string;
                                 uuid: string;
                                 created_at: Record<string, never> | string | number;
-                                premium_uuid: (string | null) | null;
                                 avatar: string;
                                 player: ({
                                     id: number;
@@ -3329,15 +3600,15 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                     password: string;
                 };
                 "application/x-www-form-urlencoded": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                     password: string;
                 };
                 "multipart/form-data": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                     password: string;
                 };
             };
@@ -3370,19 +3641,19 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                 } & {
                     /** @default false */
                     strict: boolean;
                 };
                 "application/x-www-form-urlencoded": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                 } & {
                     /** @default false */
                     strict: boolean;
                 };
                 "multipart/form-data": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                 } & {
                     /** @default false */
                     strict: boolean;
@@ -3428,7 +3699,6 @@ export interface operations {
                             lower_case_nickname: string;
                             uuid: string;
                             created_at: Record<string, never> | string | number;
-                            premium_uuid: (string | null) | null;
                             avatar: string;
                             player: ({
                                 id: number;
@@ -5067,6 +5337,228 @@ export interface operations {
             };
         };
     };
+    postLauncherSessionTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    server?: (string | null) | null;
+                };
+                "application/x-www-form-urlencoded": {
+                    server?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    server?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            ticket: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TOO_MANY_REQUESTS
+                         * @enum {string}
+                         */
+                        error: "TOO_MANY_REQUESTS";
+                    };
+                };
+            };
+        };
+    };
+    postLauncherSessionVerify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ticket: string;
+                    nickname: string;
+                    server?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    ticket: string;
+                    nickname: string;
+                    server?: string;
+                };
+                "multipart/form-data": {
+                    ticket: string;
+                    nickname: string;
+                    server?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postLauncherSessionReconnect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    nickname: string;
+                    server?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    nickname: string;
+                    server?: string;
+                };
+                "multipart/form-data": {
+                    nickname: string;
+                    server?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     getLauncher: {
         parameters: {
             query?: never;
@@ -5445,6 +5937,18 @@ export interface operations {
             };
         };
     };
+    getAvatarsByFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                file: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
     getStaticManifest: {
         parameters: {
             query?: never;
@@ -5453,6 +5957,244 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: never;
+    };
+    getReleasesDownloadByPlatform: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                platform: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getReleasesByChannelLatest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                channel: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getReleasesByChannelByVersionByPlatformByFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                channel: string;
+                version: string;
+                platform: string;
+                file: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getYggdrasil: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postYggdrasilAuthserverAuthenticate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postYggdrasilAuthserverRefresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+                "multipart/form-data": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    postYggdrasilAuthserverValidate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+                "multipart/form-data": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    postYggdrasilAuthserverInvalidate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+                "multipart/form-data": {
+                    accessToken: string;
+                    clientToken?: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    postYggdrasilAuthserverSignout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    username: string;
+                    password: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    username: string;
+                    password: string;
+                };
+                "multipart/form-data": {
+                    username: string;
+                    password: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    postYggdrasilSessionserverSessionMinecraftJoin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    accessToken: string;
+                    selectedProfile: string | {
+                        id: string;
+                        name?: string;
+                    };
+                    serverId: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    accessToken: string;
+                    selectedProfile: string | {
+                        id: string;
+                        name?: string;
+                    };
+                    serverId: string;
+                };
+                "multipart/form-data": {
+                    accessToken: string;
+                    selectedProfile: string | {
+                        id: string;
+                        name?: string;
+                    };
+                    serverId: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    getYggdrasilSessionserverSessionMinecraftHasJoined: {
+        parameters: {
+            query: {
+                username: string;
+                serverId: string;
+                ip?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getYggdrasilSessionserverSessionMinecraftProfileById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postYggdrasilApiProfilesMinecraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string[];
+                "application/x-www-form-urlencoded": string[];
+                "multipart/form-data": string[];
+            };
+        };
         responses: never;
     };
     postAuthLoginBasic: {
@@ -5488,6 +6230,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             nickname: string;
+                            uuid: string;
                         };
                     };
                 };
@@ -5503,7 +6246,7 @@ export interface operations {
                          * @default NOT_EXISTS
                          * @enum {string}
                          */
-                        error: "NOT_EXISTS" | "PASSWORD_OR_LOGIN_INCORRECT";
+                        error: "NOT_EXISTS" | "PASSWORD_OR_LOGIN_INCORRECT" | "TOKEN_IS_NOT_PROVIDED" | "TOKEN_NOT_FOUND" | "CAP_UNAVAILABLE";
                     };
                 };
             };
@@ -5515,6 +6258,21 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+            /** @description Response for status 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TOO_MANY_REQUESTS
+                         * @enum {string}
+                         */
+                        error: "TOO_MANY_REQUESTS";
                     };
                 };
             };
@@ -5857,6 +6615,8 @@ export interface operations {
                     "application/json": {
                         data: {
                             nickname: string;
+                            uuid: string;
+                            avatar: string;
                             token: string;
                             /** Format: date-time */
                             expires_at: string;
@@ -5879,6 +6639,21 @@ export interface operations {
                     };
                 };
             };
+            /** @description Response for status 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TOO_MANY_REQUESTS
+                         * @enum {string}
+                         */
+                        error: "TOO_MANY_REQUESTS";
+                    };
+                };
+            };
         };
     };
     getAuthClientValidate: {
@@ -5890,6 +6665,85 @@ export interface operations {
         };
         requestBody?: never;
         responses: never;
+    };
+    patchAuthClientPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    currentPass: string;
+                    newPass: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    currentPass: string;
+                    newPass: string;
+                };
+                "multipart/form-data": {
+                    currentPass: string;
+                    newPass: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default PASSWORD_OR_LOGIN_INCORRECT
+                         * @enum {string}
+                         */
+                        error: "PASSWORD_OR_LOGIN_INCORRECT" | "PASSWORD_IS_UNSAFE";
+                    };
+                };
+            };
+            /** @description Response for status 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "NOT_FOUND";
+                    };
+                };
+            };
+        };
     };
     postAuthClientLogout: {
         parameters: {
@@ -5956,28 +6810,25 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                     password: string;
                     findout: string;
                     /** @enum {string} */
                     findoutType: "custom" | "referrer";
-                    hash: string;
                 };
                 "application/x-www-form-urlencoded": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                     password: string;
                     findout: string;
                     /** @enum {string} */
                     findoutType: "custom" | "referrer";
-                    hash: string;
                 };
                 "multipart/form-data": {
-                    nickname: string & (unknown & unknown);
+                    nickname: string;
                     password: string;
                     findout: string;
                     /** @enum {string} */
                     findoutType: "custom" | "referrer";
-                    hash: string;
                 };
             };
         };
@@ -6006,7 +6857,7 @@ export interface operations {
                          * @default USER_EXISTS
                          * @enum {string}
                          */
-                        error: "USER_EXISTS" | "PASSWORD_IS_UNSAFE" | "AUTHORIZATION_DISABLED" | "IP_RESTRICTIONS";
+                        error: "USER_EXISTS" | "PASSWORD_IS_UNSAFE" | "AUTHORIZATION_DISABLED" | "IP_RESTRICTIONS" | "TOKEN_IS_NOT_PROVIDED" | "TOKEN_NOT_FOUND" | "CAP_UNAVAILABLE";
                     };
                 };
             };
@@ -6044,39 +6895,6 @@ export interface operations {
                 };
             };
         };
-    };
-    postAuthRestoreValidate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    nickname: string;
-                    hash: string;
-                };
-            };
-        };
-        responses: never;
-    };
-    "postAuthRestoreSet-new-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    newPassword: string;
-                };
-            };
-        };
-        responses: never;
     };
     getAuthSessionList: {
         parameters: {
@@ -8134,6 +8952,21 @@ export interface operations {
                     };
                 };
             };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "NOT_FOUND";
+                    };
+                };
+            };
             /** @description Response for status 500 */
             500: {
                 headers: {
@@ -8180,6 +9013,36 @@ export interface operations {
                     "application/json": {
                         /** @constant */
                         data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default PASSWORD_OR_LOGIN_INCORRECT
+                         * @enum {string}
+                         */
+                        error: "PASSWORD_OR_LOGIN_INCORRECT" | "PASSWORD_IS_UNSAFE";
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "NOT_FOUND";
                     };
                 };
             };
