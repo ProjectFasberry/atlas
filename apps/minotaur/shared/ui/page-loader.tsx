@@ -1,4 +1,5 @@
 import { getStaticImage } from "../lib/helpers"
+import { translate } from "@/shared/locales/helpers"
 
 const loaderImage = getStaticImage("gifs/loading.webp")
 
@@ -9,7 +10,7 @@ export const PageLoader = () => {
         src={loaderImage}
         width={96}
         height={96}
-        alt="Загрузка..."
+        alt={translate["shared.loading"]()}
         loading="eager"
       />
     </div>

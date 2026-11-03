@@ -82,22 +82,23 @@ type ItemPriceProps = {
 
 export const ItemPrice = reatomComponent<ItemPriceProps>(({ ctx, price, currency }) => {
   const currencies = getCurrencies(ctx);
+  const currencyInfo = currencies[currency];
 
   return (
     <div className="flex items-center gap-1 text-base select-none text-nowrap font-semibold">
       <Typography className={itemPriceVariant(price.variant)}>
         {price.value}
       </Typography>
-      {currencies[currency].img ? (
+      {currencyInfo?.img ? (
         <img
-          src={currencies[currency].img}
+          src={currencyInfo.img}
           draggable={false}
-          alt={currencies[currency].symbol}
+          alt={currencyInfo.symbol}
           width={24}
           height={24}
         />
       ) : (
-        <span>{currencies[currency].symbol}</span>
+        <span>{currencyInfo?.symbol ?? currency}</span>
       )}
     </div>
   )

@@ -49,7 +49,8 @@
 - `export const dynamic = 'force-dynamic'` - the sidebar and permissions depend on the database
   and on a cookie;
 - the theme class is rendered on `<html>` by the server from the `theme` cookie, so there is
-  no flash and no script before paint;
+  no flash and no script before paint; the same value seeds `$theme` in the Reatom context
+  (`ReatomProvider initialTheme`), so the first client render matches the SSR markup;
 - `RootProvider theme={{ enabled: false }}` - a custom theme instead of the Fumadocs one;
 - `DocsLayout tree={await getPageTree()}` with `nav.mode: 'top'` and a custom `Separator`.
 

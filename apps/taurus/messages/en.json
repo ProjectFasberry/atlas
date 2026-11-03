@@ -109,14 +109,13 @@
         "download": "The server is only reachable through the Fasberry launcher. Download it and sign in with the nickname you used to register.",
         "download-windows": "Download for Windows",
         "download-macos": "Download for macOS",
-        "download-hint": "dev build, 2.3 MB, Windows 10/11 x64. The macOS build is coming later.",
-        "download-macos-soon": "macOS - soon"
+        "download-hint": "Windows 10/11 x64 and macOS (Apple Silicon). The launcher updates itself after installation."
       }
     }
   },
   "error-page": {
-    "title": "Disconnected",
     "404": "Could not find the requested resource.",
+    "title": "Disconnected",
     "to-safety-host": "Return to a safe place"
   },
   "pages": {

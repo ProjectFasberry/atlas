@@ -109,14 +109,13 @@
         "download": "Заходить на сервер можно только через лаунчер Fasberry. Скачай его и войди под ником, который указал при регистрации.",
         "download-windows": "Скачать для Windows",
         "download-macos": "Скачать для macOS",
-        "download-hint": "dev-сборка, 2.3 МБ, Windows 10/11 x64. Версия для macOS появится позже.",
-        "download-macos-soon": "macOS - скоро"
+        "download-hint": "Windows 10/11 x64 и macOS (Apple Silicon). После установки лаунчер обновляется сам."
       }
     }
   },
   "error-page": {
-    "title": "Отключено",
     "404": "Не удалось найти нужный ресурс.",
+    "title": "Отключено",
     "to-safety-host": "Вернуться в безопасное место"
   },
   "pages": {

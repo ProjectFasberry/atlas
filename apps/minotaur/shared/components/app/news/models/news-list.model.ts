@@ -1,7 +1,7 @@
 import { logError } from "@/shared/lib/log"
 import {
   action, atom, batch, reatomAsync, reatomMap, sleep,
-  withAssign, withCache, withConcurrency, withDataAtom, withErrorAtom, withStatusesAtom
+  withAbort, withAssign, withCache, withConcurrency, withDataAtom, withErrorAtom, withStatusesAtom
 } from "@reatom/framework"
 import { getNews, type PublicNewsParams } from "./news.model"
 import { createViewerModel } from "@/shared/models/shared.model"
@@ -28,6 +28,7 @@ export const newsState = atom(null, "newsState").pipe(
             onChangeEvent: action(async (ctx, e: React.ChangeEvent<HTMLInputElement>) => {
               newsState.filters.searchQuery(ctx, e.target.value);
               await ctx.schedule(() => sleep(DEFAULT_SOFT_DELAY))
+              news.reset(ctx)
               news.refetchAll(ctx)
             }, `${name}.onChangeEvent`).pipe(
               withConcurrency()
@@ -42,6 +43,14 @@ export const newsState = atom(null, "newsState").pipe(
 
 export const news = atom(null, "news").pipe(
   withAssign((_, name) => ({
+    reset: action((ctx) => {
+      news.fetch.abort(ctx)
+      news.fetch.cacheAtom.reset(ctx)
+      newsState.allData(ctx, new Map())
+      newsState.allOldData(ctx, new Map())
+      newsState.allMeta(ctx, null)
+      newsState.filters.endCursor(ctx, null)
+    }),
     refetchAll: action((ctx) => {
       news.fetch.cacheAtom.reset(ctx)
       news.fetch(ctx)
@@ -74,7 +83,8 @@ export const news = atom(null, "news").pipe(
       withDataAtom(null),
       withStatusesAtom(),
       withCache({ swr: false }),
-      withErrorAtom()
+      withErrorAtom(),
+      withAbort()
     ),
     onIsViewEvent: action((ctx) => {
       const meta = ctx.get(newsState.allMeta)
@@ -93,7 +103,10 @@ export const news = atom(null, "news").pipe(
   }))
 )
 
-newsState.filters.asc.onChange((ctx) => news.refetchAll(ctx))
+newsState.filters.asc.onChange((ctx) => {
+  news.reset(ctx)
+  news.refetchAll(ctx)
+})
 newsStateInView.onChange((ctx, state) => state && news.onIsViewEvent(ctx))
 
 export const newsNotFoundTitleAtom = atom((ctx) => {

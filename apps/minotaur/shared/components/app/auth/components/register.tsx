@@ -2,13 +2,12 @@ import { NicknameInput, PasswordInput } from "./auth"
 import { reatomComponent } from "@reatom/npm-react"
 import { auth, type AuthFindoutType, authState } from "../models/auth.model"
 import { Input } from "@/shared/ui/input"
-import { type JSX, type ReactNode, useState } from "react"
+import { type JSX, type ReactNode } from "react"
 import { Button } from "@/shared/ui/button"
-import { SeedPhrase, SeedPhraseFooter, SeedPhraseHeader, SeedPhraseBody } from "@/shared/ui/seed-phrase"
 import { Icon } from "@/shared/ui/icon"
 import {
   type AuthRegisterType,
-  registerNavigationModel, register, registerSeedPhraseModel, registerState, findoutSelectedTypeAtom,
+  registerNavigationModel, register, registerState, findoutSelectedTypeAtom,
   createFindoutOptions
 } from "../models/register.model"
 import { IconLoader } from "@/shared/ui/icon-loader"
@@ -34,7 +33,7 @@ const FindoutReferrerInput = reatomComponent(({ ctx }) => (
     value={ctx.spy(authState.fields.findout) ?? ""}
     onClick={() => auth.resetError(ctx)}
     onChange={e => authState.fields.findout(ctx, e.target.value)}
-    maxLength={32}
+    maxLength={16}
   />
 ), "FindoutReferrerInput")
 const FindoutOtherInput = reatomComponent(({ ctx }) => (
@@ -116,6 +115,34 @@ const FindoutComponent = reatomComponent(({ ctx }) => {
   return FINDOUT_COMPONENTS?.[data] ?? null;
 }, "FindoutComponent")
 
+const PasswordRepeatInput = reatomComponent(({ ctx }) => (
+  <Input
+    type="password"
+    autoComplete="new-password"
+    aria-label={translate["auth.register.placeholders.password-repeat"]()}
+    placeholder={translate["auth.register.placeholders.password-repeat"]()}
+    value={ctx.spy(authState.fields.passwordRepeat)}
+    onClick={() => auth.resetError(ctx)}
+    onChange={e => authState.fields.passwordRepeat(ctx, e.target.value)}
+    maxLength={72}
+  />
+), "PasswordRepeatInput")
+
+const PasswordHint = reatomComponent(({ ctx }) => {
+  const password = ctx.spy(authState.fields.password)
+  const repeat = ctx.spy(authState.fields.passwordRepeat)
+  const mismatch = repeat.length > 0 && password !== repeat
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-neutral-400">{translate["auth.register.password-hint"]()}</span>
+      {mismatch && (
+        <span className="text-xs text-red">{translate["auth.register.password-mismatch"]()}</span>
+      )}
+    </div>
+  )
+}, "PasswordHint")
+
 const PrivacyTerms = reatomComponent(({ ctx }) => {
   return (
     <div className="inline-flex gap-2 items-start">
@@ -152,8 +179,13 @@ const PrivacyTerms = reatomComponent(({ ctx }) => {
 const RegisterStartInput = () => (
   <>
     <div className="flex flex-col gap-2 w-full">
-      <NicknameInput />
+      <div className="flex flex-col gap-1 w-full">
+        <NicknameInput />
+        <span className="text-xs text-neutral-400">{translate["auth.register.nickname-hint"]()}</span>
+      </div>
       <PasswordInput />
+      <PasswordRepeatInput />
+      <PasswordHint />
       <div className="flex flex-col gap-2 w-full">
         <FindoutOptions />
         <FindoutComponent />
@@ -162,67 +194,6 @@ const RegisterStartInput = () => (
     <PrivacyTerms />
   </>
 )
-
-const RegisterSeedPhraseConfirm = reatomComponent(({ ctx }) => {
-  const words = ctx.spy(registerSeedPhraseModel.state.repeatWords)
-  const [isHidden, setIsHidden] = useState(true);
-
-  return (
-    <SeedPhrase
-      words={words}
-      isEditable={true}
-      isHidden={isHidden}
-      className="gap-6"
-      onUpdateWord={(idx, value) => registerSeedPhraseModel.events.updateRepeatWords(ctx, value, idx)}
-    >
-      <SeedPhraseHeader onChangeVisibilityStatus={v => setIsHidden(v)}>
-        <p className="text-neutral-400">
-          {translate["auth.register.seed-phrase.startTitle"]()}
-        </p>
-      </SeedPhraseHeader>
-      <SeedPhraseBody />
-    </SeedPhrase>
-  )
-}, "RegisterSeedPhraseConfirm")
-
-const RegisterSeedPhraseSave = reatomComponent(({ ctx }) => {
-  const words = ctx.spy(registerSeedPhraseModel.state.words)
-  const [isHidden, setIsHidden] = useState(true);
-
-  return (
-    <div className="flex flex-col w-full gap-4">
-      <SeedPhrase
-        isEditable={false}
-        words={words}
-        isHidden={isHidden}
-        className="gap-6"
-      >
-        <SeedPhraseHeader onChangeVisibilityStatus={v => setIsHidden(v)}>
-          <p className="text-neutral-400">
-            {translate["auth.register.seed-phrase.saveTitle"]()}
-          </p>
-        </SeedPhraseHeader>
-        <SeedPhraseBody />
-        <SeedPhraseFooter>
-          <div className="flex items-center justify-end w-full">
-            <Button
-              type="button"
-              background="default"
-              className="gap-2"
-              onClick={() => register.downloadPhrase(ctx)}
-            >
-              {translate["auth.register.seed-phrase.download"]()}
-              <Icon name='sprite:download' className="size-4" />
-            </Button>
-          </div>
-          <p className="text-neutral-400 text-xs text-center">
-            {translate["auth.register.seed-phrase.warning"]()}
-          </p>
-        </SeedPhraseFooter>
-      </SeedPhrase>
-    </div>
-  )
-}, "RegisterSeedPhraseSave")
 
 const RegisterConfirmLoading = () => {
   return (
@@ -242,8 +213,6 @@ const RegisterConfirmLoading = () => {
 const RegisterConfirmError = reatomComponent(({ ctx }) => {
   const handleToBack = () => {
     spawn(ctx, (spawnCtx) => {
-      registerNavigationModel.back(spawnCtx)
-      registerNavigationModel.back(spawnCtx)
       registerNavigationModel.back(spawnCtx)
     })
   }
@@ -352,8 +321,6 @@ const RegisterNavigation = reatomComponent(({ ctx }) => {
 
 const STEP_COMPONENTS: Record<AuthRegisterType, ReactNode> = {
   "start-input": <RegisterStartInput />,
-  "seed-phrase-save": <RegisterSeedPhraseSave />,
-  "seed-phrase-confirm": <RegisterSeedPhraseConfirm />,
   "confirm": <RegisterConfirm />
 };
 

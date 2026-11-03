@@ -83,16 +83,21 @@ const LoginQRRetry = reatomComponent(({ ctx }) => {
   };
 
   return (
-    <div className="flex flex-col w-full items-center justify-center">
+    <div className="flex flex-col w-full items-center justify-center gap-3">
+      <p className="text-sm text-neutral-400 text-center">
+        {translate["auth.login.qr.expired"]()}
+      </p>
       <button
         type="button"
         disabled={ctx.spy(login.qr.generate.statusesAtom).isPending}
         onClick={handleClick}
-        className="group cursor-pointer active:scale-[0.98] duration-150"
+        aria-label={translate["auth.login.qr.refresh"]()}
+        className="group cursor-pointer active:scale-[0.98] duration-150 flex items-center gap-2"
       >
         <div ref={iconRef}>
-          <Icon name='sprite:refresh' className="size-[42px] text-neutral-200" />
+          <Icon name='sprite:refresh' className="size-[32px] text-neutral-200" />
         </div>
+        <span className="text-sm font-semibold">{translate["auth.login.qr.refresh"]()}</span>
       </button>
     </div>
   )
@@ -119,11 +124,31 @@ const LoginQRConnected = reatomComponent(({ ctx }) => {
   )
 }, "LoginQRConnected")
 
-const LoginQRDeclined = () => (
-  <div className="flex flex-col w-full items-center justify-center gap-4">
+const LoginQRDeclined = reatomComponent(({ ctx }) => (
+  <div className="flex flex-col w-full items-center justify-center gap-3">
     <Icon name="sprite:hand-stop" className="size-[32px] text-red-600" />
+    <p className="text-sm text-neutral-400 text-center">
+      {translate["auth.login.qr.declined"]()}
+    </p>
+    <Button
+      type="button"
+      background="default"
+      onClick={() => spawn(ctx, (spawnCtx) => login.qr.generate(spawnCtx))}
+    >
+      {translate["auth.login.qr.retry"]()}
+    </Button>
+  </div>
+), "LoginQRDeclined")
+
+const LoginQRScanned = () => (
+  <div className="flex flex-col items-center gap-2">
+    <LoginQRConnected />
+    <p className="text-sm text-neutral-400 text-center">
+      {translate["auth.login.qr.scanned"]()}
+    </p>
   </div>
 )
+
 const LoginVerified = () => (
   <div className="flex flex-col w-full items-center justify-center gap-4">
     <Icon name="sprite:check" className="size-[32px] text-green-600" />
@@ -131,8 +156,9 @@ const LoginVerified = () => (
 )
 
 const LOGIN_QR_COMPONENTS: Partial<Record<AuthLoginQRStatus, ReactNode>> = {
+  "idle": <LoginQRConnected />,
   "expired": <LoginQRRetry />,
-  "connected": <LoginQRConnected />,
+  "connected": <LoginQRScanned />,
   "declined": <LoginQRDeclined />,
   "verified": <LoginVerified />
 }

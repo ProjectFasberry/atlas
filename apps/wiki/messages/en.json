@@ -29,6 +29,7 @@
     "save": "Save",
     "saving": "Saving…",
     "hint": "Select text to change its format. Backspace removes the selected block.",
+    "source-locale": "You are editing the Russian original page. The translation is updated separately.",
     "undo": "Undo",
     "redo": "Redo",
     "bold": "Bold",

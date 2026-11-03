@@ -2,7 +2,6 @@ import { action, atom, withAssign, connectLogger, type Unsubscribe, withInit, ty
 import type { PageContext } from "vike/types";
 import { withSsr } from "../ssr";
 import { parseBoolean } from "../../lib/utils";
-import { detectMobile } from "@/shared/lib/helpers";
 import { detectHardwareAcceleration } from "@/shared/lib/helpers";
 import { ENVIRONMENT } from "../../consts";
 import { getIsAuthed, maybeSpyOptionAtom } from "./utils";
@@ -130,10 +129,11 @@ export const app = atom(null, "app").pipe(
     init: action((ctx) => {
       let unsubs: Unsubscribe[] = [];
 
-      appState.inited.isMobile(ctx, detectMobile());
-
       const { onChange, unsub } = updateReactiveIsMobile(ctx)
       onChange();
+
+      // Keep the devtools/feature heuristics on the same source as the UI.
+      appState.inited.isMobile(ctx, ctx.get(appState.current.isMobile));
 
       unsubs.push(unsub)
 
@@ -160,6 +160,10 @@ export const app = atom(null, "app").pipe(
       pageState.isClientside(ctx, !!pageCtx.Page)
       pageState.data(ctx, pageCtx.data ?? null);
       snapshots.init(ctx, pageCtx.snapshot);
+
+      // `snapshots.init` restores the server (UA based) value on every navigation,
+      // so the client media query has to be re-applied on top of it.
+      syncIsMobile(ctx);
     }, `${name}.sync`),
   }))
 )
@@ -224,3 +228,11 @@ const updateReactiveIsMobile = action((ctx) => {
     unsub: () => mql.removeEventListener("change", onChange)
   }
 }, "updateReactiveIsMobile")
+
+export const syncIsMobile = action((ctx) => {
+  if (typeof window === "undefined") return;
+
+  const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
+
+  appState.current.isMobile(ctx, mql.matches)
+}, "syncIsMobile")

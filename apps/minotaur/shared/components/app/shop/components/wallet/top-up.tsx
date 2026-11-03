@@ -15,6 +15,9 @@ import { Select, createListCollection } from '@ark-ui/react/select'
 import { Portal } from "@ark-ui/react/portal";
 import { selectContentBaseStyle, selectVariant } from "@/shared/ui/select"
 import { getFromDictionary } from "@/shared/models/app/utils";
+import { translate } from "@/shared/locales/helpers";
+import { Checkbox } from "@ark-ui/react/checkbox";
+import { checkboxVariant } from "@/shared/ui/checkbox";
 
 type TopupTargetProps = {
   variant?: "compact", title?: never, img: string
@@ -71,7 +74,7 @@ const TopUpRecipient = reatomComponent(({ ctx }) => {
     <Input
       value={ctx.spy(topupState.recipient)}
       onChange={e => topupState.recipient(ctx, e.target.value)}
-      placeholder="Никнейм"
+      placeholder={translate["store.topup.recipient-placeholder"]()}
       maxLength={128}
     />
   )
@@ -95,7 +98,7 @@ const TopUpCurrencies = reatomComponent(({ ctx }) => {
     >
       <Select.Control className={selectVariant.control()}>
         <Select.Trigger className={selectVariant.trigger()}>
-          <Select.ValueText placeholder="Не выбрано" />
+          <Select.ValueText placeholder={translate["store.topup.currency-placeholder"]()} />
         </Select.Trigger>
         <div className={selectVariant.indicators()}>
           <Select.ClearTrigger className={selectVariant.clearTrigger()}>
@@ -129,15 +132,15 @@ const TopUpCurrencies = reatomComponent(({ ctx }) => {
   )
 }, "TopUpCurrencies")
 
-const BUTTONS = [
+const getButtons = (isReview: boolean) => [
   {
-    label: "Назад",
+    label: translate["store.topup.back"](),
     bgVariant: "default",
     cdAtom: topupNavigationModel.canGoBackAtom,
     cb: (ctx: Ctx) => spawn(ctx, (spawnCtx) => topupNavigationModel.back(spawnCtx))
   },
   {
-    label: "Продолжить",
+    label: isReview ? translate["store.topup.review.pay"]() : translate["store.topup.continue"](),
     bgVariant: "positive",
     cdAtom: topupNavigationModel.canGoNextAtom,
     cb: (ctx: Ctx) => spawn(ctx, (spawnCtx) => topupNavigationModel.next(spawnCtx))
@@ -148,9 +151,11 @@ const TopupNavigation = reatomComponent(({ ctx }) => {
   const isLast = ctx.spy(topupNavigationModel.isLastStepAtom)
   if (isLast) return null;
 
+  const buttons = getButtons(ctx.spy(topupState.type) === "review");
+
   return (
     <div className="flex items-center gap-2 w-full *:w-full">
-      {BUTTONS.map((button, idx) => (
+      {buttons.map((button, idx) => (
         <Button
           key={idx}
           type="button"
@@ -177,7 +182,7 @@ const ExchangeItem = reatomComponent<{ type: string, values: Record<string, numb
         <Icon name="sprite:exchange" className="size-4 text-neutral-400" />
       </div>
       <div className="flex flex-col gap-2 w-full h-full">
-        <Typography color="gray">Курс на текущий момент</Typography>
+        <Typography color="gray">{translate["store.topup.rate"]()}</Typography>
         <div className='flex flex-col gap-1 w-full'>
           {Object.entries(values).map(([currency, value]) => (
             <div key={currency}>~ {value.toFixed(2)} {currency}</div>
@@ -210,7 +215,7 @@ const TopupValue = reatomComponent(({ ctx }) => {
       <Input
         maxLength={8}
         className="w-full"
-        placeholder="Количество валюты"
+        placeholder={translate["store.topup.amount-placeholder"]()}
         value={ctx.spy(topupState.value)}
         onChange={e => topupState.value.onChangeEvent(ctx, e)}
       />
@@ -251,24 +256,93 @@ const TopupValue = reatomComponent(({ ctx }) => {
   )
 }, "TopupValue")
 
+const ReviewRow = ({ label, value }: { label: string, value: string }) => (
+  <div className="flex items-center justify-between gap-4 w-full">
+    <Typography color="gray" className="text-sm">{label}</Typography>
+    <Typography className="text-base font-semibold text-right">{value}</Typography>
+  </div>
+)
+
+const TopupReview = reatomComponent(({ ctx }) => {
+  const value = ctx.spy(topupState.value)
+  const wallet = ctx.spy(topupState.wallet)
+  const recipient = ctx.spy(topupState.recipient)
+  const method = ctx.spy(topupState.method.type)
+  const currency = ctx.spy(topupState.method.currency)
+  const rates = ctx.spy(topup.fetchExchange.dataAtom)
+  const walletTitle = topupState.WALLETS.find((item) => item.value === wallet)?.title ?? wallet
+  const rate = currency ? rates?.find((entry) => entry.type === wallet)?.values[currency] : undefined
+  const price = rate ? (value * rate).toFixed(2) : null
+
+  return (
+    <div className="flex flex-col gap-4 w-full">
+      <Typography className="text-lg font-semibold">
+        {translate["store.topup.review.title"]()}
+      </Typography>
+      <div className="flex flex-col gap-2 rounded-xl bg-neutral-900 p-4 w-full">
+        <ReviewRow
+          label={translate["store.topup.review.amount"]()}
+          value={`${value} ${walletTitle}`}
+        />
+        <ReviewRow
+          label={translate["store.topup.review.recipient"]()}
+          value={recipient || "—"}
+        />
+        <ReviewRow
+          label={translate["store.topup.review.method"]()}
+          value={[method?.title, currency].filter(Boolean).join(", ") || "—"}
+        />
+        <ReviewRow
+          label={translate["store.topup.review.price"]()}
+          value={price ? `${price} ${currency}` : "—"}
+        />
+      </div>
+      <div className="rounded-xl bg-red/15 border border-red/40 p-4">
+        <Typography className="text-sm leading-5">
+          {translate["store.topup.review.warning"]()}
+        </Typography>
+      </div>
+      <Checkbox.Root
+        checked={ctx.spy(topupState.confirmed)}
+        onCheckedChange={(details) => {
+          if (typeof details.checked === "boolean") topupState.confirmed(ctx, details.checked)
+        }}
+        className={checkboxVariant.root("flex items-start gap-2")}
+      >
+        <Checkbox.Control className={checkboxVariant.control({ variant: "filled" })} />
+        <Checkbox.Label className="text-sm cursor-pointer">
+          {translate["store.topup.review.confirm"]()}
+        </Checkbox.Label>
+        <Checkbox.HiddenInput />
+      </Checkbox.Root>
+    </div>
+  )
+}, "TopupReview")
+
 const TopupConfirm = reatomComponent(({ ctx }) => {
   if (ctx.spy(topup.submit.statusesAtom).isPending) return <IconLoader />
 
   const error = ctx.spy(topupErrorAtom)
   const data = ctx.spy(topup.submit.dataAtom)
+  const currency = ctx.spy(topupState.method.currency)
   const isSuccess = data && !error;
 
-  const title = isSuccess ? `Заказ был создан` : `Заказ не был создан`
+  const title = isSuccess ? translate["store.topup.success"]() : translate["store.topup.failure"]()
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-4">
-      <div className="flex flex-col gap-2 bg-neutral-900 min-h-36 rounded-xl w-full h-full items-center justify-center">
+      <div className="flex flex-col gap-2 bg-neutral-900 min-h-36 rounded-xl w-full h-full items-center justify-center p-4">
         {isSuccess ? (
           <Icon name="sprite:check" className='size-9 text-green-400' />
         ) : (
           <Icon name="sprite:x" className="size-9 text-red" />
         )}
-        <Typography className="text-lg font-semibold">{title}</Typography>
+        <Typography className="text-lg font-semibold text-center">{title}</Typography>
+        {isSuccess && data && (
+          <Typography color="gray" className="text-sm text-center">
+            {translate["store.topup.total"]()}: {data.totalPrice} {currency}
+          </Typography>
+        )}
       </div>
       {isSuccess ? (
         <Button
@@ -277,7 +351,7 @@ const TopupConfirm = reatomComponent(({ ctx }) => {
           onClick={() => topup.toOrder(ctx, data.uniqueId)}
           className="font-semibold"
         >
-          К заказу
+          {translate["store.topup.to-order"]()}
         </Button>
       ) : (
         <Button
@@ -285,7 +359,7 @@ const TopupConfirm = reatomComponent(({ ctx }) => {
           className='px-4 w-fit font-semibold'
           onClick={() => topup.resetAll(ctx)}
         >
-          Вернуться
+          {translate["store.topup.return"]()}
         </Button>
       )}
     </div>
@@ -303,7 +377,7 @@ const COMPONENTS: Record<TopupType, ReactNode> = {
     <div className="flex flex-col gap-4 w-full">
       <div className="flex flex-col gap-2 w-full">
         <Typography className="text-lg font-semibold">
-          Выберите метод оплаты и валюту
+          {translate["store.topup.select-method"]()}
         </Typography>
         <div className="grid sm:grid-cols-3 grid-cols-1 auto-rows-auto gap-2 w-full h-full">
           <TopUpMethods />
@@ -312,6 +386,7 @@ const COMPONENTS: Record<TopupType, ReactNode> = {
       <TopUpCurrencies />
     </div>
   ),
+  "review": <TopupReview />,
   "confirm": <TopupConfirm />
 }
 

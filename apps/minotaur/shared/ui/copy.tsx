@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button, type ButtonProps } from "./button";
 import { clsx } from "cnfast";
 import { toast } from "sonner";
+import { translate } from "@/shared/locales/helpers";
 
 const CopyButton = ({ content }: { content: string }) => {
   const [isCopied, setIsCopied] = useState(false);
@@ -22,7 +23,7 @@ const CopyButton = ({ content }: { content: string }) => {
       type="button"
       onClick={handleCopy}
       className="absolute right-1 *:size-3 top-1 p-1 hover:bg-neutral-600 rounded-sm bg-neutral-700 transition-colors"
-      aria-label="Копировать"
+      aria-label={translate["shared.copy.aria"]()}
     >
       {isCopied
         ? <Icon name="sprite:check" className="text-green-400" />
@@ -54,13 +55,13 @@ export const Copy = (props: CopyProps) => {
     const { code, onClick, className, ...buttonProps } = props;
 
     const wrapOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      toast.success("Содержимое скопировано");
+      toast.success(translate["shared.copy.success"]());
       onClick?.(e);
     }
 
     return (
       <Button background="default" className={clsx("text-sm font-semibold", className)} onClick={wrapOnClick} {...buttonProps}>
-        Скопировать
+        {translate["shared.copy.button"]()}
       </Button>
     )
   }

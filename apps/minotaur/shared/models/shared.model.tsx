@@ -1,5 +1,5 @@
 import { client } from "../lib/client-wrapper"
-import { action, atom, reatomAsync, withErrorAtom, withStatusesAtom, type Ctx } from "@reatom/framework";
+import { action, atom, reatomAsync, withErrorAtom, withStatusesAtom, type Ctx, type CtxSpy } from "@reatom/framework";
 import { withAssign } from "@reatom/framework";
 import { playerSeemsLikePlayersIsShowKey, playerSLPState } from "../components/app/player/models/player-seems-like.model";
 import { parseBoolean } from "../lib/utils";
@@ -8,7 +8,6 @@ import type { PageContextServer } from "vike/types";
 import { useInView } from "react-intersection-observer";
 import { useUpdate } from "@reatom/npm-react";
 import { withSsr } from "./ssr";
-import { invariant } from "../lib/utils";
 import { locales, setLocale, type Locale } from "@/paraglide/runtime";
 import { logError } from "../lib/log";
 
@@ -80,11 +79,13 @@ export async function fetchCurrencies() {
 }
 export const currenciesAtom = atom<Currencies | null>(null, "currencies").pipe(withSsr("currencies"))
 
-export const getCurrencies = action((ctx) => {
-  const data = ctx.get(currenciesAtom)
-  invariant(data, "Currencies is not defined")
-  return data
-})
+export const getCurrencies = (ctx: Ctx | CtxSpy): Currencies => {
+  // Currencies are optional bootstrap data: fall back to an empty map instead
+  // of crashing store/cart screens when the snapshot has no currencies yet.
+  const data = ctx.spy ? ctx.spy(currenciesAtom) : ctx.get(currenciesAtom)
+
+  return data ?? {}
+}
 
 const isAvailableLang = (lang: string): lang is Locale => locales.includes(lang as Locale)
 

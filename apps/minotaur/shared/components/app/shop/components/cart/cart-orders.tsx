@@ -7,21 +7,27 @@ import { PageLoader } from "@/shared/ui/page-loader"
 import { type AtomMut, type Ctx } from "@reatom/framework"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
+import { translate } from "@/shared/locales/helpers"
 
-const STATUSES: Record<string, string> = {
-  "pending": "Ждёт оплаты",
-  "succeeded": "Завершён"
+const getStatusTitle = (status: string) => {
+  switch (status) {
+    case "pending": return translate["store.orders.status.pending"]()
+    case "succeeded": return translate["store.orders.status.succeeded"]()
+    case "canceled": return translate["store.orders.status.canceled"]()
+    case "waitingForCapture": return translate["store.orders.status.waiting-for-capture"]()
+    default: return status
+  }
 }
 
 const CartOrdersEmpty = () => {
   return (
     <div className="flex flex-col w-full bg-neutral-900 p-2 sm:p-3 lg:p-4 rounded-lg">
-      <Typography className='text-2xl font-semibold'>Пусто</Typography>
+      <Typography className='text-2xl font-semibold'>{translate["store.orders.empty.title"]()}</Typography>
       <Typography className="text-neutral-400 text-base leading-5">
-        Заказ появится сразу после оформления
+        {translate["store.orders.empty.description"]()}
       </Typography>
       <Link href="/store/cart" className="w-fit mt-4 leading-5 text-base text-green-400">
-        В корзину
+        {translate["store.orders.empty.to-cart"]()}
       </Link>
     </div>
   )
@@ -84,7 +90,12 @@ export const CartOrdersList = reatomComponent(({ ctx }) => {
   const data = ctx.spy(cartOrders.fetch.dataAtom)
   if (!data) return <CartOrdersEmpty />
 
-  const getOrderLink = (uniqueId: string) => `/store/order/${uniqueId}?type=${ctx.get(cartOrdersState.type)}`
+  const getOrderLink = (uniqueId: string) => {
+    // "all" and "default" both list external orders, only "game" uses internal ones.
+    const type = ctx.get(cartOrdersState.type) === "game" ? "game" : "default";
+
+    return `/store/order/${uniqueId}?type=${type}`
+  }
 
   return (
     <div id="content" className='flex flex-col gap-2 rounded-xl bg-neutral-900 p-2 sm:p-3 lg:p-4 w-full h-full'>
@@ -96,10 +107,10 @@ export const CartOrdersList = reatomComponent(({ ctx }) => {
         >
           <div className="flex flex-col gap-1 min-w-0">
             <Typography className="font-semibold truncate text-lg leading-5">
-              Заказ #{order.unique_id}
+              {translate["store.orders.order"]({ id: order.unique_id })}
             </Typography>
             <Typography className="text-neutral-400 truncate text-sm leading-4">
-              {STATUSES[order.status]}
+              {getStatusTitle(order.status)}
             </Typography>
           </div>
         </Link>
@@ -112,13 +123,13 @@ export const CartOrdersFilters = () => {
   return (
     <div id="filters" className="flex items-center gap-2 w-full">
       <OrdersFilterDropdown
-        label="Статус"
+        label={translate["store.orders.filters.status"]()}
         options={cartOrdersState.STATUS_OPTIONS}
         currentValue={cartOrdersState.status}
         onSelect={(ctx, val) => cartOrdersState.status(ctx, val)}
       />
       <OrdersFilterDropdown
-        label="Тип"
+        label={translate["store.orders.filters.type"]()}
         options={cartOrdersState.TYPE_OPTIONS}
         currentValue={cartOrdersState.type}
         onSelect={(ctx, val) => cartOrdersState.type(ctx, val)}

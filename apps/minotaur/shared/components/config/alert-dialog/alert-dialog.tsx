@@ -6,6 +6,7 @@ import { Dialog } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal"
 import { dialogVariant, dialogBaseStyle, DialogClose } from "@/shared/ui/dialog";
 import { ErrorBlock } from "@/shared/ui/error-block";
+import { translate } from "@/shared/locales/helpers";
 
 const AlertContent = reatomComponent(({ ctx }) => {
   const opts = ctx.spy(alertDialogState.config);
@@ -20,7 +21,7 @@ const AlertContent = reatomComponent(({ ctx }) => {
   } as const;
 
   const showCancel = withCancel && !withStatus.isLoading
-  const confirmLabelWithRetry = error ? `Повторить` : confirmLabel;
+  const confirmLabelWithRetry = error ? translate["shared.alert-dialog.retry"]() : confirmLabel;
 
   return (
     <div className="w-full">
@@ -32,7 +33,7 @@ const AlertContent = reatomComponent(({ ctx }) => {
             </Typography>
           )}
           <Typography className="text-sm sm:text-base leading-6 text-neutral-400">
-            {description ?? "Это действие нельзя отменить"}
+            {description ?? translate["shared.alert-dialog.default-description"]()}
           </Typography>
           {error && (
             <div className="mt-4 flex items-center justify-start w-full">
@@ -48,7 +49,7 @@ const AlertContent = reatomComponent(({ ctx }) => {
               disabled={withStatus.isLoading}
               onClick={() => alertDialog.cancel(ctx)}
             >
-              Отмена
+              {translate["shared.alert-dialog.cancel"]()}
             </Button>
           )}
           <Button
@@ -76,7 +77,7 @@ export const AlertDialog = reatomComponent(({ ctx }) => {
         <Dialog.Positioner className={dialogVariant.positioner()} style={dialogBaseStyle} >
           <Dialog.Content className={dialogVariant.content("w-lg")} style={dialogBaseStyle} >
             <Dialog.Title className={dialogVariant.title()}>
-              {opts?.dialogTitle ?? "Подтверждение действия"}
+              {opts?.dialogTitle ?? translate["shared.alert-dialog.default-title"]()}
             </Dialog.Title>
             <AlertContent />
             <DialogClose />

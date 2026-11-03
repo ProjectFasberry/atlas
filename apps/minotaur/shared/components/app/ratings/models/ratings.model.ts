@@ -7,6 +7,7 @@ import { logError } from "@/shared/lib/log";
 import {
   type RatingBelkoin,
   type RatingCharism,
+  type RatingData,
   type RatingLands,
   type RatingParkour,
   type RatingPlaytime,
@@ -111,7 +112,18 @@ export const ratings = atom(null, "ratings").pipe(
       name: `${name}.update`,
       onFulfill: (ctx, res) => {
         batch(ctx, () => {
-          ratingsState.data(ctx, res.data.length === 0 ? null : res.data);
+          type Row = RatingData[number];
+
+          const prev = ctx.get(ratingsState.data) as Row[] | null;
+          const fresh = res.data as Row[];
+
+          const next: Row[] | null = fresh.length === 0
+            ? prev
+            : prev
+              ? [...prev, ...fresh]
+              : fresh;
+
+          ratingsState.data(ctx, next as RatingData);
           ratingsState.meta(ctx, res.meta);
         });
       },
@@ -120,7 +132,8 @@ export const ratings = atom(null, "ratings").pipe(
       },
     }).pipe(
       withStatusesAtom(),
-      withErrorAtom()
+      withErrorAtom(),
+      withAbort()
     )
   }))
 )
@@ -129,12 +142,18 @@ ratingIsViewAtom.onChange((ctx, state) => {
   if (!state) return;
 
   const meta = ctx.get(ratingsState.meta);
-  const hasMore = meta?.hasNextPage;
+  const hasMore = meta?.hasNextPage && !!meta?.endCursor;
 
   if (hasMore) {
     ratingsState.filters.endCursor(ctx, meta.endCursor);
     ratings.update(ctx);
   }
+});
+
+ratingsState.filters.asc.onChange((ctx) => {
+  ratings.update.abort(ctx);
+  ratingsState.filters.endCursor.reset(ctx);
+  ratings.fetch(ctx);
 });
 
 export type RatingItem = Pick<{ title: string; childs: string[] }, "title"> & {

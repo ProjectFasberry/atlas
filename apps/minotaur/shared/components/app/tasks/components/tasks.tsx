@@ -13,6 +13,7 @@ import { PageLoader } from "@/shared/ui/page-loader"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
 import { ErrorBlock } from "@/shared/ui/error-block"
+import { translate } from "@/shared/locales/helpers"
 
 type TaskItemProps = ExtractApiData<"getServerTaskById">["data"];
 
@@ -24,7 +25,7 @@ const EventsNotFound = () => {
       <div className="flex flex-col items-center gap-y-4">
         <img src={eventImage} alt="" width={256} height={256} />
         <Typography className="text-xl font-bold text-shark-50">
-          Ивентов пока нет
+          {translate["tasks.empty"]()}
         </Typography>
       </div>
     </div>
@@ -76,7 +77,8 @@ const TaskItemSkeleton = () => {
 const TaskItem = (
   { title, description, reward_value, action_type, action_value, reward_currency }: TaskItemProps
 ) => {
-  const action = ACTION[action_type](action_value!)
+  const renderAction = ACTION[action_type];
+  const action = action_value && renderAction ? renderAction(action_value) : null;
 
   return (
     <div className={taskItemVariant().base()}>
@@ -89,26 +91,12 @@ const TaskItem = (
         </Typography>
       </div>
       <div className={taskItemVariant().secondGroup()}>
-        {/* <Dialog>
-          <DialogTrigger asChild>
-            <Button background="default" className="w-full lg:w-fit h-10">
-              <Typography className="text-base">
-                Награда
-              </Typography>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogTitle>Ивент: {title}</DialogTitle>
-            <div className="flex flex-col gap-4 p-2 items-center justify-center w-full">
-              <div className="flex flex-col gap-2 w-full">
-                <Typography className="text-lg font-semibold">
-                  Награда:
-                </Typography>
-                <Currency type={reward_currency} value={reward_value} />
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog> */}
+        <div className="flex items-center gap-2">
+          <Typography color="gray" className="text-sm">
+            {translate["tasks.reward"]()}:
+          </Typography>
+          <Currency type={reward_currency} value={reward_value} />
+        </div>
         {action}
       </div>
     </div>

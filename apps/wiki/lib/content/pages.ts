@@ -117,12 +117,6 @@ export async function getPageTree(locale?: string): Promise<Root> {
   return { ...tree, children };
 }
 
-/** Markdown of a page, used by the llms endpoints. */
-export async function getPageMarkdown(slugs: string[]): Promise<string | null> {
-  const page = await getPage(slugs.join('/'));
-  return page?.markdown ?? null;
-}
-
 export function renderPageHtml(page: PageRow) {
   return withHeadingIds(page.html);
 }

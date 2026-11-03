@@ -33,9 +33,6 @@ const UserInfo = reatomComponent(({ ctx }) => {
           UUID: {data.uuid}
         </Typography>
         <Typography>
-          Premium UUID: {data.premium_uuid ?? "none"}
-        </Typography>
-        <Typography>
           Роль: {data.role ? `${data.role.name} ${data.role.id}` : `none`}
         </Typography>
       </div>

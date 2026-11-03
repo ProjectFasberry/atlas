@@ -29,3 +29,5 @@ next-env.d.ts
 # local content snapshot and the sync report
 /content/
 
+# playwright output
+/e2e/.artifacts/

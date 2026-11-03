@@ -39,28 +39,35 @@ const hooksConfig: Options = {
 				if (skipHook) return;
 
 				if (!response.ok) {
-					const json = await response.json();
-					if (!json) throw new Error(response.statusText);
+					// Read a clone: the response goes back to the caller and
+					// `parseWrappedJson` reads it again. The original body must stay
+					// intact, otherwise the browser throws "body used already".
+					const text = await response.clone().text();
+					const fallback = response.statusText || `HTTP ${response.status}`;
+					let json: unknown = null;
 
-					if (typeof json === 'object' && "error" in json) {
-						const error = json.error
+					try {
+						json = text ? JSON.parse(text) : null;
+					} catch {
+						json = null;
+					}
 
-						if (typeof error === 'object') {
-							const jsonErr = error as Record<string, unknown>;
+					if (!json || typeof json !== 'object') throw new Error(fallback);
 
-							if ("type" in jsonErr) {
-								const error = json.error as TypeboxIssue
+					const error = (json as { error?: unknown }).error;
 
-								if (error.type === 'validation') {
-									throw new Error(`Validation error with ${error.errors.length} errors`)
-								}
-							}
-						}
+					if (typeof error === 'object' && error !== null && "type" in error) {
+						const issue = error as TypeboxIssue;
 
-						if (typeof error === 'string') {
-							throw new Error(error);
+						if (issue.type === 'validation') {
+							throw new Error(`Validation error with ${issue.errors.length} errors`);
 						}
 					}
+
+					if (typeof error === 'string') throw new Error(error);
+
+					// Unknown shape: still fail, so no caller sees a consumed body.
+					throw new Error(fallback);
 				}
 			},
 		],

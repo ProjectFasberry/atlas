@@ -14,8 +14,26 @@ const page = createPageModel({
       ratingsState.filters.server(ctx, routeParams.server);
 
       ratings.fetch(ctx)
-    }
-  }
+    },
+    onSpy: (ctx, _, routeParams) => {
+      if (!routeParams.id || !routeParams.server) return;
+
+      const by = ctx.get(ratingsState.filters.by);
+      const server = ctx.get(ratingsState.filters.server);
+
+      // The page component stays mounted when only the route params change,
+      // so the filter atoms have to be compared instead of relying on onConnect.
+      if (by === routeParams.id && server === routeParams.server) return;
+
+      ratingsState.filters.by(ctx, routeParams.id);
+      ratingsState.filters.server(ctx, routeParams.server);
+      ratingsState.filters.endCursor.reset(ctx);
+      ratings.update.abort(ctx);
+
+      ratings.fetch(ctx)
+    },
+  },
+  spyedAtom: pageState.routeParams
 })
 
 export default function Page() {

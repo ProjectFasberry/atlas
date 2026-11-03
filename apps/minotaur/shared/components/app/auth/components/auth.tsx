@@ -6,8 +6,6 @@ import { ErrorBlock } from "@/shared/ui/error-block";
 import { translate } from "@/shared/locales/helpers";
 import { tabsTriggerVariants } from "@/shared/ui/tabs"
 import { Tabs } from '@ark-ui/react/tabs'
-import { Link } from "@/shared/components/config/link/link";
-import { showResetPasswordAtom } from "../models/login.model";
 import { LoginForm } from "./login";
 import { RegisterForm } from "./register";
 
@@ -20,11 +18,12 @@ export const NicknameInput = reatomComponent(({ ctx }) => (
     className="w-full"
     variant={ctx.spy(authState.errorsType).includes("nickname") ? "danger" : "default"}
     value={ctx.spy(authState.fields.nickname)}
-    autoComplete="nickname"
+    autoComplete="username"
+    aria-label={translate["shared.nickname"]()}
     onClick={() => auth.resetError(ctx)}
     onChange={e => authState.fields.nickname(ctx, e.target.value)}
     placeholder={translate["auth.shared.placeholders.nickname"]()}
-    maxLength={32}
+    maxLength={16}
   />
 ), "Nickname")
 
@@ -35,11 +34,16 @@ const PASSWORD_VISIBILITY_ICONS: Record<string, IconName> = {
 
 const PasswordVisibility = reatomComponent(({ ctx }) => {
   const variant = ctx.spy(authState.settings.showPassword) ? "show" : "hide";
+  const label = variant === "show"
+    ? translate["auth.shared.password-visibility.hide"]()
+    : translate["auth.shared.password-visibility.show"]();
 
   return (
     <button
       type="button"
-      className="absolute right-0 top-1/2 -translate-1/2"
+      aria-label={label}
+      aria-pressed={variant === "show"}
+      className="absolute right-0 top-1/2 -translate-1/2 flex items-center justify-center size-10"
       onClick={() => authState.settings.showPassword(ctx, (state) => !state)}
     >
       <Icon
@@ -57,11 +61,12 @@ export const PasswordInput = reatomComponent(({ ctx }) => (
       className="w-full"
       variant={ctx.spy(authState.errorsType).includes("password") ? "danger" : "default"}
       value={ctx.spy(authState.fields.password)}
-      autoComplete="password"
+      autoComplete={ctx.spy(authState.type) === "register" ? "new-password" : "current-password"}
+      aria-label={translate["auth.shared.placeholders.password"]()}
       onClick={() => auth.resetError(ctx)}
       onChange={e => authState.fields.password(ctx, e.target.value)}
       placeholder={translate["auth.shared.placeholders.password"]()}
-      maxLength={64}
+      maxLength={72}
       type={ctx.spy(authState.settings.showPassword) ? "text" : "password"}
     />
     <PasswordVisibility />
@@ -72,16 +77,6 @@ export const AuthError = reatomComponent(({ ctx }) => {
   const error = ctx.spy(authState.globalError)
   return error ? <ErrorBlock title={error} /> : null
 }, "AuthError")
-
-export const ResetPassword = reatomComponent(({ ctx }) => {
-  if (!ctx.spy(showResetPasswordAtom)) return null;
-
-  return (
-    <Link href="/auth/restore" className='flex items-center justify-center w-full text-sm text-neutral-400'>
-      {translate["auth.navigation.auth.recoveryTitle"]()}
-    </Link>
-  )
-}, "ResetPassword")
 
 const createAuthVariants = () => ([
   { label: translate["auth.navigation.auth.loginTitle"](), value: "login" },
@@ -114,7 +109,6 @@ export const Auth = reatomComponent(({ ctx }) => {
         <Tabs.Content value="login">
           <LoginForm />
         </Tabs.Content>
-        <ResetPassword />
       </div>
     </Tabs.Root>
   )

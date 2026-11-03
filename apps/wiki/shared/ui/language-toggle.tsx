@@ -26,6 +26,7 @@ export const LanguageToggle = reatomComponent(({ ctx }) => {
   return (
     <Segmented
       label={m['language.toggle']({}, { locale })}
+      testId="language-switch"
       value={locale}
       options={LOCALES}
       onSelect={choose}

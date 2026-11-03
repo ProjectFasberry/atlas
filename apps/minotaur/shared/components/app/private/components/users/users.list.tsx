@@ -94,7 +94,7 @@ const UsersItemCheckbox = reatomComponent<{ nickname: string }>(({ ctx, nickname
   )
 }, 'UsersItemCheckbox')
 
-const UsersItem = reatomComponent<PrivatedUser>(({ ctx, player, role, avatar, nickname, uuid, premium_uuid }) => {
+const UsersItem = reatomComponent<PrivatedUser>(({ ctx, player, role, avatar, nickname, uuid }) => {
   const isExpanded = ctx.spy(userIsSelectedAtom(nickname));
   const isIdentity = currentUser.getNickname(ctx) === nickname;
 

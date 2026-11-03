@@ -1,11 +1,9 @@
-import { withLocalStorage } from "@reatom/persist-web-storage";
-import { AUTH_REGISTER_TYPE, registerNavigationModel, registerSeedPhraseModel, registerState } from "../models/register.model";
+import { AUTH_REGISTER_TYPE, registerNavigationModel, registerState } from "../models/register.model";
 import { authState } from "../models/auth.model";
 import { action, atom, withAssign } from "@reatom/framework";
 import { login } from "../models/login.model";
 import { devtools } from "@/shared/models/devtools/index.model";
 
-export const teststr = atom<Nullable<string>>(null).pipe(withLocalStorage({ key: "test-str-auth-sp" }))
 const nicknameAtom = atom("registered_1");
 
 const events = atom(null).pipe(
@@ -23,13 +21,7 @@ const events = atom(null).pipe(
       authState.fields.findout(ctx, "distribate")
       authState.fields.findoutType(ctx, "referrer")
       authState.fields.acceptRules(ctx, true)
-      let result = await registerNavigationModel.next(ctx)
-      if (!result) return;
-      result = await registerNavigationModel.next(ctx)
-      if (!result) return;
-      registerSeedPhraseModel.state.repeatWords(ctx, (s) => ctx.get(teststr) ? ctx.get(teststr)!.split(" ") : s)
-      result = await registerNavigationModel.next(ctx)
-      if (!result) return;
+      await registerNavigationModel.next(ctx)
     })
   }))
 )

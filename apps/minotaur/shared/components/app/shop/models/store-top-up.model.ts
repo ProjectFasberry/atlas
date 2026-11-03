@@ -9,6 +9,7 @@ import { navigate } from "vike/client/router"
 import * as z from "zod"
 import { createNavigationModel } from "../../auth/models/navigation.model"
 import { validateNumber } from "@/shared/lib/utils"
+import { translate } from "@/shared/locales/helpers"
 
 type OutputPayload = ExtractApiData<"postStoreOrderExternalCreate">["data"]
 export type StoreExchangeRatesPayload = ExtractApiData<"getStoreOrderExternalExchange-rates">["data"]
@@ -16,7 +17,7 @@ type Schema = z.infer<typeof createOrderTopUpSchema>
 type TopUpSearch = "recipient" | "target"
 export type TopupMethodListPayload = ExtractApiData<"getStoreOrderExternalMethodsList">["data"]
 
-export type TopupType = "start-input" | "select-method" | "confirm"
+export type TopupType = "start-input" | "select-method" | "review" | "confirm"
 
 export const topupState = atom(null, "topupState").pipe(
   withAssign((_, name) => ({
@@ -45,11 +46,14 @@ export const topupState = atom(null, "topupState").pipe(
     ),
     validationError: atom<z.ZodError<Schema> | null>(null, "topUpValidationError").pipe(withReset()),
     resultError: atom<Error | null>(null, "topUpResultError").pipe(withReset()),
+    confirmed: atom(false, "topUpConfirmed").pipe(withReset()),
     search: atom<Partial<Record<TopUpSearch, string>>>({}, "topUpSearch").pipe(withReset()),
-    WALLETS: [
-      { title: "Харизма", value: "CHARISM" },
-      { title: "Белкоин", value: "BELKOIN" }
-    ],
+    get WALLETS() {
+      return [
+        { title: translate["store.topup.wallet.charism"](), value: "CHARISM" },
+        { title: translate["store.topup.wallet.belkoin"](), value: "BELKOIN" }
+      ]
+    },
     type: atom<TopupType>("start-input", `${name}.type`).pipe(withReset())
   }))
 )
@@ -81,6 +85,7 @@ export const topup = atom(null, "topup").pipe(
       topupState.value.reset(ctx);
       topupState.validationError.reset(ctx);
       topupState.resultError.reset(ctx)
+      topupState.confirmed.reset(ctx)
       topupState.search.reset(ctx)
       topupState.type.reset(ctx)
     }),
@@ -171,7 +176,8 @@ export const topup = atom(null, "topup").pipe(
 
           const schema = createOrderTopUpSchema.pick({ method: true });
           return z.safeParse(schema, raw).success;
-        })
+        }),
+        review: atom((ctx) => ctx.spy(topupState.confirmed))
       }))
     )
   }))
@@ -190,6 +196,13 @@ export const topupNavigationModel = createNavigationModel({
       id: "select-method",
       validators: {
         toNext: topup.validators.selectMethod
+      },
+      cb: action((ctx) => { topupState.confirmed.reset(ctx); return true })
+    },
+    {
+      id: "review",
+      validators: {
+        toNext: topup.validators.review
       },
       cb: action((ctx) => { topup.submit(ctx); return true })
     },

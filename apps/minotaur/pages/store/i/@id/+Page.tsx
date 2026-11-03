@@ -8,6 +8,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { Icon } from "@/shared/ui/icon";
 import { PlayerCard } from "@/shared/ui/player-card";
 import { currentUserState } from "@/shared/models/current-user/index.model";
+import { translate } from "@/shared/locales/helpers";
 
 const sectionVariant = tv({
   base: `bg-neutral-900 p-2! sm:p-4! rounded-xl w-full`,
@@ -63,7 +64,7 @@ const SelectedItemDescription = reatomComponent(({ ctx }) => {
   return (
     <div id="desc" className="flex flex-col gap-1 w-full">
       <Typography className={sectionVariant().secondary()}>
-        Описание
+        {translate["store.item.description"]()}
       </Typography>
       {html ? (
         <div
@@ -145,7 +146,7 @@ const SelectedItemBuyers = reatomComponent(({ ctx }) => {
   return (
     <div className="flex flex-col w-full gap-2">
       <Typography className={sectionVariant().secondary()}>
-        Последние покупатели
+        {translate["store.item.last-buyers"]()}
       </Typography>
       <div className="flex *:w-1/4 overflow-x-auto w-full gap-2 h-fit">
         <PlayerCard nickname={currentUser.nickname} avatar={currentUser.avatar}  />

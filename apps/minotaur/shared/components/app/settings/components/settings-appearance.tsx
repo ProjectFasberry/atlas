@@ -47,7 +47,7 @@ const SeemsLikeVisibility = reatomComponent(({ ctx }) => {
 
 export const SettingsAppearance = () => {
   return (
-    <SettingsContentWrapper title="Персонализация">
+    <SettingsContentWrapper title={translate["settings.appearance.personalization"]()}>
       <div className="flex flex-col gap-8 w-full h-full">
         <SeemsLikeVisibility />
         <BalanceSettings />

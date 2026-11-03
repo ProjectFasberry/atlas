@@ -13,6 +13,7 @@ type SegmentedProps<T extends string> = {
   options: readonly SegmentedOption<T>[];
   onSelect: (value: T, event: MouseEvent<HTMLButtonElement>) => void;
   className?: string;
+  testId?: string;
 };
 
 /**
@@ -26,6 +27,7 @@ export function Segmented<T extends string>({
   options,
   onSelect,
   className,
+  testId,
 }: SegmentedProps<T>) {
   const index = Math.max(
     0,
@@ -34,6 +36,7 @@ export function Segmented<T extends string>({
 
   return (
     <fieldset
+      data-testid={testId}
       aria-label={label}
       className={cn(
         'relative m-0 inline-grid min-w-0 auto-cols-fr grid-flow-col items-center rounded-full bg-[var(--seg-track)] p-[3px]',

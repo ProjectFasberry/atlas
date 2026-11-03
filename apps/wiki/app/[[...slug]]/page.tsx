@@ -12,7 +12,7 @@ import {
 import { getPageImageUrl, getPageMarkdownUrl } from '@/lib/content/routes';
 import { publicEnv } from '@/lib/env/public';
 import { getLocale } from '@/lib/i18n/locale';
-import { articleJsonLd, homeJsonLd } from '@/lib/seo/jsonld';
+import { articleJsonLd, homeJsonLd, serializeJsonLd } from '@/lib/seo/jsonld';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { WikiPage } from '@/shared/components/wiki/wiki-page';
 import { pageIcon } from '@/shared/ui/page-icons';
@@ -49,13 +49,14 @@ export default async function Page(props: PageProps<'/[[...slug]]'>) {
     <DocsPage toc={toc} full={page.slug === '' ? true : undefined}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <WikiPage
         slug={slug}
         title={page.title}
         description={page.description}
         html={html}
+        editSource={{ title: source.title, description: source.description, html: source.html }}
         markdownUrl={markdownUrl}
         canEdit={Boolean(editor)}
         icon={pageIcon(slug)}

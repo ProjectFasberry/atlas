@@ -22,6 +22,7 @@ export const UserMenu = reatomComponent(({ ctx }) => {
   return (
     <Menu.Root open={open} onOpenChange={({ open: next }) => setUserMenuOpen(ctx, next)}>
       <Menu.Trigger
+        data-testid="user-menu"
         aria-label={m['user.menu']({}, { locale })}
         className="
           relative block size-8 rounded-sm transition hover:opacity-90
@@ -53,7 +54,7 @@ export const UserMenu = reatomComponent(({ ctx }) => {
                 className="outline-none"
                 aria-label={m['layout.editor-badge']({}, { locale })}
               >
-                <Chip className="border-fd-primary/30 bg-fd-primary/10 text-fd-primary">
+                <Chip data-testid="editor-chip" className="border-fd-primary/30 bg-fd-primary/10 text-fd-primary">
                   <IconPencil size={13} stroke={2} aria-hidden />
                   {m['layout.editor-badge']({}, { locale })}
                 </Chip>

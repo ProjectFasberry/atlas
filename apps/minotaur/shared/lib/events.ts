@@ -58,7 +58,7 @@ export const createPageModel = <TSpy = unknown>({
 
     const pageData = ctx.get(dataAtom);
 
-    hooks?.onAfterDisconnect?.(ctx, dataAtom);
+    hooks?.onDisconnect?.(ctx, dataAtom);
 
     pageData?.unsubscribe?.()
     dataAtom.reset(ctx)

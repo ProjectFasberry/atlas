@@ -7,6 +7,7 @@ import { SettingsContentDesktop, SettingsContentMobile } from "./settings-conten
 import { Dialog } from '@ark-ui/react/dialog'
 import { Portal } from '@ark-ui/react/portal'
 import { dialogVariant, dialogBaseStyle, DialogClose } from "@/shared/ui/dialog";
+import { translate } from "@/shared/locales/helpers";
 
 const SettingsDialog = reatomComponent(({ ctx }) => {
   return (
@@ -50,7 +51,7 @@ const SettingsDrawer = () => {
   return (
     <Vaul openAtom={settingsState.isOpen}>
       <VaulContent className="h-2/3">
-        <VaulHeader title="Настройки" />
+        <VaulHeader title={translate["settings.title"]()} />
         <div className="overflow-y-auto">
           <SettingsContentMobile />
         </div>

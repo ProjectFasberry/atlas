@@ -12,6 +12,7 @@ import { type Action as ToasterAction } from "sonner"
 import type { OrderSingleDefault } from "@/pages/store/order/@id/+Page";
 import type { OrderSinglePayload } from "@/pages/store/order/@id/+data";
 import type { CreateOrderRoutePayload, OrderEventPayload } from "@/shared/schemas/payment";
+import { translate } from "@/shared/locales/helpers";
 
 export const orderState = atom(null, "orderState").pipe(
   withAssign((_, name) => ({
@@ -25,10 +26,15 @@ export const orderState = atom(null, "orderState").pipe(
   }))
 )
 
-const ERRORS_MAP: Record<string, string> = {
-  "INTERNAL_SERVER_ERROR": "Произошла ошибка при создании заказа",
-  "ITEMS_NOT_FOUND": "Товары не найдены или устарели",
-  "INSUFFICIENT": "Недостаточно баланса",
+const getOrderErrorMessage = (message: string) => {
+  switch (message) {
+    case "ITEMS_NOT_FOUND":
+      return translate["store.errors.items-not-found"]()
+    case "INSUFFICIENT":
+      return translate["store.errors.insufficient"]()
+    default:
+      return translate["store.errors.internal"]()
+  }
 }
 
 const ERRORS_EVENTS: Record<string, { cb: () => ToasterAction | ReactNode }> = {
@@ -57,7 +63,7 @@ export const order = atom(null, "order").pipe(
         logError(e);
 
         if (e instanceof Error) {
-          const msg = ERRORS_MAP[e.message] ?? Object.entries(ERRORS_MAP)?.[0]?.[1]
+          const msg = getOrderErrorMessage(e.message)
           const event = ERRORS_EVENTS[e.message];
 
           toast.error(msg, {
@@ -130,5 +136,5 @@ export async function getOrder(id: string, init: RequestInit, type: string = "de
 
 export const getOrderEventsUrl = (orderId: string) => `${env.VITE_API_URL}/store/order/${orderId}/events`
 export const createdOrderDataAtom = atom<CreateOrderRoutePayload | null>(null)
-export const getOrderUrl = (uniqueId: string, t: string = "default") => `/store/order/status/${uniqueId}?type=${t}`
+export const getOrderUrl = (uniqueId: string, t: string = "default") => `/store/order/${uniqueId}?type=${t}`
 export const loaderIsActiveAtom = atom((ctx) => ctx.spy(order.create.statusesAtom).isPending)

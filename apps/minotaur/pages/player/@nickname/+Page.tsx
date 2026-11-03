@@ -50,6 +50,7 @@ const page = createPageModel({
 
 export default function Page() {
   const [_] = useAtom(page.dataAtom);
+  const [isIdentity] = useAtom(isIdentityAtom);
 
   return (
     <div className="flex flex-col lg:flex-row relative w-full h-full items-start gap-8">
@@ -58,7 +59,7 @@ export default function Page() {
           lg:min-w-[calc(30%-16px)] lg:sticky pt-2 lg:top-0"
       >
         <PlayerSkin />
-        <PlayerSocials />
+        {isIdentity && <PlayerSocials />}
       </div>
       <div className="flex flex-col w-full gap-12 lg:w-[calc(70%-16px)] lg:min-w-[calc(70%-16px)] h-full">
         <PlayerPublic />

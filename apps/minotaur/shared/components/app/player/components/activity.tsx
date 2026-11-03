@@ -65,13 +65,6 @@ const PlayerServer = reatomComponent(({ ctx }) => {
             </div>
           </Dialog.Trigger>
         )}
-        <Dialog.Trigger>
-          <div className="flex justify-start cursor-pointer items-center overflow-x-auto gap-2 w-full">
-            <Typography className="text-neutral-400 font-semibold text-sm">
-              на сервере <span className="text-neutral-50">{server}</span>
-            </Typography>
-          </div>
-        </Dialog.Trigger>
         <Portal>
           <Dialog.Backdrop className={dialogVariant.backdrop()} />
           <Dialog.Positioner className={dialogVariant.positioner()}>

@@ -14,7 +14,12 @@ import { atom } from "@reatom/framework"
 import { MasonryGrid } from "@/shared/ui/masonry-grid"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { ErrorBlock } from "@/shared/ui/error-block"
-import { Noop } from "@/shared/ui/noop"
+
+const LandsEmpty = () => (
+  <Typography color="gray" className="text-lg">
+    {translate["lands.empty"]()}
+  </Typography>
+)
 
 const landCardVariants = tv({
   base: `flex items-start justify-between gap-6 duration-150 relative w-full rounded-xl p-3 sm:p-4 lg:p-6 bg-neutral-900`,
@@ -25,19 +30,23 @@ const landCardVariants = tv({
 })
 
 const LandCard = ({ members, name, title, ulid, details: { banner } }: LandSimilar) => {
+  const owner = members[0];
+
   return (
     <Link href={createLink("land", ulid)} className={landCardVariants().base()}>
       <div className={landCardVariants().child()}>
-        <div className="flex items-center gap-2 w-full">
-          <Avatar
-            nickname={members[0].nickname}
-            url={members[0].avatar}
-            className="h-6 w-6"
-          />
-          <Typography className="text-base sm:text-lg truncate">
-            {members[0].nickname}
-          </Typography>
-        </div>
+        {owner && (
+          <div className="flex items-center gap-2 w-full">
+            <Avatar
+              nickname={owner.nickname}
+              url={owner.avatar}
+              className="h-6 w-6"
+            />
+            <Typography className="text-base sm:text-lg truncate">
+              {owner.nickname}
+            </Typography>
+          </div>
+        )}
         <Typography className="text-base sm:text-xl truncate font-semibold">
           {name}
         </Typography>
@@ -108,7 +117,7 @@ export const LandsListShorted = reatomComponent(({ ctx }) => {
   if (error) return <ErrorBlock title={error.message} />
 
   const data = ctx.spy(lands.fetch.dataAtom)
-  if (!data) return <Noop />
+  if (!data || data.length === 0) return <LandsEmpty />
 
   return (
     <div className="flex flex-col w-full gap-2">
@@ -135,7 +144,7 @@ export const LandsList = reatomComponent(({ ctx }) => {
   if (error) return <ErrorBlock title={error.message} />
 
   const data = ctx.spy(lands.fetch.dataAtom)
-  if (!data) return <Noop />
+  if (!data || data.length === 0) return <LandsEmpty />
 
   return (
     <MasonryGrid

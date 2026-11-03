@@ -9,7 +9,9 @@ import { translate } from "@/shared/locales/helpers";
 
 export default function Page() {
   const ctx = useCtx();
-  const data = useData<Data>()?.data
+  const pageData = useData<Data>()
+  const data = pageData?.data
+  const failed = pageData?.failed
 
   onMount(() => {
     if (data) {
@@ -26,7 +28,7 @@ export default function Page() {
           </h1>
         </div>
         <div class="flex items-center justify-center w-full">
-          <ModpackList data={data} />
+          <ModpackList data={data} failed={failed} />
         </div>
       </div>
     </MainWrapperPage>

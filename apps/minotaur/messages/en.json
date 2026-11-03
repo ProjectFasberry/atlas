@@ -102,6 +102,30 @@
         "faq": "FAQ"
       },
       "warning": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
+    },
+    "error-boundary": {
+      "title": "Something went wrong",
+      "description": "We're already working on a fix.",
+      "refresh": "Refresh"
+    },
+    "alert-dialog": {
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "default-description": "This action cannot be undone",
+      "default-title": "Confirm action",
+      "not-so-fast": "Not so fast"
+    },
+    "copy": {
+      "aria": "Copy",
+      "button": "Copy",
+      "success": "Copied to clipboard"
+    },
+    "loading": "Loading...",
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "orders-limit": "Too many orders in a row. Please wait a bit.",
+      "payment-method": "This payment method is unavailable right now."
     }
   },
   "index": {
@@ -128,8 +152,7 @@
     "navigation": {
       "auth": {
         "loginTitle": "Login",
-        "regTitle": "Registration",
-        "recoveryTitle": "I forgot my password"
+        "regTitle": "Registration"
       }
     },
     "login": {
@@ -141,9 +164,14 @@
       "qr": {
         "steps": {
           "1": "1. Open Fasberry on your phone",
-          "2": "2. Go to Settings > Security > Link Device",
+          "2": "2. Open Settings > Devices > Link a device",
           "3": "3. Point your phone at the QR code on the screen"
-        }
+        },
+        "expired": "The QR code has expired",
+        "declined": "The sign-in was cancelled on the phone",
+        "refresh": "Refresh the QR code",
+        "retry": "Try again",
+        "scanned": "QR code scanned. Confirm the sign-in on the phone."
       },
       "submit": "Sign in"
     },
@@ -153,7 +181,8 @@
       "toLogin": "Go to login",
       "placeholders": {
         "findoutOther": "For example: Telegram channel",
-        "findout": "How did you hear about the project?"
+        "findout": "How did you hear about us? (optional)",
+        "password-repeat": "Repeat the password"
       },
       "findout": {
         "referrer": "From another player",
@@ -166,13 +195,10 @@
       "acceptRulesPrivacy": "privacy policy",
       "acceptRulesProcessing": "terms of service",
       "acceptRulesProject": "project rules",
-      "seed-phrase": {
-        "title": "Seed phrase",
-        "startTitle": "Enter the missing words to confirm that you saved the phrase",
-        "saveTitle": "Store the phrase in a secure place. You will need it if you want to recover access to your account",
-        "download": "Download",
-        "warning": "Before revealing your phrase, make sure no one is nearby."
-      }
+      "existing-player": "This player is already registered",
+      "password-hint": "At least 8 characters, no spaces",
+      "password-mismatch": "Passwords do not match",
+      "nickname-hint": "Latin letters, up to 16 characters, no spaces"
     },
     "shared": {
       "placeholders": {
@@ -187,24 +213,12 @@
         "password-is-unsafe": "Password is too simple",
         "user-exists": "Such a player is already registered",
         "token-not-found": "Verification is required"
+      },
+      "password-visibility": {
+        "show": "Show password",
+        "hide": "Hide password"
       }
     }
-  },
-  "recovery": {
-    "page": {
-      "title": "Recovery",
-      "description": "Recover your account using your recovery phrase"
-    },
-    "guide": {
-      "title": "To recover your password, you need to enter 12 words (seed phrase)",
-      "subtitle": "These words were provided during account registration",
-      "action": "I lost my seed phrase"
-    },
-    "input-nickname": "Enter nickname",
-    "input-nickname-tip": "Nickname must be entered exactly",
-    "confirm": "Confirm",
-    "new-password": "New password",
-    "repeat-password": "Repeat password"
   },
   "ratings": {
     "page": {
@@ -212,7 +226,9 @@
       "description": "Current player rankings across different categories"
     },
     "title": "Server rankings",
-    "goTo": "View leaderboard"
+    "goTo": "View leaderboard",
+    "sort": "Sort",
+    "empty": "The rating is empty for now"
   },
   "rating": {
     "page": {
@@ -274,7 +290,8 @@
     "page": {
       "title": "Territories",
       "description": "Server territories"
-    }
+    },
+    "empty": "No lands yet"
   },
   "store": {
     "page": {
@@ -307,14 +324,135 @@
       }
     },
     "item": {
-      "not-found": "Item not found"
+      "not-found": "Item not found",
+      "description": "Description",
+      "last-buyers": "Recent buyers"
+    },
+    "list": {
+      "empty": "No items available"
+    },
+    "orders": {
+      "status": {
+        "pending": "Awaiting payment",
+        "succeeded": "Completed",
+        "canceled": "Canceled",
+        "waiting-for-capture": "Awaiting confirmation"
+      },
+      "empty": {
+        "title": "Empty",
+        "description": "Your order will appear right after checkout",
+        "to-cart": "Go to cart"
+      },
+      "order": "Order #{id}",
+      "filters": {
+        "status": "Status",
+        "type": "Type",
+        "all": "All",
+        "awaiting": "Pending",
+        "completed": "Completed",
+        "game": "In-game",
+        "topup": "Top-up"
+      }
+    },
+    "order": {
+      "status": "Status",
+      "pay-link": "Payment link:",
+      "copied": "Copied",
+      "title": "Order",
+      "content": "Contents:",
+      "initiator": "Initiator",
+      "created": "Created",
+      "completed": "completed",
+      "in-progress": "in progress",
+      "items": "Items",
+      "recipient": "Recipient",
+      "state": {
+        "canceled": "Canceled",
+        "pending": "Awaiting payment",
+        "succeeded": "Paid",
+        "waiting-for-capture": "Pending"
+      },
+      "show-qr": "Show the QR code",
+      "pay": "Pay",
+      "amount": "Amount due"
+    },
+    "topup": {
+      "rules": {
+        "1": "1. Enter the desired amount",
+        "2": "2. Choose a payment method",
+        "3": "3. Pay"
+      },
+      "recipient-placeholder": "Nickname",
+      "currency-placeholder": "Not selected",
+      "back": "Back",
+      "continue": "Continue",
+      "rate": "Current exchange rate",
+      "amount-placeholder": "Amount",
+      "success": "Order created",
+      "failure": "Order was not created",
+      "to-order": "View order",
+      "return": "Go back",
+      "select-method": "Choose a payment method and currency",
+      "wallet": {
+        "charism": "Charism",
+        "belkoin": "Belkoin"
+      },
+      "button": "Top up",
+      "review": {
+        "title": "Check the order",
+        "amount": "You top up",
+        "recipient": "Recipient",
+        "method": "Payment method",
+        "price": "Approximate amount due",
+        "warning": "This is real money. Crypto payments are irreversible. If you are under 18, ask your parents to pay for the order.",
+        "confirm": "I am 18+ or have my parents' permission",
+        "pay": "Create an invoice"
+      },
+      "total": "Amount due"
+    },
+    "errors": {
+      "internal": "Failed to create the order",
+      "items-not-found": "Items were not found or are outdated",
+      "insufficient": "Insufficient balance"
+    },
+    "recipient": {
+      "placeholder": "Enter nickname",
+      "apply": "Apply",
+      "title": "Item recipient",
+      "description": "Some items allow choosing a recipient. If none is selected, the item will be purchased for you",
+      "current": "Current recipient"
     }
   },
   "cart": {
     "page": {
       "title": "Cart",
       "description": ""
-    }
+    },
+    "content": {
+      "title": "Contents",
+      "items": "Items",
+      "selected": "Selected",
+      "submit": "Checkout",
+      "price": "Total",
+      "top-up": "Top up balance",
+      "empty": {
+        "title": "Empty",
+        "description": "Go to the store to find everything you need.",
+        "to-store": "Go to store"
+      }
+    },
+    "item": {
+      "remove": "Remove",
+      "change-recipient": "Change the recipient",
+      "select": "Select the item"
+    },
+    "nav": {
+      "cart": "Cart",
+      "orders": "Orders",
+      "top-up": "Top up balance"
+    },
+    "loading": "Preparing your order",
+    "title": "Storage"
   },
   "parkour": {
     "player": "player",
@@ -341,7 +479,8 @@
     "page": {
       "title": "News",
       "description": "Fasberry project news"
-    }
+    },
+    "sort": "Sort"
   },
   "referrals": {
     "page": {
@@ -353,13 +492,24 @@
     "page": {
       "title": "Tasks",
       "description": "Tasks page description"
-    }
+    },
+    "reward": "Reward",
+    "empty": "No tasks yet"
   },
   "support": {
     "page": {
       "title": "Support",
       "description": "Support page description"
-    }
+    },
+    "title": "Support",
+    "in-development": "in development...",
+    "description": "If something is broken or you need help, write to us.",
+    "discord": "Discord",
+    "telegram": "Telegram",
+    "contacts": "Contacts",
+    "report-title": "Report a player",
+    "report-description": "Describe the situation and attach a screenshot in Discord or Telegram, the moderators will look into it.",
+    "rules": "Project rules"
   },
   "settings": {
     "main": "General settings",
@@ -385,7 +535,21 @@
           "description": "Deletion will also affect game data linked to this account",
           "confirm": "Delete account"
         }
-      }
+      },
+      "uuid-copy": "Copy UUID",
+      "registration": "Registered",
+      "role": "Role",
+      "change-password-title": "Change password",
+      "delete": {
+        "title": "Delete account",
+        "confirm": "Confirm",
+        "description": "Account deletion is permanent; all game data will be deleted"
+      },
+      "password-changed": "Password changed",
+      "password-differs": "The new password must be different",
+      "passwords-mismatch": "Passwords do not match",
+      "invalid-password": "Invalid password",
+      "password-hint": "At least 8 characters, no spaces"
     },
     "devices": {
       "title": "Devices",
@@ -396,7 +560,8 @@
           "current-session": "Current session",
           "active-sessions": "Active sessions",
           "end-all-sessions": "Log out of all other sessions",
-          "end-this-session": "Log out of session"
+          "end-this-session": "Log out of session",
+          "empty": "No other active sessions"
         },
         "add-device": {
           "title": "Link a device to your account by scanning a QR code",
@@ -411,6 +576,10 @@
           "request-rejected": "Request rejected",
           "request-rejected-description": "You can now close this window"
         }
+      },
+      "error": "Something went wrong",
+      "new-session": {
+        "request": "New sign-in request from {browser} in {location}. Confirm that it is you."
       }
     },
     "connections": {
@@ -419,7 +588,11 @@
         "add-connection": {
           "title": "Add accounts to your profile"
         }
-      }
+      },
+      "discord-warning": "You will be redirected to the Discord connection page",
+      "continue-confirm": "Continue?",
+      "go": "Continue",
+      "remove-error": "Failed to remove the social connection."
     },
     "store": {
       "title": "Store",
@@ -430,7 +603,9 @@
           "current-recipient-description": "Recipient assigned to all items added to the cart.",
           "save": "Save"
         }
-      }
+      },
+      "recipient-not-found": "This player is not registered",
+      "saved": "Changes saved"
     },
     "appearance": {
       "title": "Personalization",
@@ -442,13 +617,39 @@
         "balance-animation": {
           "description": "Numbers will change smoothly when the balance increases or decreases."
         }
-      }
+      },
+      "personalization": "Personalization"
     },
     "language": {
       "title": "Language"
     },
     "logout": {
       "title": "Log out"
-    }
+    },
+    "title": "Settings",
+    "security": {
+      "title": "Security"
+    },
+    "errors": {
+      "title": "Something went wrong"
+    },
+    "sessions": {
+      "end-all-confirm": "Are you sure you want to end all sessions?",
+      "forbidden": "For security reasons you cannot end this session. Wait a few hours and try again.",
+      "forbidden-rest": "For security reasons you cannot end the other sessions. Wait a few hours and try again.",
+      "ok": "OK"
+    },
+    "actions": "Actions"
+  },
+  "banned": {
+    "logout": "Sign out",
+    "never": "never",
+    "connection-lost": "Connection lost",
+    "title": "You have been banned",
+    "reason": "Reason",
+    "reason-not-specified": "not specified",
+    "unban": "Unban",
+    "appeal": "Appeal the ban",
+    "rules": "Project rules"
   }
 }

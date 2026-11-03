@@ -7,6 +7,10 @@
 		"dev": "pnpm --filter * dev",
 		"lint": "pnpm --filter * lint",
 		"type-check": "pnpm --filter * type-check",
+		"openapi": "pnpm --filter @repo/shared openapi:prod",
+		"openapi:dev": "pnpm --filter @repo/shared openapi:dev",
+		"openapi:prod": "pnpm --filter @repo/shared openapi:prod",
+		"openapi:check": "pnpm --filter @repo/shared openapi:check",
 		"circular-check": "pnpm --filter * circlular-check",
 		"postinstall": "lefthook install"
 	},

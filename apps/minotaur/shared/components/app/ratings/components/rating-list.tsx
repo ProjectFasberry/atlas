@@ -10,7 +10,7 @@ import { reatomComponent } from "@reatom/npm-react";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { type ReactNode } from "react";
 import { type AtomState } from "@reatom/framework";
-import { ratingsState, ratings } from "../models/ratings.model";
+import { ratingsState, ratings, RatingsViewer } from "../models/ratings.model";
 import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
@@ -18,7 +18,7 @@ import { Avatar } from "../../../../ui/avatar";
 import { Link } from "@/shared/components/config/link/link";
 import { dayjs } from "@/shared/lib/dayjs"
 import { PageLoader } from "@/shared/ui/page-loader";
-import { Noop } from "@/shared/ui/noop";
+import { Typography } from "@/shared/ui/typography";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { createLink } from "@/shared/components/config/link/link.model";
 import { translate } from "@/shared/locales/helpers";
@@ -232,7 +232,8 @@ const RatingsFilter = reatomComponent(({ ctx }) => {
 
   return (
     <Button
-      className='bg-neutral-800 hover:bg-neutral-700 aspect-square text-neutral-400 h-8 w-8 p-1'
+      aria-label={translate["ratings.sort"]()}
+      className='bg-neutral-800 hover:bg-neutral-700 aspect-square text-neutral-400 h-11 w-11 p-1'
       onClick={() => ratingsState.filters.asc(ctx, (state) => !state)}
     >
       {current ? <Icon name="sprite:arrow-down" /> : <Icon name="sprite:arrow-up" />}
@@ -302,7 +303,7 @@ export const COMPONENTS: Record<AtomState<typeof ratingsState.filters.by>, React
 
 const RatingTableHeader = reatomComponent(({ ctx }) => HEADERS[ctx.spy(ratingsState.filters.by)], "RatingTableHeader")
 const RatingTableBody = reatomComponent(({ ctx }) => {
-  if (ctx.spy(ratings.update.statusesAtom).isPending) {
+  if (!ctx.spy(ratingsState.data) && ctx.spy(ratings.update.statusesAtom).isPending) {
     return Array.from({ length: 32 }).map((_, idx) => <TableRowsSkeleton key={idx} />)
   }
 
@@ -315,17 +316,26 @@ export const Ratings = reatomComponent(({ ctx }) => {
   const error = ctx.spy(ratings.fetch.errorAtom);
   if (error) return <ErrorBlock title={error.message} />
 
-  if (!ctx.spy(ratingsState.data)) return <Noop />
+  if (!ctx.spy(ratingsState.data)) {
+    return (
+      <Typography color="gray" className="text-lg">
+        {translate["ratings.empty"]()}
+      </Typography>
+    )
+  }
 
   return (
-    <Table>
-      <TableCaption>Рейтинг</TableCaption>
-      <TableHeader>
-        <RatingTableHeader />
-      </TableHeader>
-      <TableBody>
-        <RatingTableBody />
-      </TableBody>
-    </Table>
+    <>
+      <Table>
+        <TableCaption>Рейтинг</TableCaption>
+        <TableHeader>
+          <RatingTableHeader />
+        </TableHeader>
+        <TableBody>
+          <RatingTableBody />
+        </TableBody>
+      </Table>
+      <RatingsViewer />
+    </>
   )
 }, "Ratings")

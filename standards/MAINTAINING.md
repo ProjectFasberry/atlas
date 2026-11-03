@@ -22,6 +22,20 @@ The `package.json` defines several commands for routine maintenance:
   `pnpm gen:icons`
   Executes `scripts/generate-icons.ts` to build out standard UI icons.
 
+## OpenAPI types
+
+The generated clients live in `pkgs/shared/types/gen/` (`main` and `panel`). Regenerate
+them after any backend route or schema change:
+
+- `pnpm openapi:prod` - from `api.fasberry.fun` and `panel.fasberry.fun`.
+- `pnpm openapi:dev` - from the local backend at `127.0.0.1:4104` and `:4105`.
+- `pnpm openapi:check` - CI guard; fails when the checked-in types are stale.
+
+The same scripts work from `pkgs/shared`. Prod URLs come from
+`pkgs/shared/.env.local` (`API_MAIN_OPENAPI_URL`, `API_PANEL_OPENAPI_URL`, optionally
+`API_PANEL_AUTHORIZATION_KEY`); the generator renders them into Redocly because this
+version does not expand `${VAR}` itself. Never commit `.env.local`.
+
 ## Environment & Secrets
 
 Environment variables are securely injected via **Infisical**.

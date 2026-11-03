@@ -20,7 +20,7 @@ async function fetchAppDictionaries(init: RequestInit) {
 }
 
 function fetchSharedData(ctx: ReturnType<typeof createCtx>) {
-  Promise.all([
+  return Promise.all([
     fetchCurrencies().then(r => currenciesAtom(ctx, r)),
     fetchSocials().then(r => socialsAtom(ctx, r))
   ]).catch(e => {
@@ -69,7 +69,9 @@ export async function onCreatePageContext(pageCtx: PageContextServer) {
   const url = new URL(urlPathname, `http://${headers["host"]}`);
   setupUrlAtomSettings(ctx, () => url)
 
-  fetchSharedData(ctx);
+  // Started in parallel with the required requests, but awaited before the
+  // snapshot is built so currencies/socials are always available on the client.
+  const sharedData = fetchSharedData(ctx);
 
   const [options, dictionaries] = await Promise.all([
     fetchAppState({ headers }),
@@ -80,6 +82,8 @@ export async function onCreatePageContext(pageCtx: PageContextServer) {
   })
 
   setupApp(options, headers, dictionaries)
+
+  await sharedData;
 
   if (!options.flags.isAuthed) {
     return updateSnapshot();

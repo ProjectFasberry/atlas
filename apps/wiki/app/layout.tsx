@@ -46,7 +46,7 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
           i18n={i18nProvider(locale === 'ru' ? translations : defaultTranslations)}
           theme={{ enabled: false }}
         >
-          <ReatomProvider>
+          <ReatomProvider initialTheme={theme}>
             <LocaleSync locale={locale} />
             <ViewerSync viewer={viewer} />
             <DocsLayout

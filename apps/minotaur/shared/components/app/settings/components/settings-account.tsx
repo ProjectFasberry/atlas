@@ -36,9 +36,24 @@ const SettingsMainDeleteAccount = reatomComponent(({ ctx }) => {
 }, "DeleteAccount")
 
 const CHANGE_PASSWORD_FIELDS = [
-  { placeholder: translate["settings.account.sections.password-and-authentication.current-password"](), value: changePassState.currentPass },
-  { placeholder: translate["settings.account.sections.password-and-authentication.new-password"](), value: changePassState.newPass },
-  { placeholder: translate["settings.account.sections.password-and-authentication.repeat-password"](), value: changePassState.newPassRepeat }
+  {
+    type: "password",
+    autoComplete: "current-password",
+    placeholder: translate["settings.account.sections.password-and-authentication.current-password"](),
+    value: changePassState.currentPass
+  },
+  {
+    type: "password",
+    autoComplete: "new-password",
+    placeholder: translate["settings.account.sections.password-and-authentication.new-password"](),
+    value: changePassState.newPass
+  },
+  {
+    type: "password",
+    autoComplete: "new-password",
+    placeholder: translate["settings.account.sections.password-and-authentication.repeat-password"](),
+    value: changePassState.newPassRepeat
+  }
 ]
 
 const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
@@ -60,8 +75,8 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
         <Portal>
           <Dialog.Backdrop className={dialogVariant.backdrop()} />
           <DialogPositioner className={dialogVariant.positioner()}>
-            <Dialog.Content className={dialogVariant.content("w-1/4!")}>
-              <Dialog.Title className={dialogVariant.title()}>Изменение пароля</Dialog.Title>
+            <Dialog.Content className={dialogVariant.content()}>
+              <Dialog.Title className={dialogVariant.title()}>{translate["settings.account.change-password-title"]()}</Dialog.Title>
               <form
                 className="flex flex-col gap-6 w-full inert:opacity-60 inert:pointer-events-none"
                 onSubmit={e => changePass.handle(ctx, e)}
@@ -71,12 +86,19 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
                   {CHANGE_PASSWORD_FIELDS.map((field, idx) => (
                     <Input
                       key={idx}
+                      type={field.type}
+                      autoComplete={field.autoComplete}
                       placeholder={field.placeholder}
+                      minLength={8}
+                      maxLength={72}
                       required
                       value={ctx.spy(field.value)}
                       onChange={e => field.value(ctx, e.target.value)}
                     />
                   ))}
+                  <span className="text-xs text-neutral-400">
+                    {translate["settings.account.password-hint"]()}
+                  </span>
                 </div>
                 {error && (
                   <ErrorBlock title={error?.message} />
@@ -101,12 +123,12 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
   )
 }, "ChangePassword")
 
-const INFO_ACTIONS_LIST = [
+const getInfoActions = () => [
   {
-    label: "Скопировать UUID",
+    label: translate["settings.account.uuid-copy"](),
     action: (value: string) => action(async (ctx) => {
       await navigator.clipboard.writeText(value);
-      toast.success(translate["shared.copyed-to-clipboard"]())
+      toast.success(translate["shared.copy.success"]())
     }),
     value: "copy-uuid"
   }
@@ -116,6 +138,7 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
   if (!currentUser) return null;
 
   const { nickname, avatar, meta, uuid } = currentUser;
+  const infoActions = getInfoActions();
 
   return (
     <div className="flex flex-col gap-4 bg-neutral-800 rounded-xl p-4 w-full h-full">
@@ -125,15 +148,15 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
           {nickname}
         </div>
         <Menu.Root
-          onSelect={({ value }) => INFO_ACTIONS_LIST.find(d => d.value === value)?.action(uuid)(ctx)}
+          onSelect={({ value }) => infoActions.find(d => d.value === value)?.action(uuid)(ctx)}
         >
-          <Menu.Trigger className={menuVariant.trigger()}>
+          <Menu.Trigger className={menuVariant.trigger()} aria-label={translate["settings.actions"]()}>
             <Icon name="sprite:dots" className="size-[22px] text-neutral-400" />
           </Menu.Trigger>
           <Portal>
             <Menu.Positioner>
               <Menu.Content className={menuVariant.content()}>
-                {INFO_ACTIONS_LIST.map((item) => (
+                {infoActions.map((item) => (
                   <Menu.Item key={item.value} value={item.value} className={menuVariant.item()}>
                     {item.label}
                   </Menu.Item>
@@ -145,10 +168,10 @@ const SettingsMainInfo = reatomComponent(({ ctx }) => {
       </div>
       <div className="flex flex-col w-full gap-1">
         <span>
-          Регистрация: {dayjs(meta.reg_date.toString()).format("DD.MM.YYYY")}
+          {translate["settings.account.registration"]()}: {dayjs(meta.reg_date.toString()).format("DD.MM.YYYY")}
         </span>
         <span>
-          Роль: {meta.role.name}
+          {translate["settings.account.role"]()}: {meta.role.name}
         </span>
       </div>
     </div>

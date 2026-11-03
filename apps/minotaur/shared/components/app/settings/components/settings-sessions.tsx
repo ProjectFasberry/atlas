@@ -94,7 +94,13 @@ const SessionsListActive = reatomComponent(({ ctx }) => {
   }
 
   const data = ctx.spy(sessionsState.activeList);
-  if (!data || isEmptyArray(data)) return <Noop />
+  if (!data || isEmptyArray(data)) {
+    return (
+      <Typography color="gray" className="text-sm">
+        {translate["settings.devices.sections.sessions.empty"]()}
+      </Typography>
+    )
+  }
 
   return data.map((session, idx) => <SessionItem key={idx} session={session} type="active" />)
 }, "SessionsListActive")

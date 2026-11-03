@@ -15,7 +15,7 @@ function metadata(
   const title = wrapTitle(item.title).slice(0, 64)
   const description = item.description ?? "";
   const image = item.imageUrl
-  const keywords = `${item.title}, fasberry, fasberry page, товар, магазин, store`
+  const keywords = `${item.title}, fasberry, fasberry page, store, marketplace, item`
 
   return {
     title,

@@ -11,8 +11,8 @@
  */
 import crypto from 'node:crypto';
 import pg from 'pg';
-import sanitizeHtml from 'sanitize-html';
 import Turndown from 'turndown';
+import { sanitizeContent } from '../lib/content/html.ts';
 
 const API = 'https://api.mymemory.translated.net/get';
 const LIMIT = 480;
@@ -132,7 +132,7 @@ async function main() {
 
     const title = await request(page.title);
     const description = page.description ? await request(page.description) : '';
-    const html = sanitizeHtml(await translateHtml(page.html));
+    const html = sanitizeContent(await translateHtml(page.html));
     const markdown = turndown.turndown(html).trim();
 
     await client.query(

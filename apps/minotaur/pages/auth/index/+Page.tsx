@@ -5,6 +5,7 @@ import { createPageModel } from "@/shared/lib/events";
 import { pageState } from "@/shared/models/page-context.model";
 import { register } from "@/shared/components/app/auth/models/register.model";
 import { getDevModulesInfo } from "@/shared/models/app/index.model";
+import { authLoginVariantAtom, login } from "@/shared/components/app/auth/models/login.model";
 
 const page = createPageModel({
   name: "auth",
@@ -13,6 +14,10 @@ const page = createPageModel({
       authState.searchParams(ctx, (state) => ctx.get(pageState.urlParsed)?.search ?? state)
 
       if (!isConnected()) return;
+
+      if (ctx.get(authLoginVariantAtom) === "qr") {
+        login.qr.generate(ctx);
+      }
 
       const devModulesInfo = getDevModulesInfo(ctx);
 
@@ -31,6 +36,7 @@ const page = createPageModel({
     onDisconnect: (ctx) => {
       auth.resetAuthState(ctx)
       register.resetRegisterState(ctx)
+      login.qr.close(ctx)
     },
   }
 })

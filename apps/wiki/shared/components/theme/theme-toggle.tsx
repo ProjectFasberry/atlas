@@ -14,6 +14,7 @@ export const ThemeToggle = reatomComponent<{ className?: string }>(({ className,
   return (
     <Segmented
       label={m['theme.toggle']({}, { locale })}
+      testId="theme-switch"
       value={isDark ? 'dark' : 'light'}
       className={className}
       options={[

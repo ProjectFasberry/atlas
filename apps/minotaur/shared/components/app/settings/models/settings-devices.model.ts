@@ -4,6 +4,7 @@ import type { TrackFunction } from "@yudiel/react-qr-scanner"
 import { login } from "../../auth/models/login.model"
 import { isError } from "@/shared/lib/utils"
 import { toast } from "sonner"
+import { translate } from "@/shared/locales/helpers"
 
 export const scanState = atom(null, "scanState").pipe(
 	withAssign((_, name) => ({
@@ -101,7 +102,7 @@ export const scanReaderModel = {
   }),
   onError: action((ctx, error: Error | unknown) => {
     if (isError(error)) {
-      toast.error("Произошла ошибка", {
+      toast.error(translate["settings.devices.error"](), {
         description: error.message
       })
 

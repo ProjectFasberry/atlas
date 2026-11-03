@@ -3,10 +3,10 @@ apis:
     root: ${API_MAIN_OPENAPI_URL}
     x-openapi-ts:
       output: ./types/gen/main/schema.ts
-  # panel:
-  #   root: ${API_PANEL_OPENAPI_URL}
-  #   x-openapi-ts:
-  #     output: ./types/gen/panel/schema.ts
+  panel:
+    root: ${API_PANEL_OPENAPI_URL}
+    x-openapi-ts:
+      output: ./types/gen/panel/schema.ts
 
 resolve:
   http:

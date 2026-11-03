@@ -10,6 +10,7 @@ import { ChangeRecipientDialog } from "../recipient/change-recipient";
 import { Icon } from "@/shared/ui/icon"
 import { expImage } from "@/shared/consts/images";
 import { order } from "../../models/store-order.model";
+import { translate } from "@/shared/locales/helpers";
 
 const CartContentData = reatomComponent(({ ctx }) => {
   const data = ctx.spy(cartState.data);
@@ -26,18 +27,21 @@ const CartSummerySelected = reatomComponent(({ ctx }) => ctx.spy(cartDataSelecte
 const CartSummeryTotal = reatomComponent(({ ctx }) => ctx.spy(cartState.data).length, "CartSummery")
 
 const CartActionsSubmit = reatomComponent(({ ctx }) => {
-  const isValid = ctx.spy(cartIsValidAtom) || ctx.spy(order.create.statusesAtom).isPending;
+  const isValid = ctx.spy(cartIsValidAtom);
+  const isPending = ctx.spy(order.create.statusesAtom).isPending;
 
   return (
     <Button
       id="submit"
       type="button"
       background="positive"
-      disabled={!isValid}
+      disabled={!isValid || isPending}
+      withSpinner
+      isLoading={isPending}
       className="w-full h-10 font-semibold"
       onClick={() => spawn(ctx, (spawnCtx) => order.create(spawnCtx))}
     >
-      К оформлению
+      {translate["cart.content.submit"]()}
     </Button>
   )
 }, "CartActionsSubmit")
@@ -46,13 +50,13 @@ const CartContentEmpty = () => {
   return (
     <div className="flex flex-col bg-neutral-900 rounded-lg p-4 sm:p-3 lg:p-4 lg:w-2/3">
       <Typography className='text-2xl font-semibold'>
-        Пусто
+        {translate["cart.content.empty.title"]()}
       </Typography>
       <Typography className="text-neutral-400 text-base leading-5">
-        Перейдите в магазин, чтобы найти всё, что нужно.
+        {translate["cart.content.empty.description"]()}
       </Typography>
       <Link href="/store" className="mt-4 text-lg w-fit text-green-400">
-        В магазин
+        {translate["cart.content.empty.to-store"]()}
       </Link>
     </div>
   )
@@ -66,14 +70,14 @@ export const CartListContent = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-4 lg:w-2/3 bg-neutral-900 p-2 sm:p-3 lg:p-4 rounded-xl">
       <div className="flex flex-col gap-1">
         <Typography className="text-xl font-semibold">
-          Содержимое
+          {translate["cart.content.title"]()}
         </Typography>
         <div className="flex items-center justify-between w-full gap-2">
           <Typography className="text-neutral-400">
-            Товаров: <CartSummeryTotal />
+            {translate["cart.content.items"]()}: <CartSummeryTotal />
           </Typography>
           <Typography className="text-neutral-400">
-            Выбрано: <CartSummerySelected />
+            {translate["cart.content.selected"]()}: <CartSummerySelected />
           </Typography>
         </div>
       </div>
@@ -100,7 +104,7 @@ export const CartActions = () => {
               "
             >
               <Icon name="sprite:credit-card-pay" className="size-5" />
-              Пополнить счет
+              {translate["cart.content.top-up"]()}
             </Link>
           </div>
         </div>
@@ -120,7 +124,7 @@ export const CartActions = () => {
             </div>
             <div className="flex flex-col justify-center">
               <Typography color="gray" className="text-lg leading-6">
-                Стоимость
+                {translate["cart.content.price"]()}
               </Typography>
               <CartPrice />
             </div>

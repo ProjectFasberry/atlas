@@ -105,13 +105,15 @@ const Item = (props: { idx: number, title: string }) => {
   const [isActive] = useAtom(getIsActiveAtom(props.idx))
 
   return (
-    <div
+    <button
+      type="button"
       data-state={isActive() ? "active" : "inactive"}
+      aria-pressed={isActive()}
       onClick={() => selectedKeyAtom(ctx, props.idx)}
       class={navigationBadge({ variant: isActive() ? "selected" : "unselected" })}
     >
-      <Typography class="truncate">{props.title}</Typography>
-    </div>
+      <span class="truncate">{props.title}</span>
+    </button>
   )
 }
 

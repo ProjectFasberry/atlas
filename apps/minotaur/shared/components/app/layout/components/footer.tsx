@@ -4,14 +4,11 @@ import { Typography } from "@/shared/ui/typography"
 import { env } from "@/shared/env"
 import { Logotype } from "./logotype"
 import { translate } from "@/shared/locales/helpers"
-import { action } from "@reatom/framework"
+import { type AtomState } from "@reatom/framework"
 import { reatomComponent } from "@reatom/npm-react"
 import { socialsAtom } from "@/shared/models/shared.model"
 
-const getHrefs = action((ctx) => {
-  const data = ctx.get(socialsAtom);
-  if (!data) return null;
-
+const getHrefs = (data: AtomState<typeof socialsAtom>) => {
   let telegramHref: string | undefined;
   let discordHref: string | undefined;
 
@@ -28,17 +25,17 @@ const getHrefs = action((ctx) => {
   }
 
   return { telegramHref, discordHref }
-})
+}
 
 const createLandingUrl = (path: string) => `${env.VITE_LANDING_URL}${path}`
 
 export const Footer = reatomComponent(({ ctx }) => {
-  const data = getHrefs(ctx);
+  const data = getHrefs(ctx.spy(socialsAtom));
 
   return (
     <div
       className="
-        flex items-center justify-center w-full pb-24 h-full lg:min-h-40 p-3 lg:p-4
+        flex items-center justify-center w-full pb-[calc(6rem+env(safe-area-inset-bottom))] h-full lg:min-h-40 p-3 lg:p-4
         bg-gradient-to-br from-green-800/40 via-green-800/50 to-green-800/40 border-t border-green-700/20
         lg:backdrop-blur-md
       "
@@ -49,7 +46,7 @@ export const Footer = reatomComponent(({ ctx }) => {
             <div className="h-14 w-full">
               <Logotype />
             </div>
-            {data && (
+            {data && (data.telegramHref || data.discordHref) && (
               <div
                 className="
                 flex items-center gap-2
@@ -57,12 +54,16 @@ export const Footer = reatomComponent(({ ctx }) => {
                 *:flex *:items-center *:justify-center *:p-2 *:rounded-full
               "
               >
-                <a href={data.discordHref} aria-label="Дискорд">
-                  <Icon name="sprite:brand-discord" className="size-[18px]" />
-                </a>
-                <a href={data.telegramHref} aria-label="Телеграм">
-                  <Icon name="sprite:brand-telegram" className="size-[18px]" />
-                </a>
+                {data.discordHref && (
+                  <a href={data.discordHref} aria-label="Дискорд">
+                    <Icon name="sprite:brand-discord" className="size-[18px]" />
+                  </a>
+                )}
+                {data.telegramHref && (
+                  <a href={data.telegramHref} aria-label="Телеграм">
+                    <Icon name="sprite:brand-telegram" className="size-[18px]" />
+                  </a>
+                )}
               </div>
             )}
           </div>

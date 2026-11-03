@@ -9,7 +9,7 @@ const port = 3005;
 process.env.PORT = String(port)
 
 const app = new Hono<Env>()
-  .get("/health", async (ctx) => ctx.status(200))
+  .get("/health", async (ctx) => ctx.body(null, 200))
   .use(contextStorage())
   .use("*", async (ctx, next) =>
     paraglideMiddleware(ctx.req.raw, ({ locale }) => {

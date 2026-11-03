@@ -4,15 +4,46 @@ import { action, atom, reatomAsync, withAssign, withErrorAtom, withReset, withSt
 import { settings, } from "./settings.model"
 import { toast } from "sonner"
 import { isError } from "@/shared/lib/utils"
+import { passwordSchema } from "@/shared/schemas/auth"
+import { translate } from "@/shared/locales/helpers"
+
+/** The API answers with machine codes; the modal shows human texts. */
+const getChangePasswordError = (message: string) => {
+  switch (message) {
+    case "PASSWORD_OR_LOGIN_INCORRECT":
+      return translate["auth.shared.errors.password-or-login-incorrect"]()
+    case "PASSWORD_IS_UNSAFE":
+      return translate["auth.shared.errors.password-is-unsafe"]()
+    case "NOT_FOUND":
+      return translate["auth.shared.errors.not-exists"]()
+    default:
+      return message
+  }
+}
+
+function firstIssueMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    try {
+      const issues = JSON.parse(String((error as { message: unknown }).message))
+      const message = Array.isArray(issues) ? issues[0]?.message : null
+
+      if (typeof message === "string") return message
+    } catch {
+      // not a serialized zod error, fall through
+    }
+  }
+
+  return translate["settings.account.invalid-password"]()
+}
 
 export const settingsAccountModel = () => {
   const deleteAccount = atom(null, "deleteAccount").pipe(
     withAssign((_, name) => ({
       before: action((ctx) => {
         alertDialog.open(ctx, {
-          title: "Удаление аккаунта",
-          confirmLabel: "Подтвердить",
-          description: "Удаление аккаунта безвозвратное, все игровые данные будут удалены",
+          title: translate["settings.account.delete.title"](),
+          confirmLabel: translate["settings.account.delete.confirm"](),
+          description: translate["settings.account.delete.description"](),
           onConfirm: () => deleteAccount.submit(ctx),
         })
       }, `${name}.before`),
@@ -30,7 +61,7 @@ export const settingsAccountModel = () => {
         },
         onReject: (_, e) => {
           if (isError(e)) {
-            toast.error(e.message)
+            toast.error(getChangePasswordError(e.message))
           }
         }
       }).pipe(
@@ -75,12 +106,12 @@ export const settingsAccountModel = () => {
         onFulfill: (ctx, res) => {
           if (res === "OK") {
             changePassState.isOpen(ctx, false)
-            toast.success("Пароль изменен")
+            toast.success(translate["settings.account.password-changed"]())
           }
         },
         onReject: (_, e) => {
           if (isError(e)) {
-            toast.error(e.message)
+            toast.error(getChangePasswordError(e.message))
           }
         }
       }).pipe(
@@ -100,13 +131,20 @@ export const settingsAccountModel = () => {
 
         const repeatPass = ctx.get(changePassState.newPassRepeat);
 
+        const parsed = passwordSchema.safeParse(newPass)
+
+        if (!parsed.success) {
+          changePass.submit.errorAtom(ctx, new Error(firstIssueMessage(parsed.error)))
+          return;
+        }
+
         if (currentPass === newPass) {
-          changePass.submit.errorAtom(ctx, new Error("Новый пароль должен отличаться"))
+          changePass.submit.errorAtom(ctx, new Error(translate["settings.account.password-differs"]()))
           return;
         }
 
         if (newPass !== repeatPass) {
-          changePass.submit.errorAtom(ctx, new Error("Пароли не совпадают"))
+          changePass.submit.errorAtom(ctx, new Error(translate["settings.account.passwords-mismatch"]()))
           return;
         }
 

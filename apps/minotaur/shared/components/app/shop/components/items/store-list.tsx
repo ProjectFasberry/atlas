@@ -5,6 +5,7 @@ import { getStaticImage } from "@/shared/lib/helpers"
 import { PageLoader } from "@/shared/ui/page-loader"
 import { StoreItem } from "./store-item"
 import { isEmptyArray } from "@/shared/lib/utils"
+import { translate } from "@/shared/locales/helpers"
 
 const itemsNotFoundImage = getStaticImage("minecraft/items/block_inspect.webp")
 
@@ -12,7 +13,7 @@ const ItemsNotFound = () => {
   return (
     <div className="flex flex-col gap-2 items-center h-full justify-center w-full">
       <img src={itemsNotFoundImage} width={64} height={64} alt="" />
-      <Typography className="text-xl font-semibold">Доступных товаров нет</Typography>
+      <Typography className="text-xl font-semibold">{translate["store.list.empty"]()}</Typography>
     </div>
   )
 }

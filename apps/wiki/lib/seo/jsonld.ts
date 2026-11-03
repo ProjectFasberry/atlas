@@ -36,6 +36,19 @@ export function homeJsonLd(description: string) {
   };
 }
 
+/**
+ * JSON-LD is inlined into a `<script>` tag, so a `</script>` or a line separator
+ * inside `description` would break out of it. Escape the characters that matter.
+ */
+export function serializeJsonLd(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
 /** Structured data of a single wiki page. */
 export function articleJsonLd({ title, description, url, image, updatedAt }: ArticleJsonLdInput) {
   return {

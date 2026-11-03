@@ -3,10 +3,12 @@
  * Sync of the Fasberry wiki with the backend.
  *
  *   pnpm sync:wiki
+ *   pnpm sync:wiki --force          # also overwrite pages edited in the editor
  *   WIKI_API_URL=https://api.fasberry.fun pnpm sync:wiki
  *
  * The script pulls /wiki/categories and /wiki/category/{slug}, converts TipTap JSON
- * into HTML/markdown and writes pages straight into PostgreSQL. Images stay in the
+ * into HTML/markdown and writes pages straight into PostgreSQL. Pages saved by the
+ * editor are left alone unless `--force` is passed. Images stay in the
  * public bucket: legacy addresses are normalised to volume.fasberry.fun and the
  * skipped nodes are listed in content/wiki-sync-report.json.
  */
@@ -22,6 +24,7 @@ import { openDb, upsertPage } from './lib/db.mjs';
 const API = (process.env.WIKI_API_URL || 'https://api.fasberry.fun').replace(/\/$/, '');
 const ROOT = process.cwd();
 const REPORT_FILE = path.join(ROOT, 'content/wiki-sync-report.json');
+const force = process.argv.includes('--force');
 
 async function fetchJson(url, attempt = 1) {
   try {
@@ -348,10 +351,13 @@ async function main() {
   const slugs = [...new Set(sections.flatMap((section) => section.pages))];
 
   const { client, db } = await openDb();
+  const sources = new Map(
+    (await db.select({ slug: wikiPages.slug, source: wikiPages.source }).from(wikiPages)).map(
+      (row) => [row.slug, row.source],
+    ),
+  );
   const previous = new Set(
-    (
-      await db.select({ slug: wikiPages.slug }).from(wikiPages).where(eq(wikiPages.source, 'sync'))
-    ).map((row) => row.slug),
+    [...sources].filter(([, source]) => source === 'sync').map(([slug]) => slug),
   );
 
   // linear order: groups first, inside a group as on the backend
@@ -367,6 +373,7 @@ async function main() {
     generatedAt: new Date().toISOString(),
     api: API,
     pages: 0,
+    skipped: 0,
     empty: [],
     failedPages: [],
     removed: [],
@@ -374,6 +381,13 @@ async function main() {
   const written = [];
 
   for (const slug of slugs) {
+    if (!force && sources.get(slug) === 'editor') {
+      console.log(`· ${slug} — есть правки из редактора, пропускаю`);
+      report.skipped += 1;
+      written.push(slug);
+      continue;
+    }
+
     let payload = null;
     let fetchError = null;
     try {
@@ -435,7 +449,9 @@ async function main() {
   await fs.writeFile(REPORT_FILE, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   await client.end();
 
-  console.log(`\nГотово: ${report.pages} страниц, удалено ${report.removed.length}.`);
+  console.log(
+    `\nГотово: ${report.pages} страниц, пропущено ${report.skipped}, удалено ${report.removed.length}.`,
+  );
   console.log(`Отчёт: ${path.relative(ROOT, REPORT_FILE)}`);
 }
 
