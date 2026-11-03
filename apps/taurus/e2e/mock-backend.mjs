@@ -5,17 +5,6 @@ import http from 'node:http';
  * load are answered; everything else 404s, so an unexpected call is visible in the test.
  */
 const routes = {
-  '/launcher': () => ({
-    data: {
-      artifacts: [
-        {
-          platform: 'windows-x86_64',
-          url: 'https://example.test/Fasberry-e2e-setup.exe',
-        },
-        { platform: 'darwin-aarch64', url: null },
-      ],
-    },
-  }),
   '/rules/tags': () => ({ data: [{ id: 1, title: 'E2E' }] }),
   '/rules/list': () => ({
     data: [

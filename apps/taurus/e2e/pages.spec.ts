@@ -2,9 +2,8 @@ import { type APIRequestContext, expect, test } from '@playwright/test';
 
 /**
  * The landing is server rendered, so the pages are checked through the response text. A
- * browser adds nothing here: the interactive bits are the launcher fetch (covered by the
- * wiki suite via the same api) and the header menu, which needs a browser and a much
- * lighter dev server than `vike dev` gives us - see `e2e/README.md`.
+ * browser adds nothing here: the interactive bits are the header menu, which needs a
+ * browser and a much lighter dev server than `vike dev` gives us - see `e2e/README.md`.
  */
 const text = async (request: APIRequestContext, path: string) => {
   const response = await request.get(path);
@@ -39,6 +38,13 @@ test.describe('landing pages', () => {
     const { response, body } = await text(request, '/modpack');
     expect(response.status()).toBe(200);
     expect(body).toContain('E2E Modpack');
+  });
+
+  test('links the stable launcher downloads', async ({ request }) => {
+    const { response, body } = await text(request, '/start');
+    expect(response.status()).toBe(200);
+    expect(body).toContain('/releases/download/windows-x86_64');
+    expect(body).toContain('/releases/download/darwin-aarch64');
   });
 
   test('answers 404 for an unknown page', async ({ request }) => {

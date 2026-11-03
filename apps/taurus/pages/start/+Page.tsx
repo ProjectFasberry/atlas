@@ -1,14 +1,13 @@
 import { MainWrapperPage } from "@/shared/ui/main-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import { tv } from "tailwind-variants";
-import { getStaticObject } from "@/shared/lib/helpers";
+import { getLauncherDownloadUrl, getStaticObject } from "@/shared/lib/helpers";
 import { env } from "@/shared/env";
-import { onMount } from "solid-js";
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
-import { launcher, launcherArtifact } from "./(models)/launcher.model";
 import { translate } from "@/shared/locales/helpers";
 
 const APP_URL = env.VITE_APP_URL
+const WINDOWS_URL = getLauncherDownloadUrl("windows-x86_64")
+const MACOS_URL = getLauncherDownloadUrl("darwin-aarch64")
 const NumericItem = ({ index }: { index: number }) => {
   return (
     <div class="flex items-center justify-center aspect-square border-shark-800">
@@ -32,16 +31,6 @@ const stepImageVariant = tv({
 })
 
 export default function Page() {
-  const ctx = useCtx();
-
-  onMount(() => {
-    launcher.fetch(ctx)
-  })
-
-  const [launcherData] = useAtom(launcher.fetch.dataAtom)
-  const windowsUrl = () => launcherArtifact(launcherData(), "windows-x86_64")
-  const macosUrl = () => launcherArtifact(launcherData(), "darwin-aarch64")
-
   return (
     <MainWrapperPage>
       <div class="flex flex-col items-center w-full gap-12 h-full">
@@ -87,10 +76,8 @@ export default function Page() {
                     <a
                       target="_blank"
                       rel="noreferrer"
-                      href={windowsUrl() ?? undefined}
-                      aria-disabled={windowsUrl() ? undefined : "true"}
+                      href={WINDOWS_URL}
                       class="flex justify-center items-center button px-4 py-1"
-                      classList={{ "opacity-60 pointer-events-none select-none": !windowsUrl() }}
                     >
                       <Typography class="text-nowrap">
                         {translate["start.template.steps.download-windows"]()}
@@ -99,15 +86,11 @@ export default function Page() {
                     <a
                       target="_blank"
                       rel="noreferrer"
-                      href={macosUrl() ?? undefined}
-                      aria-disabled={macosUrl() ? undefined : "true"}
+                      href={MACOS_URL}
                       class="flex justify-center items-center button px-4 py-1"
-                      classList={{ "opacity-60 pointer-events-none select-none": !macosUrl() }}
                     >
                       <Typography class="text-nowrap">
-                        {macosUrl()
-                          ? translate["start.template.steps.download-macos"]()
-                          : translate["start.template.steps.download-macos-soon"]()}
+                        {translate["start.template.steps.download-macos"]()}
                       </Typography>
                     </a>
                   </div>
