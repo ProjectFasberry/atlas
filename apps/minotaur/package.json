@@ -15,12 +15,7 @@
 		"type-check": "bun scripts/fix-sprite.ts && tsc --build",
 		"circular-check": "bunx dpdm --no-warning ./renderer/+onCreatePageContext.server.ts",
 		"gen:translate": "inlang machine translate --project project.inlang",
-		"gen:icons": "bun run scripts/generate-icons.ts",
-		"--------------------": "",
-		"build:image:prod": "infisical run --env=common --path=/root -- make build STAGE=prod NAME=minotaur",
-		"release:prod": "pnpm type-check & pnpm build:prod && pnpm build:image:prod",
-		"build:image:staging": "infisical run --env=common --path=/root -- make build STAGE=staging NAME=minotaur",
-		"release:staging": "pnpm type-check && pnpm build:staging && pnpm build:image:staging"
+		"gen:icons": "bun run scripts/generate-icons.ts"
 	},
 	"sideEffects": [
 		"**/*.css"

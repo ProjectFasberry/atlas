@@ -59,47 +59,43 @@ selected tab, drafts) goes to atoms as well. The locale follows the same rule: `
 
 ## Build and deploy
 
-Production code: `/home/rusik/work/fasberry/atlas/apps/wiki` (monorepo `atlas`). Node in
-`~/.local/node-v25.9.0/bin`, pnpm in `~/.local/share/pnpm/bin`. The app runs in standalone mode
-and stores content in PostgreSQL on `i-m` (`prod-db-general`, database `general`).
+Production code: `/home/rusik/work/fasberry/atlas/apps/wiki` (monorepo `atlas`). The app runs
+in standalone mode and stores content in PostgreSQL on the deploy host (`prod-db-general`,
+database `general`).
 
 ```bash
 pnpm --filter wiki type-check
-make -C apps/wiki build BUILDER=im   # linux/amd64, pushes registry.fasberry.fun/prod/wiki:latest
 ```
+
+Deploys are pull-based: push to `dev`/`staging` for the staging image or `main` for prod.
+`.github/workflows/build-wiki.yml` builds `linux/amd64` on `ubuntu-latest` and pushes
+`registry.fasberry.fun/<stage>/wiki:latest` plus `:sha-<commit>`. The host runs a pull timer
+installed from the infra repo every two minutes and recreates `prod-app-wiki` only when the
+digest changed. There is no ssh/buildx path from a workstation.
+
+The staging stack currently has no `wiki` service, so the staging image is built for parity but
+is not rolled out until the infra repo adds it.
+
+The workflow needs `REGISTRY_USERNAME` and `REGISTRY_PASSWORD`; `NODE_AUTH_TOKEN` is optional and
+is mounted as a BuildKit secret for private packages. `NEXT_PUBLIC_SITE_URL_{PROD,STAGING}`
+is a repo variable (default `https://wiki.fasberry.fun`) and is baked into the image at build
+time; database and auth settings are read at runtime.
 
 The app lives in the pnpm workspace, so the build context is the repository root and
 `next.config.mjs` sets `outputFileTracingRoot` to it. Dependencies come from the root
 `pnpm-lock.yaml`. Biome is switched off for this app for now: the root config excludes
 `apps/wiki` and there is no local config, so `pnpm lint` here checks nothing.
 
-`BUILDER=im` is a docker buildx builder over ssh to the `i-m` host (`ssh://i-m`,
-`docker-container` driver), so the image is built natively on x86 instead of QEMU on the arm64
-Mac. Without it the same command builds locally and is several times slower.
-
-On the server (`i-m`):
-- service `wiki` in `/opt/main/prod/docker-compose.prod.yml`, container `prod-app-wiki`;
-- `ports: ${WIKI_EXTERNAL_PORT}:3000` with `WIKI_EXTERNAL_PORT=127.0.0.1:3007` in
-  `/opt/main/prod/.env` (the ansible `safe_ports` role clamps it to loopback);
-- database settings come from `PGHOST=prod-db-general` plus the existing `GENERAL_POSTGRES_*`
-  variables, so no password is duplicated in the compose file;
-- Traefik picks it up from `/opt/main/infra/config/traefik/config/dynamic.yml`
-  (router `wiki` -> service `wiki-svc` -> `http://127.0.0.1:3007`);
-- the `com.centurylinklabs.watchtower.enable` label means a pushed `:latest` is rolled out
-  automatically, no manual `compose up`.
-
-```bash
-cd /opt/main/prod
-docker compose -f docker-compose.prod.yml config --quiet
-docker compose -f docker-compose.prod.yml up -d wiki
-docker logs -f prod-app-wiki
-```
+Host-side facts (owned by the infra repo): service `wiki` in
+`/opt/main/prod/docker-compose.prod.yml`, container `prod-app-wiki`, `127.0.0.1:3007` published
+by Traefik as `wiki.fasberry.fun`. A rollback pins `:sha-<commit>` in that compose file rather
+than rebuilding. Do not run compose or any host command from this checkout.
 
 Notes:
 - the schema is applied by the app on the first query, so a new database needs no migration step;
 - certificates for `wiki.fasberry.fun` come from the `httpresolver` (HTTP-01). The main
   `myresolver` uses the Cloudflare DNS challenge, and `api.cloudflare.com` is unreachable from
-  `i-m`, so DNS-01 hangs there;
+  the host, so DNS-01 hangs there;
 - do not push without an explicit request (`AGENTS.md`).
 
 ## Checks
@@ -108,5 +104,5 @@ Notes:
 - `pnpm --filter wiki test:e2e` - Playwright against a production build; see `e2e/README.md`.
   It needs a throwaway PostgreSQL (`E2E_DATABASE_URL`, the script refuses a URL without `e2e`
   in it) and runs its own mock backend, so the real API and session cookies are never touched.
-- Quick check after deploy: `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3007/`
+- Quick check after a rollout: `curl -s -o /dev/null -w '%{http_code}' https://wiki.fasberry.fun/`
 - Test the theme animation in Chromium and Firefox separately: the paths differ.

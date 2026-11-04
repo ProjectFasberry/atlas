@@ -50,16 +50,21 @@ WIKI_EDITOR_OPEN=1 pnpm dev   # open the editor to everyone, locally only
 
 ## Deploy
 
-```bash
-cd apps/wiki
-make build BUILDER=im   # linux/amd64, built natively on the i-m host over ssh
-```
+Container deploys are pull-based:
 
-The build context is the monorepo root, so the image uses the shared `pnpm-lock.yaml`.
+- push to `dev` or `staging` builds the staging image, push to `main` builds prod;
+- `.github/workflows/build-wiki.yml` builds `linux/amd64` and pushes
+  `registry.fasberry.fun/<stage>/wiki:latest` plus `:sha-<commit>`;
+- the deploy host runs a pull timer from the infra repo every two minutes and
+  recreates `prod-app-wiki` only when the digest changed.
 
-The image goes to `registry.fasberry.fun/prod/wiki:latest`. On the server the service is in
-`/opt/main/prod/docker-compose.prod.yml`, listens on `127.0.0.1:3007` and is published by Traefik
-as `wiki.fasberry.fun`. The watchtower label rolls out a pushed `:latest` automatically.
+No checkout of this repo needs SSH to the host: registry and compose changes
+belong to the infra repo. The image needs `NEXT_PUBLIC_SITE_URL` at build time
+(repo variable, defaults to `https://wiki.fasberry.fun`) and the database/auth
+environment at runtime. A rollback pins `:sha-<commit>` in the host compose.
+
+Staging currently has no `wiki` service in `/opt/main/staging`, so the staging
+image is built for parity but is not rolled out until the infra repo adds it.
 
 ## Languages
 

@@ -22,6 +22,14 @@ The app provides an interactive interface for Minecraft server management, inclu
 
 ## Installation / Setup -> ./SETUP.md
 
+## Deploy
+
+The image is built by `.github/workflows/build-minotaur.yml`, not on a workstation: push to
+`main` for prod or `dev`/`staging` for staging. The workflow builds the client bundle on
+`ubuntu-latest`, pushes `registry.fasberry.fun/<stage>/minotaur:latest` and
+`:sha-<commit>`, and the deploy host pulls it on a cron timer
+(`scripts/deploy/pull-update.sh`). Staging bakes the `*.alpha.fasberry.fun` URLs.
+
 ## Additional Resources
 - [Vike Documentation](https://vike.dev/)
 - [React Documentation](https://react.dev/)
