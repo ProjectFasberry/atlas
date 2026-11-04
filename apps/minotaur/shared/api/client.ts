@@ -1,87 +1,59 @@
-import ky, { type Options } from "ky";
+import createClient from "openapi-fetch";
+import type { paths as MainPaths } from "@/shared/types/gen/api/main.schema";
+import type { paths as PanelPaths } from "@/shared/types/gen/api/panel.schema";
 import { env } from "../env";
 
-const baseConfig: Options = {
-	credentials: "include",
-	timeout: 5000,
-	headers: import.meta.env.DEV
-		? { "x-forwarded-for": "127.0.0.1" }
-		: {},
-};
+const DEFAULT_TIMEOUT_MS = 5000;
 
-export const SKIP_HOOK_HEADER = "X-Skip-Error-Handling";
+/**
+ * Shared transport for both clients: timeout, the dev proxy header and the
+ * server-side Host header, while openapi-fetch keeps the typed paths.
+ */
+async function apiFetch(input: Request): Promise<Response> {
+	const timeoutMs = Number(input.headers.get("x-request-timeout")) || DEFAULT_TIMEOUT_MS;
+	input.headers.delete("x-request-timeout");
 
-type TypeboxIssue = {
-	type: string,
-	on: string,
-	property: string,
-	essage: string,
-	summary: string,
-	expected: { data: unknown[] },
-	found: { data: unknown[] },
-	errors: unknown[]
+	if (import.meta.env.DEV && !input.headers.has("x-forwarded-for")) {
+		input.headers.set("x-forwarded-for", "127.0.0.1");
+	}
+
+	if (typeof window === "undefined") {
+		input.headers.delete("host");
+	}
+
+	const controller = new AbortController();
+	const timer = setTimeout(() => controller.abort(), timeoutMs);
+	const onAbort = () => controller.abort();
+
+	if (input.signal.aborted) controller.abort();
+	else input.signal.addEventListener("abort", onAbort);
+
+	try {
+		return await fetch(new Request(input, { signal: controller.signal }));
+	} finally {
+		clearTimeout(timer);
+		input.signal.removeEventListener("abort", onAbort);
+	}
 }
 
-const hooksConfig: Options = {
-	hooks: {
-		afterResponse: [
-			async ({ response, request }) => {
-				let skipHook = false;
-
-				const reqHeaders = request.headers;
-
-				if (reqHeaders) {
-					if (reqHeaders.get(SKIP_HOOK_HEADER) === "true") {
-						skipHook = true;
-					}
-				}
-
-				if (skipHook) return;
-
-				if (!response.ok) {
-					// Read a clone: the response goes back to the caller and
-					// `parseWrappedJson` reads it again. The original body must stay
-					// intact, otherwise the browser throws "body used already".
-					const text = await response.clone().text();
-					const fallback = response.statusText || `HTTP ${response.status}`;
-					let json: unknown = null;
-
-					try {
-						json = text ? JSON.parse(text) : null;
-					} catch {
-						json = null;
-					}
-
-					if (!json || typeof json !== 'object') throw new Error(fallback);
-
-					const error = (json as { error?: unknown }).error;
-
-					if (typeof error === 'object' && error !== null && "type" in error) {
-						const issue = error as TypeboxIssue;
-
-						if (issue.type === 'validation') {
-							throw new Error(`Validation error with ${issue.errors.length} errors`);
-						}
-					}
-
-					if (typeof error === 'string') throw new Error(error);
-
-					// Unknown shape: still fail, so no caller sees a consumed body.
-					throw new Error(fallback);
-				}
-			},
-		],
-	},
-};
-
-export const clientInstance = ky.create({
-	...baseConfig,
+export const mainClient = createClient<MainPaths>({
 	baseUrl: env.VITE_API_URL,
-	...hooksConfig,
+	credentials: "include",
+	fetch: apiFetch,
 });
 
-export const panelClientInstance = ky.create({
-	...baseConfig,
+export const panelClient = createClient<PanelPaths>({
 	baseUrl: env.VITE_PANEL_API_URL,
-	...hooksConfig,
+	credentials: "include",
+	fetch: apiFetch,
 });
+
+/** Raw request for the few callers that need response headers or a body they parse themselves. */
+export async function mainFetch(path: string, init: RequestInit = {}) {
+	return apiFetch(
+		new Request(new URL(path, env.VITE_API_URL), {
+			credentials: "include",
+			...init,
+		}),
+	);
+}

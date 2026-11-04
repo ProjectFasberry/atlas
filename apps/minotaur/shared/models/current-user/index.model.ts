@@ -1,7 +1,6 @@
-import { SKIP_HOOK_HEADER } from '../../api/client';
 import { action, atom } from "@reatom/framework";
 import { withAssign, withReset } from "@reatom/framework";
-import { clientInstance } from "../../api/client";
+import { mainFetch } from "../../api/client";
 import { parseWrappedJson } from '../../lib/client-wrapper';
 import { withSsr } from "../ssr";
 import { invariant } from "@/shared/lib/utils";
@@ -57,16 +56,11 @@ export const currentUser = atom(null, "currentUser").pipe(
 )
 
 export async function getMe(init: RequestInit) {
-  const headers = {
-    ...init.headers,
-    [SKIP_HOOK_HEADER]: "true"
-  }
+  const headers = new Headers(init.headers);
 
-  const res = await clientInstance("me", {
+  const res = await mainFetch("me", {
     ...init,
     headers,
-    throwHttpErrors: false,
-    retry: 0
   })
 
   return parseWrappedJson<MePayload>(res)

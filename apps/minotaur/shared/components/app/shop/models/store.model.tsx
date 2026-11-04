@@ -5,7 +5,7 @@ import { logError } from '@/shared/lib/log';
 import { snapshots } from '@/shared/models/ssr';
 import { type PageContextServer } from 'vike/types';
 import { client, withQueryParams } from '@/shared/lib/client-wrapper';
-import { clientInstance } from "@/shared/api/client"
+import { mainClient } from "@/shared/api/client"
 import { DEFAULT_SOFT_DELAY } from '@/shared/consts/index';
 import { withSearchParamsPersist } from '@reatom/url';
 import { withSsr } from "@/shared/models/ssr"
@@ -95,8 +95,8 @@ export const storeItems = atom(null, "storeItems").pipe(
 
       const ctx = createCtx();
 
-      const category = pageCtx.urlParsed.search["c"] ?? "all"
-      const wallet = pageCtx.urlParsed.search["w"] ?? "ALL"
+      const category = (pageCtx.urlParsed.search["c"] ?? "all") as "all" | "donate" | "event"
+      const wallet = (pageCtx.urlParsed.search["w"] ?? "ALL") as "CHARISM" | "BELKOIN" | "ALL"
       const searchQuery = pageCtx.urlParsed.search["sq"] ?? undefined;
 
       const searchParams = {
@@ -105,20 +105,22 @@ export const storeItems = atom(null, "storeItems").pipe(
         searchQuery
       }
 
-      const res = await clientInstance.get("store/items", {
-        searchParams, headers
+      const { data, response } = await mainClient.GET("/store/items", {
+        params: { query: { category, wallet, searchQuery } },
+        headers,
       });
 
-      const data = await res.json<WrappedResponse<StoreItemsPayload>>();
-      if ("error" in data) throw new Error(data.error)
+      if (!data) {
+        throw new Error("Malformed response");
+      }
 
       const payload = data.data
 
       // set/update the client_id
-      const setCookieValue = res.headers.getSetCookie()
+      const setCookieValue = response.headers.getSetCookie()
 
       if (setCookieValue.length >= 1) {
-        pageCtx.headersResponse = res.headers
+        pageCtx.headersResponse = response.headers
       }
 
       for (const [origin, val] of Object.entries(searchParams)) {
