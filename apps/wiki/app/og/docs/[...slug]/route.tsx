@@ -29,7 +29,7 @@ let hero: Promise<string | null> | null = null;
 /**
  * Rasterising a 1200x630 card with a photo takes seconds on a small VM, which is
  * longer than a link-preview bot waits. Finished PNGs are kept per process, keyed
- * by the page revision, and the deploy warms them up (`make warm`).
+ * by the page revision; hitting the image URL once after a rollout fills the cache.
  */
 const cards = new Map<string, { key: string; png: Buffer }>();
 const CARD_CACHE_LIMIT = 64;

@@ -15,8 +15,13 @@ scripts.
 - **Secrets stay out of the repo, logs and images.** Environment secrets come
   from Infisical; private packages need a token passed as a BuildKit secret or a
   local env var, never as `ARG`/`ENV` and never committed.
-- **Deploy only on an explicit request**, using the app's documented path. Do not
-  invent a deploy step or ship from a dirty tree without confirming what ships.
+- **No direct host access.** Never ssh/scp/rsync/docker or docker compose into
+  `i-m` or the production host, and do not add such a step. Container deploys are
+  CI-built images pulled by the host; host, registry and compose changes belong
+  to the infra repo.
+- **Deploy only on an explicit request**, by pushing the app branch or running
+  its workflow. Do not invent a deploy step or ship from a dirty tree without
+  confirming what ships.
 - **Do not edit generated files** - Paraglide output, generated icon sprites,
   `dist` and similar build artifacts. Regenerate them with the app's script.
 
@@ -55,11 +60,21 @@ filter for one app.
 
 ## Deploy
 
-- Only when asked, per app. Each app documents its own build and rollout; follow
-  that path and verify the health/status endpoint afterwards.
-- Remove temporary tokens and build files from hosts when done; never leave a
-  credential behind.
-- Report the image/build digest or deployment result, not just "deployed".
+Container apps (`minotaur`, `wiki`) deploy by push: `main` goes to `prod`,
+`dev`/`staging` goes to `staging`. `.github/workflows/build-<app>.yml` builds a
+`linux/amd64` image and pushes `registry.fasberry.fun/<stage>/<app>:latest` plus
+`:sha-<commit>`. The deploy host runs a pull timer installed from the infra repo
+(every two minutes) and recreates a container only when the image digest changed.
+
+- Required repo secrets: `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`; add
+  `NODE_AUTH_TOKEN` only when the build installs private packages.
+- Do not ssh/scp/docker into `i-m` or run compose there. Host-side changes
+  (Traefik, Zot, compose files, the pull script install) belong to the infra repo.
+- Rollback is a compose change to `:sha-<commit>` on the host, not a rebuild.
+- `taurus` is a Cloudflare Worker and still deploys manually with `wrangler`;
+  it has no container in this pull path.
+- Verify the public health/status endpoint after a rollout and report the image
+  digest, not just "deployed".
 
 ## Issue tracking
 

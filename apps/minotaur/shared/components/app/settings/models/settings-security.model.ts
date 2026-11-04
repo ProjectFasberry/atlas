@@ -6,8 +6,12 @@ import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialo
 import { toast } from "sonner";
 import { translate } from "@/shared/locales/helpers";
 
-export type SessionPayload = ExtractApiData<"getAuthSessionCurrent">["data"]
-export type SesssionsPayload = ExtractApiData<"getAuthSessionList">["data"];
+type CurrentSession = ExtractApiData<"getAuthSessionCurrent">["data"]
+type SessionRow = ExtractApiData<"getAuthSessionList">["data"][number]
+
+/** The API returns the session id for termination; the published schema still omits it. */
+export type SessionPayload = CurrentSession & { id: string }
+export type SesssionsPayload = Array<SessionRow & { id: string }>;
 
 export const sessionsState = atom(null, "sessionsState").pipe(
   withAssign((_, name) => ({
@@ -52,7 +56,7 @@ export const sessions = atom(null, "sessions").pipe(
           const curr = ctx.get(sessionsState.current);
           if (!curr) return res;
 
-          return res.filter(d => d.created_at !== curr.created_at)
+          return res.filter(d => d.id ? d.id !== curr.id : d.created_at !== curr.created_at)
         })
       }
     }).pipe(
@@ -67,7 +71,7 @@ export const sessions = atom(null, "sessions").pipe(
       sessions.fetchCurrent(ctx)
     }),
     terminateById: reatomAsync(async (ctx, id: string) => {
-      throw new Error("Not implemented");
+      if (!id) throw new Error("SESSION_ID_MISSING");
 
       return await client
         .delete<ExtractApiData<"deleteAuthSessionById">["data"]>(`auth/session/${id}`)

@@ -36,6 +36,31 @@ The same scripts work from `pkgs/shared`. Prod URLs come from
 `API_PANEL_AUTHORIZATION_KEY`); the generator renders them into Redocly because this
 version does not expand `${VAR}` itself. Never commit `.env.local`.
 
+## Build and deploy
+
+Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:
+
+- `.github/workflows/build-<app>.yml` runs on `ubuntu-latest` for push to `main`
+  (prod) and `dev`/`staging` (staging), plus manual dispatch with a stage input.
+- It pushes `registry.fasberry.fun/<stage>/<app>:latest` and
+  `:sha-<commit>`; the image is `linux/amd64`, never QEMU on the arm64 workstation.
+- The deploy host runs a pull timer installed from the infra repo (cron every two
+  minutes). It pulls the configured services and recreates a container only when
+  the digest changed.
+- Repo secrets: `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`; `NODE_AUTH_TOKEN` only
+  when private `@projectfasberry` packages are installed (passed as the BuildKit
+  secret `npm_token`).
+- Per-stage public URLs for the client bundles come from GitHub repo variables:
+  `VITE_API_URL_{PROD,STAGING}`, `VITE_APP_URL_{PROD,STAGING}`,
+  `VITE_PANEL_API_URL_{PROD,STAGING}` for minotaur, and
+  `NEXT_PUBLIC_SITE_URL_{PROD,STAGING}` for wiki. Shared minotaur values (`VITE_LANDING_URL`, `VITE_VOLUME_URL`,
+  `VITE_CAP_URL`, ...) are optional; the workflows carry safe defaults.
+- There is no ssh/scp/docker path to the host from this repo. Host-side changes
+  (Traefik, Zot, compose files, cron install) belong to the infra repo.
+- Rollback pins `:sha-<commit>` in the host compose file.
+- `apps/taurus` is a Cloudflare Worker and still deploys manually with
+  `wrangler deploy`; it is not part of the pull-based image path.
+
 ## Environment & Secrets
 
 Environment variables are securely injected via **Infisical**.

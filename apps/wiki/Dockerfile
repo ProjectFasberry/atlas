@@ -1,25 +1,30 @@
 # syntax=docker/dockerfile:1
 
 # Wiki app of the atlas monorepo: Next.js 16 standalone + PostgreSQL.
-# The build context is the repository root (see apps/wiki/Makefile).
+# The build context is the repository root (see .github/workflows/build-wiki.yml).
 ARG NODE_VERSION=26
 
 FROM node:${NODE_VERSION}-alpine AS base
 ENV PNPM_HOME=/pnpm \
     PATH=/pnpm:$PATH \
     NEXT_TELEMETRY_DISABLED=1
-RUN npm install -g pnpm@12
+RUN npm install -g pnpm@12.4.2
 
 # --- dependencies: the whole workspace, so the shared lockfile stays valid ---
 FROM base AS deps
 WORKDIR /app
 COPY . .
-RUN pnpm install --frozen-lockfile --filter wiki... --ignore-scripts
+# Optional GitHub Packages token for private @projectfasberry packages.
+RUN --mount=type=secret,id=npm_token \
+    sh -c 'if [ -s /run/secrets/npm_token ]; then printf "@projectfasberry:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\nalways-auth=true\n" "$(cat /run/secrets/npm_token)" > /root/.npmrc; fi' \
+    && pnpm install --frozen-lockfile --filter wiki... --ignore-scripts
 
 # --- build: no database access, every page is dynamic ---
 FROM deps AS builder
 WORKDIR /app
-ENV NODE_ENV=production
+ARG NEXT_PUBLIC_SITE_URL=https://wiki.fasberry.fun
+ENV NODE_ENV=production \
+    NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 RUN pnpm --filter wiki build
 
 # --- runtime: standalone output only ---
