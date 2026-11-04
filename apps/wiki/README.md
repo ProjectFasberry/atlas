@@ -63,8 +63,10 @@ belong to the infra repo. The image needs `NEXT_PUBLIC_SITE_URL` at build time
 (repo variable, defaults to `https://wiki.fasberry.fun`) and the database/auth
 environment at runtime. A rollback pins `:sha-<commit>` in the host compose.
 
-Staging currently has no `wiki` service in `/opt/main/staging`, so the staging
-image is built for parity but is not rolled out until the infra repo adds it.
+Whether a stage actually runs the service, on which host and behind which route
+is decided by the infrastructure repository (`ProjectFasberry/infra`); the
+staging image is built for parity and the infra repo decides when it is rolled
+out.
 
 ## Languages
 

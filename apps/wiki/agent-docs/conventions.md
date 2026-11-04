@@ -86,10 +86,10 @@ The app lives in the pnpm workspace, so the build context is the repository root
 `pnpm-lock.yaml`. Biome is switched off for this app for now: the root config excludes
 `apps/wiki` and there is no local config, so `pnpm lint` here checks nothing.
 
-Host-side facts (owned by the infra repo): service `wiki` in
-`/opt/main/prod/docker-compose.prod.yml`, container `prod-app-wiki`, `127.0.0.1:3007` published
-by Traefik as `wiki.fasberry.fun`. A rollback pins `:sha-<commit>` in that compose file rather
-than rebuilding. Do not run compose or any host command from this checkout.
+Everything host-side - service and container names, ports, routes, rollout and
+rollback - is owned by the infrastructure repository (`ProjectFasberry/infra`).
+A rollback pins `:sha-<commit>` there instead of rebuilding. Do not run compose
+or any host command from this checkout.
 
 Notes:
 - the schema is applied by the app on the first query, so a new database needs no migration step;
