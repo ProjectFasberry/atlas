@@ -63,8 +63,7 @@ const SessionItem = reatomComponent<{ session: SessionPayload, type: "current" |
         <Menu.Root
           onSelect={(details) => {
             if (details.value === 'terminate') {
-              // TODO: implement deleting by id
-              sessions.terminateById(ctx, "2")
+              sessions.terminateById(ctx, session.id)
             }
           }}
         >
@@ -102,7 +101,7 @@ const SessionsListActive = reatomComponent(({ ctx }) => {
     )
   }
 
-  return data.map((session, idx) => <SessionItem key={idx} session={session} type="active" />)
+  return data.map((session) => <SessionItem key={session.id} session={session} type="active" />)
 }, "SessionsListActive")
 
 const SessionsListCurrent = reatomComponent(({ ctx }) => {
