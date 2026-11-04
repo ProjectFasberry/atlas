@@ -58,7 +58,6 @@
 		"cnfast": "0.0.6",
 		"dayjs": "1.11.11",
 		"elysia": "1.4.28",
-		"ky": "2.0.2",
 		"openapi-fetch": "0.17.0",
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
