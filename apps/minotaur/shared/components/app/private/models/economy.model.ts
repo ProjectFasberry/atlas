@@ -65,6 +65,64 @@ export type PaymentOrder = {
   expiresAt: string;
 };
 
+export type BalanceMismatch = {
+  nickname: string;
+  currency: string;
+  wallet: number;
+  plugin: number;
+  delta: number;
+};
+
+export type ReconciliationData = {
+  balances: {
+    at: string;
+    checked: number;
+    mismatchCount: number;
+    missingPlugin: number;
+    pendingProjection: number;
+    mismatches: BalanceMismatch[];
+  };
+  jobs: {
+    pending: number;
+    failed: number;
+    stuck: number;
+    oldestPendingAt: Nullable<string>;
+    failedSamples: { orderId: string; kind: string; error: Nullable<string>; attempts: number }[];
+  };
+};
+
+export type FlowRow = {
+  currency: string;
+  reason: string;
+  inflow: number;
+  outflow: number;
+  net: number;
+  operations: number;
+};
+
+export type EconomyReport = {
+  period: { from: string; to: string };
+  flows: {
+    rows: FlowRow[];
+    totals: Record<string, { inflow: number; outflow: number; net: number }>;
+  };
+  payments: {
+    orders: Record<string, number>;
+    created: number;
+    succeeded: number;
+    conversion: number;
+    revenueMinor: Record<string, number>;
+    uniquePayers: number;
+    belkoinIssued: number;
+  };
+  whales: {
+    totalBelkoin: number;
+    topAmount: number;
+    topShare: number;
+    holders: number;
+  };
+};
+
 const PAGE_SIZE = 50;
 
 export const economyState = atom(null, "economyState").pipe(
@@ -86,6 +144,8 @@ export const economyState = atom(null, "economyState").pipe(
     ),
     fakeAmount: atom("", `${name}.fakeAmount`),
     fakeOrder: atom<PaymentOrder | null>(null, `${name}.fakeOrder`),
+    reconciliation: atom<ReconciliationData | null>(null, `${name}.reconciliation`),
+    report: atom<EconomyReport | null>(null, `${name}.report`),
     form: atom(null, `${name}.form`).pipe(
       withAssign((_, form) => ({
         currency: atom<EconomyCurrency>("BELKOIN", `${form}.currency`),
@@ -328,6 +388,26 @@ export const economy = atom(null, "economy").pipe(
         onConfirm: () => economy.deleteRate(ctx, rate.id),
       });
     }),
+
+    loadReconciliation: reatomAsync(async (ctx) => {
+      return await ctx.schedule(() => client<ReconciliationData>("privated/economy/reconciliation").exec());
+    }, {
+      name: `${name}.loadReconciliation`,
+      onFulfill: (ctx, payload) => {
+        if (payload) economyState.reconciliation(ctx, payload);
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    loadReport: reatomAsync(async (ctx) => {
+      return await ctx.schedule(() => client<EconomyReport>("privated/economy/report").exec());
+    }, {
+      name: `${name}.loadReport`,
+      onFulfill: (ctx, payload) => {
+        if (payload) economyState.report(ctx, payload);
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
 
     createFakeInvoice: reatomAsync(async (ctx) => {
       const amount = Number(ctx.get(economyState.fakeAmount).replace(/[^0-9]/g, ""));

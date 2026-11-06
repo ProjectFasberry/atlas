@@ -741,6 +741,143 @@ const FakePaymentSection = reatomComponent(({ ctx }) => {
   );
 }, "EconomyFakePayment");
 
+
+const MINOR_EXPONENT: Record<string, number> = { RUB: 2, USDT: 6, USDC: 6 };
+
+function formatMinor(amount: number, currency: string) {
+  const exponent = MINOR_EXPONENT[currency] ?? 2;
+  return number.format(amount / 10 ** exponent);
+}
+
+const ReconciliationSection = reatomComponent(({ ctx }) => {
+  const data = ctx.spy(economyState.reconciliation);
+  const report = ctx.spy(economyState.report);
+  const checking = ctx.spy(economy.loadReconciliation.statusesAtom).isPending;
+  const loadingReport = ctx.spy(economy.loadReport.statusesAtom).isPending;
+  const error = ctx.spy(economy.loadReconciliation.errorAtom) ?? ctx.spy(economy.loadReport.errorAtom);
+
+  return (
+    <SectionWrapper className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Typography className="text-sm font-semibold">Сверка и отчёт</Typography>
+        <div className="flex items-center gap-2">
+          <Button
+            background="default"
+            className="h-8 px-3 text-xs"
+            disabled={checking}
+            onClick={() => economy.loadReconciliation(ctx)}
+          >
+            {checking ? "Проверка..." : "Проверить сверку"}
+          </Button>
+          <Button
+            background="default"
+            className="h-8 px-3 text-xs"
+            disabled={loadingReport}
+            onClick={() => economy.loadReport(ctx)}
+          >
+            {loadingReport ? "Загрузка..." : "Отчёт за 7 дней"}
+          </Button>
+        </div>
+      </div>
+
+      {error && <ErrorBlock title={error.message} />}
+
+      {data && (
+        <div className="flex flex-col gap-2">
+          <Typography className="text-xs text-neutral-400">
+            Проверено {data.balances.checked}, расхождений {data.balances.mismatchCount},
+            ждут проекции {data.balances.pendingProjection}, без строки плагина {data.balances.missingPlugin}.
+            Очередь: {data.jobs.pending} в ожидании, {data.jobs.failed} с ошибкой, {data.jobs.stuck} зависло.
+          </Typography>
+
+          {data.balances.mismatches.length > 0 && (
+            <Table>
+              <TableHeader>
+                <TableRow className="*:font-semibold *:text-base">
+                  <TableHead>Игрок</TableHead>
+                  <TableHead>Валюта</TableHead>
+                  <TableHead>Ledger</TableHead>
+                  <TableHead>Плагин</TableHead>
+                  <TableHead className="text-right">Разница</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.balances.mismatches.map((item) => (
+                  <TableRow key={`${item.nickname}:${item.currency}`}>
+                    <TableCell>{item.nickname}</TableCell>
+                    <TableCell>{item.currency}</TableCell>
+                    <TableCell>{number.format(item.wallet)}</TableCell>
+                    <TableCell>{number.format(item.plugin)}</TableCell>
+                    <TableCell className="text-right">{formatAmount(item.delta)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+
+          {data.jobs.failedSamples.length > 0 && (
+            <div className="flex flex-col gap-1 text-xs text-red">
+              {data.jobs.failedSamples.map((job) => (
+                <span key={`${job.orderId}:${job.kind}`}>
+                  {job.kind} {job.orderId}: {job.error ?? "unknown"} ({job.attempts} попыток)
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {report && (
+        <div className="flex flex-col gap-2">
+          <Typography className="text-xs text-neutral-400">
+            Период: {formatDate(report.period.from)} - {formatDate(report.period.to)}.
+            Заказов {report.payments.created}, оплачено {report.payments.succeeded},
+            конверсия {(report.payments.conversion * 100).toFixed(1)}%,
+            плательщиков {report.payments.uniquePayers},
+            выдано BELKOIN {number.format(report.payments.belkoinIssued)}.
+            Топ-5 держателей: {(report.whales.topShare * 100).toFixed(1)}% от {number.format(report.whales.totalBelkoin)} BELKOIN.
+          </Typography>
+
+          {Object.entries(report.payments.revenueMinor).length > 0 && (
+            <Typography className="text-xs text-neutral-400">
+              Выручка: {Object.entries(report.payments.revenueMinor)
+                .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
+                .join(", ")}.
+            </Typography>
+          )}
+
+          {report.flows.rows.length > 0 && (
+            <Table>
+              <TableHeader>
+                <TableRow className="*:font-semibold *:text-base">
+                  <TableHead>Валюта</TableHead>
+                  <TableHead>Причина</TableHead>
+                  <TableHead>Приход</TableHead>
+                  <TableHead>Расход</TableHead>
+                  <TableHead>Итог</TableHead>
+                  <TableHead className="text-right">Операций</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {report.flows.rows.slice(0, 15).map((row) => (
+                  <TableRow key={`${row.currency}:${row.reason}`}>
+                    <TableCell>{row.currency}</TableCell>
+                    <TableCell title={row.reason}>{reasonLabel(row.reason)}</TableCell>
+                    <TableCell className="text-green-500">{number.format(row.inflow)}</TableCell>
+                    <TableCell className="text-red">{number.format(row.outflow)}</TableCell>
+                    <TableCell>{formatAmount(row.net)}</TableCell>
+                    <TableCell className="text-right">{number.format(row.operations)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
+      )}
+    </SectionWrapper>
+  );
+}, "EconomyReconciliation");
+
 export const EconomyPanel = reatomComponent(({ ctx }) => {
   const loading = ctx.spy(economy.search.statusesAtom).isPending;
   const wallet = ctx.spy(economyState.wallet);
@@ -751,6 +888,7 @@ export const EconomyPanel = reatomComponent(({ ctx }) => {
 
   return (
     <div className="flex flex-col gap-3 w-full">
+      <ReconciliationSection />
       <SearchBar />
 
       {loading && !wallet && <PageLoader />}
