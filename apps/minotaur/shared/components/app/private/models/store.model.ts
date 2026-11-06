@@ -24,6 +24,7 @@ export const createStoreItemState = atom(null, "createStoreItemState").pipe(
     content: atom<JSONContent>({}, `${name}.content`).pipe(withReset()),
     price: atom<CreateItemStoreSchema["price"]>("0", `${name}.price`).pipe(withReset()),
     command: atom<CreateItemStoreSchema["command"]>("", `${name}.command`).pipe(withReset()),
+    refundCmd: atom<Nullable<CreateItemStoreSchema["refund_cmd"]>>(null, `${name}.refundCmd`).pipe(withReset()),
     type: atom<Nullable<CreateItemStoreSchema["type"]>>(null, `${name}.type`).pipe(withReset())
   }))
 )
@@ -37,6 +38,7 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
       createStoreItemState.content.reset(ctx)
       createStoreItemState.price.reset(ctx)
       createStoreItemState.command.reset(ctx)
+      createStoreItemState.refundCmd.reset(ctx)
       createStoreItemState.type.reset(ctx)
     }),
     submit: reatomAsync(async (ctx) => {
@@ -48,6 +50,7 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
         content: ctx.get(createStoreItemState.content),
         price: ctx.get(createStoreItemState.price),
         command: ctx.get(createStoreItemState.command),
+        refund_cmd: ctx.get(createStoreItemState.refundCmd),
         type: ctx.get(createStoreItemState.type)
       }
 

@@ -73,6 +73,11 @@ export const CreateItem = reatomComponent(({ ctx }) => {
         placeholder="Команда для выдачи"
       />
       <Input
+        value={ctx.spy(createStoreItemState.refundCmd) ?? ""}
+        onChange={e => createStoreItemState.refundCmd(ctx, e.target.value)}
+        placeholder="Команда для возврата (необязательно)"
+      />
+      <Input
         type="file"
         onChange={e => {
           if (!e.target.files) return;
