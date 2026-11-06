@@ -35,10 +35,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             stage="${{ inputs.stage }}"
-          elif [ "${{ github.ref_name }}" = "main" ]; then
-            stage=prod
           else
-            stage=staging
+            stage=prod
           fi
           echo "stage=$stage" >> "$GITHUB_OUTPUT"
 
