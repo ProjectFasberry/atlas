@@ -4,6 +4,7 @@ import {
 } from "@reatom/framework";
 import { toast } from "sonner";
 import { notifyAboutRestrictRole } from "./actions.model";
+import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 
 export type EconomyCurrency = "BELKOIN" | "CHARISM";
 export type EconomyOperation = "credit" | "debit";
@@ -80,6 +81,7 @@ export const economyState = atom(null, "economyState").pipe(
         to: atom("RUB", `${form}.to`),
         rate: atom("", `${form}.rate`),
         spread: atom("0", `${form}.spread`),
+        editing: atom<Nullable<number>>(null, `${form}.editing`),
       }))
     ),
     fakeAmount: atom("", `${name}.fakeAmount`),
@@ -249,13 +251,21 @@ export const economy = atom(null, "economy").pipe(
     }).pipe(withStatusesAtom(), withErrorAtom()),
 
     addRate: reatomAsync(async (ctx) => {
-      const rate = await ctx.schedule(() =>
-        client.post<ExchangeRate>("privated/economy/rates")
+      const editing = ctx.get(economyState.rateForm.editing);
+      const body = {
+        rate: Number(ctx.get(economyState.rateForm.rate)),
+        spread: Number(ctx.get(economyState.rateForm.spread)) || 0,
+      };
+
+      const rate = await ctx.schedule(() => editing
+        ? client.patch<ExchangeRate>(`privated/economy/rates/${editing}`)
+          .pipe(withJsonBody(body))
+          .exec()
+        : client.post<ExchangeRate>("privated/economy/rates")
           .pipe(withJsonBody({
             from: ctx.get(economyState.rateForm.from).trim().toUpperCase(),
             to: ctx.get(economyState.rateForm.to).trim().toUpperCase(),
-            rate: Number(ctx.get(economyState.rateForm.rate)),
-            spread: Number(ctx.get(economyState.rateForm.spread)) || 0,
+            ...body,
           }))
           .exec()
       );
@@ -269,9 +279,55 @@ export const economy = atom(null, "economy").pipe(
 
         economyState.rates(ctx, payload.payload);
         economyState.rateForm.rate(ctx, "");
+        economyState.rateForm.spread(ctx, "0");
+        economyState.rateForm.editing(ctx, null);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    startEditRate: action((ctx, rate: ExchangeRate) => {
+      economyState.rateForm.editing(ctx, rate.id);
+      economyState.rateForm.from(ctx, rate.from_currency);
+      economyState.rateForm.to(ctx, rate.to_currency);
+      economyState.rateForm.rate(ctx, String(Number(rate.rate)));
+      economyState.rateForm.spread(ctx, String(Number(rate.spread)));
+    }),
+
+    cancelEditRate: action((ctx) => {
+      economyState.rateForm.editing(ctx, null);
+      economyState.rateForm.rate(ctx, "");
+      economyState.rateForm.spread(ctx, "0");
+    }),
+
+    deleteRate: reatomAsync(async (ctx, id: number) => {
+      await ctx.schedule(() =>
+        client.delete<ExchangeRate>(`privated/economy/rates/${id}`).exec()
+      );
+
+      const payload = await ctx.schedule(() => client<RatesPayload>("privated/economy/rates").exec());
+      return { id, payload };
+    }, {
+      name: `${name}.deleteRate`,
+      onFulfill: (ctx, result) => {
+        if (!result) return;
+
+        economyState.rates(ctx, result.payload);
+        if (ctx.get(economyState.rateForm.editing) === result.id) {
+          economy.cancelEditRate(ctx);
+        }
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    confirmDeleteRate: action((ctx, rate: ExchangeRate) => {
+      alertDialog.open(ctx, {
+        title: "Удалить курс?",
+        description: `${rate.from_currency} -> ${rate.to_currency} (${Number(rate.rate)})`,
+        confirmLabel: "Удалить",
+        withCancel: true,
+        onConfirm: () => economy.deleteRate(ctx, rate.id),
+      });
+    }),
 
     createFakeInvoice: reatomAsync(async (ctx) => {
       const amount = Number(ctx.get(economyState.fakeAmount).replace(/[^0-9]/g, ""));

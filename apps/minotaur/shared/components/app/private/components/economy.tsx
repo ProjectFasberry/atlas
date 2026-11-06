@@ -564,10 +564,12 @@ const RatesSection = reatomComponent(({ ctx }) => {
   const to = ctx.spy(economyState.rateForm.to);
   const rate = ctx.spy(economyState.rateForm.rate);
   const spread = ctx.spy(economyState.rateForm.spread);
-  const busy = ctx.spy(economy.addRate.statusesAtom).isPending;
+  const editing = ctx.spy(economyState.rateForm.editing);
+  const busy = ctx.spy(economy.addRate.statusesAtom).isPending
+    || ctx.spy(economy.deleteRate.statusesAtom).isPending;
   const error = ctx.spy(economy.addRate.errorAtom);
 
-  const valid = Number(rate) > 0 && Number(spread) >= 0 && Number(spread) < 1 && from !== to;
+  const valid = Number(rate) > 0 && Number(spread) >= 0 && Number(spread) < 1 && (editing !== null || from !== to);
 
   return (
     <SectionWrapper className="flex flex-col gap-2">
@@ -586,6 +588,7 @@ const RatesSection = reatomComponent(({ ctx }) => {
                 <TableHead>Курс</TableHead>
                 <TableHead>Спред</TableHead>
                 <TableHead className="text-right">Действует с</TableHead>
+                {canWrite && <TableHead className="text-right">Действия</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -596,6 +599,28 @@ const RatesSection = reatomComponent(({ ctx }) => {
                   <TableCell>{Number(item.rate)}</TableCell>
                   <TableCell>{Math.round(Number(item.spread) * 1000) / 10}%</TableCell>
                   <TableCell className="text-right whitespace-nowrap">{formatDate(item.effective_from)}</TableCell>
+                  {canWrite && (
+                    <TableCell className="text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="small"
+                          background="default"
+                          disabled={busy}
+                          onClick={() => economy.startEditRate(ctx, item)}
+                        >
+                          Изменить
+                        </Button>
+                        <Button
+                          size="small"
+                          background="default"
+                          disabled={busy}
+                          onClick={() => economy.confirmDeleteRate(ctx, item)}
+                        >
+                          Удалить
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -607,16 +632,18 @@ const RatesSection = reatomComponent(({ ctx }) => {
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={from}
+            disabled={editing !== null}
             onChange={(event) => economyState.rateForm.from(ctx, event.target.value)}
-            className="h-8 rounded-lg bg-neutral-800 px-2 text-xs"
+            className="h-8 rounded-lg bg-neutral-800 px-2 text-xs disabled:opacity-50"
           >
             {RATE_CURRENCIES.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
           <Typography className="text-xs text-neutral-400">→</Typography>
           <select
             value={to}
+            disabled={editing !== null}
             onChange={(event) => economyState.rateForm.to(ctx, event.target.value)}
-            className="h-8 rounded-lg bg-neutral-800 px-2 text-xs"
+            className="h-8 rounded-lg bg-neutral-800 px-2 text-xs disabled:opacity-50"
           >
             {RATE_CURRENCIES.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
@@ -642,8 +669,18 @@ const RatesSection = reatomComponent(({ ctx }) => {
             disabled={!valid || busy}
             onClick={() => economy.addRate(ctx)}
           >
-            Добавить курс
+            {editing !== null ? "Сохранить" : "Добавить курс"}
           </Button>
+          {editing !== null && (
+            <Button
+              size="small"
+              background="default"
+              disabled={busy}
+              onClick={() => economy.cancelEditRate(ctx)}
+            >
+              Отмена
+            </Button>
+          )}
           {error && <ErrorBlock title={error.message} />}
         </div>
       )}
