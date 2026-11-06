@@ -391,6 +391,7 @@ const RefundDialog = reatomComponent<{ item: LedgerItem | null, onClose: () => v
               <Dialog.Title className={dialogVariant.title("text-left!")}>Возврат заказа</Dialog.Title>
               <Typography color="gray" className="text-sm">
                 Средства вернутся на кошелёк игрока, действие попадёт в журнал операций.
+                Отзыв выданного товара выполняется отдельной задачей и может занять время.
               </Typography>
             </div>
 

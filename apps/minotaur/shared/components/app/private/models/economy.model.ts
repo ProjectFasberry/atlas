@@ -522,7 +522,7 @@ export const economy = atom(null, "economy").pipe(
     confirmRefundOrder: action((ctx, order: AdminOrder) => {
       alertDialog.open(ctx, {
         title: "Вернуть платёж?",
-        description: `${order.orderId}: ${order.belkoin} BELKOIN игроку ${order.nickname}`,
+        description: `${order.orderId}: ${order.belkoin} BELKOIN игроку ${order.nickname}. Проверь, что купленные за эти BELKOIN товары возвращены: баланс не различает источник.`,
         confirmLabel: "Вернуть",
         withCancel: true,
         onConfirm: () => economy.refundOrder(ctx, order),
