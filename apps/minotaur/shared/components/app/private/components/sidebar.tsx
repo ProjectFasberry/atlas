@@ -253,7 +253,7 @@ export const Sidebar = () => {
         className: `
           flex sm:h-fit sm:max-h-fit h-12 max-h-12 items-center sm:items-stretch sticky z-20 top-2 flex-row overflow-x-auto lg:flex-col
           border lg:border-transparent border-neutral-800 gap-2 lg:gap-4 w-full
-          lg:w-1/5 p-2 lg:p-3 bg-neutral-900 rounded-xl scrollbar-h-2 overflow-y-hidden
+          lg:w-1/5 lg:shrink-0 p-2 lg:p-3 bg-neutral-900 rounded-xl scrollbar-h-2 overflow-y-hidden
         `
       })}
     >

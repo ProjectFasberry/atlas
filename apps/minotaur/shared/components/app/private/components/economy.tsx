@@ -878,7 +878,146 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
   );
 }, "EconomyReconciliation");
 
+
+const ORDER_STATUS_LABEL: Record<string, string> = {
+  pending: "Ожидает",
+  succeeded: "Оплачен",
+  failed: "Ошибка",
+  expired: "Истёк",
+  refunded: "Возврат",
+};
+
+const ORDER_STATUSES: { label: string, value: Nullable<string> }[] = [
+  { label: "Все", value: null },
+  { label: "Ожидают", value: "pending" },
+  { label: "Оплачены", value: "succeeded" },
+  { label: "Возвраты", value: "refunded" },
+  { label: "Ошибки", value: "failed" },
+  { label: "Истекли", value: "expired" },
+];
+
+const OrdersSection = reatomComponent(({ ctx }) => {
+  const orders = ctx.spy(economyState.orders);
+  const meta = ctx.spy(economyState.ordersMeta);
+  const nickname = ctx.spy(economyState.ordersFilter.nickname);
+  const status = ctx.spy(economyState.ordersFilter.status);
+  const loading = ctx.spy(economy.loadOrders.statusesAtom).isPending;
+  const loadingMore = ctx.spy(economy.loadMoreOrders.statusesAtom).isPending;
+  const busy = ctx.spy(economy.refundOrder.statusesAtom).isPending;
+  const error = ctx.spy(economy.loadOrders.errorAtom) ?? ctx.spy(economy.refundOrder.errorAtom);
+
+  return (
+    <SectionWrapper className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Typography className="text-sm font-semibold">Заказы</Typography>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            value={nickname}
+            onChange={(event) => economyState.ordersFilter.nickname(ctx, event.target.value)}
+            placeholder="Никнейм"
+            maxLength={32}
+            className="h-8 w-40"
+          />
+          <Button
+            background="default"
+            className="h-8 px-3 text-xs"
+            disabled={loading}
+            onClick={() => economy.loadOrders(ctx)}
+          >
+            {loading ? "Загрузка..." : "Найти"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1">
+        {ORDER_STATUSES.map((item) => (
+          <Button
+            key={item.label}
+            background={status === item.value ? "white" : "default"}
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              economyState.ordersFilter.status(ctx, item.value);
+              economy.loadOrders(ctx);
+            }}
+          >
+            {item.label}
+          </Button>
+        ))}
+      </div>
+
+      {error && <ErrorBlock title={error.message} />}
+
+      {orders.length === 0
+        ? <Noop title={loading ? "Загрузка..." : "Заказов нет"} />
+        : (
+          <Table>
+            <TableHeader>
+              <TableRow className="*:font-semibold *:text-base">
+                <TableHead>Дата</TableHead>
+                <TableHead>Заказ</TableHead>
+                <TableHead>Игрок</TableHead>
+                <TableHead>Провайдер</TableHead>
+                <TableHead>Статус</TableHead>
+                <TableHead>Сумма</TableHead>
+                <TableHead>BELKOIN</TableHead>
+                <TableHead className="text-right">Действие</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {orders.map((order) => (
+                <TableRow key={order.orderId}>
+                  <TableCell className="whitespace-nowrap">{formatDate(order.createdAt)}</TableCell>
+                  <TableCell className="text-xs text-neutral-400">{order.orderId}</TableCell>
+                  <TableCell>{order.nickname}</TableCell>
+                  <TableCell>{order.provider}</TableCell>
+                  <TableCell>{ORDER_STATUS_LABEL[order.status] ?? order.status}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {formatMinor(order.amountMinor, order.currency)} {order.currency}
+                  </TableCell>
+                  <TableCell>{number.format(order.belkoin)}</TableCell>
+                  <TableCell className="text-right">
+                    {order.status === "succeeded" && (
+                      <Button
+                        size="small"
+                        background="default"
+                        disabled={busy}
+                        onClick={() => economy.confirmRefundOrder(ctx, order)}
+                      >
+                        Вернуть
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+
+      {meta?.hasNextPage && (
+        <Button
+          background="default"
+          className="h-8 px-3 text-xs self-center"
+          disabled={loadingMore}
+          onClick={() => economy.loadMoreOrders(ctx)}
+        >
+          {loadingMore ? "Загрузка..." : "Показать ещё"}
+        </Button>
+      )}
+    </SectionWrapper>
+  );
+}, "EconomyOrders");
+
+const PANEL_TABS = [
+  { value: "player", label: "Игрок" },
+  { value: "rates", label: "Курсы" },
+  { value: "payments", label: "Платежи" },
+  { value: "reconciliation", label: "Сверка" },
+] as const;
+
+type PanelTab = typeof PANEL_TABS[number]["value"];
+
 export const EconomyPanel = reatomComponent(({ ctx }) => {
+  const [tab, setTab] = useState<PanelTab>("player");
   const loading = ctx.spy(economy.search.statusesAtom).isPending;
   const wallet = ctx.spy(economyState.wallet);
 
@@ -886,30 +1025,62 @@ export const EconomyPanel = reatomComponent(({ ctx }) => {
     economy.loadRates(ctx);
   }, []);
 
+  useUpdate((ctx) => {
+    if (tab === "payments") economy.loadOrders(ctx);
+  }, [tab]);
+
   return (
-    <div className="flex flex-col gap-3 w-full">
-      <ReconciliationSection />
-      <SearchBar />
+    <div className="flex flex-col gap-3 w-full min-w-0">
+      <div className="flex w-full flex-wrap gap-1 rounded-xl bg-neutral-900 p-1">
+        {PANEL_TABS.map((item) => (
+          <Button
+            key={item.value}
+            background={tab === item.value ? "white" : "default"}
+            className="h-8 flex-1 px-3 text-xs sm:flex-none"
+            onClick={() => setTab(item.value)}
+          >
+            {item.label}
+          </Button>
+        ))}
+      </div>
 
-      {loading && !wallet && <PageLoader />}
-
-      {!wallet && !loading && (
-        <Noop title="Найдите игрока, чтобы увидеть его кошелёк и журнал" />
-      )}
-
-      {wallet && (
+      {tab === "player" && (
         <>
-          <SectionWrapper className="flex flex-col gap-2">
-            <WalletBalances />
-          </SectionWrapper>
-          <AdjustForm />
-          <LedgerTable />
-          <MigrationPanel />
+          <SearchBar />
+
+          {loading && !wallet && <PageLoader />}
+
+          {!wallet && !loading && (
+            <Noop title="Найдите игрока, чтобы увидеть его кошелёк и журнал" />
+          )}
+
+          {wallet && (
+            <>
+              <SectionWrapper className="flex flex-col gap-2">
+                <WalletBalances />
+              </SectionWrapper>
+              <AdjustForm />
+              <LedgerTable />
+            </>
+          )}
         </>
       )}
 
-      <RatesSection />
-      <FakePaymentSection />
+      {tab === "rates" && <RatesSection />}
+
+      {tab === "payments" && (
+        <>
+          <FakePaymentSection />
+          <OrdersSection />
+        </>
+      )}
+
+      {tab === "reconciliation" && (
+        <>
+          <ReconciliationSection />
+          <MigrationPanel />
+        </>
+      )}
     </div>
   );
 }, "EconomyPanel");

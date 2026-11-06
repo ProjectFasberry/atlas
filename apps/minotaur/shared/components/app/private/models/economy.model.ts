@@ -91,6 +91,26 @@ export type ReconciliationData = {
   };
 };
 
+export type AdminOrder = {
+  id: number;
+  orderId: string;
+  nickname: string;
+  provider: string;
+  status: string;
+  amountMinor: number;
+  currency: string;
+  belkoin: number;
+  createdAt: string;
+  expiresAt: string;
+  paidAt: Nullable<string>;
+  refundedAt: Nullable<string>;
+};
+
+export type OrdersPage = {
+  data: AdminOrder[];
+  meta: { hasNextPage: boolean; endCursor?: string };
+};
+
 export type FlowRow = {
   currency: string;
   reason: string;
@@ -146,6 +166,14 @@ export const economyState = atom(null, "economyState").pipe(
     fakeOrder: atom<PaymentOrder | null>(null, `${name}.fakeOrder`),
     reconciliation: atom<ReconciliationData | null>(null, `${name}.reconciliation`),
     report: atom<EconomyReport | null>(null, `${name}.report`),
+    orders: atom<AdminOrder[]>([], `${name}.orders`),
+    ordersMeta: atom<OrdersPage["meta"] | null>(null, `${name}.ordersMeta`),
+    ordersFilter: atom(null, `${name}.ordersFilter`).pipe(
+      withAssign((_, filters) => ({
+        nickname: atom("", `${filters}.nickname`),
+        status: atom<Nullable<string>>(null, `${filters}.status`),
+      }))
+    ),
     form: atom(null, `${name}.form`).pipe(
       withAssign((_, form) => ({
         currency: atom<EconomyCurrency>("BELKOIN", `${form}.currency`),
@@ -408,6 +436,92 @@ export const economy = atom(null, "economy").pipe(
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    loadOrders: reatomAsync(async (ctx) => {
+      const nickname = ctx.get(economyState.ordersFilter.nickname).trim();
+      const status = ctx.get(economyState.ordersFilter.status);
+
+      return await ctx.schedule(() =>
+        client<OrdersPage>("privated/economy/orders")
+          .pipe(withQueryParams({
+            limit: 50,
+            ...(nickname ? { nickname } : {}),
+            ...(status ? { status } : {}),
+          }))
+          .exec()
+      );
+    }, {
+      name: `${name}.loadOrders`,
+      onFulfill: (ctx, page) => {
+        if (!page) return;
+
+        economyState.orders(ctx, page.data);
+        economyState.ordersMeta(ctx, page.meta);
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    loadMoreOrders: reatomAsync(async (ctx) => {
+      const meta = ctx.get(economyState.ordersMeta);
+      if (!meta?.endCursor) return null;
+
+      const nickname = ctx.get(economyState.ordersFilter.nickname).trim();
+      const status = ctx.get(economyState.ordersFilter.status);
+
+      return await ctx.schedule(() =>
+        client<OrdersPage>("privated/economy/orders")
+          .pipe(withQueryParams({
+            limit: 50,
+            endCursor: meta.endCursor,
+            ...(nickname ? { nickname } : {}),
+            ...(status ? { status } : {}),
+          }))
+          .exec()
+      );
+    }, {
+      name: `${name}.loadMoreOrders`,
+      onFulfill: (ctx, page) => {
+        if (!page) return;
+
+        economyState.orders(ctx, (current) => [...current, ...page.data]);
+        economyState.ordersMeta(ctx, page.meta);
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    refundOrder: reatomAsync(async (ctx, order: AdminOrder) => {
+      await ctx.schedule(() =>
+        client.post<unknown>(`payments/orders/${order.orderId}/refund`)
+          .pipe(withJsonBody({ reason: "Возврат из панели" }))
+          .exec()
+      );
+
+      return await ctx.schedule(() =>
+        client<OrdersPage>("privated/economy/orders")
+          .pipe(withQueryParams({ limit: 50 }))
+          .exec()
+      );
+    }, {
+      name: `${name}.refundOrder`,
+      onFulfill: (ctx, page) => {
+        if (!page) return;
+
+        economyState.orders(ctx, page.data);
+        economyState.ordersMeta(ctx, page.meta);
+        toast.success("Возврат платежа выполнен");
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    confirmRefundOrder: action((ctx, order: AdminOrder) => {
+      alertDialog.open(ctx, {
+        title: "Вернуть платёж?",
+        description: `${order.orderId}: ${order.belkoin} BELKOIN игроку ${order.nickname}`,
+        confirmLabel: "Вернуть",
+        withCancel: true,
+        onConfirm: () => economy.refundOrder(ctx, order),
+      });
+    }),
 
     createFakeInvoice: reatomAsync(async (ctx) => {
       const amount = Number(ctx.get(economyState.fakeAmount).replace(/[^0-9]/g, ""));
