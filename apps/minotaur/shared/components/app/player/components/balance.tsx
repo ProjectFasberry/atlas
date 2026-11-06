@@ -84,6 +84,7 @@ const BalanceServerSelect = reatomComponent(({ ctx }) => {
 const BalanceCardContent = reatomComponent<BalanceCardProps>(({ ctx, value, wallet, image }) => {
   const title = getFromDictionary(ctx, wallet)
   const isLoading = !ctx.spy(pageState.isClientside) || ctx.spy(balance.fetch.statusesAtom).isPending
+  const serverAvailable = ctx.spy(balanceState.serverAvailable)
 
   return (
     <div className="relative rounded-2xl min-w-80 overflow-hidden w-full h-56">
@@ -115,7 +116,11 @@ const BalanceCardContent = reatomComponent<BalanceCardProps>(({ ctx, value, wall
               draggable={false}
               className='select-none'
             />
-            {isLoading ? <Skeleton className="h-8 w-24" /> : <CardValue value={value} />}
+            {isLoading
+              ? <Skeleton className="h-8 w-24" />
+              : wallet === "CHARISM" && !serverAvailable
+                ? <Typography className="text-sm text-neutral-400">сервер недоступен</Typography>
+                : <CardValue value={value} />}
           </div>
           <Button
             background="white"

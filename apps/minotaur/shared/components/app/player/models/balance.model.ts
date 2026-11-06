@@ -5,12 +5,13 @@ import { action, atom, batch } from "@reatom/framework";
 import { withAssign } from "@reatom/framework";
 import { withLocalStorage } from "@reatom/persist-web-storage";
 
-type BalancePayload = ExtractApiData<"getServerBalance">["data"]
+type BalancePayload = ExtractApiData<"getServerBalance">["data"] & { available?: boolean; purchasable?: boolean }
 
 export const balanceState = atom(null, "balanceState").pipe(
   withAssign((_, name) => ({
     charismBalance: atom(0, `${name}.charismBalance`),
     belkoinBalance: atom(0, `${name}.belkoinBalance`),
+    serverAvailable: atom(true, `${name}.serverAvailable`),
     settings: atom(null, `${name}.settings`).pipe(
       withAssign((_, name) => ({
         animateBalance: atom(true, `${name}.animateBalance`).pipe(
@@ -44,6 +45,7 @@ export const balance = atom(null, "balance").pipe(
         batch(ctx, () => {
           balanceState.charismBalance(ctx, transform(res.CHARISM))
           balanceState.belkoinBalance(ctx, transform(res.BELKOIN))
+          balanceState.serverAvailable(ctx, res.available !== false)
         })
       },
       onReject: (_, e) => logError(e)
