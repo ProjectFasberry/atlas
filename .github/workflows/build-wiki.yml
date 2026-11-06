@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux, x64, fasberry]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -52,7 +52,6 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          builder: fasberry
           context: .
           file: apps/wiki/Dockerfile
           platforms: linux/amd64

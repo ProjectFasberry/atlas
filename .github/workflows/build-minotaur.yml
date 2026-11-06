@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux, x64, fasberry]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -50,6 +50,8 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
 
       - name: Configure npm auth
         env:
@@ -92,7 +94,6 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          builder: fasberry
           context: .
           file: apps/minotaur/Dockerfile
           platforms: linux/amd64
