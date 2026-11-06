@@ -1,3 +1,3 @@
 import { wrapTitle } from "@/shared/lib/helpers";
 
-export default wrapTitle("Панель")
+export default wrapTitle("Traefik")

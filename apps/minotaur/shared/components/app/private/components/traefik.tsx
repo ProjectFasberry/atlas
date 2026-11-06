@@ -1,61 +1,87 @@
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Button } from "@/shared/ui/button";
-import { Icon } from "@/shared/ui/icon"
-import { configAtom, saveConfig, traefikConfig } from "../models/traefik.model";
+import { Icon } from "@/shared/ui/icon";
+import {
+  configAtom, isDirtyAtom, resetConfig, saveConfig, traefikConfig,
+} from "../models/traefik.model";
 
 export const ConfigEditor = reatomComponent(({ ctx }) => {
   useUpdate(traefikConfig, []);
 
-  const config = ctx.spy(configAtom)
-  const fetchStatus = ctx.spy(traefikConfig.statusesAtom)
-  const fetchError = ctx.spy(traefikConfig.errorAtom)
-  const savingStatus = ctx.spy(saveConfig.statusesAtom)
-  const savingError = ctx.spy(saveConfig.errorAtom)
-  const error = fetchError ?? savingError;
+  const config = ctx.spy(configAtom);
+  const isDirty = ctx.spy(isDirtyAtom);
+  const fetchStatus = ctx.spy(traefikConfig.statusesAtom);
+  const fetchError = ctx.spy(traefikConfig.errorAtom);
+  const saving = ctx.spy(saveConfig.statusesAtom).isPending;
+  const saveError = ctx.spy(saveConfig.errorAtom);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      if (!ctx.get(isDirtyAtom) || ctx.get(saveConfig.statusesAtom).isPending) return;
       saveConfig(ctx);
     });
   };
 
-  const isDisabled = fetchStatus.isPending || savingStatus.isPending;
+  const isBusy = fetchStatus.isPending || saving;
+  const error = fetchError ?? saveError;
 
   return (
-    <div className="flex flex-col gap-6 w-full h-full">
-      <div className="flex items-center justify-start gap-4">
+    <div className="flex flex-col gap-3 w-full">
+      <div className="flex flex-wrap items-center gap-2">
         <Button
           onClick={() => saveConfig(ctx)}
-          disabled={isDisabled}
+          disabled={isBusy || !isDirty}
           variant="default"
           className="bg-white gap-2 text-black"
         >
-          {savingStatus.isPending ? 'Сохранение' : 'Сохранить (Ctrl+S)'}
-          {savingStatus.isPending && (
-            <Icon name="sprite:loader-2" className="size-4 animate-spin duration-300" />
-          )}
+          {saving ? "Сохранение" : "Сохранить (Ctrl+S)"}
+          {saving && <Icon name="sprite:loader-2" className="size-4 animate-spin duration-300" />}
         </Button>
-        {fetchStatus.isPending && <span className="text-white">Загрузка...</span>}
-        {error && <span className="text-red">{error.message}</span>}
+        <Button
+          background="default"
+          onClick={() => resetConfig(ctx)}
+          disabled={isBusy || !isDirty}
+        >
+          Отменить
+        </Button>
+        <Button
+          background="default"
+          onClick={() => traefikConfig(ctx)}
+          disabled={isBusy || isDirty}
+          title={isDirty ? "Сначала сохраните или отмените изменения" : "Перечитать файл"}
+        >
+          <Icon name="sprite:refresh" className="size-4" />
+          Обновить
+        </Button>
+
+        <span className={`text-sm font-semibold ${isDirty ? "text-yellow-400" : "text-neutral-500"}`}>
+          {isDirty ? "Есть несохранённые изменения" : "Сохранено"}
+        </span>
       </div>
-      <div className="flex w-full h-dvh">
+
+      {error && (
+        <span className="text-sm text-red">{error.message}</span>
+      )}
+
+      <div className="w-full overflow-hidden rounded-xl border border-neutral-800 h-[calc(100dvh-18rem)] min-h-[420px]">
         <Editor
           defaultLanguage="yaml"
           theme="vs-dark"
-          className="w-full h-full"
+          height="100%"
           value={config}
-          onChange={(val) => configAtom(ctx, val ?? "")}
+          onChange={(value) => configAtom(ctx, value ?? "")}
           onMount={handleEditorDidMount}
           options={{
-            fontFamily: 'Consolas, monospace',
+            fontFamily: "Consolas, monospace",
             fontSize: 13,
-            renderLineHighlight: 'all',
-            cursorSmoothCaretAnimation: 'on',
+            renderLineHighlight: "all",
+            cursorSmoothCaretAnimation: "on",
             smoothScrolling: true,
+            minimap: { enabled: false },
           }}
         />
       </div>
     </div>
   );
-}, "ConfigEditor")
+}, "TraefikConfigEditor");

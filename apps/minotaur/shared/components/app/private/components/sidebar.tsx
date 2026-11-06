@@ -119,9 +119,8 @@ const links: SidebarLink[] = [
   { title: "Магазин", value: "/private/store", permission: "store.item.read" },
   { title: "Игрок", value: "/private/users", permission: "players.read" },
   { title: "История", value: "/private/history", permission: "history.read" },
-  { title: "Панель", value: "/private/panel", permission: "config.panel.read" },
+  { title: "Traefik", value: "/private/panel", permission: "config.panel.read" },
   { title: "Релизы", value: "/private/releases", permission: RELEASES_READ_PERMISSION },
-  { title: "Тестовое", value: "/private/test", permission: "config.panel.read" },
 ]
 
 const SidebarHeader = () => {

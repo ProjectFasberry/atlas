@@ -4,7 +4,7 @@ import { SectionWrapper, WithHeader } from "@/shared/components/app/private/comp
 export default function Page() {
   return (
     <SectionWrapper className="flex flex-col gap-4 w-full h-full">
-      <WithHeader title="Traefik dynamic config" />
+      <WithHeader title="Динамическая конфигурация Traefik" />
       <ConfigEditor />
     </SectionWrapper>
   )
