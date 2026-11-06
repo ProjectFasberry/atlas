@@ -8,7 +8,6 @@ import { translate } from "@/shared/locales/helpers"
 const getStoreBadges = () => [
   { title: translate["cart.nav.cart"](), value: "" },
   { title: translate["cart.nav.orders"](), value: "/orders" },
-  { title: translate["cart.nav.top-up"](), value: "/topup", variant: "active" },
 ] as const;
 
 export const CartNavigation = () => {

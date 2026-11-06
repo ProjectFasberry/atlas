@@ -5,7 +5,6 @@ import { withAssign, withReset } from "@reatom/framework";
 import { env } from "@/shared/env";
 import { logError } from "@/shared/lib/log";
 import { client, withJsonBody } from "@/shared/lib/client-wrapper";
-import { TopUpButton } from "../components/wallet/top-up-button";
 import { navigate } from "vike/client/router";
 import { type ReactNode } from "react";
 import { type Action as ToasterAction } from "sonner"
@@ -40,9 +39,9 @@ const getOrderErrorMessage = (message: string) => {
   }
 }
 
-const ERRORS_EVENTS: Record<string, { cb: () => ToasterAction | ReactNode }> = {
-  "INSUFFICIENT": { cb: () => <TopUpButton /> }
-}
+// Top-up is temporarily unlinked: its page still talks to the removed legacy
+// payment endpoints and will be rewritten on top of /payments/invoice.
+const ERRORS_EVENTS: Record<string, { cb: () => ToasterAction | ReactNode }> = {}
 
 export const order = atom(null, "order").pipe(
   withAssign((_, name) => ({
