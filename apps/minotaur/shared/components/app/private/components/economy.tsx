@@ -888,6 +888,14 @@ const ORDER_STATUS_LABEL: Record<string, string> = {
   refunded: "Возврат",
 };
 
+const ORDER_STATUS_STYLE: Record<string, string> = {
+  pending: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+  succeeded: "border-green-500/20 bg-green-500/10 text-green-400",
+  failed: "border-red/20 bg-red/10 text-red",
+  expired: "border-neutral-600/30 bg-neutral-600/10 text-neutral-400",
+  refunded: "border-violet-500/20 bg-violet-500/10 text-violet-300",
+};
+
 const ORDER_STATUSES: { label: string, value: Nullable<string> }[] = [
   { label: "Все", value: null },
   { label: "Ожидают", value: "pending" },
@@ -897,11 +905,22 @@ const ORDER_STATUSES: { label: string, value: Nullable<string> }[] = [
   { label: "Истекли", value: "expired" },
 ];
 
+const ORDER_PROVIDERS = [
+  { label: "Все провайдеры", value: "" },
+  { label: "Fake", value: "fake" },
+  { label: "SBP", value: "sbp" },
+  { label: "Heleket", value: "heleket" },
+];
+
+const FILTER_CONTROL_CLASS = "h-8 rounded-lg border border-neutral-800 bg-neutral-900 px-2 text-xs text-neutral-200 outline-none focus:ring-1 focus:ring-green-500";
+
 const OrdersSection = reatomComponent(({ ctx }) => {
   const orders = ctx.spy(economyState.orders);
   const meta = ctx.spy(economyState.ordersMeta);
   const nickname = ctx.spy(economyState.ordersFilter.nickname);
+  const appliedNickname = ctx.spy(economyState.ordersFilter.appliedNickname);
   const status = ctx.spy(economyState.ordersFilter.status);
+  const provider = ctx.spy(economyState.ordersFilter.provider);
   const sort = ctx.spy(economyState.ordersFilter.sort);
   const order = ctx.spy(economyState.ordersFilter.order);
   const loading = ctx.spy(economy.loadOrders.statusesAtom).isPending;
@@ -909,86 +928,169 @@ const OrdersSection = reatomComponent(({ ctx }) => {
   const busy = ctx.spy(economy.refundOrder.statusesAtom).isPending;
   const error = ctx.spy(economy.loadOrders.errorAtom) ?? ctx.spy(economy.refundOrder.errorAtom);
 
+  const hasFilters = Boolean(
+    nickname !== appliedNickname
+    || appliedNickname
+    || status
+    || provider
+    || sort !== "date"
+    || order !== "desc",
+  );
+  const statusLabel = ORDER_STATUSES.find((item) => item.value === status)?.label ?? status;
+  const providerLabel = ORDER_PROVIDERS.find((item) => item.value === provider)?.label ?? provider;
+
+  const setStatus = (value: string) => {
+    economyState.ordersFilter.status(ctx, value || null);
+    economy.loadOrders(ctx);
+  };
+  const setProvider = (value: string) => {
+    economyState.ordersFilter.provider(ctx, value || null);
+    economy.loadOrders(ctx);
+  };
+  const applySort = (value: "date" | "amount") => {
+    if (sort === value) {
+      economyState.ordersFilter.order(ctx, order === "desc" ? "asc" : "desc");
+    } else {
+      economyState.ordersFilter.sort(ctx, value);
+      economyState.ordersFilter.order(ctx, "desc");
+    }
+    economy.loadOrders(ctx);
+  };
+  const toggleOrder = () => {
+    economyState.ordersFilter.order(ctx, order === "desc" ? "asc" : "desc");
+    economy.loadOrders(ctx);
+  };
+
   return (
     <SectionWrapper className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Typography className="text-sm font-semibold">Заказы</Typography>
+      <div className="flex flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-900/40 p-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Input
-            value={nickname}
-            onChange={(event) => economyState.ordersFilter.nickname(ctx, event.target.value)}
-            placeholder="Никнейм"
-            maxLength={32}
-            className="h-8 w-40"
-          />
+          <div className="flex items-center gap-1">
+            <Input
+              value={nickname}
+              onChange={(event) => economyState.ordersFilter.nickname(ctx, event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") economy.applyOrdersNickname(ctx);
+              }}
+              placeholder="Никнейм"
+              maxLength={32}
+              className="h-8 w-44"
+            />
+            <Button
+              background="default"
+              className="h-8 px-3 text-xs"
+              disabled={loading}
+              onClick={() => economy.applyOrdersNickname(ctx)}
+            >
+              {loading ? "Загрузка..." : "Найти"}
+            </Button>
+          </div>
+
+          <select
+            value={status ?? ""}
+            onChange={(event) => setStatus(event.target.value)}
+            className={FILTER_CONTROL_CLASS}
+            aria-label="Фильтр по статусу"
+          >
+            {ORDER_STATUSES.map((item) => (
+              <option key={item.label} value={item.value ?? ""}>{item.label}</option>
+            ))}
+          </select>
+
+          <select
+            value={provider ?? ""}
+            onChange={(event) => setProvider(event.target.value)}
+            className={FILTER_CONTROL_CLASS}
+            aria-label="Фильтр по провайдеру"
+          >
+            {ORDER_PROVIDERS.map((item) => (
+              <option key={item.label} value={item.value}>{item.label}</option>
+            ))}
+          </select>
+
+          <select
+            value={sort}
+            onChange={(event) => applySort(event.target.value as "date" | "amount")}
+            className={FILTER_CONTROL_CLASS}
+            aria-label="Сортировка"
+          >
+            <option value="date">По дате</option>
+            <option value="amount">По сумме</option>
+          </select>
+
           <Button
             background="default"
             className="h-8 px-3 text-xs"
-            disabled={loading}
-            onClick={() => economy.loadOrders(ctx)}
+            onClick={toggleOrder}
+            title={order === "desc" ? "По убыванию" : "По возрастанию"}
           >
-            {loading ? "Загрузка..." : "Найти"}
+            {order === "desc" ? "↓ Убывание" : "↑ Возрастание"}
+          </Button>
+
+          <Button
+            background="default"
+            className="h-8 px-3 text-xs"
+            disabled={!hasFilters || loading}
+            onClick={() => economy.resetOrdersFilters(ctx)}
+          >
+            Сбросить
           </Button>
         </div>
-      </div>
 
-      <div className="flex flex-wrap items-center gap-1">
-        {([
-          { label: "Дата", value: "date" as const },
-          { label: "Сумма", value: "amount" as const },
-        ]).map((item) => (
-          <Button
-            key={item.value}
-            background={sort === item.value ? "white" : "default"}
-            className="h-7 px-2 text-xs"
-            onClick={() => {
-              economyState.ordersFilter.sort(ctx, item.value);
-              economy.loadOrders(ctx);
-            }}
-          >
-            {item.label}
-          </Button>
-        ))}
-        <Button
-          background="default"
-          className="h-7 px-2 text-xs"
-          onClick={() => {
-            economyState.ordersFilter.order(ctx, order === "desc" ? "asc" : "desc");
-            economy.loadOrders(ctx);
-          }}
-        >
-          {order === "desc" ? "Сначала новые" : "Сначала старые"}
-        </Button>
-        {ORDER_STATUSES.map((item) => (
-          <Button
-            key={item.label}
-            background={status === item.value ? "white" : "default"}
-            className="h-7 px-2 text-xs"
-            onClick={() => {
-              economyState.ordersFilter.status(ctx, item.value);
-              economy.loadOrders(ctx);
-            }}
-          >
-            {item.label}
-          </Button>
-        ))}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+          <span>Показано: {orders.length}{meta?.hasNextPage ? "+" : ""}</span>
+          {appliedNickname && (
+            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">Игрок: {appliedNickname}</span>
+          )}
+          {status && (
+            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">Статус: {statusLabel}</span>
+          )}
+          {provider && (
+            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">Провайдер: {providerLabel}</span>
+          )}
+        </div>
       </div>
 
       {error && <ErrorBlock title={error.message} />}
 
       {orders.length === 0
-        ? <Noop title={loading ? "Загрузка..." : "Заказов нет"} />
+        ? (
+          <div className="flex flex-col items-center gap-2">
+            <Noop title={loading ? "Загрузка..." : "Заказов нет"} />
+            {hasFilters && (
+              <Button background="default" className="h-8 px-3 text-xs" onClick={() => economy.resetOrdersFilters(ctx)}>
+                Сбросить фильтры
+              </Button>
+            )}
+          </div>
+        )
         : (
-          <Table>
+          <Table className={loading ? "opacity-60" : undefined}>
             <TableHeader>
               <TableRow className="*:font-semibold *:text-base">
-                <TableHead>Дата</TableHead>
+                <TableHead>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 hover:text-neutral-50"
+                    onClick={() => applySort("date")}
+                  >
+                    Дата {sort === "date" ? (order === "desc" ? "↓" : "↑") : ""}
+                  </button>
+                </TableHead>
                 <TableHead>Заказ</TableHead>
                 <TableHead>Игрок</TableHead>
                 <TableHead>Провайдер</TableHead>
                 <TableHead>Статус</TableHead>
                 <TableHead>Сумма</TableHead>
-                <TableHead>BELKOIN</TableHead>
+                <TableHead>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 hover:text-neutral-50"
+                    onClick={() => applySort("amount")}
+                  >
+                    BELKOIN {sort === "amount" ? (order === "desc" ? "↓" : "↑") : ""}
+                  </button>
+                </TableHead>
                 <TableHead className="text-right">Действие</TableHead>
               </TableRow>
             </TableHeader>
@@ -999,7 +1101,14 @@ const OrdersSection = reatomComponent(({ ctx }) => {
                   <TableCell className="text-xs text-neutral-400">{order.orderId}</TableCell>
                   <TableCell>{order.nickname}</TableCell>
                   <TableCell>{order.provider}</TableCell>
-                  <TableCell>{ORDER_STATUS_LABEL[order.status] ?? order.status}</TableCell>
+                  <TableCell>
+                    <span className={clsx(
+                      "rounded-sm border px-2 py-0.5 text-xs",
+                      ORDER_STATUS_STYLE[order.status] ?? "border-neutral-700 bg-neutral-800 text-neutral-300",
+                    )}>
+                      {ORDER_STATUS_LABEL[order.status] ?? order.status}
+                    </span>
+                  </TableCell>
                   <TableCell className="whitespace-nowrap">
                     {formatMinor(order.amountMinor, order.currency)} {order.currency}
                   </TableCell>

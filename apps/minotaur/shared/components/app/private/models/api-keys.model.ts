@@ -11,7 +11,7 @@ import { actions } from "./actions.model";
 export const apiKeysState = atom(null, "apiKeysState").pipe(
   withAssign((_, name) => ({
     data: atom<ApiKeys | null>(null, `${name}.data`).pipe(withReset()),
-    duration: atom(60000, `${name}.duration`).pipe(withReset()),
+    duration: atom(2592000, `${name}.duration`).pipe(withReset()),
     description: atom("", `${name}.description`).pipe(withReset()),
     afterCreate: atom(null, `${name}.afterCreate`).pipe(
       withAssign((_, name) => ({
@@ -22,8 +22,9 @@ export const apiKeysState = atom(null, "apiKeysState").pipe(
   }))
 )
 
-type ApiKeys = ExtractApiData<"getPrivatedApiKeysList">["data"]
-export type ApiKey = ApiKeys[number]
+type ApiKeysResponse = ExtractApiData<"getPrivatedApiKeysList">["data"]
+export type ApiKey = Omit<ApiKeysResponse[number], "duration"> & { duration: number | null }
+type ApiKeys = ApiKey[]
 
 type ApiKeyCreatePayload = ExtractApiData<"postPrivatedApiKeysCreate">["data"];
 

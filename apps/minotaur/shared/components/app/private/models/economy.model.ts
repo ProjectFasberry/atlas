@@ -171,7 +171,9 @@ export const economyState = atom(null, "economyState").pipe(
     ordersFilter: atom(null, `${name}.ordersFilter`).pipe(
       withAssign((_, filters) => ({
         nickname: atom("", `${filters}.nickname`),
+        appliedNickname: atom("", `${filters}.appliedNickname`),
         status: atom<Nullable<string>>(null, `${filters}.status`),
+        provider: atom<Nullable<string>>(null, `${filters}.provider`),
         sort: atom<"date" | "amount">("date", `${filters}.sort`),
         order: atom<"asc" | "desc">("desc", `${filters}.order`),
       }))
@@ -440,8 +442,9 @@ export const economy = atom(null, "economy").pipe(
     }).pipe(withStatusesAtom(), withErrorAtom()),
 
     loadOrders: reatomAsync(async (ctx) => {
-      const nickname = ctx.get(economyState.ordersFilter.nickname).trim();
+      const nickname = ctx.get(economyState.ordersFilter.appliedNickname).trim();
       const status = ctx.get(economyState.ordersFilter.status);
+      const provider = ctx.get(economyState.ordersFilter.provider);
 
       return await ctx.schedule(() =>
         client<OrdersPage>("privated/economy/orders")
@@ -451,6 +454,7 @@ export const economy = atom(null, "economy").pipe(
             order: ctx.get(economyState.ordersFilter.order),
             ...(nickname ? { nickname } : {}),
             ...(status ? { status } : {}),
+            ...(provider ? { provider } : {}),
           }))
           .exec()
       );
@@ -469,8 +473,9 @@ export const economy = atom(null, "economy").pipe(
       const meta = ctx.get(economyState.ordersMeta);
       if (!meta?.endCursor) return null;
 
-      const nickname = ctx.get(economyState.ordersFilter.nickname).trim();
+      const nickname = ctx.get(economyState.ordersFilter.appliedNickname).trim();
       const status = ctx.get(economyState.ordersFilter.status);
+      const provider = ctx.get(economyState.ordersFilter.provider);
 
       return await ctx.schedule(() =>
         client<OrdersPage>("privated/economy/orders")
@@ -481,6 +486,7 @@ export const economy = atom(null, "economy").pipe(
             order: ctx.get(economyState.ordersFilter.order),
             ...(nickname ? { nickname } : {}),
             ...(status ? { status } : {}),
+            ...(provider ? { provider } : {}),
           }))
           .exec()
       );
@@ -494,6 +500,22 @@ export const economy = atom(null, "economy").pipe(
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    applyOrdersNickname: action((ctx) => {
+      const nickname = ctx.get(economyState.ordersFilter.nickname).trim();
+      economyState.ordersFilter.appliedNickname(ctx, nickname);
+      economy.loadOrders(ctx);
+    }, `${name}.applyOrdersNickname`),
+
+    resetOrdersFilters: action((ctx) => {
+      economyState.ordersFilter.nickname(ctx, "");
+      economyState.ordersFilter.appliedNickname(ctx, "");
+      economyState.ordersFilter.status(ctx, null);
+      economyState.ordersFilter.provider(ctx, null);
+      economyState.ordersFilter.sort(ctx, "date");
+      economyState.ordersFilter.order(ctx, "desc");
+      economy.loadOrders(ctx);
+    }, `${name}.resetOrdersFilters`),
 
     refundOrder: reatomAsync(async (ctx, order: AdminOrder) => {
       await ctx.schedule(() =>
