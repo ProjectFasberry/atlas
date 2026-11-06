@@ -1,13 +1,20 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
+import { useState } from "react";
+import { clsx } from "cnfast";
+import { Dialog } from "@ark-ui/react/dialog";
+import { Portal } from "@ark-ui/react/portal";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { Icon } from "@/shared/ui/icon";
 import { Noop } from "@/shared/ui/noop";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { PageLoader } from "@/shared/ui/page-loader";
 import { Typography } from "@/shared/ui/typography";
+import { dialogVariant, DialogClose } from "@/shared/ui/dialog";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 import { SectionWrapper, WithHeader } from "./ui";
 import { currentUserState } from "@/shared/models/current-user/index.model";
+import { belkoinImage, charismImage } from "@/shared/consts/images";
 import { dayjs } from "@/shared/lib/dayjs";
 import {
   economy, economyBusyAtom, economyState,
@@ -16,10 +23,22 @@ import {
 
 export const ECONOMY_WRITE_PERMISSION = "economy.write";
 
+const CURRENCIES: EconomyCurrency[] = ["BELKOIN", "CHARISM"];
+
 const CURRENCY_LABEL: Record<EconomyCurrency, string> = {
   BELKOIN: "Белкоин",
   CHARISM: "Харизма",
 };
+
+const CURRENCY_IMAGE: Record<EconomyCurrency, string> = {
+  BELKOIN: belkoinImage,
+  CHARISM: charismImage,
+};
+
+const OPERATIONS: { label: string, value: EconomyOperation, icon: "sprite:plus" | "sprite:arrow-down" }[] = [
+  { label: "Начислить", value: "credit", icon: "sprite:plus" },
+  { label: "Списать", value: "debit", icon: "sprite:arrow-down" },
+];
 
 const REASON_LABEL: Record<string, string> = {
   "migration": "Миграция баланса",
@@ -86,19 +105,58 @@ const SearchBar = reatomComponent(({ ctx }) => {
 
 const WalletBalances = reatomComponent(({ ctx }) => {
   const wallet = ctx.spy(economyState.wallet);
+  const selected = ctx.spy(economyState.form.currency);
   if (!wallet) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Typography className="text-sm text-neutral-400">
-        Игрок: <span className="text-neutral-50 font-semibold">{wallet.nickname}</span>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Typography className="text-sm font-semibold">Кошелёк</Typography>
+        <Typography className="text-xs text-neutral-400">
+          Игрок: <span className="text-neutral-50 font-semibold">{wallet.nickname}</span>
+        </Typography>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {CURRENCIES.map((currency) => {
+          const isSelected = selected === currency;
+
+          return (
+            <button
+              key={currency}
+              type="button"
+              data-state={isSelected}
+              onClick={() => economyState.form.currency(ctx, currency)}
+              className={clsx(
+                "flex items-center justify-between gap-3 rounded-xl border p-3 text-left duration-150",
+                isSelected
+                  ? "border-green-700 bg-green-500/10"
+                  : "border-neutral-800 bg-neutral-800/40 hover:border-neutral-700 hover:bg-neutral-800/70"
+              )}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <img
+                  src={CURRENCY_IMAGE[currency]}
+                  width={28}
+                  height={28}
+                  alt=""
+                  draggable={false}
+                  className="shrink-0 select-none"
+                />
+                <div className="flex min-w-0 flex-col">
+                  <Typography className="text-xs text-neutral-400">{CURRENCY_LABEL[currency]}</Typography>
+                  <Typography className="truncate text-xl font-semibold">
+                    {number.format(wallet[currency])}
+                  </Typography>
+                </div>
+              </div>
+              {isSelected && <Icon name="sprite:check" className="size-4 shrink-0 text-green-500" />}
+            </button>
+          );
+        })}
+      </div>
+      <Typography className="text-xs text-neutral-500">
+        Выберите кошелёк, чтобы сразу подготовить операцию.
       </Typography>
-      {(Object.keys(CURRENCY_LABEL) as EconomyCurrency[]).map((currency) => (
-        <div key={currency} className="rounded-lg border border-neutral-800 px-3 py-1">
-          <Typography className="text-xs text-neutral-400">{CURRENCY_LABEL[currency]}</Typography>
-          <Typography className="text-base font-semibold">{number.format(wallet[currency])}</Typography>
-        </div>
-      ))}
     </div>
   );
 }, "EconomyWallet");
@@ -111,75 +169,140 @@ const AdjustForm = reatomComponent(({ ctx }) => {
   const reason = ctx.spy(economyState.form.reason);
   const busy = ctx.spy(economyBusyAtom);
   const error = ctx.spy(economy.adjust.errorAtom);
+  const canWrite = ctx.spy(currentUserState.perms).includes(ECONOMY_WRITE_PERMISSION);
 
-  if (!wallet) return null;
+  if (!wallet || !canWrite) return null;
 
+  const isCredit = operation === "credit";
   const amountValue = Number(amount);
+  const currentBalance = wallet[currency];
+  const insufficient = !isCredit && Number.isInteger(amountValue) && amountValue > currentBalance;
+  const projected = isCredit
+    ? currentBalance + (Number.isInteger(amountValue) ? amountValue : 0)
+    : currentBalance - (Number.isInteger(amountValue) ? amountValue : 0);
   const valid = Number.isInteger(amountValue)
     && amountValue > 0
-    && reason.trim().length >= 3;
+    && reason.trim().length >= 3
+    && !insufficient;
 
   return (
-    <SectionWrapper className="flex flex-col gap-2">
-      <Typography className="text-sm font-semibold">Корректировка баланса</Typography>
+    <SectionWrapper className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-col gap-0.5">
+          <Typography className="text-sm font-semibold">Начисление и списание</Typography>
+          <Typography color="gray" className="text-xs">
+            Изменения применяются сразу и попадают в журнал операций.
+          </Typography>
+        </div>
+        <span className="rounded-lg bg-neutral-800 px-2 py-1 text-[11px] font-medium text-neutral-400">
+          {number.format(currentBalance)} {CURRENCY_LABEL[currency].toLowerCase()}
+        </span>
+      </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1">
-          {(Object.keys(CURRENCY_LABEL) as EconomyCurrency[]).map((value) => (
-            <Button
-              key={value}
-              background={currency === value ? "white" : "default"}
-              className="h-8 px-2 text-xs"
-              onClick={() => economyState.form.currency(ctx, value)}
-            >
-              {CURRENCY_LABEL[value]}
-            </Button>
-          ))}
+      <div className="grid gap-2 sm:grid-cols-2">
+        <div className="flex flex-col gap-1">
+          <Typography color="gray" className="text-xs">Операция</Typography>
+          <div className="flex items-center gap-1 rounded-xl bg-neutral-800 p-1">
+            {OPERATIONS.map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                data-state={operation === item.value}
+                onClick={() => economyState.form.operation(ctx, item.value)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-neutral-300 duration-150 hover:bg-neutral-700 data-[state=true]:bg-neutral-50 data-[state=true]:text-neutral-950"
+              >
+                <Icon name={item.icon} className="size-4" />
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex items-center gap-1">
-          {([
-            { label: "Начислить", value: "credit" },
-            { label: "Списать", value: "debit" },
-          ] as { label: string, value: EconomyOperation }[]).map((item) => (
-            <Button
-              key={item.value}
-              background={operation === item.value ? "white" : "default"}
-              className="h-8 px-2 text-xs"
-              onClick={() => economyState.form.operation(ctx, item.value)}
-            >
-              {item.label}
-            </Button>
-          ))}
+        <div className="flex flex-col gap-1">
+          <Typography color="gray" className="text-xs">Валюта</Typography>
+          <div className="flex items-center gap-1 rounded-xl bg-neutral-800 p-1">
+            {CURRENCIES.map((item) => (
+              <button
+                key={item}
+                type="button"
+                data-state={currency === item}
+                onClick={() => economyState.form.currency(ctx, item)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-neutral-300 duration-150 hover:bg-neutral-700 data-[state=true]:bg-neutral-50 data-[state=true]:text-neutral-950"
+              >
+                <img
+                  src={CURRENCY_IMAGE[item]}
+                  width={18}
+                  height={18}
+                  alt=""
+                  draggable={false}
+                  className="select-none"
+                />
+                {CURRENCY_LABEL[item]}
+              </button>
+            ))}
+          </div>
         </div>
+      </div>
 
-        <Input
-          value={amount}
-          onChange={(event) => economyState.form.amount(ctx, event.target.value.replace(/\D/g, ""))}
-          placeholder="Сумма"
-          inputMode="numeric"
-          maxLength={10}
-          className="h-8 w-28"
-        />
+      <div className="grid gap-2 sm:grid-cols-[minmax(0,10rem)_1fr]">
+        <div className="flex flex-col gap-1">
+          <Typography color="gray" className="text-xs">Сумма</Typography>
+          <Input
+            value={amount}
+            onChange={(event) => economyState.form.amount(ctx, event.target.value.replace(/\D/g, ""))}
+            placeholder="0"
+            inputMode="numeric"
+            maxLength={10}
+            className="h-10 w-full"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <Typography color="gray" className="text-xs">Причина</Typography>
+          <Input
+            value={reason}
+            onChange={(event) => economyState.form.reason(ctx, event.target.value)}
+            placeholder="Например: компенсация за ивент"
+            maxLength={200}
+            className="h-10 w-full"
+          />
+        </div>
+      </div>
 
-        <Input
-          value={reason}
-          onChange={(event) => economyState.form.reason(ctx, event.target.value)}
-          placeholder="Причина (обязательно)"
-          maxLength={200}
-          className="h-8 flex-1"
-        />
+      <div className="flex flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-800/40 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <Typography color="gray" className="text-xs">Баланс после операции</Typography>
+          <span className="text-sm font-semibold text-neutral-400">{number.format(currentBalance)}</span>
+          <Icon name="sprite:arrow-right" className="size-4 text-neutral-500" />
+          <span
+            className={clsx(
+              "text-base font-semibold",
+              insufficient ? "text-red" : isCredit ? "text-green-500" : "text-neutral-50"
+            )}
+          >
+            {number.format(projected)}
+          </span>
+          <Typography color="gray" className="text-xs">{CURRENCY_LABEL[currency].toLowerCase()}</Typography>
+        </div>
 
         <Button
-          background="white"
-          className="h-8 px-4 text-xs"
+          background={isCredit ? "positive" : "default"}
+          variant={isCredit ? "default" : "danger"}
+          withSpinner
+          isLoading={busy}
+          className="h-10 px-4 text-sm font-semibold"
           disabled={!valid || busy}
           onClick={() => economy.adjust(ctx)}
         >
-          Применить
+          {isCredit ? "Начислить" : "Списать"}
+          {amountValue > 0 ? ` ${number.format(amountValue)}` : ""}
         </Button>
       </div>
 
+      {insufficient && (
+        <Typography className="text-xs text-red">
+          Недостаточно средств: на балансе {number.format(currentBalance)} {CURRENCY_LABEL[currency].toLowerCase()}.
+        </Typography>
+      )}
       {error && <ErrorBlock title={error.message} />}
       <Typography className="text-xs text-neutral-500">
         Каждая правка пишется в журнал с актором и причиной, прямые изменения балансов запрещены.
@@ -188,7 +311,9 @@ const AdjustForm = reatomComponent(({ ctx }) => {
   );
 }, "EconomyAdjustForm");
 
-const LedgerRow = reatomComponent<{ item: LedgerItem, canWrite: boolean }>(({ ctx, item, canWrite }) => {
+const LedgerRow = reatomComponent<{
+  item: LedgerItem, canWrite: boolean, onRefund: (item: LedgerItem) => void
+}>(({ ctx, item, canWrite, onRefund }) => {
   const busy = ctx.spy(economyBusyAtom);
   const refundable = canWrite && item.reason.startsWith("store.purchase:") && item.order_id;
 
@@ -209,7 +334,7 @@ const LedgerRow = reatomComponent<{ item: LedgerItem, canWrite: boolean }>(({ ct
             size="small"
             background="default"
             disabled={busy}
-            onClick={() => item.order_id && economy.refund(ctx, item.order_id)}
+            onClick={() => onRefund(item)}
           >
             Вернуть
           </Button>
@@ -219,28 +344,122 @@ const LedgerRow = reatomComponent<{ item: LedgerItem, canWrite: boolean }>(({ ct
   );
 }, "EconomyLedgerRow");
 
+const RefundInfoRow = ({ label, value, accent, mono }: {
+  label: string, value: string, accent?: boolean, mono?: boolean
+}) => (
+  <div className="flex items-center justify-between gap-3">
+    <Typography color="gray" className="text-xs">{label}</Typography>
+    <span
+      className={clsx(
+        "truncate text-sm",
+        accent ? "font-semibold text-green-500" : "font-medium text-neutral-100",
+        mono && "font-mono text-xs"
+      )}
+    >
+      {value}
+    </span>
+  </div>
+)
+
+const RefundDialog = reatomComponent<{ item: LedgerItem | null, onClose: () => void }>(({ ctx, item, onClose }) => {
+  const reason = ctx.spy(economyState.refundReason);
+  const busy = ctx.spy(economy.refund.statusesAtom).isPending;
+  const error = ctx.spy(economy.refund.errorAtom);
+
+  if (!item) return null;
+
+  const amount = Math.abs(item.delta);
+
+  const submit = async () => {
+    if (!item.order_id) return;
+
+    try {
+      await economy.refund(ctx, item.order_id);
+      onClose();
+    } catch {
+      // The model reports the failure through a toast and errorAtom.
+    }
+  };
+
+  return (
+    <Dialog.Root open onOpenChange={({ open }) => { if (!open) onClose(); }}>
+      <Portal>
+        <Dialog.Backdrop className={dialogVariant.backdrop()} />
+        <Dialog.Positioner className={dialogVariant.positioner()}>
+          <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-w-lg!")}>
+            <div className="flex flex-col gap-1 pr-8 w-full">
+              <Dialog.Title className={dialogVariant.title("text-left!")}>Возврат заказа</Dialog.Title>
+              <Typography color="gray" className="text-sm">
+                Средства вернутся на кошелёк игрока, действие попадёт в журнал операций.
+              </Typography>
+            </div>
+
+            <div className="flex w-full flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-800/40 p-3">
+              <RefundInfoRow label="Игрок" value={item.nickname} />
+              <RefundInfoRow label="Заказ" value={item.order_id ?? "—"} mono />
+              <RefundInfoRow label="Списание" value={`${formatAmount(item.delta)} ${CURRENCY_LABEL[item.currency]}`} />
+              <RefundInfoRow label="К возврату" value={`${number.format(amount)} ${CURRENCY_LABEL[item.currency]}`} accent />
+            </div>
+
+            <div className="flex w-full flex-col gap-1">
+              <Typography color="gray" className="text-xs">Причина возврата</Typography>
+              <Input
+                value={reason}
+                onChange={(event) => economyState.refundReason(ctx, event.target.value)}
+                placeholder="Например: возврат по запросу игрока"
+                maxLength={200}
+                className="h-10 w-full"
+              />
+            </div>
+
+            {error && <ErrorBlock title={error.message} />}
+
+            <div className="flex w-full items-center justify-end gap-2">
+              <Button background="default" className="h-10 px-4 text-sm" onClick={onClose}>
+                Отмена
+              </Button>
+              <Button
+                background="white"
+                withSpinner
+                isLoading={busy}
+                className="h-10 px-4 text-sm font-semibold"
+                disabled={busy || reason.trim().length < 3}
+                onClick={submit}
+              >
+                Вернуть средства
+              </Button>
+            </div>
+            <DialogClose />
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
+  );
+}, "EconomyRefundDialog");
+
 const LedgerTable = reatomComponent(({ ctx }) => {
   const ledger = ctx.spy(economyState.ledger);
   const meta = ctx.spy(economyState.meta);
   const canWrite = ctx.spy(currentUserState.perms).includes(ECONOMY_WRITE_PERMISSION);
   const loadMore = ctx.spy(economy.loadMore.statusesAtom).isPending;
   const loadMoreError = ctx.spy(economy.loadMore.errorAtom);
-  const refundReason = ctx.spy(economyState.refundReason);
+  const [refundTarget, setRefundTarget] = useState<LedgerItem | null>(null);
 
   if (!ctx.spy(economyState.wallet)) return null;
+
+  const openRefund = (item: LedgerItem) => {
+    if (ctx.get(economyState.refundReason).trim().length === 0) {
+      economyState.refundReason(ctx, "Возврат по запросу игрока");
+    }
+
+    setRefundTarget(item);
+  };
 
   return (
     <SectionWrapper className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Typography className="text-sm font-semibold">Журнал операций</Typography>
         <div className="flex items-center gap-2">
-          <Input
-            value={refundReason}
-            onChange={(event) => economyState.refundReason(ctx, event.target.value)}
-            placeholder="Причина возврата"
-            maxLength={200}
-            className="h-8 w-56"
-          />
           <Button
             background="default"
             className="h-8 px-3 text-xs"
@@ -270,10 +489,19 @@ const LedgerTable = reatomComponent(({ ctx }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {ledger.map((item) => <LedgerRow key={item.id} item={item} canWrite={canWrite} />)}
+              {ledger.map((item) => (
+                <LedgerRow
+                  key={item.id}
+                  item={item}
+                  canWrite={canWrite}
+                  onRefund={openRefund}
+                />
+              ))}
             </TableBody>
           </Table>
         )}
+
+      <RefundDialog item={refundTarget} onClose={() => setRefundTarget(null)} />
 
       {meta?.hasNextPage && (
         <Button
@@ -486,8 +714,6 @@ export const EconomyPanel = reatomComponent(({ ctx }) => {
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <RatesSection />
-      <FakePaymentSection />
       <SearchBar />
 
       {loading && !wallet && <PageLoader />}
@@ -506,6 +732,9 @@ export const EconomyPanel = reatomComponent(({ ctx }) => {
           <MigrationPanel />
         </>
       )}
+
+      <RatesSection />
+      <FakePaymentSection />
     </div>
   );
 }, "EconomyPanel");

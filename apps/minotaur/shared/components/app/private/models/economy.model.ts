@@ -2,6 +2,7 @@ import { client, withJsonBody, withQueryParams } from "@/shared/lib/client-wrapp
 import {
   action, atom, reatomAsync, withAssign, withErrorAtom, withStatusesAtom,
 } from "@reatom/framework";
+import { toast } from "sonner";
 import { notifyAboutRestrictRole } from "./actions.model";
 
 export type EconomyCurrency = "BELKOIN" | "CHARISM";
@@ -188,6 +189,9 @@ export const economy = atom(null, "economy").pipe(
       onFulfill: (ctx, payload) => {
         if (!payload) return;
 
+        const operation = ctx.get(economyState.form.operation);
+        const amount = ctx.get(economyState.form.amount);
+
         economyState.wallet(ctx, (wallet) => wallet
           ? { ...wallet, [payload.result.currency]: payload.result.balance }
           : wallet);
@@ -195,6 +199,10 @@ export const economy = atom(null, "economy").pipe(
         economyState.meta(ctx, payload.page.meta);
         economyState.form.amount(ctx, "");
         economyState.form.reason(ctx, "");
+
+        toast.success(operation === "credit" ? "Баланс пополнен" : "Баланс уменьшен", {
+          description: `${payload.result.nickname}: ${amount} ${payload.result.currency}`,
+        });
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(withStatusesAtom(), withErrorAtom()),
@@ -225,6 +233,7 @@ export const economy = atom(null, "economy").pipe(
         economyState.wallet(ctx, payload.wallet);
         economyState.ledger(ctx, payload.page.data);
         economyState.meta(ctx, payload.page.meta);
+        toast.success("Возврат выполнен");
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(withStatusesAtom(), withErrorAtom()),

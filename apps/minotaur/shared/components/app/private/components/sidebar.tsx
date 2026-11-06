@@ -11,6 +11,9 @@ import { Portal } from '@ark-ui/react/portal'
 import { dialogVariant, DialogClose } from "@/shared/ui/dialog";
 import { useState } from "react";
 import { scrollableVariant } from "@/shared/consts/style-variants";
+import { Avatar } from "@/shared/ui/avatar";
+import { Noop } from "@/shared/ui/noop";
+import { dayjs } from "@/shared/lib/dayjs";
 
 type Perms = {
   read: string[], create: string[], update: string[], delete: string[], unknown: string[],
@@ -35,17 +38,33 @@ const transformPermsByNamespace = action((ctx) => {
   });
 })
 
+const sortPerms = (items: string[]) => [...items].sort((a, b) => a.localeCompare(b))
+
 const groupsAtom = atom((ctx) => {
   const perms = ctx.spy(permsAtom)
 
   return [
-    { title: "Read", data: perms.read },
-    { title: "Create", data: perms.create },
-    { title: "Update", data: perms.update },
-    { title: "Delete", data: perms.delete },
-    { title: "Unknown", data: perms.unknown },
+    { title: "Чтение", data: sortPerms(perms.read) },
+    { title: "Создание", data: sortPerms(perms.create) },
+    { title: "Изменение", data: sortPerms(perms.update) },
+    { title: "Удаление", data: sortPerms(perms.delete) },
+    { title: "Прочее", data: sortPerms(perms.unknown) },
   ].filter(g => g.data && g.data.length > 0);
 })
+
+function formatAccountDate(value: unknown) {
+  if (typeof value !== "string" && typeof value !== "number") return "—";
+
+  const date = dayjs(value);
+  return date.isValid() ? date.format("DD.MM.YYYY") : "—";
+}
+
+const InfoCell = ({ label, value }: { label: string, value: string }) => (
+  <div className="flex flex-col gap-0.5 rounded-xl border border-neutral-800 bg-neutral-800/40 px-3 py-2">
+    <span className="text-[10px] font-medium uppercase tracking-wide text-neutral-500">{label}</span>
+    <span className="truncate text-sm font-semibold text-neutral-100">{value}</span>
+  </div>
+)
 
 const UserInfo = reatomComponent(({ ctx }) => {
   const [open, setOpen] = useState(false)
@@ -59,34 +78,111 @@ const UserInfo = reatomComponent(({ ctx }) => {
   if (!role) return null;
 
   const groups = ctx.spy(groupsAtom)
+  const permissions = ctx.spy(currentUserState.perms)
   const roleTitle = getFromDictionary(ctx, role.name)
+  const registeredAt = formatAccountDate(currentUser.meta.reg_date)
 
   return (
     <Dialog.Root open={open} onOpenChange={({ open }) => setOpen(open)}>
-      <Dialog.Trigger className="flex justify-between rounded-xl bg-neutral-800 h-6 sm:h-10 overflow-hidden px-2 sm:px-4 gap-2 items-center">
-        <Typography className="text-sm sm:text-base font-semibold">
-          <span className="hidden sm:inline">Роль:&nbsp;</span>
-          <span>{roleTitle.toLowerCase()}</span>
-        </Typography>
-        <Icon name="sprite:arrows-diagonal" className="text-neutral-400 h-3 w-3 sm:h-4.5 sm:w-4.5" />
+      <Dialog.Trigger className="group flex w-full min-w-0 items-center justify-between gap-2 rounded-xl bg-neutral-800 px-2 py-0.5 text-left duration-150 hover:bg-neutral-700 sm:h-10 sm:px-3 sm:py-0">
+        <div className="flex min-w-0 items-center gap-2">
+          <Avatar
+            url={currentUser.avatar}
+            nickname={currentUser.nickname}
+            className="size-6 shrink-0 sm:size-7"
+          />
+          <Typography className="hidden max-w-24 truncate text-sm font-semibold sm:block">
+            {currentUser.nickname}
+          </Typography>
+          <span className="truncate rounded-lg bg-green-500/15 px-1.5 py-0.5 text-[11px] font-semibold text-green-400">
+            {roleTitle}
+          </span>
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5 text-neutral-400">
+          <span
+            title="Всего прав"
+            className="hidden rounded-lg bg-neutral-900 px-1.5 py-0.5 text-[10px] font-semibold sm:inline-flex"
+          >
+            {permissions.length}
+          </span>
+          <Icon name="sprite:arrows-diagonal" className="size-3.5 sm:size-4" />
+        </div>
       </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content("items-start! justify-start! h-2/3")}>
-            <Dialog.Title className={dialogVariant.title()}>Разрешения</Dialog.Title>
-            <div className="flex flex-col gap-2 h-full overflow-y-auto rounded-xl scrollbar scrollbar-thumb-neutral-800 w-full">
-              {groups.map((group) => (
-                <div
-                  key={group.title}
-                  className="flex flex-col border h-full border-neutral-800 p-1 sm:p-2 rounded-xl gap-2 w-full"
-                >
-                  <Typography className="text-base sm:text-lg font-semibold">{group.title}</Typography>
-                  <div className="flex flex-col gap-1 w-full">
-                    {group.data.map(item => <span key={item} className="text-[12px] sm:text-sm">-&nbsp;{item}</span>)}
-                  </div>
+          <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-h-[80vh] overflow-hidden")}>
+            <div className="flex flex-col gap-1 pr-8">
+              <Dialog.Title className={dialogVariant.title()}>Профиль и права</Dialog.Title>
+              <Typography color="gray" className="text-sm">
+                Роль определяет доступные разделы приватной панели.
+              </Typography>
+            </div>
+
+            <div className="flex w-full flex-col gap-3 rounded-xl border border-neutral-800 bg-neutral-800/40 p-3 sm:flex-row sm:items-center">
+              <Avatar
+                url={currentUser.avatar}
+                nickname={currentUser.nickname}
+                className="size-12 shrink-0"
+              />
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Typography className="truncate text-lg font-semibold">
+                    {currentUser.nickname}
+                  </Typography>
+                  <span className="rounded-lg bg-green-500/15 px-2 py-0.5 text-[11px] font-semibold text-green-400">
+                    {roleTitle}
+                  </span>
                 </div>
-              ))}
+                <Typography color="gray" className="truncate text-xs">
+                  UUID: {currentUser.uuid}
+                </Typography>
+              </div>
+            </div>
+
+            <div className="grid w-full gap-2 sm:grid-cols-3">
+              <InfoCell label="Права" value={permissions.length.toString()} />
+              <InfoCell label="Группы" value={groups.length.toString()} />
+              <InfoCell label="Регистрация" value={registeredAt} />
+            </div>
+
+            <div
+              className={scrollableVariant({
+                className: "flex min-h-0 w-full flex-1 flex-col gap-2 overflow-y-auto pr-1"
+              })}
+            >
+              {groups.length === 0
+                ? <Noop title="Права не назначены" />
+                : (
+                  <div className="grid w-full gap-2 sm:grid-cols-2">
+                    {groups.map((group) => (
+                      <div
+                        key={group.title}
+                        className="flex flex-col gap-1.5 rounded-xl border border-neutral-800 p-2"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <Typography className="text-sm font-semibold">{group.title}</Typography>
+                          <span className="rounded-lg bg-neutral-800 px-1.5 py-0.5 text-[11px] font-medium text-neutral-400">
+                            {group.data.length}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          {group.data.map((item) => (
+                            <div
+                              key={item}
+                              className="flex items-center gap-1.5 rounded-lg bg-neutral-800/60 px-2 py-1"
+                            >
+                              <Icon name="sprite:check" className="size-3 shrink-0 text-green-500" />
+                              <span className="truncate font-mono text-[11px] text-neutral-300" title={item}>
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
             <DialogClose />
           </Dialog.Content>
@@ -115,7 +211,6 @@ type SidebarLink = {
 
 const links: SidebarLink[] = [
   { title: "Конфигурация", value: "/private/", permission: "config.panel.read" },
-  { title: "Мессенджер", value: "/private/messenger", permission: "private.chat.read" },
   { title: "Магазин", value: "/private/store", permission: "store.item.read" },
   { title: "Игрок", value: "/private/users", permission: "players.read" },
   { title: "История", value: "/private/history", permission: "history.read" },
