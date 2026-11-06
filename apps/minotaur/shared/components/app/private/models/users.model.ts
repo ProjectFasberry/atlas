@@ -64,7 +64,8 @@ export const users = atom(null, "users").pipe(
       await ctx.schedule(() => sleep(DEFAULT_SOFT_DELAY))
       users.refetchAll(ctx)
     }).pipe(
-      withConcurrency()
+      // A newer keystroke cancels the pending debounce+fetch of the previous one.
+      withConcurrency("last-in-win")
     ),
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() => getUsers(getParams(ctx)))
@@ -81,6 +82,10 @@ export const users = atom(null, "users").pipe(
       withAbort()
     ),
     refetchAll: action((ctx) => {
+      // Searching or changing the sort invalidates an in-flight next page:
+      // its cursor belongs to the previous query.
+      users.update.abort(ctx)
+      users.update.errorAtom.reset(ctx)
       usersState.filters.endCursor.reset(ctx)
       usersState.filters.startCursor.reset(ctx)
       users.fetch.cacheAtom.reset(ctx)
@@ -94,9 +99,22 @@ export const users = atom(null, "users").pipe(
         usersState.data(ctx, (state) => new Map([...state, ...res.data.map(d => [d.nickname, d] as const)]))
         usersState.meta(ctx, res.meta)
       },
-      onReject: (_, e) => notifyAboutRestrictRole(e)
+      onReject: (ctx, e) => {
+        // The cursor is opaque and can outlive a deploy or a sort change.
+        // Falling back to the first page is better than a stuck list.
+        if (e instanceof Error && e.message === "INVALID_CURSOR") {
+          users.refetchAll(ctx)
+          return
+        }
+
+        notifyAboutRestrictRole(e)
+      }
     }).pipe(
-      withStatusesAtom()
+      withStatusesAtom(),
+      withErrorAtom(),
+      withAbort(),
+      // A sentinel that stays in view would otherwise fire the same cursor twice.
+      withConcurrency("first-in-win")
     ),
     fetchSingle: reatomAsync(async (ctx, nickname: string) => {
       return await ctx.schedule(() =>
@@ -346,15 +364,6 @@ usersRestrictState.selectedId.onChange((ctx, state) => !state &&
 usersState.meta.onChange((ctx, state) => state &&
   usersState.filters.endCursor(ctx, (prev) => state.endCursor ? state.endCursor : prev)
 )
-usersListInView.onChange((ctx, state) => {
-  if (!state) return;
-
-  const hasNextPage = ctx.get(usersState.meta)?.hasNextPage
-  if (!hasNextPage) return;
-
-  users.update(ctx)
-})
-
 export const userIsSelectedAtom = (nickname: string) => atom((ctx) => ctx.spy(usersRestrictState.selectedUser) === nickname)
 export const isCheckedAtom = (nickname: string) => atom((ctx) => ctx.spy(usersRestrictState.nicknames).has(nickname))
 

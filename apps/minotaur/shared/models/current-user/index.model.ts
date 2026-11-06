@@ -12,6 +12,7 @@ export type MePayload = ExtractApiData<"getMe">['data'];
 
 export const CURRENT_USER_KEY = 'currentUser' as const
 export const CONFIG_PANEL_READ_PERMISSION = "config.panel.read"
+export const RELEASES_READ_PERMISSION = "releases.read"
 
 export const currentUserState = atom<MePayload | null>(null, "currentUser").pipe(
   withAssign((target, name) => ({

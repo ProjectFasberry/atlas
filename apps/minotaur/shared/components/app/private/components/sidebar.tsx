@@ -1,7 +1,7 @@
 import { Link } from "@/shared/components/config/link/link"
 import { tv } from "tailwind-variants"
 import { getFromDictionary } from "@/shared/models/app/utils";
-import { currentUserState } from "@/shared/models/current-user/index.model";
+import { currentUserState, RELEASES_READ_PERMISSION } from "@/shared/models/current-user/index.model";
 import { action, atom } from "@reatom/framework";
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
@@ -107,14 +107,21 @@ const linkVariant = tv({
   }
 })
 
-const links = [
-  { title: "Конфигурация", value: "/private/" },
-  { title: "Мессенджер", value: "/private/messenger" },
-  { title: "Магазин", value: "/private/store" },
-  { title: "Игрок", value: "/private/users" },
-  { title: "История", value: "/private/history" },
-  { title: "Панель", value: "/private/panel" },
-  { title: "Тестовое", value: "/private/test" },
+type SidebarLink = {
+  title: string
+  value: string
+  permission: string
+}
+
+const links: SidebarLink[] = [
+  { title: "Конфигурация", value: "/private/", permission: "config.panel.read" },
+  { title: "Мессенджер", value: "/private/messenger", permission: "private.chat.read" },
+  { title: "Магазин", value: "/private/store", permission: "store.item.read" },
+  { title: "Игрок", value: "/private/users", permission: "players.read" },
+  { title: "История", value: "/private/history", permission: "history.read" },
+  { title: "Панель", value: "/private/panel", permission: "config.panel.read" },
+  { title: "Релизы", value: "/private/releases", permission: RELEASES_READ_PERMISSION },
+  { title: "Тестовое", value: "/private/test", permission: "config.panel.read" },
 ]
 
 const SidebarHeader = () => {
@@ -126,11 +133,14 @@ const SidebarHeader = () => {
   )
 }
 
-const SidebarBody = () => {
+const SidebarBody = reatomComponent(({ ctx }) => {
+  const permissions = ctx.spy(currentUserState.perms)
+  const visible = links.filter((link) => permissions.includes(link.permission))
+
   return (
     <div className="flex flex-row items-center lg:items-stretch lg:flex-col gap-1 w-full">
       <span className="hidden lg:inline">Навигация</span>
-      {links.map((link) => (
+      {visible.map((link) => (
         <Link key={link.title} href={link.value} className={linkVariant().base()}>
           <Typography className={linkVariant().text()}>
             {link.title}
@@ -139,7 +149,7 @@ const SidebarBody = () => {
       ))}
     </div>
   )
-}
+}, "SidebarBody")
 
 export const Sidebar = () => {
   return (
