@@ -12,7 +12,7 @@ export const cartOrdersState = atom(null, "cartOrdersState").pipe(
     status: atom<string>("all", `${name}.status`).pipe(
       withSearchParamsPersist("status", (d = "all") => d),
     ),
-    type: atom<string>("all", `${name}.type`).pipe(
+    type: atom<string>("game", `${name}.type`).pipe(
       withSearchParamsPersist("type", (d = "all") => d),
     ),
     get STATUS_OPTIONS() {
@@ -24,9 +24,8 @@ export const cartOrdersState = atom(null, "cartOrdersState").pipe(
     },
     get TYPE_OPTIONS() {
       return [
-        { title: translate["store.orders.filters.all"](), value: "all" },
         { title: translate["store.orders.filters.game"](), value: "game" },
-        { title: translate["store.orders.filters.topup"](), value: "default" },
+        { title: translate["store.orders.filters.all"](), value: "all" },
       ]
     }
   }))
@@ -60,7 +59,9 @@ export const cartOrders = atom(null, "cartOrders").pipe(
     }),
     fetch: reatomAsync(async (ctx) => {
       const type = ctx.get(cartOrdersState.type)
-      const target = type === 'game' ? "internal" : "external"
+      // The legacy external payment orders are not used; until a real top-up
+      // provider is wired every order in the panel is a game order.
+      const target = type === 'default' ? "external" : "internal"
 
       const EVENTS = {
         internal: () => getInternalOrders({

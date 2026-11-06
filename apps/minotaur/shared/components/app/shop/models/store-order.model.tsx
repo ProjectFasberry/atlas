@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { withAssign, withReset } from "@reatom/framework";
 import { env } from "@/shared/env";
 import { logError } from "@/shared/lib/log";
-import { client } from "@/shared/lib/client-wrapper";
+import { client, withJsonBody } from "@/shared/lib/client-wrapper";
 import { TopUpButton } from "../components/wallet/top-up-button";
 import { navigate } from "vike/client/router";
 import { type ReactNode } from "react";
@@ -13,6 +13,9 @@ import type { OrderSingleDefault } from "@/pages/store/order/@id/+Page";
 import type { OrderSinglePayload } from "@/pages/store/order/@id/+data";
 import type { CreateOrderRoutePayload, OrderEventPayload } from "@/shared/schemas/payment";
 import { translate } from "@/shared/locales/helpers";
+import { cartState } from "./store-cart.model";
+import { balance } from "../../player/models/balance.model";
+import type { OrderSingleGamePayload } from "@/pages/store/order/@id/+data";
 
 export const orderState = atom(null, "orderState").pipe(
   withAssign((_, name) => ({
@@ -27,10 +30,10 @@ export const orderState = atom(null, "orderState").pipe(
 )
 
 const getOrderErrorMessage = (message: string) => {
-  switch (message) {
-    case "ITEMS_NOT_FOUND":
+  switch (message.toLowerCase()) {
+    case "items-not-found":
       return translate["store.errors.items-not-found"]()
-    case "INSUFFICIENT":
+    case "insufficient":
       return translate["store.errors.insufficient"]()
     default:
       return translate["store.errors.internal"]()
@@ -48,16 +51,24 @@ export const order = atom(null, "order").pipe(
       orderState.es(ctx, es(getOrderEventsUrl(orderId)))
     }),
     create: reatomAsync(async () => {
+      // The same key is reused by the client's automatic retry, so a lost
+      // response cannot charge the player twice.
       return await client
         .post<CreateOrderRoutePayload>("store/order/internal/create", {
           retry: 1
         })
+        .pipe(withJsonBody({ idempotencyKey: crypto.randomUUID() }))
         .exec()
     }, {
       name: `${name}.create`,
       onFulfill: (ctx, res) => {
         createdOrderDataAtom(ctx, res);
-        ctx.schedule(() => navigate(getOrderUrl(res.purchase.uniqueId, "default")))
+
+        cartState.data(ctx, []);
+        cartState.price(ctx, { BELKOIN: 0, CHARISM: 0 });
+        balance.refetchAll(ctx);
+
+        ctx.schedule(() => navigate(getOrderUrl(res.purchase.uniqueId, "game")))
       },
       onReject: (_, e) => {
         logError(e);
@@ -127,6 +138,14 @@ orderState.es.onChange((ctx, target) => {
 })
 
 export async function getOrder(id: string, init: RequestInit, type: string = "default") {
+  if (type === "game") {
+    const order = await client
+      .get<OrderSingleGamePayload>(`store/order/internal/${id}`, init)
+      .exec()
+
+    return { ...order, type: "game" } as OrderSinglePayload
+  }
+
   return client
     .get<OrderSinglePayload>(`store/order/external/${id}`, {
       ...init, searchParams: { type }
