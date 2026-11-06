@@ -79,8 +79,10 @@ export const history = atom(null, "history").pipe(
     }, {
       name: `${name}.fetch`,
       onFulfill: (ctx, result) => {
-        historyData(ctx, result.data);
-        historyMeta(ctx, result.meta);
+        // The API page is `{ data, meta }`; keep a bad shape from blanking the
+        // table with an undefined list.
+        historyData(ctx, Array.isArray(result?.data) ? result.data : []);
+        historyMeta(ctx, result?.meta ?? null);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(
@@ -103,8 +105,9 @@ export const history = atom(null, "history").pipe(
       onFulfill: (ctx, result) => {
         if (!result) return;
 
-        historyData(ctx, (current) => uniquePrepend(current, result.data));
-        historyMeta(ctx, result.meta);
+        const items = Array.isArray(result.data) ? result.data : [];
+        historyData(ctx, (current) => uniquePrepend(current, items));
+        historyMeta(ctx, result.meta ?? null);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(
