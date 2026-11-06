@@ -352,7 +352,17 @@
         "completed": "Completed",
         "game": "In-game",
         "topup": "Top-up"
-      }
+      },
+      "sort": {
+        "label": "Sort",
+        "date": "By date",
+        "amount": "By amount"
+      },
+      "direction": {
+        "desc": "Newest first",
+        "asc": "Oldest first"
+      },
+      "items_count": "Items: {count}"
     },
     "order": {
       "status": "Status",

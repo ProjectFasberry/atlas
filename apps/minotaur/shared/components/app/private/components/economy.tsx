@@ -901,6 +901,8 @@ const OrdersSection = reatomComponent(({ ctx }) => {
   const meta = ctx.spy(economyState.ordersMeta);
   const nickname = ctx.spy(economyState.ordersFilter.nickname);
   const status = ctx.spy(economyState.ordersFilter.status);
+  const sort = ctx.spy(economyState.ordersFilter.sort);
+  const order = ctx.spy(economyState.ordersFilter.order);
   const loading = ctx.spy(economy.loadOrders.statusesAtom).isPending;
   const loadingMore = ctx.spy(economy.loadMoreOrders.statusesAtom).isPending;
   const busy = ctx.spy(economy.refundOrder.statusesAtom).isPending;
@@ -930,6 +932,32 @@ const OrdersSection = reatomComponent(({ ctx }) => {
       </div>
 
       <div className="flex flex-wrap items-center gap-1">
+        {([
+          { label: "Дата", value: "date" as const },
+          { label: "Сумма", value: "amount" as const },
+        ]).map((item) => (
+          <Button
+            key={item.value}
+            background={sort === item.value ? "white" : "default"}
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              economyState.ordersFilter.sort(ctx, item.value);
+              economy.loadOrders(ctx);
+            }}
+          >
+            {item.label}
+          </Button>
+        ))}
+        <Button
+          background="default"
+          className="h-7 px-2 text-xs"
+          onClick={() => {
+            economyState.ordersFilter.order(ctx, order === "desc" ? "asc" : "desc");
+            economy.loadOrders(ctx);
+          }}
+        >
+          {order === "desc" ? "Сначала новые" : "Сначала старые"}
+        </Button>
         {ORDER_STATUSES.map((item) => (
           <Button
             key={item.label}

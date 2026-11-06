@@ -172,6 +172,8 @@ export const economyState = atom(null, "economyState").pipe(
       withAssign((_, filters) => ({
         nickname: atom("", `${filters}.nickname`),
         status: atom<Nullable<string>>(null, `${filters}.status`),
+        sort: atom<"date" | "amount">("date", `${filters}.sort`),
+        order: atom<"asc" | "desc">("desc", `${filters}.order`),
       }))
     ),
     form: atom(null, `${name}.form`).pipe(
@@ -445,6 +447,8 @@ export const economy = atom(null, "economy").pipe(
         client<OrdersPage>("privated/economy/orders")
           .pipe(withQueryParams({
             limit: 50,
+            sort: ctx.get(economyState.ordersFilter.sort),
+            order: ctx.get(economyState.ordersFilter.order),
             ...(nickname ? { nickname } : {}),
             ...(status ? { status } : {}),
           }))
@@ -473,6 +477,8 @@ export const economy = atom(null, "economy").pipe(
           .pipe(withQueryParams({
             limit: 50,
             endCursor: meta.endCursor,
+            sort: ctx.get(economyState.ordersFilter.sort),
+            order: ctx.get(economyState.ordersFilter.order),
             ...(nickname ? { nickname } : {}),
             ...(status ? { status } : {}),
           }))
