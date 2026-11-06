@@ -336,7 +336,8 @@
         "pending": "Ждёт оплаты",
         "succeeded": "Завершён",
         "canceled": "Отменён",
-        "waiting-for-capture": "Ожидает подтверждения"
+        "waiting-for-capture": "Ожидает подтверждения",
+        "processing": "Выполняется"
       },
       "empty": {
         "title": "Пусто",

@@ -336,7 +336,8 @@
         "pending": "Awaiting payment",
         "succeeded": "Completed",
         "canceled": "Canceled",
-        "waiting-for-capture": "Awaiting confirmation"
+        "waiting-for-capture": "Awaiting confirmation",
+        "processing": "Processing"
       },
       "empty": {
         "title": "Empty",

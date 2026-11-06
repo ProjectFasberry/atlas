@@ -12,7 +12,7 @@ import { dayjs } from "@/shared/lib/dayjs"
 
 const getStatusTitle = (status: string) => {
   switch (status) {
-    case "pending": return translate["store.orders.status.pending"]()
+    case "pending": return translate["store.orders.status.processing"]()
     case "succeeded": return translate["store.orders.status.succeeded"]()
     default: return status
   }
