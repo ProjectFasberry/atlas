@@ -1,4 +1,4 @@
-import { reatomComponent } from "@reatom/npm-react";
+import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Noop } from "@/shared/ui/noop";
@@ -326,12 +326,168 @@ const MigrationPanel = reatomComponent(({ ctx }) => {
   );
 }, "EconomyMigration");
 
+
+const RATE_CURRENCIES = ["RUB", "USDT", "USDC", "BELKOIN", "CHARISM"] as const;
+
+const RatesSection = reatomComponent(({ ctx }) => {
+  const canWrite = ctx.spy(currentUserState.perms).includes(ECONOMY_WRITE_PERMISSION);
+  const payload = ctx.spy(economyState.rates);
+  const from = ctx.spy(economyState.rateForm.from);
+  const to = ctx.spy(economyState.rateForm.to);
+  const rate = ctx.spy(economyState.rateForm.rate);
+  const spread = ctx.spy(economyState.rateForm.spread);
+  const busy = ctx.spy(economy.addRate.statusesAtom).isPending;
+  const error = ctx.spy(economy.addRate.errorAtom);
+
+  const valid = Number(rate) > 0 && Number(spread) >= 0 && Number(spread) < 1 && from !== to;
+
+  return (
+    <SectionWrapper className="flex flex-col gap-2">
+      <Typography className="text-sm font-semibold">Курсы валют</Typography>
+      <Typography className="text-xs text-neutral-400">
+        База - цена BELKOIN в рублях; остальные валюты считаются через BELKOIN. Спред удерживается при конвертации.
+      </Typography>
+
+      {payload && payload.current.length > 0
+        ? (
+          <Table>
+            <TableHeader>
+              <TableRow className="*:font-semibold *:text-base">
+                <TableHead>Из</TableHead>
+                <TableHead>В</TableHead>
+                <TableHead>Курс</TableHead>
+                <TableHead>Спред</TableHead>
+                <TableHead className="text-right">Действует с</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {payload.current.map((item) => (
+                <TableRow key={`${item.from_currency}:${item.to_currency}:${item.effective_from}`}>
+                  <TableCell>{item.from_currency}</TableCell>
+                  <TableCell>{item.to_currency}</TableCell>
+                  <TableCell>{Number(item.rate)}</TableCell>
+                  <TableCell>{Math.round(Number(item.spread) * 1000) / 10}%</TableCell>
+                  <TableCell className="text-right whitespace-nowrap">{formatDate(item.effective_from)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )
+        : <Noop title="Курсы ещё не заданы" />}
+
+      {canWrite && (
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={from}
+            onChange={(event) => economyState.rateForm.from(ctx, event.target.value)}
+            className="h-8 rounded-lg bg-neutral-800 px-2 text-xs"
+          >
+            {RATE_CURRENCIES.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+          <Typography className="text-xs text-neutral-400">→</Typography>
+          <select
+            value={to}
+            onChange={(event) => economyState.rateForm.to(ctx, event.target.value)}
+            className="h-8 rounded-lg bg-neutral-800 px-2 text-xs"
+          >
+            {RATE_CURRENCIES.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+          <Input
+            value={rate}
+            onChange={(event) => economyState.rateForm.rate(ctx, event.target.value.replace(/[^0-9.]/g, ""))}
+            placeholder="Курс"
+            inputMode="decimal"
+            maxLength={12}
+            className="h-8 w-28"
+          />
+          <Input
+            value={spread}
+            onChange={(event) => economyState.rateForm.spread(ctx, event.target.value.replace(/[^0-9.]/g, ""))}
+            placeholder="Спред, 0.05"
+            inputMode="decimal"
+            maxLength={6}
+            className="h-8 w-28"
+          />
+          <Button
+            background="white"
+            className="h-8 px-4 text-xs"
+            disabled={!valid || busy}
+            onClick={() => economy.addRate(ctx)}
+          >
+            Добавить курс
+          </Button>
+          {error && <ErrorBlock title={error.message} />}
+        </div>
+      )}
+    </SectionWrapper>
+  );
+}, "EconomyRates");
+
+const FakePaymentSection = reatomComponent(({ ctx }) => {
+  const canWrite = ctx.spy(currentUserState.perms).includes(ECONOMY_WRITE_PERMISSION);
+  const amount = ctx.spy(economyState.fakeAmount);
+  const order = ctx.spy(economyState.fakeOrder);
+  const busy = ctx.spy(economy.createFakeInvoice.statusesAtom).isPending;
+  const error = ctx.spy(economy.createFakeInvoice.errorAtom);
+
+  if (!canWrite) return null;
+
+  return (
+    <SectionWrapper className="flex flex-col gap-2">
+      <Typography className="text-sm font-semibold">Тестовая оплата</Typography>
+      <Typography className="text-xs text-neutral-400">
+        Создаёт счёт фейкового провайдера и открывает страницу оплаты. Доступно только админам.
+      </Typography>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          value={amount}
+          onChange={(event) => economyState.fakeAmount(ctx, event.target.value.replace(/\D/g, ""))}
+          placeholder="Сумма, ₽"
+          inputMode="numeric"
+          maxLength={10}
+          className="h-8 w-36"
+        />
+        <Button
+          background="white"
+          className="h-8 px-4 text-xs"
+          disabled={busy || amount.length === 0}
+          onClick={() => economy.createFakeInvoice(ctx)}
+        >
+          Создать счёт
+        </Button>
+      </div>
+
+      {error && <ErrorBlock title={error.message} />}
+
+      {order && (
+        <div className="flex flex-col gap-1 text-xs text-neutral-400">
+          <span>
+            Заказ {order.orderId}: {order.status}, к начислению BELKOIN {order.belkoin}
+          </span>
+          {order.payUrl && (
+            <a className="text-neutral-50 underline" href={order.payUrl} target="_blank" rel="noreferrer">
+              Открыть страницу оплаты
+            </a>
+          )}
+        </div>
+      )}
+    </SectionWrapper>
+  );
+}, "EconomyFakePayment");
+
 export const EconomyPanel = reatomComponent(({ ctx }) => {
   const loading = ctx.spy(economy.search.statusesAtom).isPending;
   const wallet = ctx.spy(economyState.wallet);
 
+  useUpdate((ctx) => {
+    economy.loadRates(ctx);
+  }, []);
+
   return (
     <div className="flex flex-col gap-3 w-full">
+      <RatesSection />
+      <FakePaymentSection />
       <SearchBar />
 
       {loading && !wallet && <PageLoader />}

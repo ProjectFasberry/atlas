@@ -38,6 +38,31 @@ export type MigrationBatch = {
   nextCursor: Nullable<string>;
 };
 
+export type ExchangeRate = {
+  id: number;
+  from_currency: string;
+  to_currency: string;
+  rate: number | string;
+  spread: number | string;
+  effective_from: string;
+};
+
+export type RatesPayload = {
+  current: ExchangeRate[];
+  history: ExchangeRate[];
+};
+
+export type PaymentOrder = {
+  orderId: string;
+  provider: string;
+  status: string;
+  amountMinor: number;
+  currency: string;
+  belkoin: number;
+  payUrl: Nullable<string>;
+  expiresAt: string;
+};
+
 const PAGE_SIZE = 50;
 
 export const economyState = atom(null, "economyState").pipe(
@@ -47,6 +72,17 @@ export const economyState = atom(null, "economyState").pipe(
     ledger: atom<LedgerItem[]>([], `${name}.ledger`),
     meta: atom<LedgerPage["meta"] | null>(null, `${name}.meta`),
     migration: atom<MigrationBatch | null>(null, `${name}.migration`),
+    rates: atom<RatesPayload | null>(null, `${name}.rates`),
+    rateForm: atom(null, `${name}.rateForm`).pipe(
+      withAssign((_, form) => ({
+        from: atom("BELKOIN", `${form}.from`),
+        to: atom("RUB", `${form}.to`),
+        rate: atom("", `${form}.rate`),
+        spread: atom("0", `${form}.spread`),
+      }))
+    ),
+    fakeAmount: atom("", `${name}.fakeAmount`),
+    fakeOrder: atom<PaymentOrder | null>(null, `${name}.fakeOrder`),
     form: atom(null, `${name}.form`).pipe(
       withAssign((_, form) => ({
         currency: atom<EconomyCurrency>("BELKOIN", `${form}.currency`),
@@ -189,6 +225,58 @@ export const economy = atom(null, "economy").pipe(
         economyState.wallet(ctx, payload.wallet);
         economyState.ledger(ctx, payload.page.data);
         economyState.meta(ctx, payload.page.meta);
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    loadRates: reatomAsync(async (ctx) => {
+      return await ctx.schedule(() => client<RatesPayload>("privated/economy/rates").exec());
+    }, {
+      name: `${name}.loadRates`,
+      onFulfill: (ctx, payload) => {
+        if (payload) economyState.rates(ctx, payload);
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    addRate: reatomAsync(async (ctx) => {
+      const rate = await ctx.schedule(() =>
+        client.post<ExchangeRate>("privated/economy/rates")
+          .pipe(withJsonBody({
+            from: ctx.get(economyState.rateForm.from).trim().toUpperCase(),
+            to: ctx.get(economyState.rateForm.to).trim().toUpperCase(),
+            rate: Number(ctx.get(economyState.rateForm.rate)),
+            spread: Number(ctx.get(economyState.rateForm.spread)) || 0,
+          }))
+          .exec()
+      );
+
+      const payload = await ctx.schedule(() => client<RatesPayload>("privated/economy/rates").exec());
+      return { rate, payload };
+    }, {
+      name: `${name}.addRate`,
+      onFulfill: (ctx, payload) => {
+        if (!payload) return;
+
+        economyState.rates(ctx, payload.payload);
+        economyState.rateForm.rate(ctx, "");
+      },
+      onReject: (_, error) => notifyAboutRestrictRole(error),
+    }).pipe(withStatusesAtom(), withErrorAtom()),
+
+    createFakeInvoice: reatomAsync(async (ctx) => {
+      const amount = Number(ctx.get(economyState.fakeAmount).replace(/[^0-9]/g, ""));
+      if (!Number.isInteger(amount) || amount <= 0) return null;
+
+      return await ctx.schedule(() =>
+        client.post<PaymentOrder>("payments/invoice")
+          .pipe(withJsonBody({ provider: "fake", amountMinor: amount * 100, currency: "RUB" }))
+          .exec()
+      );
+    }, {
+      name: `${name}.createFakeInvoice`,
+      onFulfill: (ctx, order) => {
+        if (order) economyState.fakeOrder(ctx, order);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(withStatusesAtom(), withErrorAtom()),
