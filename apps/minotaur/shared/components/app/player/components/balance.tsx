@@ -2,9 +2,7 @@ import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
 import { Button } from "@/shared/ui/button";
 import { getStaticImage } from "@/shared/lib/helpers";
-import { Icon } from "@/shared/ui/icon"
 import { balance, balanceState } from "../models/balance.model";
-import { navigate } from "vike/client/router";
 import { getFromDictionary } from "@/shared/models/app/utils";
 import { belkoinImage, charismImage } from "@/shared/consts/images";
 import { pageState } from "@/shared/models/page-context.model";
@@ -122,13 +120,7 @@ const BalanceCardContent = reatomComponent<BalanceCardProps>(({ ctx, value, wall
                 ? <Typography className="text-sm text-neutral-400">сервер недоступен</Typography>
                 : <CardValue value={value} />}
           </div>
-          <Button
-            background="white"
-            className="p-0"
-            onClick={() => navigate(`/store/cart/topup?target=${wallet}`)}
-          >
-            <Icon name="sprite:plus" className="size-5 text-neutral-950" />
-          </Button>
+
         </div>
       </div>
     </div>

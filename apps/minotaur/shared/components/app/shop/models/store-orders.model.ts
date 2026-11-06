@@ -43,6 +43,7 @@ export const cartOrdersState = atom(null, "cartOrdersState").pipe(
         { title: translate["store.orders.filters.all"](), value: "all" },
         { title: translate["store.orders.status.pending"](), value: "pending" },
         { title: translate["store.orders.status.succeeded"](), value: "succeeded" },
+        { title: translate["store.orders.status.refunded"](), value: "refunded" },
       ];
     },
     get SORT_OPTIONS(): OrdersFilterOption[] {

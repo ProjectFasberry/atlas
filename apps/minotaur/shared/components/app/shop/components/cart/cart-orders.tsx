@@ -134,7 +134,7 @@ export const CartOrdersList = reatomComponent(({ ctx }) => {
       {data.map((order) => (
         <Link
           key={order.unique_id}
-          href={`/store/order/${order.unique_id}?type=game`}
+          href={`/store/order/${order.unique_id}`}
           className="flex items-center justify-between w-full p-4 rounded-lg border border-neutral-800"
         >
           <div className="flex flex-col gap-1 min-w-0">

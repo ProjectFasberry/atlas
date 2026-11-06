@@ -59,8 +59,17 @@ export const GameOrder = reatomComponent(({ ctx }) => {
                   ID: {item.store_item_id}
                 </Typography>
               </div>
-              <div className="text-neutral-300 text-sm md:text-base">
-                {translate["store.order.recipient"]()}: {item.recipient}
+              <div className="flex flex-col items-start gap-1 text-neutral-300 text-sm md:items-end md:text-base">
+                <span>{translate["store.order.recipient"]()}: {item.recipient}</span>
+                {item.delivery_status === "revoked" && (
+                  <span className="text-xs text-red">Возвращён</span>
+                )}
+                {item.delivery_status === "pending" && (
+                  <span className="text-xs text-amber-400">Выдаётся</span>
+                )}
+                {item.delivery_status === "failed" && (
+                  <span className="text-xs text-red">Ошибка выдачи</span>
+                )}
               </div>
             </Link>
           ))}
