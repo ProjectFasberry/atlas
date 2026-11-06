@@ -337,7 +337,8 @@
         "succeeded": "Completed",
         "canceled": "Canceled",
         "waiting-for-capture": "Awaiting confirmation",
-        "processing": "Processing"
+        "processing": "Processing",
+        "refunded": "Refunded"
       },
       "empty": {
         "title": "Empty",

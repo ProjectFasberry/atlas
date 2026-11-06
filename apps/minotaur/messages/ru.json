@@ -337,7 +337,8 @@
         "succeeded": "Завершён",
         "canceled": "Отменён",
         "waiting-for-capture": "Ожидает подтверждения",
-        "processing": "Выполняется"
+        "processing": "Выполняется",
+        "refunded": "Возвращён"
       },
       "empty": {
         "title": "Пусто",

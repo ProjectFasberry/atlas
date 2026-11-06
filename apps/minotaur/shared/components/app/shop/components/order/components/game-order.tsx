@@ -31,9 +31,11 @@ export const GameOrder = reatomComponent(({ ctx }) => {
           </span>
         </Typography>
         <Typography className="text-neutral-50 text-lg">
-          {translate["store.order.status"]()}: {data.finished_at
-            ? <span className="text-green-600" title={dayjs(data.finished_at).format("DD MMM YYYY, HH:mm")}>{translate["store.order.completed"]()}</span>
-            : <span className="text-neutral-400">{translate["store.order.in-progress"]()}</span>
+          {translate["store.order.status"]()}: {data.status === "refunded"
+            ? <span className="text-red">{translate["store.orders.status.refunded"]()}</span>
+            : data.finished_at
+              ? <span className="text-green-600" title={dayjs(data.finished_at).format("DD MMM YYYY, HH:mm")}>{translate["store.order.completed"]()}</span>
+              : <span className="text-neutral-400">{translate["store.order.in-progress"]()}</span>
           }
         </Typography>
       </header>

@@ -13,7 +13,7 @@ export type GameOrder = {
   initiator: string;
   created_at: string;
   finished_at: Nullable<string>;
-  status: "pending" | "succeeded";
+  status: "pending" | "succeeded" | "refunded";
   price: Record<string, number>;
   items_count: number;
 };

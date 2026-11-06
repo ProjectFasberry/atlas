@@ -11,6 +11,8 @@ export type OrderSingleGamePayload = {
 	initiator: string;
 	created_at: Date;
 	finished_at: Date | null;
+	status: "pending" | "succeeded" | "refunded";
+	price: Record<string, number>;
 	items: {
 		id: number;
 		store_item_id: number;

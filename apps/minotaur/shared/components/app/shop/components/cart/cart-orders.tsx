@@ -14,6 +14,7 @@ const getStatusTitle = (status: string) => {
   switch (status) {
     case "pending": return translate["store.orders.status.processing"]()
     case "succeeded": return translate["store.orders.status.succeeded"]()
+    case "refunded": return translate["store.orders.status.refunded"]()
     default: return status
   }
 }
