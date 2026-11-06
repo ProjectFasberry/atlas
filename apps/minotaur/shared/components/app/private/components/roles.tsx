@@ -216,6 +216,7 @@ const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(event) => event.stopPropagation()}
               placeholder="Поиск по названию"
               className="h-8 w-full"
               maxLength={64}
