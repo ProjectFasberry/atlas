@@ -792,6 +792,7 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
         <div className="flex flex-col gap-2">
           <Typography className="text-xs text-neutral-400">
             Проверено {data.balances.checked}, расхождений {data.balances.mismatchCount},
+            лотов не сходится {data.balances.lotMismatch},
             ждут проекции {data.balances.pendingProjection}, без строки плагина {data.balances.missingPlugin}.
             Очередь: {data.jobs.pending} в ожидании, {data.jobs.failed} с ошибкой, {data.jobs.stuck} зависло.
           </Typography>
@@ -856,6 +857,7 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
               Net: {Object.entries(report.payments.netRevenueMinor)
                 .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
                 .join(", ") || "0"}.
+              {!report.payments.providerRefundsImplemented && " Возвраты у провайдера ещё не реализованы."}
             </Typography>
           )}
 

@@ -79,6 +79,7 @@ export type ReconciliationData = {
     at: string;
     checked: number;
     mismatchCount: number;
+    lotMismatch: number;
     missingPlugin: number;
     pendingProjection: number;
     mismatches: BalanceMismatch[];
