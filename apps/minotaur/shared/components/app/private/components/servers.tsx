@@ -1,12 +1,18 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
+import { Dialog } from "@ark-ui/react/dialog"
+import { Portal } from "@ark-ui/react/portal"
+import { clsx } from "cnfast"
 import { Button } from "@/shared/ui/button"
+import { Input } from "@/shared/ui/input"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { PageLoader } from "@/shared/ui/page-loader"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
 import { Typography } from "@/shared/ui/typography"
-import { clsx } from "cnfast"
+import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { currentUserState } from "@/shared/models/current-user/index.model"
-import { servers, type ServerPayload } from "../models/servers.model"
+import {
+  patchOf, serverEditor, servers, type ServerPayload,
+} from "../models/servers.model"
 
 export const SERVERS_READ_PERMISSION = "servers.read"
 export const SERVERS_UPDATE_PERMISSION = "servers.update"
@@ -22,6 +28,98 @@ const Flag = ({ active, label }: { active: boolean, label: string }) => (
   </span>
 )
 
+const Field = (props: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}) => (
+  <label className="flex flex-col gap-1 w-full">
+    <span className="text-xs font-medium text-neutral-400">{props.label}</span>
+    <Input value={props.value} onChange={(event) => props.onChange(event.target.value)} />
+  </label>
+)
+
+const SelectField = (props: {
+  label: string
+  value: string
+  options: string[]
+  onChange: (value: string) => void
+}) => (
+  <label className="flex flex-col gap-1 w-full">
+    <span className="text-xs font-medium text-neutral-400">{props.label}</span>
+    <select
+      className="h-10 rounded-xl bg-neutral-800 px-4 text-sm text-neutral-100 outline-none focus:ring-2 focus:ring-green-500"
+      value={props.value}
+      onChange={(event) => props.onChange(event.target.value)}
+    >
+      {props.options.map((option) => <option key={option} value={option}>{option}</option>)}
+    </select>
+  </label>
+)
+
+const ServerEditor = reatomComponent(({ ctx }) => {
+  const server = ctx.spy(serverEditor.target)
+  const form = ctx.spy(serverEditor.form)
+  const saving = ctx.spy(servers.save.statusesAtom).isPending
+
+  if (!server) return null
+
+  const set = (key: Parameters<typeof serverEditor.set>[1]) =>
+    (value: string) => serverEditor.set(ctx, key, value)
+
+  const save = () => {
+    servers.save(ctx, { id: server.id, patch: patchOf(form) })
+      .then(() => serverEditor.close(ctx))
+      .catch(() => undefined)
+  }
+
+  return (
+    <Dialog.Root open onOpenChange={({ open }) => { if (!open) serverEditor.close(ctx) }}>
+      <Portal>
+        <Dialog.Backdrop className={dialogVariant.backdrop()} />
+        <Dialog.Positioner>
+          <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-w-2xl max-h-[85vh] overflow-y-auto")}>
+            <DialogClose />
+            <Dialog.Title className={dialogVariant.title()}>Изменить сервер</Dialog.Title>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+              <Field label="Название" value={form.fullname} onChange={set("fullname")} />
+              <Field label="Origin" value={server.origin} onChange={() => undefined} />
+              <Field label="Описание" value={form.description} onChange={set("description")} />
+              <Field label="Превью (URL)" value={form.thumbnail} onChange={set("thumbnail")} />
+              <Field label="Версия Minecraft" value={form.client_version} onChange={set("client_version")} />
+              <SelectField
+                label="Загрузчик"
+                value={form.loader}
+                options={["fabric", "quilt", "neoforge", "forge", "vanilla"]}
+                onChange={set("loader")}
+              />
+              <Field label="Версия загрузчика" value={form.loader_version} onChange={set("loader_version")} />
+              <Field label="Java major" value={form.java_major} onChange={set("java_major")} />
+              <Field label="Ресурс-пак" value={form.resource_pack} onChange={set("resource_pack")} />
+              <SelectField
+                label="Клиентский мод"
+                value={form.client_mod}
+                options={["required", "optional"]}
+                onChange={set("client_mod")}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 w-full">
+              <Button background="default" className="h-9" onClick={() => serverEditor.close(ctx)}>
+                Отмена
+              </Button>
+              <Button background="positive" className="h-9" disabled={saving} onClick={save}>
+                Сохранить
+              </Button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
+  )
+}, "ServerEditor")
+
 export const Servers = reatomComponent(({ ctx }) => {
   useUpdate(servers.fetch, [])
 
@@ -35,14 +133,14 @@ export const Servers = reatomComponent(({ ctx }) => {
   if (error) return <ErrorBlock title={String(error)} />
 
   const patch = (server: ServerPayload, change: Parameters<typeof servers.save>[1]["patch"]) => {
-    servers.save(ctx, { id: server.id, patch: change, }).catch(() => undefined)
+    servers.save(ctx, { id: server.id, patch: change }).catch(() => undefined)
   }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
         <Typography color="gray" className="text-sm">
-          `available` блокирует вход до подключения: билет на сервер не выдаётся, reconnect-пасс не принимается.
+          available блокирует вход до подключения: билет на сервер не выдаётся, reconnect-пасс не принимается.
         </Typography>
         <Button
           background="default"
@@ -99,9 +197,9 @@ export const Servers = reatomComponent(({ ctx }) => {
                     background="default"
                     className="h-8 text-xs"
                     disabled={!canEdit || saving}
-                    onClick={() => patch(server, { excluded: !server.excluded })}
+                    onClick={() => serverEditor.open(ctx, server)}
                   >
-                    {server.excluded ? "Показать" : "Скрыть"}
+                    Изменить
                   </Button>
                 </div>
               </TableCell>
@@ -109,6 +207,8 @@ export const Servers = reatomComponent(({ ctx }) => {
           ))}
         </TableBody>
       </Table>
+
+      <ServerEditor />
     </div>
   )
 }, "Servers")
