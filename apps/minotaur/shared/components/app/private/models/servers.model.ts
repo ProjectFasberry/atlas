@@ -1,7 +1,7 @@
-import { mainFetch } from "@/shared/api/client"
-import { parseWrappedJson } from "@/shared/lib/client-wrapper"
+import { client } from "@/shared/lib/client-wrapper"
 import {
-  action, atom, reatomAsync, withAssign, withDataAtom, withErrorAtom, withStatusesAtom,
+  action, atom, reatomAsync,
+  withAssign, withDataAtom, withErrorAtom, withStatusesAtom
 } from "@reatom/framework"
 
 export type ServerPayload = {
@@ -61,17 +61,17 @@ const emptyForm: ServerForm = {
   client_mod: "required",
 }
 
-function formOf(server: ServerPayload): ServerForm {
+function formOf(s: ServerPayload): ServerForm {
   return {
-    fullname: server.fullname,
-    description: server.description ?? "",
-    thumbnail: server.thumbnail,
-    client_version: server.client_version,
-    loader: server.loader,
-    loader_version: server.loader_version ?? "",
-    java_major: String(server.java_major),
-    resource_pack: server.resource_pack ?? "",
-    client_mod: server.client_mod,
+    fullname: s.fullname,
+    description: s.description ?? "",
+    thumbnail: s.thumbnail,
+    client_version: s.client_version,
+    loader: s.loader,
+    loader_version: s.loader_version ?? "",
+    java_major: String(s.java_major),
+    resource_pack: s.resource_pack ?? "",
+    client_mod: s.client_mod,
   }
 }
 
@@ -94,9 +94,9 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
   withAssign((_, name) => ({
     target: atom<ServerPayload | null>(null, `${name}.target`),
     form: atom<ServerForm>(emptyForm, `${name}.form`),
-    open: action((ctx, server: ServerPayload) => {
-      serverEditor.target(ctx, server)
-      serverEditor.form(ctx, formOf(server))
+    open: action((ctx, s: ServerPayload) => {
+      serverEditor.target(ctx, s)
+      serverEditor.form(ctx, formOf(s))
     }, `${name}.open`),
     close: action((ctx) => {
       serverEditor.target(ctx, null)
@@ -108,42 +108,29 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
   }))
 )
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await mainFetch(path, init)
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => null) as { error?: unknown } | null
-    const error = typeof body?.error === "string" ? body.error : `HTTP ${response.status}`
-    throw new Error(error)
-  }
-
-  return parseWrappedJson<T>(response)
-}
-
 export const servers = atom(null, "servers").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => request<ServerPayload[]>("privated/servers"))
+      return await ctx.schedule(() =>
+        client.get<ServerPayload[]>("privated/servers").exec()
+      )
     }, `${name}.fetch`).pipe(
       withDataAtom(null),
       withStatusesAtom(),
       withErrorAtom(),
     ),
     save: reatomAsync(async (ctx, input: { id: number; patch: ServerPatch }) => {
-      const updated = await ctx.schedule(() =>
-        request<ServerPayload>(`privated/servers/${input.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(input.patch),
-        })
+      return await ctx.schedule(() =>
+        client.patch<ServerPayload>(`privated/servers/${input.id}`, { json: input.patch }).exec()
       )
-
-      // Keep the table in sync without a second round trip.
-      const current = ctx.get(servers.fetch.dataAtom) ?? []
-      servers.fetch.dataAtom(ctx, current.map((server) => server.id === updated.id ? updated : server))
-
-      return updated
-    }, `${name}.save`).pipe(
+    }, {
+      name: `${name}.save`,
+      onFulfill: (ctx, updated) => {
+        // Keep the table in sync without a second round trip.
+        const current = ctx.get(servers.fetch.dataAtom) ?? []
+        servers.fetch.dataAtom(ctx, current.map((s) => s.id === updated.id ? updated : s))
+      }
+    }).pipe(
       withStatusesAtom(),
       withErrorAtom(),
     ),

@@ -1,6 +1,7 @@
 import { client, withQueryParams } from "@/shared/lib/client-wrapper"
 import {
-  atom, reatomAsync, withAbort, withAssign, withDataAtom, withErrorAtom, withStatusesAtom,
+  atom, reatomAsync,
+  withAbort, withAssign, withDataAtom, withErrorAtom, withStatusesAtom,
 } from "@reatom/framework"
 import { withLocalStorage } from "@reatom/persist-web-storage"
 import { notifyAboutRestrictRole } from "./actions.model"
