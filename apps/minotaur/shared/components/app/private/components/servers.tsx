@@ -57,7 +57,8 @@ const SelectField = (props: {
   </label>
 )
 
-const ServerEditor = reatomComponent(({ ctx }) => {
+/** Dialog body; the surrounding Dialog.Root owns open/close. */
+const ServerEditorFields = reatomComponent(({ ctx }) => {
   const server = ctx.spy(serverEditor.target)
   const form = ctx.spy(serverEditor.form)
   const saving = ctx.spy(servers.save.statusesAtom).isPending
@@ -68,57 +69,46 @@ const ServerEditor = reatomComponent(({ ctx }) => {
     (value: string) => serverEditor.set(ctx, key, value)
 
   const save = () => {
-    servers.save(ctx, { id: server.id, patch: patchOf(form) })
-      .then(() => serverEditor.close(ctx))
-      .catch(() => undefined)
+    servers.save(ctx, { id: server.id, patch: patchOf(form) }).catch(() => undefined)
   }
 
   return (
-    <Dialog.Root open onOpenChange={({ open }) => { if (!open) serverEditor.close(ctx) }}>
-      <Portal>
-        <Dialog.Backdrop className={dialogVariant.backdrop()} />
-        <Dialog.Positioner>
-          <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-w-2xl max-h-[85vh] overflow-y-auto")}>
-            <DialogClose />
-            <Dialog.Title className={dialogVariant.title()}>Изменить сервер</Dialog.Title>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
-              <Field label="Название" value={form.fullname} onChange={set("fullname")} />
-              <Field label="Origin" value={server.origin} onChange={() => undefined} />
-              <Field label="Описание" value={form.description} onChange={set("description")} />
-              <Field label="Превью (URL)" value={form.thumbnail} onChange={set("thumbnail")} />
-              <Field label="Версия Minecraft" value={form.client_version} onChange={set("client_version")} />
-              <SelectField
-                label="Загрузчик"
-                value={form.loader}
-                options={["fabric", "quilt", "neoforge", "forge", "vanilla"]}
-                onChange={set("loader")}
-              />
-              <Field label="Версия загрузчика" value={form.loader_version} onChange={set("loader_version")} />
-              <Field label="Java major" value={form.java_major} onChange={set("java_major")} />
-              <Field label="Ресурс-пак" value={form.resource_pack} onChange={set("resource_pack")} />
-              <SelectField
-                label="Клиентский мод"
-                value={form.client_mod}
-                options={["required", "optional"]}
-                onChange={set("client_mod")}
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 w-full">
-              <Button background="default" className="h-9" onClick={() => serverEditor.close(ctx)}>
-                Отмена
-              </Button>
-              <Button background="positive" className="h-9" disabled={saving} onClick={save}>
-                Сохранить
-              </Button>
-            </div>
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Portal>
-    </Dialog.Root>
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+        <Field label="Название" value={form.fullname} onChange={set("fullname")} />
+        <Field label="Origin" value={server.origin} onChange={() => undefined} />
+        <Field label="Описание" value={form.description} onChange={set("description")} />
+        <Field label="Превью (URL)" value={form.thumbnail} onChange={set("thumbnail")} />
+        <Field label="Версия Minecraft" value={form.client_version} onChange={set("client_version")} />
+        <SelectField
+          label="Загрузчик"
+          value={form.loader}
+          options={["fabric", "quilt", "neoforge", "forge", "vanilla"]}
+          onChange={set("loader")}
+        />
+        <Field label="Версия загрузчика" value={form.loader_version} onChange={set("loader_version")} />
+        <Field label="Java major" value={form.java_major} onChange={set("java_major")} />
+        <Field label="Ресурс-пак" value={form.resource_pack} onChange={set("resource_pack")} />
+        <SelectField
+          label="Клиентский мод"
+          value={form.client_mod}
+          options={["required", "optional"]}
+          onChange={set("client_mod")}
+        />
+      </div>
+      <div className="flex justify-end gap-2 w-full">
+        <Dialog.CloseTrigger asChild>
+          <Button background="default" className="h-9">Отмена</Button>
+        </Dialog.CloseTrigger>
+        <Dialog.CloseTrigger asChild>
+          <Button background="positive" className="h-9" disabled={saving} onClick={save}>
+            Сохранить
+          </Button>
+        </Dialog.CloseTrigger>
+      </div>
+    </>
   )
-}, "ServerEditor")
+}, "ServerEditorFields")
 
 export const Servers = reatomComponent(({ ctx }) => {
   useUpdate(servers.fetch, [])
@@ -193,22 +183,37 @@ export const Servers = reatomComponent(({ ctx }) => {
                   >
                     {server.available ? "Закрыть вход" : "Открыть вход"}
                   </Button>
-                  <Button
-                    background="default"
-                    className="h-8 text-xs"
-                    disabled={!canEdit || saving}
-                    onClick={() => serverEditor.open(ctx, server)}
+
+                  <Dialog.Root
+                    onOpenChange={({ open }) => { if (!open) serverEditor.close(ctx) }}
                   >
-                    Изменить
-                  </Button>
+                    <Dialog.Trigger asChild>
+                      <Button
+                        background="default"
+                        className="h-8 text-xs"
+                        disabled={!canEdit || saving}
+                        onPointerDown={() => serverEditor.open(ctx, server)}
+                      >
+                        Изменить
+                      </Button>
+                    </Dialog.Trigger>
+                    <Portal>
+                      <Dialog.Backdrop className={dialogVariant.backdrop()} />
+                      <Dialog.Positioner>
+                        <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-w-2xl max-h-[85vh] overflow-y-auto")}>
+                          <DialogClose />
+                          <Dialog.Title className={dialogVariant.title()}>Изменить сервер</Dialog.Title>
+                          <ServerEditorFields />
+                        </Dialog.Content>
+                      </Dialog.Positioner>
+                    </Portal>
+                  </Dialog.Root>
                 </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-
-      <ServerEditor />
     </div>
   )
 }, "Servers")
