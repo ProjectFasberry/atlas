@@ -132,8 +132,12 @@ export type EconomyReport = {
     orders: Record<string, number>;
     created: number;
     succeeded: number;
+    refunded: number;
     conversion: number;
     revenueMinor: Record<string, number>;
+    refundedMinor: Record<string, number>;
+    netRevenueMinor: Record<string, number>;
+    providerRefundsImplemented: false;
     uniquePayers: number;
     belkoinIssued: number;
   };

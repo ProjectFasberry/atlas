@@ -12,7 +12,10 @@ import { renderToHTMLString } from "@tiptap/static-renderer";
 import { editorExtensions } from "@/shared/components/config/editor/editor.model";
 import type { JSONContent } from "@tiptap/react";
 
-export type StoreItem = ExtractApiData<"getStoreItems">["data"]["data"][number]
+export type StoreItem = ExtractApiData<"getStoreItems">["data"]["data"][number] & {
+	command?: string | null;
+	refund_cmd?: string | null;
+}
 
 export async function getStoreItem(id: string, init: RequestInit) {
   return client

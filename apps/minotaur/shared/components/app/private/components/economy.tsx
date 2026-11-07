@@ -838,17 +838,24 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
           <Typography className="text-xs text-neutral-400">
             Период: {formatDate(report.period.from)} - {formatDate(report.period.to)}.
             Заказов {report.payments.created}, оплачено {report.payments.succeeded},
+            возвращено {report.payments.refunded},
             конверсия {(report.payments.conversion * 100).toFixed(1)}%,
             плательщиков {report.payments.uniquePayers},
             выдано BELKOIN {number.format(report.payments.belkoinIssued)}.
             Топ-5 держателей: {(report.whales.topShare * 100).toFixed(1)}% от {number.format(report.whales.totalBelkoin)} BELKOIN.
           </Typography>
 
-          {Object.entries(report.payments.revenueMinor).length > 0 && (
+          {(Object.entries(report.payments.revenueMinor).length > 0 || Object.entries(report.payments.refundedMinor).length > 0) && (
             <Typography className="text-xs text-neutral-400">
               Выручка: {Object.entries(report.payments.revenueMinor)
                 .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
-                .join(", ")}.
+                .join(", ") || "0"}.
+              Возвраты: {Object.entries(report.payments.refundedMinor)
+                .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
+                .join(", ") || "0"}.
+              Net: {Object.entries(report.payments.netRevenueMinor)
+                .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
+                .join(", ") || "0"}.
             </Typography>
           )}
 
