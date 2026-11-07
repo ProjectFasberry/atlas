@@ -338,7 +338,8 @@
         "canceled": "Отменён",
         "waiting-for-capture": "Ожидает подтверждения",
         "processing": "Выполняется",
-        "refunded": "Возвращён"
+        "refunded": "Возвращён",
+        "skipped": "Уже есть"
       },
       "empty": {
         "title": "Пусто",
@@ -346,6 +347,7 @@
         "to-cart": "В корзину"
       },
       "order": "Заказ #{id}",
+      "skipped": "Некоторые товары уже есть и не были списаны ({count})",
       "filters": {
         "status": "Статус",
         "type": "Тип",
@@ -425,7 +427,8 @@
     "errors": {
       "internal": "Произошла ошибка при создании заказа",
       "items-not-found": "Товары не найдены или устарели",
-      "insufficient": "Недостаточно баланса"
+      "insufficient": "Недостаточно баланса",
+      "items-already-owned": "Все выбранные товары уже есть"
     },
     "recipient": {
       "placeholder": "Введите никнейм",

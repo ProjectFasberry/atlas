@@ -17,6 +17,8 @@ const getOrderErrorMessage = (message: string) => {
       return translate["store.errors.items-not-found"]()
     case "insufficient":
       return translate["store.errors.insufficient"]()
+    case "items-already-owned":
+      return translate["store.errors.items-already-owned"]()
     default:
       return translate["store.errors.internal"]()
   }
@@ -36,6 +38,10 @@ export const order = atom(null, "order").pipe(
     }, {
       name: `${name}.create`,
       onFulfill: (ctx, res) => {
+        if (res.skipped && res.skipped.length > 0) {
+          toast.info(translate["store.orders.skipped"]({ count: res.skipped.length }))
+        }
+
         cartState.data(ctx, []);
         cartState.price(ctx, { BELKOIN: 0, CHARISM: 0 });
         balance.refetchAll(ctx);

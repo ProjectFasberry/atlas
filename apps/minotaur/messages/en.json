@@ -338,7 +338,8 @@
         "canceled": "Canceled",
         "waiting-for-capture": "Awaiting confirmation",
         "processing": "Processing",
-        "refunded": "Refunded"
+        "refunded": "Refunded",
+        "skipped": "Already owned"
       },
       "empty": {
         "title": "Empty",
@@ -346,6 +347,7 @@
         "to-cart": "Go to cart"
       },
       "order": "Order #{id}",
+      "skipped": "Some items are already owned and were not charged ({count})",
       "filters": {
         "status": "Status",
         "type": "Type",
@@ -425,7 +427,8 @@
     "errors": {
       "internal": "Failed to create the order",
       "items-not-found": "Items were not found or are outdated",
-      "insufficient": "Insufficient balance"
+      "insufficient": "Insufficient balance",
+      "items-already-owned": "All selected items are already owned"
     },
     "recipient": {
       "placeholder": "Enter nickname",

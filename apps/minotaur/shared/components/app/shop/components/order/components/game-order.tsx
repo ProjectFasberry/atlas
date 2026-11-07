@@ -70,6 +70,11 @@ export const GameOrder = reatomComponent(({ ctx }) => {
                 {item.delivery_status === "failed" && (
                   <span className="text-xs text-red">Ошибка выдачи</span>
                 )}
+                {item.delivery_status === "skipped" && (
+                  <span className="text-xs text-neutral-400">
+                    {translate["store.orders.status.skipped"]()}
+                  </span>
+                )}
               </div>
             </Link>
           ))}
