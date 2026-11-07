@@ -13,6 +13,7 @@ export type EconomyWallet = {
   nickname: string;
   BELKOIN: number;
   CHARISM: number;
+  refundable?: Record<EconomyCurrency, number>;
 };
 
 export type LedgerItem = {
@@ -100,6 +101,7 @@ export type AdminOrder = {
   amountMinor: number;
   currency: string;
   belkoin: number;
+  refundableBelkoin: number;
   createdAt: string;
   expiresAt: string;
   paidAt: Nullable<string>;
@@ -544,7 +546,7 @@ export const economy = atom(null, "economy").pipe(
     confirmRefundOrder: action((ctx, order: AdminOrder) => {
       alertDialog.open(ctx, {
         title: "Вернуть платёж?",
-        description: `${order.orderId}: ${order.belkoin} BELKOIN игроку ${order.nickname}. Проверь, что купленные за эти BELKOIN товары возвращены: баланс не различает источник.`,
+        description: `${order.orderId}: к возврату ${order.refundableBelkoin ?? 0} из ${order.belkoin} BELKOIN игроку ${order.nickname}. Потраченная часть пополнения не возвращается; купленные товары остаются.`,
         confirmLabel: "Вернуть",
         withCancel: true,
         onConfirm: () => economy.refundOrder(ctx, order),

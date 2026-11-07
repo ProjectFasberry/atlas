@@ -147,6 +147,11 @@ const WalletBalances = reatomComponent(({ ctx }) => {
                   <Typography className="truncate text-xl font-semibold">
                     {number.format(wallet[currency])}
                   </Typography>
+                  {wallet.refundable && (
+                    <Typography className="text-[10px] text-neutral-500">
+                      К возврату: {number.format(wallet.refundable[currency] ?? 0)}
+                    </Typography>
+                  )}
                 </div>
               </div>
               {isSelected && <Icon name="sprite:check" className="size-4 shrink-0 text-green-500" />}
