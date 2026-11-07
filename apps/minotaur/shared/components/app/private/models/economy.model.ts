@@ -267,13 +267,14 @@ export const economy = atom(null, "economy").pipe(
       const reason = ctx.get(economyState.form.reason).trim();
 
       const result = await ctx.schedule(() =>
-        client.post<{ nickname: string; currency: EconomyCurrency; balance: number }>("privated/economy/adjust")
+        client.post<{ nickname: string; currency: EconomyCurrency; balance: number; duplicate: boolean }>("privated/economy/adjust")
           .pipe(withJsonBody({
             nickname: wallet.nickname,
             currency: ctx.get(economyState.form.currency),
             operation: ctx.get(economyState.form.operation),
             amount,
             reason,
+            idempotencyKey: crypto.randomUUID(),
           }))
           .exec()
       );

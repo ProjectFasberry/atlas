@@ -428,7 +428,10 @@
       "internal": "Failed to create the order",
       "items-not-found": "Items were not found or are outdated",
       "insufficient": "Insufficient balance",
-      "items-already-owned": "All selected items are already owned"
+      "items-already-owned": "All selected items are already owned",
+      "price-changed": "An item price changed, refresh the cart",
+      "cart-changed": "The cart changed, refresh it and try again",
+      "busy": "Checkout is already running, try again"
     },
     "recipient": {
       "placeholder": "Enter nickname",

@@ -19,6 +19,12 @@ const getOrderErrorMessage = (message: string) => {
       return translate["store.errors.insufficient"]()
     case "items-already-owned":
       return translate["store.errors.items-already-owned"]()
+    case "price-changed":
+      return translate["store.errors.price-changed"]()
+    case "cart-changed":
+      return translate["store.errors.cart-changed"]()
+    case "lock_busy":
+      return translate["store.errors.busy"]()
     default:
       return translate["store.errors.internal"]()
   }
