@@ -1,7 +1,16 @@
 import { Link } from "@/shared/components/config/link/link"
 import { tv } from "tailwind-variants"
 import { getFromDictionary } from "@/shared/models/app/utils";
-import { currentUserState, RELEASES_READ_PERMISSION } from "@/shared/models/current-user/index.model";
+import { currentUserState } from "@/shared/models/current-user/index.model";
+import {
+  CONFIG_PANEL_READ_PERMISSION,
+  ECONOMY_READ_PERMISSION,
+  HISTORY_READ_PERMISSION,
+  PLAYERS_READ_PERMISSION,
+  RELEASES_READ_PERMISSION,
+  SERVERS_READ_PERMISSION,
+  STORE_ITEM_READ_PERMISSION,
+} from "@/shared/consts/permissions";
 import { action, atom } from "@reatom/framework";
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
@@ -9,7 +18,6 @@ import { Icon } from "@/shared/ui/icon"
 import { Dialog } from '@ark-ui/react/dialog'
 import { Portal } from '@ark-ui/react/portal'
 import { dialogVariant, DialogClose } from "@/shared/ui/dialog";
-import { useState } from "react";
 import { scrollableVariant } from "@/shared/consts/style-variants";
 import { Avatar } from "@/shared/ui/avatar";
 import { Noop } from "@/shared/ui/noop";
@@ -18,6 +26,8 @@ import { dayjs } from "@/shared/lib/dayjs";
 type Perms = {
   read: string[], create: string[], update: string[], delete: string[], unknown: string[],
 }
+
+const userInfoOpen = atom(false, "sidebar.userInfoOpen");
 
 const permsAtom = atom<Perms>({
   read: [], create: [], update: [], delete: [], unknown: [],
@@ -67,7 +77,7 @@ const InfoCell = ({ label, value }: { label: string, value: string }) => (
 )
 
 const UserInfo = reatomComponent(({ ctx }) => {
-  const [open, setOpen] = useState(false)
+  const open = ctx.spy(userInfoOpen)
 
   useUpdate(transformPermsByNamespace, []);
 
@@ -83,7 +93,7 @@ const UserInfo = reatomComponent(({ ctx }) => {
   const registeredAt = formatAccountDate(currentUser.meta.reg_date)
 
   return (
-    <Dialog.Root open={open} onOpenChange={({ open }) => setOpen(open)}>
+    <Dialog.Root open={open} onOpenChange={({ open: next }) => userInfoOpen(ctx, next)}>
       <Dialog.Trigger className="group flex w-full min-w-0 items-center justify-between gap-2 rounded-xl bg-neutral-800 px-2 py-0.5 text-left duration-150 hover:bg-neutral-700 sm:h-10 sm:px-3 sm:py-0">
         <div className="flex min-w-0 items-center gap-2">
           <Avatar
@@ -210,13 +220,13 @@ type SidebarLink = {
 }
 
 const links: SidebarLink[] = [
-  { title: "Конфигурация", value: "/private/", permission: "config.panel.read" },
-  { title: "Магазин", value: "/private/store", permission: "store.item.read" },
-  { title: "Игрок", value: "/private/users", permission: "players.read" },
-  { title: "История", value: "/private/history", permission: "history.read" },
+  { title: "Конфигурация", value: "/private/", permission: CONFIG_PANEL_READ_PERMISSION },
+  { title: "Магазин", value: "/private/store", permission: STORE_ITEM_READ_PERMISSION },
+  { title: "Игрок", value: "/private/users", permission: PLAYERS_READ_PERMISSION },
+  { title: "История", value: "/private/history", permission: HISTORY_READ_PERMISSION },
   { title: "Релизы", value: "/private/releases", permission: RELEASES_READ_PERMISSION },
-  { title: "Серверы", value: "/private/servers", permission: "servers.read" },
-  { title: "Экономика", value: "/private/economy", permission: "economy.read" },
+  { title: "Серверы", value: "/private/servers", permission: SERVERS_READ_PERMISSION },
+  { title: "Экономика", value: "/private/economy", permission: ECONOMY_READ_PERMISSION },
 ]
 
 const SidebarHeader = () => {

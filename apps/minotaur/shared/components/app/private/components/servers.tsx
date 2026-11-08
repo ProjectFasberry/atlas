@@ -10,10 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Typography } from "@/shared/ui/typography"
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { currentUserState } from "@/shared/models/current-user/index.model"
+import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
 import { patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
-
-export const SERVERS_READ_PERMISSION = "servers.read"
-export const SERVERS_UPDATE_PERMISSION = "servers.update"
 
 const Flag = ({ active, label }: { active: boolean, label: string }) => (
   <span

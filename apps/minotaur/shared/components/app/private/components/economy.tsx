@@ -1,5 +1,4 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
-import { useState } from "react";
 import { clsx } from "cnfast";
 import { Dialog } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
@@ -449,7 +448,7 @@ const LedgerTable = reatomComponent(({ ctx }) => {
   const canWrite = ctx.spy(currentUserState.perms).includes(ECONOMY_WRITE_PERMISSION);
   const loadMore = ctx.spy(economy.loadMore.statusesAtom).isPending;
   const loadMoreError = ctx.spy(economy.loadMore.errorAtom);
-  const [refundTarget, setRefundTarget] = useState<LedgerItem | null>(null);
+  const refundTarget = ctx.spy(economyState.refundTarget);
 
   if (!ctx.spy(economyState.wallet)) return null;
 
@@ -458,7 +457,7 @@ const LedgerTable = reatomComponent(({ ctx }) => {
       economyState.refundReason(ctx, "Возврат по запросу игрока");
     }
 
-    setRefundTarget(item);
+    economyState.refundTarget(ctx, item);
   };
 
   return (
@@ -507,7 +506,7 @@ const LedgerTable = reatomComponent(({ ctx }) => {
           </Table>
         )}
 
-      <RefundDialog item={refundTarget} onClose={() => setRefundTarget(null)} />
+      <RefundDialog item={refundTarget} onClose={() => economyState.refundTarget(ctx, null)} />
 
       {meta?.hasNextPage && (
         <Button
@@ -1169,7 +1168,7 @@ const PANEL_TABS = [
 type PanelTab = typeof PANEL_TABS[number]["value"];
 
 export const EconomyPanel = reatomComponent(({ ctx }) => {
-  const [tab, setTab] = useState<PanelTab>("player");
+  const tab = ctx.spy(economyState.tab) as PanelTab;
   const loading = ctx.spy(economy.search.statusesAtom).isPending;
   const wallet = ctx.spy(economyState.wallet);
 
@@ -1189,7 +1188,7 @@ export const EconomyPanel = reatomComponent(({ ctx }) => {
             key={item.value}
             background={tab === item.value ? "white" : "default"}
             className="h-8 flex-1 px-3 text-xs sm:flex-none"
-            onClick={() => setTab(item.value)}
+            onClick={() => economyState.tab(ctx, item.value)}
           >
             {item.label}
           </Button>

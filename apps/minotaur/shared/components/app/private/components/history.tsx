@@ -7,14 +7,16 @@ import { Noop } from "@/shared/ui/noop";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { Typography } from "@/shared/ui/typography";
 import { SectionWrapper } from "./ui";
-import { spawn } from "@reatom/framework";
-import { useEffect, useRef, useState } from "react";
+import { atom, spawn } from "@reatom/framework";
 import { dayjs } from "@/shared/lib/dayjs";
 import { getFromDictionary } from "@/shared/models/app/utils";
 import {
   HistoryViewer, history, historyDataAtom, historyInView, historyMetaAtom, historyPendingCountAtom, historyState,
   type HistoryItem, type HistorySeverity,
 } from "../models/history.model";
+
+const historyFiltersReady = atom(false, "historyFiltersReady")
+const historyFiltersTimer = atom<ReturnType<typeof setTimeout> | null>(null, "historyFiltersTimer")
 
 const SEVERITIES: { label: string, value: Nullable<HistorySeverity> }[] = [
   { label: "Все", value: null },
@@ -38,16 +40,19 @@ const HistoryFilters = reatomComponent(({ ctx }) => {
   const initiator = ctx.spy(historyState.filters.initiator);
   const event = ctx.spy(historyState.filters.event);
   const severity = ctx.spy(historyState.filters.severity);
-  const firstRun = useRef(true);
-
-  useEffect(() => {
-    if (firstRun.current) {
-      firstRun.current = false;
-      return;
+  useUpdate((ctx) => {
+    if (!ctx.get(historyFiltersReady)) {
+      historyFiltersReady(ctx, true)
+      return
     }
 
-    const timer = setTimeout(() => history.refetchAll(ctx), 300);
-    return () => clearTimeout(timer);
+    const current = ctx.get(historyFiltersTimer)
+    if (current) clearTimeout(current)
+
+    historyFiltersTimer(ctx, setTimeout(() => {
+      historyFiltersTimer(ctx, null)
+      history.refetchAll(ctx)
+    }, 300))
   }, [initiator, event, severity]);
 
   return (
@@ -83,14 +88,14 @@ const HistoryFilters = reatomComponent(({ ctx }) => {
 }, "HistoryFilters")
 
 const HistoryRow = reatomComponent<HistoryItem>(({ ctx, ...item }) => {
-  const [open, setOpen] = useState(false);
+  const open = ctx.spy(historyState.expanded).has(item.id);
   const fresh = ctx.spy(historyState.freshIds).has(item.id);
 
   return (
     <>
       <TableRow
         className={fresh ? "cursor-pointer animate-[flash_2s_ease-out_forwards]" : "cursor-pointer"}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => historyState.toggleExpanded(ctx, item.id)}
       >
         <TableCell className="font-medium">{item.id}</TableCell>
         <TableCell>{item.initiator}</TableCell>

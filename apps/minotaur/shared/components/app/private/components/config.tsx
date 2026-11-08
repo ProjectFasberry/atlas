@@ -1,6 +1,6 @@
 import { newsSection } from "./news"
 import { actionsState, type ActionParent, type ActionType } from "../models/actions.model"
-import { type ReactNode, useState } from "react"
+import { type ReactNode } from "react"
 import { bannersSection } from "./banners"
 import { dictionariesSection } from "./dictionaries"
 import { eventsSection } from "./events"
@@ -11,6 +11,7 @@ import { Methods } from "./methods"
 import { Options } from "./options"
 import { atom } from "@reatom/framework"
 import { modpackSection } from "./modpack"
+import { configSectionsOpen, toggleConfigSection } from "../models/config.model"
 import { landsSection } from "./lands"
 import { apiKeysSection } from "./api"
 import { Icon } from "@/shared/ui/icon"
@@ -87,15 +88,15 @@ type ConfigSectionProps = {
  * Children stay mounted when collapsed: an open editor or a half-edited role
  * must not lose its state when the section is folded away.
  */
-const ConfigSection = ({ id, title, action, children }: ConfigSectionProps) => {
-  const [open, setOpen] = useState(true)
+const ConfigSection = reatomComponent<ConfigSectionProps>(({ ctx, id, title, action, children }) => {
+  const open = ctx.spy(configSectionsOpen)[id] ?? true
 
   return (
     <SectionWrapper id={id} className="flex flex-col gap-2 w-full scroll-mt-24">
       <div className="flex items-center justify-between gap-2 w-full">
         <button
           type="button"
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => toggleConfigSection(ctx, id)}
           className="flex items-center gap-2 text-left"
           aria-expanded={open}
         >
@@ -112,7 +113,7 @@ const ConfigSection = ({ id, title, action, children }: ConfigSectionProps) => {
       </div>
     </SectionWrapper>
   )
-}
+}, "ConfigSection")
 
 const SECTIONS: { id: string, title: string }[] = [
   { id: "config-general", title: "Основное" },

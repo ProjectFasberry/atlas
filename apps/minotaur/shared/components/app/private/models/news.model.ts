@@ -33,6 +33,11 @@ export const newsList = {
   )
 }
 
+export type NewsImageVariant = "input-url" | "null"
+
+/** Image source picker state for the news editor. */
+export const newsImageVariant = atom<NewsImageVariant>("null", "newsImageVariant")
+
 export const createNewsState = atom(null, "createNewsState").pipe(
   withAssign((_, name) => ({
     title: atom("", `${name}.title`).pipe(withReset()),
@@ -62,6 +67,7 @@ export const createNews = atom(null, "createNews").pipe(
       createNewsState.imageUrl.data.reset(ctx)
       createNewsState.content.reset(ctx)
       createNewsState.tempContent.reset(ctx)
+      newsImageVariant(ctx, "null")
     }),
     isValid: atom((ctx) =>
       createNewsSchema.safeParse({

@@ -3,17 +3,20 @@ import {
   login, type AuthLoginQRStatus, loginState,
   type AuthLoginVariant, authLoginVariantAtom, authSubmitIsDisabledAtom
 } from "../models/login.model"
-import { type ReactNode, useRef } from "react"
+import { type ReactNode } from "react"
 import { Icon } from "@/shared/ui/icon"
 // import { Copy } from "@/shared/ui/copy"
 import { Button } from "@/shared/ui/button"
-import { spawn } from "@reatom/framework"
+import { atom, spawn } from "@reatom/framework"
 import { Separator } from "@/shared/ui/separator"
 import { NicknameInput, PasswordInput } from "./auth"
 import { IconLoader } from "@/shared/ui/icon-loader"
 import { translate } from "@/shared/locales/helpers"
 import { QrCode } from "@ark-ui/react/qr-code"
 import { qrCodeVariant } from "@/shared/ui/qr-code"
+
+const qrIconAtom = atom<HTMLDivElement | null>(null, "loginQrIcon")
+const qrSpinTimerAtom = atom<ReturnType<typeof setTimeout> | null>(null, "loginQrSpinTimer")
 
 const LoginVariants = reatomComponent(({ ctx }) => (
   <div className="grid grid-cols-2 auto-rows-auto gap-2 w-full [&>*:only-child]:col-span-2">
@@ -62,22 +65,21 @@ const LoginPassword = reatomComponent(({ ctx }) => {
 }, 'LoginPassword')
 
 const LoginQRRetry = reatomComponent(({ ctx }) => {
-  const iconRef = useRef<HTMLDivElement | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const handleClick = () => {
-    const el = iconRef.current;
+    const el = ctx.get(qrIconAtom);
     if (!el) return;
 
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    const current = ctx.get(qrSpinTimerAtom);
+    if (current) clearTimeout(current);
 
     el.classList.remove('animate-spin', 'duration-150');
     void el.offsetWidth;
     el.classList.add('animate-spin', 'duration-150');
 
-    timeoutRef.current = setTimeout(() => {
+    qrSpinTimerAtom(ctx, setTimeout(() => {
       el.classList.remove('animate-spin', 'duration-150');
-    }, 600);
+      qrSpinTimerAtom(ctx, null);
+    }, 600));
 
     spawn(ctx, (spawnCtx) => login.qr.generate(spawnCtx));
   };
@@ -94,7 +96,7 @@ const LoginQRRetry = reatomComponent(({ ctx }) => {
         aria-label={translate["auth.login.qr.refresh"]()}
         className="group cursor-pointer active:scale-[0.98] duration-150 flex items-center gap-2"
       >
-        <div ref={iconRef}>
+        <div ref={(element) => { qrIconAtom(ctx, element) }}>
           <Icon name='sprite:refresh' className="size-[32px] text-neutral-200" />
         </div>
         <span className="text-sm font-semibold">{translate["auth.login.qr.refresh"]()}</span>

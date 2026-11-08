@@ -41,6 +41,12 @@ export const historyState = atom(null, "historyState").pipe(
     paused: atom(false, `${name}.paused`),
     pending: atom<HistoryItem[]>([], `${name}.pending`),
     freshIds: atom<Set<number>>(new Set<number>(), `${name}.freshIds`),
+    expanded: atom<Set<number>>(new Set<number>(), `${name}.expanded`),
+    toggleExpanded: action((ctx, id: number) => {
+      const next = new Set(ctx.get(historyState.expanded));
+      next.has(id) ? next.delete(id) : next.add(id);
+      historyState.expanded(ctx, next);
+    }, `${name}.toggleExpanded`),
   }))
 );
 

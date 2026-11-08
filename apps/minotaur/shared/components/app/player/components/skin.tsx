@@ -1,9 +1,9 @@
-import { spawn } from "@reatom/framework";
+import { atom, spawn } from "@reatom/framework";
 import { tv } from "tailwind-variants";
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Typography } from "@/shared/ui/typography"
-import React, { useRef, useState } from "react";
+import React from "react";
 import { Icon, type IconName } from "@/shared/ui/icon"
 import { pageState } from "@/shared/models/page-context.model";
 import { Button } from "@/shared/ui/button";
@@ -72,6 +72,9 @@ const SkinRender = reatomComponent(({ ctx }) => {
     </div>
   );
 }, "SkinRender")
+
+const skinControlInputAtom = atom<HTMLInputElement | null>(null, "skinControlInput")
+const skinControlDragAtom = atom(false, "skinControlDrag")
 
 const skinHeadVariant = tv({
   base: `flex items-center select-none justify-center *:rounded-lg p-0.5 aspect-square rounded-lg overflow-hidden cursor-pointer border-2`,
@@ -174,13 +177,11 @@ const SkinMainHeadSkeleton = () => (
 const FALLBACK_AVATAR = getStaticImage("fallback/steve_head.png");
 
 const Avatar = reatomComponent<{ width: number, height: number, src: string }>(({ ctx, src, ...props }) => {
-  const [avatar, setAvatar] = useState<string | null>(src);
-
   return (
     <img
-      src={avatar ?? FALLBACK_AVATAR}
+      src={src || FALLBACK_AVATAR}
       alt=""
-      onError={() => setAvatar(FALLBACK_AVATAR)}
+      onError={(event) => { event.currentTarget.src = FALLBACK_AVATAR }}
       {...props}
     />
   )
@@ -280,17 +281,16 @@ const SelectedSkinData = reatomComponent(({ ctx }) => {
 }, "SelectedSkinData")
 
 const SkinControlInput = reatomComponent(({ ctx }) => {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [drag, setDrag] = useState(false);
+  const drag = ctx.spy(skinControlDragAtom);
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    setDrag(true);
+    skinControlDragAtom(ctx, true);
   };
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    setDrag(false);
+    skinControlDragAtom(ctx, false);
 
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
@@ -309,13 +309,13 @@ const SkinControlInput = reatomComponent(({ ctx }) => {
 
   return (
     <div
-      onClick={() => inputRef.current?.click()}
+      onClick={() => ctx.get(skinControlInputAtom)?.click()}
       onDragOver={onDragOver}
-      onDragLeave={() => setDrag(false)}
+      onDragLeave={() => skinControlDragAtom(ctx, false)}
       onDrop={onDrop}
       className={va({ className: `${drag && "bg-neutral-800"}` })}
     >
-      <input ref={inputRef} onChange={onChange} type="file" className="hidden" />
+      <input ref={(element) => { skinControlInputAtom(ctx, element) }} onChange={onChange} type="file" className="hidden" />
       <div className='flex items-center justify-center rounded-lg h-10 w-10 border border-neutral-800'>
         <Icon name="sprite:upload" className="size-6 text-neutral-400" />
       </div>

@@ -1,5 +1,5 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
-import { useState } from "react"
+import { atom } from "@reatom/framework"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { Typography } from "@/shared/ui/typography"
 import { Button } from "@/shared/ui/button"
@@ -52,6 +52,8 @@ const rolesListPermItemVariant = tv({
     id: "flex items-center justify-center h-6 min-w-6 aspect-auto w-fit bg-neutral-700 rounded-sm p-1"
   }
 })
+
+const rolesPermQuery = atom("", "rolesPermQuery")
 
 const RolesListItemPermsItemSkeleton = () => {
   return (
@@ -173,7 +175,7 @@ const RolesListItemSaveChanges = reatomComponent(({ ctx }) => {
 
 const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
   const id = ctx.spy(roleEditableAtom)?.id
-  const [query, setQuery] = useState("")
+  const query = ctx.spy(rolesPermQuery)
 
   if (!id) return null;
 
@@ -194,7 +196,7 @@ const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
   const isDisabled = availablePerms.length === 0
 
   return (
-    <Menu.Root onOpenChange={({ open }) => !open && setQuery("")}>
+    <Menu.Root onOpenChange={({ open }) => !open && rolesPermQuery(ctx, "")}>
       <Menu.Trigger asChild>
         <Button
           className="gap-2 font-semibold h-8 text-sm bg-neutral-800"
@@ -215,7 +217,7 @@ const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
             </Typography>
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => rolesPermQuery(ctx, e.target.value)}
               onKeyDown={(event) => event.stopPropagation()}
               placeholder="Поиск по названию"
               className="h-8 w-full"

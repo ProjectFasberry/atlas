@@ -10,6 +10,8 @@ import {
   editNews, editNewsState,
   deleteNews, newsList,
   createNewsStateFullImageUrlAtom,
+  newsImageVariant,
+  type NewsImageVariant,
   type NewsSingle
 } from "../models/news.model"
 import { Input } from "@/shared/ui/input"
@@ -25,7 +27,7 @@ import { Button } from "@/shared/ui/button";
 import { Dialog } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog";
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { BackButton } from "@/shared/ui/back-button";
 import { createLink } from "@/shared/components/config/link/link.model";
 
@@ -192,7 +194,7 @@ const { Storage } = storageModel({
   }
 })
 
-type Variant = "input-url" | "null";
+type Variant = NewsImageVariant;
 
 const VARIANTS: Record<Variant, ({ ctx, setVariant }: { ctx: Ctx, setVariant: (state: Variant) => void }) => ReactNode> = {
   "input-url": ({ ctx, setVariant }) => (
@@ -225,7 +227,8 @@ const VARIANTS: Record<Variant, ({ ctx, setVariant }: { ctx: Ctx, setVariant: (s
 }
 
 const CreateNewsImageVariants = reatomComponent(({ ctx }) => {
-  const [variant, setVariant] = useState<Variant>("null");
+  const variant = ctx.spy(newsImageVariant);
+  const setVariant = (state: Variant) => newsImageVariant(ctx, state);
   const Component = VARIANTS[variant];
   return Component({ ctx, setVariant })
 }, "CreateNewsImageVariants")

@@ -11,9 +11,11 @@ import { isError } from "@/shared/lib/utils";
 export type MePayload = ExtractApiData<"getMe">['data'];
 
 export const CURRENT_USER_KEY = 'currentUser' as const
-export const CONFIG_PANEL_READ_PERMISSION = "config.panel.read"
-export const RELEASES_READ_PERMISSION = "releases.read"
-export const ECONOMY_READ_PERMISSION = "economy.read"
+export {
+  CONFIG_PANEL_READ_PERMISSION,
+  ECONOMY_READ_PERMISSION,
+  RELEASES_READ_PERMISSION,
+} from "@/shared/consts/permissions"
 
 export const currentUserState = atom<MePayload | null>(null, "currentUser").pipe(
   withAssign((target, name) => ({

@@ -155,6 +155,8 @@ const PAGE_SIZE = 50;
 export const economyState = atom(null, "economyState").pipe(
   withAssign((_, name) => ({
     target: atom("", `${name}.target`),
+    tab: atom<string>("player", `${name}.tab`),
+    refundTarget: atom<LedgerItem | null>(null, `${name}.refundTarget`),
     wallet: atom<EconomyWallet | null>(null, `${name}.wallet`),
     ledger: atom<LedgerItem[]>([], `${name}.ledger`),
     meta: atom<LedgerPage["meta"] | null>(null, `${name}.meta`),

@@ -1,9 +1,11 @@
 import { reatomComponent } from "@reatom/npm-react";
+import { atom } from "@reatom/framework";
 import { tv, type VariantProps } from "tailwind-variants";
 import { landBannerAtom } from "../models/land.model";
-import { useRef } from "react";
 import { bannerEditIsAllowedAtom, landEditing, landEditingState } from "../models/edit-land.model";
 import { Icon } from "@/shared/ui/icon"
+
+const bannerInputAtom = atom<HTMLInputElement | null>(null, "landBannerInput")
 
 const imageBannerVariant = tv({
   base: `select-none w-full h-full object-cover max-w-[144px]`
@@ -43,8 +45,6 @@ export const LandBanner = ({ banner, variant, className }: DefaultBannerProps) =
 }
 
 export const LandBannerWithEditing = reatomComponent(({ ctx }) => {
-  const ref = useRef<HTMLInputElement | null>(null);
-
   const currentBanner = ctx.spy(landBannerAtom)
   const newBanner = ctx.spy(landEditingState.personalization.bannerUrl)
   const editIsAllow = ctx.spy(bannerEditIsAllowedAtom)
@@ -53,7 +53,7 @@ export const LandBannerWithEditing = reatomComponent(({ ctx }) => {
     <div
       id="banner"
       data-mode={editIsAllow ? "edit" : "watch"}
-      onClick={() => editIsAllow && ref.current?.click()}
+      onClick={() => editIsAllow && ctx.get(bannerInputAtom)?.click()}
       className={bannerVariants({ className: "data-[mode=edit]:cursor-pointer min-w-[144px]" })}
     >
       {editIsAllow ? (
@@ -81,7 +81,7 @@ export const LandBannerWithEditing = reatomComponent(({ ctx }) => {
         />
       )}
       <input
-        ref={ref}
+        ref={(element) => { bannerInputAtom(ctx, element) }}
         className="hidden"
         type="file"
         multiple={false}
