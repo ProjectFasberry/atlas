@@ -4,7 +4,7 @@ import { reatomMap, sleep, withAssign, withConcurrency, withInit, withReset } fr
 import { logError } from '@/shared/lib/log';
 import { snapshots } from '@/shared/models/ssr';
 import { type PageContextServer } from 'vike/types';
-import { client, withQueryParams } from '@/shared/lib/client-wrapper';
+import { client } from '@/shared/lib/client-wrapper';
 import { mainClient } from "@/shared/api/client"
 import { DEFAULT_SOFT_DELAY } from '@/shared/consts/index';
 import { withSearchParamsPersist } from '@reatom/url';
@@ -31,11 +31,7 @@ export type StoreItemsPayload = ExtractApiData<"getStoreItems">["data"]
 
 export async function getStoreItems(params: StoreItemsParams, init?: RequestInit) {
   return client
-    .get<StoreItemsPayload>("store/items", init)
-    .pipe(
-      withQueryParams(params)
-    )
-    .exec()
+    .get("/store/items", { ...init, params: { query: params }})
 }
 
 export type SelectItemToCartOptions = {

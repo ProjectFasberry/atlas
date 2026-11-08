@@ -22,7 +22,7 @@ export const modpack = atom(null, "modpack").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client<Modpacks>("modpack/list", { signal: ctx.controller.signal }).exec()
+        client.get("/modpack/list", { signal: ctx.controller.signal })
       )
     }, {
       name: `${name}.fetch`,
@@ -41,10 +41,10 @@ export const modpack = atom(null, "modpack").pipe(
       }
 
       return await client
-        .post<ExtractApiData<"postPrivatedModpacksCreate">["data"]>("privated/modpacks/create", {
+        .post("/privated/modpacks/create", {
           json
         })
-        .exec()
+
     }, {
       name: `${name}.create`,
       onFulfill: (ctx, res) => {
@@ -70,8 +70,7 @@ export const modpack = atom(null, "modpack").pipe(
     }),
     delete: reatomAsync(async (_, id: Modpack["id"]) => {
       const result = await client
-        .delete<ExtractApiData<"deletePrivatedModpacksById">["data"]>(`privated/modpacks/${id}`)
-        .exec()
+        .delete("/privated/modpacks/{id}", { params: { path: { id } } })
 
       return { id, result }
     }, {

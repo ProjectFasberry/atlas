@@ -1,7 +1,7 @@
 import { action, atom, withErrorAtom } from "@reatom/framework"
 import { reatomAsync, withAssign, withCache, withDataAtom, withReset, withStatusesAtom } from "@reatom/framework"
 import { getEvents, type EventsSingle } from "../../events/models/events.model"
-import { client, withJsonBody } from "@/shared/lib/client-wrapper"
+import { client } from "@/shared/lib/client-wrapper"
 import { toast } from "sonner"
 import { actions, notifyAboutRestrictRole } from "./actions.model"
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
@@ -49,9 +49,7 @@ export const createEvent = atom(null, "createEvent").pipe(
       }
 
       return await client
-        .post<ExtractApiData<EventType>["data"]>("privated/events/create")
-        .pipe(withJsonBody(json))
-        .exec()
+        .post("/privated/events/create", { json })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -81,8 +79,7 @@ export const deleteEvent = atom(null, "deleteEvent").pipe(
     }),
     submit: reatomAsync(async (_, id: EventsSingle["id"]) => {
       const result = await client
-        .delete<ExtractApiData<"deletePrivatedEventsById">["data"]>(`privated/events/${id}`)
-        .exec()
+        .delete("/privated/events/{id}", { params: { path: { id } } })
 
       return { result, id }
     }, {

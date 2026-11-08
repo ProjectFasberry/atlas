@@ -1,4 +1,4 @@
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { action, atom, reatomAsync, withAssign, withCache, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { reatomMap } from "@reatom/framework";
 import { notifyAboutRestrictRole } from "./actions.model";
@@ -28,9 +28,10 @@ const optionsControl = atom(null, "optionsControl").pipe(
 
       try {
         const result = await client
-          .post<ExtractApiData<"postPrivatedOptionsByNameEdit">["data"]>(`privated/options/${option}/edit`,)
-          .pipe(withJsonBody({ value }))
-          .exec()
+          .post("/privated/options/{name}/edit", {
+            json: { value },
+            params: { path: { name: option } }
+          })
 
         optionsControl.updateOption(ctx, option, { isLoading: false, value: result.value })
       } catch (e) {
@@ -49,7 +50,9 @@ const optionsControl = atom(null, "optionsControl").pipe(
 const options = atom(null, "options").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client<OptionsPayload>("privated/options/list").exec())
+      return await ctx.schedule(() =>
+        client.get("/privated/options/list")
+      )
     }, {
       name: `${name}.fetch`,
       onFulfill: (ctx, res) => {

@@ -133,13 +133,11 @@ const skins = atom(null, "skins").pipe(
 
           const id = selectedSkin.identifier
 
-          return await ctx.schedule(() =>
-            client
-              .get<"success" | "error">("server/skin/set", {
-                searchParams: { id },
-                retry: 1
-              })
-              .exec()
+          return await ctx.schedule(() => client
+            .get("/server/skin/set", {
+              params: { query: { id } },
+              retry: 1
+            })
           )
         }, {
           name: `${name}.set`,
@@ -158,11 +156,10 @@ const skins = atom(null, "skins").pipe(
           payloadFormData.append("variant", ctx.get(skinsState.control.variant))
 
           const result = await client
-            .post<{ url: string }>("server/skin/upload", {
+            .post("/server/skin/upload", {
               body: payloadFormData,
               timeout: 10000
             })
-            .exec()
 
           await ctx.schedule(() => sleep(DEFAULT_SOFT_DELAY));
 
@@ -190,7 +187,7 @@ const skins = atom(null, "skins").pipe(
       skins.fetch.dataAtom.reset(ctx);
 
       return await ctx.schedule(() =>
-        client<SkinsHistory[]>(`server/skin/history/${nickname}`, { signal: ctx.controller.signal }).exec()
+        client.get("/server/skin/history/{nickname}", { signal: ctx.controller.signal, params: { path: { nickname } } })
       )
     }, {
       name: `${name}.fetch`,

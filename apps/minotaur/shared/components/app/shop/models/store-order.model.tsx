@@ -3,11 +3,11 @@ import { atom } from "@reatom/framework";
 import { toast } from "sonner";
 import { withAssign } from "@reatom/framework";
 import { logError } from "@/shared/lib/log";
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { navigate } from "vike/client/router";
 import type { CreateOrderRoutePayload } from "@/shared/schemas/payment";
 import { translate } from "@/shared/locales/helpers";
-import { cartState } from "./store-cart.model";
+import { cartState, EMPTY_CART_PRICE } from "./store-cart.model";
 import { balance } from "../../player/models/balance.model";
 import type { OrderSingleGamePayload } from "@/pages/store/order/@id/+data";
 
@@ -35,12 +35,11 @@ export const order = atom(null, "order").pipe(
     create: reatomAsync(async () => {
       // The same key is reused by the client's automatic retry, so a lost
       // response cannot charge the player twice.
-      return await client
-        .post<CreateOrderRoutePayload>("store/order/internal/create", {
-          retry: 1
+      return await client.raw
+        .post<CreateOrderRoutePayload>("/store/order/internal/create", {
+          retry: 1,
+          json: { idempotencyKey: crypto.randomUUID() }
         })
-        .pipe(withJsonBody({ idempotencyKey: crypto.randomUUID() }))
-        .exec()
     }, {
       name: `${name}.create`,
       onFulfill: (ctx, res) => {
@@ -49,7 +48,7 @@ export const order = atom(null, "order").pipe(
         }
 
         cartState.data(ctx, []);
-        cartState.price(ctx, { BELKOIN: 0, CHARISM: 0 });
+        cartState.price(ctx, EMPTY_CART_PRICE);
         balance.refetchAll(ctx);
 
         ctx.schedule(() => navigate(getOrderUrl(res.purchase.uniqueId)))
@@ -68,9 +67,8 @@ export const order = atom(null, "order").pipe(
 )
 
 export async function getOrder(id: string, init: RequestInit): Promise<OrderSingleGamePayload> {
-  return client
-    .get<OrderSingleGamePayload>(`store/order/internal/${id}`, init)
-    .exec()
+  return client.raw
+    .get<OrderSingleGamePayload>(`/store/order/internal/${id}`, init)
 }
 
 export const getOrderUrl = (uniqueId: string) => `/store/order/${uniqueId}`;

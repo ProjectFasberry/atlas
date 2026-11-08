@@ -1,4 +1,4 @@
-import { client, withJsonBody, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import {
   action, atom, reatomAsync, withAssign, withErrorAtom, withStatusesAtom,
 } from "@reatom/framework";
@@ -200,15 +200,11 @@ export const economyState = atom(null, "economyState").pipe(
 );
 
 async function fetchWallet(nickname: string) {
-  return client<EconomyWallet>("privated/economy/wallet")
-    .pipe(withQueryParams({ nickname }))
-    .exec();
+  return client.raw.get<EconomyWallet>("/privated/economy/wallet", { params: { query: { nickname } } })
 }
 
 async function fetchPage(nickname: string, endCursor?: string) {
-  return client<LedgerPage>("privated/economy/ledger")
-    .pipe(withQueryParams({ nickname, limit: PAGE_SIZE, endCursor }))
-    .exec();
+  return client.raw.get<LedgerPage>("/privated/economy/ledger", { params: { query: { nickname, limit: PAGE_SIZE, endCursor } } })
 }
 
 function uniqueAppend(current: LedgerItem[], items: LedgerItem[]) {
@@ -240,15 +236,16 @@ export const economy = atom(null, "economy").pipe(
         economyState.meta(ctx, result.page.meta);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     refresh: action((ctx) => {
       const nickname = ctx.get(economyState.wallet)?.nickname;
       if (!nickname) return;
 
       economy.search(ctx, nickname);
     }),
-
     loadMore: reatomAsync(async (ctx) => {
       const nickname = ctx.get(economyState.wallet)?.nickname;
       const meta = ctx.get(economyState.meta);
@@ -264,8 +261,10 @@ export const economy = atom(null, "economy").pipe(
         economyState.meta(ctx, page.meta);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     adjust: reatomAsync(async (ctx) => {
       const wallet = ctx.get(economyState.wallet);
       if (!wallet) return null;
@@ -273,17 +272,17 @@ export const economy = atom(null, "economy").pipe(
       const amount = Number(ctx.get(economyState.form.amount));
       const reason = ctx.get(economyState.form.reason).trim();
 
-      const result = await ctx.schedule(() =>
-        client.post<{ nickname: string; currency: EconomyCurrency; balance: number; duplicate: boolean }>("privated/economy/adjust")
-          .pipe(withJsonBody({
+      const result = await ctx.schedule(() => client.raw
+        .post<{ nickname: string; currency: EconomyCurrency; balance: number; duplicate: boolean }>("/privated/economy/adjust", {
+          json: {
             nickname: wallet.nickname,
             currency: ctx.get(economyState.form.currency),
             operation: ctx.get(economyState.form.operation),
             amount,
             reason,
             idempotencyKey: crypto.randomUUID(),
-          }))
-          .exec()
+          }
+        })
       );
 
       const page = await ctx.schedule(() => fetchPage(wallet.nickname));
@@ -309,18 +308,20 @@ export const economy = atom(null, "economy").pipe(
         });
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     refund: reatomAsync(async (ctx, orderId: string) => {
       const wallet = ctx.get(economyState.wallet);
       if (!wallet) return null;
 
       const reason = ctx.get(economyState.refundReason).trim() || "Возврат по запросу игрока";
 
-      await ctx.schedule(() =>
-        client.post<unknown>("privated/economy/refund")
-          .pipe(withJsonBody({ orderId, reason }))
-          .exec()
+      await ctx.schedule(() => client
+        .raw.post<unknown>("/privated/economy/refund", {
+          json: { orderId, reason }
+        })
       );
 
       const [nextWallet, page] = await ctx.schedule(() => Promise.all([
@@ -340,39 +341,48 @@ export const economy = atom(null, "economy").pipe(
         toast.success("Возврат выполнен");
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     loadRates: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client<RatesPayload>("privated/economy/rates").exec());
+      return await ctx.schedule(() =>
+        client.raw.get<RatesPayload>("/privated/economy/rates")
+      );
     }, {
       name: `${name}.loadRates`,
       onFulfill: (ctx, payload) => {
         if (payload) economyState.rates(ctx, payload);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     addRate: reatomAsync(async (ctx) => {
       const editing = ctx.get(economyState.rateForm.editing);
-      const body = {
+      const json = {
         rate: Number(ctx.get(economyState.rateForm.rate)),
         spread: Number(ctx.get(economyState.rateForm.spread)) || 0,
       };
 
       const rate = await ctx.schedule(() => editing
-        ? client.patch<ExchangeRate>(`privated/economy/rates/${editing}`)
-          .pipe(withJsonBody(body))
-          .exec()
-        : client.post<ExchangeRate>("privated/economy/rates")
-          .pipe(withJsonBody({
-            from: ctx.get(economyState.rateForm.from).trim().toUpperCase(),
-            to: ctx.get(economyState.rateForm.to).trim().toUpperCase(),
-            ...body,
-          }))
-          .exec()
+        ? client.raw
+          .patch<ExchangeRate>("/privated/economy/rates/{id}", { json, params: { path: { id: editing } } })
+        : client.raw
+          .post<ExchangeRate>("/privated/economy/rates", {
+            json: {
+              from: ctx.get(economyState.rateForm.from).trim().toUpperCase(),
+              to: ctx.get(economyState.rateForm.to).trim().toUpperCase(),
+              ...json,
+            }
+          })
       );
 
-      const payload = await ctx.schedule(() => client<RatesPayload>("privated/economy/rates").exec());
+      const payload = await ctx.schedule(() =>
+        client.raw.get<RatesPayload>("/privated/economy/rates")
+      );
+
       return { rate, payload };
     }, {
       name: `${name}.addRate`,
@@ -385,8 +395,10 @@ export const economy = atom(null, "economy").pipe(
         economyState.rateForm.editing(ctx, null);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     startEditRate: action((ctx, rate: ExchangeRate) => {
       economyState.rateForm.editing(ctx, rate.id);
       economyState.rateForm.from(ctx, rate.from_currency);
@@ -394,19 +406,17 @@ export const economy = atom(null, "economy").pipe(
       economyState.rateForm.rate(ctx, String(Number(rate.rate)));
       economyState.rateForm.spread(ctx, String(Number(rate.spread)));
     }),
-
     cancelEditRate: action((ctx) => {
       economyState.rateForm.editing(ctx, null);
       economyState.rateForm.rate(ctx, "");
       economyState.rateForm.spread(ctx, "0");
     }),
-
     deleteRate: reatomAsync(async (ctx, id: number) => {
       await ctx.schedule(() =>
-        client.delete<ExchangeRate>(`privated/economy/rates/${id}`).exec()
+        client.raw.delete("/privated/economy/rates/{id}", { params: { path: { id } } })
       );
 
-      const payload = await ctx.schedule(() => client<RatesPayload>("privated/economy/rates").exec());
+      const payload = await ctx.schedule(() => client.raw.get<RatesPayload>("/privated/economy/rates"));
       return { id, payload };
     }, {
       name: `${name}.deleteRate`,
@@ -419,8 +429,10 @@ export const economy = atom(null, "economy").pipe(
         }
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     confirmDeleteRate: action((ctx, rate: ExchangeRate) => {
       alertDialog.open(ctx, {
         title: "Удалить курс?",
@@ -430,43 +442,48 @@ export const economy = atom(null, "economy").pipe(
         onConfirm: () => economy.deleteRate(ctx, rate.id),
       });
     }),
-
     loadReconciliation: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client<ReconciliationData>("privated/economy/reconciliation").exec());
+      return await ctx.schedule(() => client.raw.get<ReconciliationData>("/privated/economy/reconciliation"));
     }, {
       name: `${name}.loadReconciliation`,
       onFulfill: (ctx, payload) => {
         if (payload) economyState.reconciliation(ctx, payload);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     loadReport: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client<EconomyReport>("privated/economy/report").exec());
+      return await ctx.schedule(() => client.raw.get<EconomyReport>("/privated/economy/report"));
     }, {
       name: `${name}.loadReport`,
       onFulfill: (ctx, payload) => {
         if (payload) economyState.report(ctx, payload);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     loadOrders: reatomAsync(async (ctx) => {
       const nickname = ctx.get(economyState.ordersFilter.appliedNickname).trim();
       const status = ctx.get(economyState.ordersFilter.status);
       const provider = ctx.get(economyState.ordersFilter.provider);
 
       return await ctx.schedule(() =>
-        client<OrdersPage>("privated/economy/orders")
-          .pipe(withQueryParams({
-            limit: 50,
-            sort: ctx.get(economyState.ordersFilter.sort),
-            order: ctx.get(economyState.ordersFilter.order),
-            ...(nickname ? { nickname } : {}),
-            ...(status ? { status } : {}),
-            ...(provider ? { provider } : {}),
-          }))
-          .exec()
+        client.raw.get<OrdersPage>("/privated/economy/orders", {
+          params: {
+            query: {
+              limit: 50,
+              sort: ctx.get(economyState.ordersFilter.sort),
+              order: ctx.get(economyState.ordersFilter.order),
+              ...(nickname ? { nickname } : {}),
+              ...(status ? { status } : {}),
+              ...(provider ? { provider } : {}),
+            }
+          }
+        })
       );
     }, {
       name: `${name}.loadOrders`,
@@ -477,8 +494,10 @@ export const economy = atom(null, "economy").pipe(
         economyState.ordersMeta(ctx, page.meta);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     loadMoreOrders: reatomAsync(async (ctx) => {
       const meta = ctx.get(economyState.ordersMeta);
       if (!meta?.endCursor) return null;
@@ -488,17 +507,19 @@ export const economy = atom(null, "economy").pipe(
       const provider = ctx.get(economyState.ordersFilter.provider);
 
       return await ctx.schedule(() =>
-        client<OrdersPage>("privated/economy/orders")
-          .pipe(withQueryParams({
-            limit: 50,
-            endCursor: meta.endCursor,
-            sort: ctx.get(economyState.ordersFilter.sort),
-            order: ctx.get(economyState.ordersFilter.order),
-            ...(nickname ? { nickname } : {}),
-            ...(status ? { status } : {}),
-            ...(provider ? { provider } : {}),
-          }))
-          .exec()
+        client.raw.get<OrdersPage>("/privated/economy/orders", {
+          params: {
+            query: {
+              limit: 50,
+              endCursor: meta.endCursor,
+              sort: ctx.get(economyState.ordersFilter.sort),
+              order: ctx.get(economyState.ordersFilter.order),
+              ...(nickname ? { nickname } : {}),
+              ...(status ? { status } : {}),
+              ...(provider ? { provider } : {}),
+            }
+          }
+        })
       );
     }, {
       name: `${name}.loadMoreOrders`,
@@ -509,14 +530,15 @@ export const economy = atom(null, "economy").pipe(
         economyState.ordersMeta(ctx, page.meta);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     applyOrdersNickname: action((ctx) => {
       const nickname = ctx.get(economyState.ordersFilter.nickname).trim();
       economyState.ordersFilter.appliedNickname(ctx, nickname);
       economy.loadOrders(ctx);
     }, `${name}.applyOrdersNickname`),
-
     resetOrdersFilters: action((ctx) => {
       economyState.ordersFilter.nickname(ctx, "");
       economyState.ordersFilter.appliedNickname(ctx, "");
@@ -526,18 +548,18 @@ export const economy = atom(null, "economy").pipe(
       economyState.ordersFilter.order(ctx, "desc");
       economy.loadOrders(ctx);
     }, `${name}.resetOrdersFilters`),
-
     refundOrder: reatomAsync(async (ctx, order: AdminOrder) => {
       await ctx.schedule(() =>
-        client.post<unknown>(`payments/orders/${order.orderId}/refund`)
-          .pipe(withJsonBody({ reason: "Возврат из панели" }))
-          .exec()
+        client.raw.post<unknown>("/payments/orders/{orderId}/refund", {
+          params: { path: { orderId: order.orderId } },
+          json: { reason: "Возврат из панели" }
+        })
       );
 
       return await ctx.schedule(() =>
-        client<OrdersPage>("privated/economy/orders")
-          .pipe(withQueryParams({ limit: 50 }))
-          .exec()
+        client.raw.get<OrdersPage>("/privated/economy/orders", {
+          params: { query: { limit: 50 } }
+        })
       );
     }, {
       name: `${name}.refundOrder`,
@@ -549,26 +571,28 @@ export const economy = atom(null, "economy").pipe(
         toast.success("Возврат платежа выполнен");
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     confirmRefundOrder: action((ctx, order: AdminOrder) => {
       alertDialog.open(ctx, {
         title: "Вернуть платёж?",
-        description: `${order.orderId}: к возврату ${order.refundableBelkoin ?? 0} из ${order.belkoin} BELKOIN игроку ${order.nickname}. Потраченная часть пополнения не возвращается; купленные товары остаются.`,
+        description: `${order.orderId}: к возврату ${order.refundableBelkoin ?? 0}
+          из ${order.belkoin} BELKOIN игроку ${order.nickname}. Потраченная часть пополнения не возвращается; купленные товары остаются.`,
         confirmLabel: "Вернуть",
         withCancel: true,
         onConfirm: () => economy.refundOrder(ctx, order),
       });
     }),
-
     createFakeInvoice: reatomAsync(async (ctx) => {
       const amount = Number(ctx.get(economyState.fakeAmount).replace(/[^0-9]/g, ""));
       if (!Number.isInteger(amount) || amount <= 0) return null;
 
       return await ctx.schedule(() =>
-        client.post<PaymentOrder>("payments/invoice")
-          .pipe(withJsonBody({ provider: "fake", amountMinor: amount * 100, currency: "RUB" }))
-          .exec()
+        client.raw.post<PaymentOrder>("/payments/invoice", {
+          json: { provider: "fake", amountMinor: amount * 100, currency: "RUB" }
+        })
       );
     }, {
       name: `${name}.createFakeInvoice`,
@@ -576,8 +600,10 @@ export const economy = atom(null, "economy").pipe(
         if (order) economyState.fakeOrder(ctx, order);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
-
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
     migrate: reatomAsync(async (ctx) => {
       let cursor: Nullable<string> = null;
       let total = { scanned: 0, migrated: 0, skipped: 0 };
@@ -585,9 +611,10 @@ export const economy = atom(null, "economy").pipe(
 
       for (let step = 0; step < 200; step += 1) {
         const batch = await ctx.schedule(() =>
-          client.post<MigrationBatch>("privated/economy/migrate")
-            .pipe(withJsonBody(cursor ? { cursor } : {}))
-            .exec()
+          client.raw.post<MigrationBatch>("/privated/economy/migrate", {
+            json: cursor ? { cursor } : {}
+          })
+
         );
 
         last = batch;
@@ -611,7 +638,10 @@ export const economy = atom(null, "economy").pipe(
         if (nickname) economy.search(ctx, nickname);
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
-    }).pipe(withStatusesAtom(), withErrorAtom()),
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
   }))
 );
 

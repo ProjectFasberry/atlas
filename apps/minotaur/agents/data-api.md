@@ -14,19 +14,37 @@ Both live in `shared/api/client.ts`; the ergonomic wrapper is
 `shared/lib/client-wrapper.ts`:
 
 ```ts
-import { client, withJsonBody, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 
-const list = await client.get<Item[]>("privated/servers").exec();
-const created = await client.post<Item>("privated/things/create").pipe(withJsonBody(body)).exec();
-const page = await client.get<Page>("privated/list").pipe(withQueryParams({ cursor })).exec();
+const users = await client.get("/privated/user/list", {
+  params: { query: { limit: 20 } },
+});
+const user = await client.get("/privated/user/{nickname}", {
+  params: { path: { nickname } },
+});
+const created = await client.post("/privated/things/create", { json: body });
 ```
 
+- Paths, query, path params and JSON bodies are inferred from the generated
+  schema. Do not pass explicit generics; they shadow the path type.
+- Calls are plain promises: no `.pipe()` and no `.exec()`.
+- `params.query` is URL-encoded; `params.path` fills `{placeholders}` and is
+  required when the path declares them.
 - The wrapper unwraps `{ data }`, throws `Error` on non-2xx with the API error
-  string, and supports `signal` (pass `ctx.controller.signal` from Reatom).
-- `withJsonBody` sets JSON headers/body; `withQueryParams` appends encoded
-  query; `withHeaders` adds headers.
+  string, and supports `signal` (pass `ctx.controller.signal` from Reatom),
+  `headers`, `json`, `body` (FormData), `timeout` and `retry`.
 - Cookies are included (`credentials: "include"`); never add auth headers
   manually.
+
+**Undocumented endpoints.** Some routes are missing from the OpenAPI contract
+(economy, payments, parts of the store and history). Use the `raw` escape hatch
+and keep the type explicit:
+
+```ts
+const wallet = await client.raw.get<EconomyWallet>("/privated/economy/wallet", {
+  params: { query: { nickname } },
+});
+```
 
 ## Types
 
@@ -49,10 +67,10 @@ The API contract is generated from the backend OpenAPI spec:
 
 ## Response envelope
 
-All API routes return `{ data: ... }` or `{ error: "..." }`; `parseWrappedJson`
-handles the envelope. In models use the wrapper, never `res.json()` directly.
-For raw header/body access use `mainFetch` only when the wrapper cannot express
-it.
+All API routes return `{ data: ... }` or `{ error: "..." }`; the wrapper
+handles the envelope. In models use the wrapper, never raw `fetch` or
+`res.json()`. For operations without a documented response, `ExtractApiData`
+may resolve to `never`; prefer `client.raw` with a local type.
 
 ## Errors
 
@@ -77,7 +95,7 @@ it.
 ## Pagination and filters
 
 - Cursor pagination uses `PaginatedMeta` (`endCursor`, `hasNextPage`).
-- Keep query/filter values in atoms; put them into `withQueryParams` in the
-  model, not in the component.
+- Keep query/filter values in atoms; pass them as `params.query` in the model,
+  not in the component.
 - When a mutation changes the list, update `dataAtom` or reset the fetch cache;
   do not keep a second copy of the list in a component.

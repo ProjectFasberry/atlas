@@ -33,7 +33,7 @@ export const something = atom(null, "something").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client.get<Item[]>("privated/something", { signal: ctx.controller.signal }).exec()
+        client.get("/privated/something", { signal: ctx.controller.signal })
       );
     }, `${name}.fetch`).pipe(
       withDataAtom(null),
@@ -60,7 +60,7 @@ export const createThing = reatomAsync(async (ctx) => {
     title: ctx.get(formState.title),
   };
 
-  return await client.post<Thing>("privated/things/create").pipe(withJsonBody(body)).exec();
+  return await client.post("/privated/things/create", { json: body });
 }, {
   name: "createThing",
   onFulfill: (ctx, created) => {
@@ -81,7 +81,7 @@ for a single error path. Do not duplicate error toasts in the component.
 - One atom per field, grouped in a `formState` atom, each with `withReset()`.
 - A `reset` action clears the group after submit.
 - Validate with a `validator`/computed atom before calling the API.
-- Submit via `reatomAsync` and `withJsonBody`.
+- Submit via `reatomAsync` with the wrapper's `json` option.
 - The submit button reads `submit.statusesAtom.isPending`; do not add a local
   `isSubmitting` flag.
 

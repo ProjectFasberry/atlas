@@ -41,7 +41,7 @@ const ReleasesSkeleton = () => (
   </div>
 )
 
-const PlatformRow = reatomComponent<{ channel: "prod" | "dev", version: string, platform: ReleasePlatform }>(
+const PlatformRow = reatomComponent<{ channel: Release["channel"], version: string, platform: ReleasePlatform }>(
   ({ ctx, channel, version, platform }) => {
     return (
       <div className="flex flex-col gap-1 rounded-lg border border-neutral-800 px-3 py-2">

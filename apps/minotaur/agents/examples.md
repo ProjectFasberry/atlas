@@ -46,7 +46,7 @@ import {
   action, atom, reatomAsync, withAbort, withAssign, withDataAtom, withErrorAtom,
   withReset, withStatusesAtom,
 } from "@reatom/framework";
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { notifyAboutRestrictRole } from "./actions.model";
 import { toast } from "sonner";
 
@@ -58,7 +58,7 @@ export const widgets = atom(null, "widgets").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) =>
       await ctx.schedule(() =>
-        client.get<Widget[]>("privated/widgets", { signal: ctx.controller.signal }).exec()
+        client.get("/privated/widgets", { signal: ctx.controller.signal })
       ),
       `${name}.fetch`
     ).pipe(withDataAtom(null), withStatusesAtom(), withErrorAtom(), withAbort()),
@@ -77,7 +77,7 @@ export const createWidget = reatomAsync(async (ctx) => {
     name: ctx.get(form.name),
   };
 
-  return await client.post<Widget>("privated/widgets").pipe(withJsonBody(body)).exec();
+  return await client.post("/privated/widgets", { json: body });
 }, {
   name: "createWidget",
   onFulfill: (ctx, created) => {

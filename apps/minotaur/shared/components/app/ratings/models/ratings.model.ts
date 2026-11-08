@@ -14,7 +14,7 @@ import {
   type RatingReputation,
   type RatingsPayload,
 } from "@/shared/schemas/rating";
-import { client, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { createViewerModel } from "@/shared/models/shared.model";
 
 type RatingMap = {
@@ -61,13 +61,12 @@ export async function getRatings(
 ) {
   const opts = { limit, endCursor, asc, server };
 
-  return client
-    .get<RatingsPayload>(`server/rating/${by}`, {
+  return client.raw
+    .get<RatingsPayload>(`/server/rating/${by}`, {
       ...init,
-      retry: 1
+      retry: 1,
+      params: { query: opts }
     })
-    .pipe(withQueryParams(opts))
-    .exec();
 }
 
 export const ratingsState = atom(null, "ratingsState").pipe(
@@ -90,7 +89,9 @@ export const ratings = atom(null, "ratings").pipe(
     fetch: reatomAsync(async (ctx) => {
       const { opts, by } = getParams(ctx);
 
-      return await ctx.schedule(() => getRatings(by, opts, { signal: ctx.controller.signal }));
+      return await ctx.schedule(() =>
+        getRatings(by, opts, { signal: ctx.controller.signal })
+      );
     }, {
       name: `${name}.fetch`,
       onFulfill: (ctx, res) => {
@@ -107,7 +108,9 @@ export const ratings = atom(null, "ratings").pipe(
     update: reatomAsync(async (ctx) => {
       const { by, opts } = getParams(ctx);
 
-      return await ctx.schedule(() => getRatings(by, opts, { signal: ctx.controller.signal }));
+      return await ctx.schedule(() =>
+        getRatings(by, opts, { signal: ctx.controller.signal })
+      );
     }, {
       name: `${name}.update`,
       onFulfill: (ctx, res) => {
@@ -164,7 +167,9 @@ export type RatingItem = Pick<{ title: string; childs: string[] }, "title"> & {
 export const rating = atom(null, "rating").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client<RatingItem[]>("server/rating/list").exec())
+      return await ctx.schedule(() =>
+        client.raw.get<RatingItem[]>("/server/rating/list")
+      )
     }, `${name}.fetch`).pipe(
       withDataAtom(null),
       withCache({ swr: false }),

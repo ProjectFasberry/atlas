@@ -20,8 +20,8 @@ export const createStorageModel = (name: string) => {
     withAssign((_, name) => ({
       getBucketsList: reatomAsync(async () => {
         return await client
-          .get<ExtractApiData<"getPrivatedVolumeBucketsList">["data"]>("privated/volume/buckets/list")
-          .exec()
+          .get("/privated/volume/buckets/list")
+
       }, `${name}.getBucketsList`).pipe(
         withDataAtom(null),
         withCache({ swr: false }),
@@ -29,9 +29,8 @@ export const createStorageModel = (name: string) => {
         withErrorAtom()
       ),
       getBucket: reatomAsync(async (_, bucketId: string) => {
-        return await client
-          .get<ExtractApiData<"getPrivatedVolumeBucketsByBucket">["data"]>(`privated/volume/bucket/${bucketId}`)
-          .exec()
+        return await client.raw
+          .get<ExtractApiData<"getPrivatedVolumeBucketsByBucket">["data"]>(`/privated/volume/bucket/${bucketId}`)
       }, `${name}.getBucket`).pipe(
         withDataAtom(null),
         withCache({ swr: false }),
@@ -39,9 +38,8 @@ export const createStorageModel = (name: string) => {
         withErrorAtom()
       ),
       getListByBucket: reatomAsync(async (_, bucketId: string) => {
-        return await client
-          .get<ExtractApiData<"getPrivatedVolumeBucketsByBucketList">["data"]>(`privated/volume/buckets/${bucketId}/list`)
-          .exec()
+        return await client.raw
+          .get<ExtractApiData<"getPrivatedVolumeBucketsByBucketList">["data"]>(`/privated/volume/buckets/${bucketId}/list`)
       }, `${name}.getListByBucket`).pipe(
         withDataAtom(null),
         withCache({ swr: false }),

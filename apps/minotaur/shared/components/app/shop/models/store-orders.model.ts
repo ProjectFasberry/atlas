@@ -1,4 +1,4 @@
-import { client, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { logError } from "@/shared/lib/log";
 import { action, atom, reatomAsync, withAssign, withStatusesAtom } from "@reatom/framework";
 import { withSearchParamsPersist } from "@reatom/url";
@@ -80,10 +80,10 @@ export const cartOrders = atom(null, "cartOrders").pipe(
       cartOrders.fetch(ctx);
     }),
     fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() =>
-        client<GameOrdersPage>("store/order/internal/list")
-          .pipe(withQueryParams(queryParams(ctx)))
-          .exec()
+      return await ctx.schedule(() => client.raw
+        .get<GameOrdersPage>("/store/order/internal/list", {
+          params: { query: queryParams(ctx) }
+        })
       );
     }, {
       name: `${name}.fetch`,
@@ -97,10 +97,10 @@ export const cartOrders = atom(null, "cartOrders").pipe(
       const meta = ctx.get(cartOrdersState.meta);
       if (!meta?.endCursor) return null;
 
-      return await ctx.schedule(() =>
-        client<GameOrdersPage>("store/order/internal/list")
-          .pipe(withQueryParams({ ...queryParams(ctx), endCursor: meta.endCursor }))
-          .exec()
+      return await ctx.schedule(() => client.raw
+        .get<GameOrdersPage>("/store/order/internal/list", {
+          params: { query: { ...queryParams(ctx), endCursor: meta.endCursor } }
+        })
       );
     }, {
       name: `${name}.loadMore`,

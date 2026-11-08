@@ -1,4 +1,4 @@
-import { client, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { createEs } from "@/shared/lib/helpers";
 import { createViewerModel } from "@/shared/models/shared.model";
 import {
@@ -66,9 +66,9 @@ function filtersParams(ctx: Ctx): Record<string, string> {
 }
 
 async function requestPage(params: Record<string, string | number | undefined>) {
-  return client<{ data: HistoryItem[]; meta: HistoryMeta }>("privated/history/list")
-    .pipe(withQueryParams(params))
-    .exec();
+  return client.raw.get<{ data: HistoryItem[]; meta: HistoryMeta }>("/privated/history/list", {
+    params: { query: params }
+  })
 }
 
 function uniquePrepend(current: HistoryItem[], items: HistoryItem[]) {
@@ -96,7 +96,6 @@ export const history = atom(null, "history").pipe(
       withErrorAtom(),
       withAbort()
     ),
-
     loadMore: reatomAsync(async (ctx) => {
       const meta = ctx.get(historyMeta);
       if (!meta?.endCursor) return null;
@@ -122,7 +121,6 @@ export const history = atom(null, "history").pipe(
       withAbort(),
       withConcurrency("first-in-win")
     ),
-
     refetchAll: action((ctx) => {
       history.loadMore.abort(ctx);
       history.loadMore.errorAtom.reset(ctx);
@@ -130,7 +128,6 @@ export const history = atom(null, "history").pipe(
       historyData(ctx, []);
       history.fetch(ctx);
     }),
-
     /** A live NATS event; dedupes against the loaded pages. */
     push: action((ctx, item: HistoryItem) => {
       if (ctx.get(historyState.paused)) {
@@ -154,7 +151,6 @@ export const history = atom(null, "history").pipe(
         });
       }, 2500);
     }),
-
     setPaused: action((ctx, paused: boolean) => {
       historyState.paused(ctx, paused);
 
@@ -167,7 +163,6 @@ export const history = atom(null, "history").pipe(
 
       historyState.pending(ctx, []);
     }),
-
     connect: action((ctx) => {
       const existing = ctx.get(historyState.instance);
       if (existing) return;
@@ -184,7 +179,6 @@ export const history = atom(null, "history").pipe(
 
       historyState.instance(ctx, es);
     }),
-
     disconnect: action((ctx) => {
       ctx.get(historyState.instance)?.close();
       historyState.instance(ctx, null);

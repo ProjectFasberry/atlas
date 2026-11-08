@@ -121,8 +121,7 @@ const connectionsControl = atom(null, "connectionsControl").pipe(
     ),
     add: reatomAsync(async (ctx, social: string) => {
       const result = await client
-        .post<ConnectionAddPayload>("server/socials/add", { json: { social } })
-        .exec()
+        .post("/server/socials/add", { json: { social } })
 
       return { result, social }
     }, `${name}.add`),
@@ -131,7 +130,7 @@ const connectionsControl = atom(null, "connectionsControl").pipe(
 
       const removeSubmit = reatomAsync(async (ctx, type: string) => {
         const result = await ctx.schedule(() =>
-          client.delete<{ type: string }>(`server/socials/${type}`).exec()
+          client.delete("/server/socials/{social}", { params: { path: { social: type } } })
         )
 
         return { result, type }
@@ -187,13 +186,14 @@ const connections = atom(null, "connections").pipe(
       const currentUser = ctx.get(currentUserState);
       if (!currentUser) return [];
 
-      return await ctx.schedule(() =>
-        client
-          .get<ExtractApiData<"getServerSocialsListByNickname">["data"]>(`server/socials/list/${currentUser.nickname}`, {
-            searchParams: { variant: "private" },
-            signal: ctx.controller.signal
-          })
-          .exec()
+      return await ctx.schedule(() => client
+        .get("/server/socials/list/{nickname}", {
+          params: {
+            query: { variant: "private" },
+            path: { nickname: currentUser.nickname }
+          },
+          signal: ctx.controller.signal
+        })
       );
     }, {
       name: `${name}.fetchList`
@@ -204,10 +204,9 @@ const connections = atom(null, "connections").pipe(
     ),
     fetchAvailable: reatomAsync(async (ctx) => {
       return await ctx.schedule(() => client
-        .get<ConnectionsAvailablePayload>("server/socials/available", {
+        .get("/server/socials/available", {
           signal: ctx.controller.signal
         })
-        .exec()
       )
     }, {
       name: `${name}.fetchAvailable`

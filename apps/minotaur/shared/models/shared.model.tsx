@@ -11,9 +11,8 @@ import { withSsr } from "./ssr";
 import { locales, setLocale, type Locale } from "@/paraglide/runtime";
 import { logError } from "../lib/log";
 
-type ExistNicknamePayload = ExtractApiData<"getValidateNicknameByNickname">["data"]
 export async function getExistNickname(nickname: string) {
-  return client<ExistNicknamePayload>(`validate/nickname/${nickname}`).exec()
+  return client.get("/validate/nickname/{nickname}", { params: { path: { nickname } } })
 }
 
 type Target<T = unknown> = Record<string, {
@@ -67,7 +66,7 @@ export const createViewerModel = ({ name, logging }: { name: string, logging?: b
 type Socials = ExtractApiData<"getMiscSocials">["data"];
 
 export async function fetchSocials() {
-  return await client<Socials>("misc/socials").exec()
+  return client.get("/misc/socials")
 }
 
 export const socialsAtom = atom<Socials>([], "socials").pipe(withSsr("socials"))
@@ -75,7 +74,7 @@ export const socialsAtom = atom<Socials>([], "socials").pipe(withSsr("socials"))
 type Currencies = ExtractApiData<"getMiscCurrencies">["data"];
 
 export async function fetchCurrencies() {
-  return await client<Currencies>("misc/currencies").exec()
+  return client.get("/misc/currencies")
 }
 export const currenciesAtom = atom<Currencies | null>(null, "currencies").pipe(withSsr("currencies"))
 
@@ -83,7 +82,6 @@ export const getCurrencies = (ctx: Ctx | CtxSpy): Currencies => {
   // Currencies are optional bootstrap data: fall back to an empty map instead
   // of crashing store/cart screens when the snapshot has no currencies yet.
   const data = ctx.spy ? ctx.spy(currenciesAtom) : ctx.get(currenciesAtom)
-
   return data ?? {}
 }
 

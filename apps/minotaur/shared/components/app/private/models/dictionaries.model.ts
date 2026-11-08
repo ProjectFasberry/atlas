@@ -1,4 +1,4 @@
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { reatomAsync, withCache, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { action, atom } from "@reatom/framework";
 import { actions, compareChanges, notifyAboutRestrictRole } from "./actions.model";
@@ -60,10 +60,9 @@ export const dict = atom(null, "dict").pipe(
   withAssign((_, name) => ({
     fetchList: reatomAsync(async (ctx) => {
       return await ctx.schedule(() => client
-        .get<ExtractApiData<"getPrivatedDictionariesList">["data"]>("privated/dictionaries/list", {
+        .get("/privated/dictionaries/list", {
           signal: ctx.controller.signal
         })
-        .exec()
       )
     }, {
       name: `${name}.fetchList`
@@ -80,9 +79,9 @@ export const dict = atom(null, "dict").pipe(
       }
 
       return await client
-        .post<ExtractApiData<"postPrivatedDictionariesCreate">["data"]>("privated/dictionaries/create")
-        .pipe(withJsonBody(json))
-        .exec()
+        .raw.post<ExtractApiData<"postPrivatedDictionariesCreate">["data"]>("/privated/dictionaries/create", {
+          json
+        })
     }, {
       name: `${name}.create`,
       onFulfill: (ctx, res) => {
@@ -104,10 +103,11 @@ export const dict = atom(null, "dict").pipe(
         value: ctx.get(dictState.editValue)
       }
 
-      return await client
-        .post<ExtractApiData<"postPrivatedDictionariesByIdEdit">["data"]>(`privated/dictionaries/${id}/edit`)
-        .pipe(withJsonBody(json))
-        .exec()
+      return await client.raw
+        .post<ExtractApiData<"postPrivatedDictionariesByIdEdit">["data"]>(`/privated/dictionaries/${id}/edit`, {
+          json,
+          params: { path: { id } }
+        })
     }, {
       name: `${name}.edit`,
       onFulfill: (ctx, res) => {
@@ -127,9 +127,8 @@ export const dict = atom(null, "dict").pipe(
       });
     }, `${name}.deleteBefore`),
     delete: reatomAsync(async (ctx, id: number) => {
-      const result = await client
-        .delete<ExtractApiData<"deletePrivatedDictionariesByIdRemove">['data']>(`privated/dictionaries/${id}/remove`)
-        .exec()
+      const result = await client.raw
+        .delete<ExtractApiData<"deletePrivatedDictionariesByIdRemove">["data"]>(`/privated/dictionaries/${id}/remove`)
 
       return { result, id };
     }, {

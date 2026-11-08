@@ -1,4 +1,4 @@
-import { client, withJsonBody, withQueryParams } from "@/shared/lib/client-wrapper"
+import { client } from "@/shared/lib/client-wrapper"
 import { logError } from "@/shared/lib/log"
 import {
   reatomAsync, spawn, withAbort, withCache, withDataAtom, withErrorAtom, withStatusesAtom,
@@ -46,7 +46,7 @@ usersState.filters.asc.onChange((ctx) => users.refetchAll(ctx))
 export const usersDataArrAtom = atom<PrivatedUsersPayload["data"]>((ctx) => Array.from(ctx.spy(usersState.data).values()))
 
 async function getUsers(query: UsersQuery) {
-  return client<PrivatedUsersPayload>("privated/user/list").pipe(withQueryParams(query)).exec()
+  return client.raw.get<PrivatedUsersPayload>("/privated/user/list", { params: { query } })
 }
 
 const getParams = action((ctx): UsersQuery => ({
@@ -118,7 +118,7 @@ export const users = atom(null, "users").pipe(
     ),
     fetchSingle: reatomAsync(async (ctx, nickname: string) => {
       return await ctx.schedule(() =>
-        client<PrivatedUser>(`privated/user/${nickname}`).exec()
+        client.get("/privated/user/{nickname}", { params: { path: { nickname } } })
       )
     }, `${name}.fetchSingle`).pipe(
       withDataAtom(),
@@ -167,9 +167,7 @@ export const usersRestrict = atom(null, "_usersRestrict").pipe(
       }
 
       const result = await client
-        .post<UsersControlPayload>("privated/user/restrict/create", { timeout: 20000 })
-        .pipe(withJsonBody(body))
-        .exec()
+        .post("/privated/user/restrict/create", { timeout: 20000, json: body  })
 
       return { nicknames, result }
     }, {
@@ -252,7 +250,7 @@ export const usersRestrict = atom(null, "_usersRestrict").pipe(
 export const usersRoles = atom(null, "_usersRoles").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client<Role[]>("privated/role/list", { signal: ctx.controller.signal }).exec())
+      return await ctx.schedule(() => client.get("/privated/role/list", { signal: ctx.controller.signal }))
     }, {
       name: `${name}.fetch`,
       onReject: (_, e) => notifyAboutRestrictRole(e)
@@ -270,9 +268,7 @@ export const usersRoles = atom(null, "_usersRoles").pipe(
       }
 
       const result = await client
-        .post<UsersControlPayload>("privated/user/roles")
-        .pipe(withJsonBody(body))
-        .exec()
+        .post("/privated/user/roles", { json: body })
 
       return { nicknames, targetRoleId, result }
     }, {
@@ -450,10 +446,9 @@ export const usersAuth = atom(null, "usersAuth").pipe(
           }
 
           return await client
-            .post<ExtractApiData<"postPrivatedUserAuthUnregister">["data"]>("privated/user/auth/unregister", {
+            .post("/privated/user/auth/unregister", {
               json
             })
-            .exec()
         }, {
           name: `${name}.submit`,
           onFulfill: (ctx, res) => {
@@ -499,10 +494,9 @@ export const usersAuth = atom(null, "usersAuth").pipe(
           usersAuth.createUser.submit.errorAtom.reset(ctx);
 
           return await client
-            .post<ExtractApiData<"postPrivatedUserAuthRegister">["data"]>("privated/user/auth/register", {
+            .post("/privated/user/auth/register", {
               json
             })
-            .exec()
         }, {
           name: `${name}.submit`,
           onFulfill: (ctx) => {
@@ -586,7 +580,6 @@ usersAuthState.createUser.isOpen.onChange((ctx, state) => {
   }
 })
 //#endregion
-
 
 type UserActionField = {
   label: string,

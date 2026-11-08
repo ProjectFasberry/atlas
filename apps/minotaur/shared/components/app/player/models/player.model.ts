@@ -44,8 +44,6 @@ export const playerState = atom(null, "playerState").pipe(
   }))
 )
 
-type RateListPayload = ExtractApiData<"getRateListByNickname">["data"]
-
 export type RateUser = {
   initiator: string;
   created_at: string;
@@ -102,8 +100,7 @@ export const player = atom(null, "player").pipe(
           }
 
           return await client
-            .post<ExtractApiData<"postRateByNickname">["data"]>(`rate/${nickname}`)
-            .exec()
+            .post("/rate/{nickname}", { params: { path: { nickname } } })
         }, {
           name: `${name}.submit`,
           onFulfill: (ctx, res) => {
@@ -130,10 +127,10 @@ export const player = atom(null, "player").pipe(
           if (!isAuthed) return null;
 
           return await client
-            .get<RateListPayload>(`rate/list/${nickname}`, {
+            .get("/rate/list/{nickname}", {
               signal: ctx.controller.signal,
+              params: { path: { nickname } },
             })
-            .exec()
         }, `${name}.fetchList`).pipe(
           withDataAtom(null),
           withStatusesAtom(),
@@ -171,7 +168,7 @@ export const isIdentityAtom = atom<boolean>((ctx) => {
 })
 
 export async function getPlayer(nickname: string, init: RequestInit) {
-  return client<Player>(`server/player/${nickname}`, init).exec()
+  return client.get("/server/player/{nickname}", { ...init, params: { path: { nickname } } })
 }
 
 export const wrapAsClientSideAtom = (condition: boolean) => atom((ctx) =>

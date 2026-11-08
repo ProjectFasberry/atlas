@@ -32,7 +32,7 @@ export const apiKeys = atom(null, "apiKeys").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client<ApiKeys>("privated/api/keys/list", { signal: ctx.controller.signal }).exec()
+        client.get("/privated/api/keys/list", { signal: ctx.controller.signal })
       )
     }, {
       name: `${name}.fetch`,
@@ -50,8 +50,7 @@ export const apiKeys = atom(null, "apiKeys").pipe(
       }
 
       const result = await client
-        .post<ApiKeyCreatePayload>("privated/api/keys/create", { json })
-        .exec()
+        .post("/privated/api/keys/create", { json })
 
       return { result };
     }, {
@@ -74,8 +73,7 @@ export const apiKeys = atom(null, "apiKeys").pipe(
     ),
     delete: reatomAsync(async (_, id: ApiKey["id"], cb?: (ctx: Ctx) => void) => {
       const result = await client
-        .delete<ExtractApiData<"deletePrivatedApiKeysById">["data"]>(`privated/api/keys/${id}`)
-        .exec()
+        .delete("/privated/api/keys/{id}", { params: { path: { id } } })
 
       return { result, id, cb };
     }, {

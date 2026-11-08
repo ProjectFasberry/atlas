@@ -49,8 +49,7 @@ export const settingsAccountModel = () => {
       }, `${name}.before`),
       submit: reatomAsync(async (ctx) => {
         return await client
-          .delete<ExtractApiData<"deleteAccount">["data"]>("account/")
-          .exec()
+          .delete("/account/")
       }, {
         name: `${name}.submit`,
         onFulfill: (ctx, res) => {
@@ -97,10 +96,9 @@ export const settingsAccountModel = () => {
         changePass.submit.errorAtom.reset(ctx);
 
         return await client
-          .patch<ExtractApiData<"patchAccountPassword">["data"]>("account/password", {
+          .patch("/account/password", {
             json
           })
-          .exec()
       }, {
         name: `${name}.submit`,
         onFulfill: (ctx, res) => {

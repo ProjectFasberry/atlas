@@ -3,7 +3,7 @@ import { logError } from "@/shared/lib/log";
 import { action, atom, type AtomState, batch, withErrorAtom } from "@reatom/framework";
 import { reatomAsync, reatomRecord, withAssign, withCache, withDataAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { getStoreItems, type StoreItemsParams } from "../../shop/models/store.model";
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { toast } from "sonner";
 import { notifyAboutRestrictRole } from "./actions.model";
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
@@ -53,10 +53,10 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
         type: ctx.get(createStoreItemState.type)
       }
 
-      return await client
-        .post<StoreItem>("privated/store/item/create")
-        .pipe(withJsonBody(body))
-        .exec()
+      return await client.raw
+        .post<StoreItem>("/privated/store/item/create", {
+          json: body
+        })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -92,8 +92,7 @@ export const deleteStoreItem = atom(null, "deleteStoreItem").pipe(
     }),
     submit: reatomAsync(async (ctx, id: number) => {
       return await client
-        .delete<{ id: number }>(`privated/store/item/${id}`)
-        .exec()
+        .delete("/privated/store/item/{id}", { params: { path: { id } } })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -155,10 +154,8 @@ export const editStoreItem = atom(null, "editStoreItem").pipe(
         { field: "content", value: ctx.get(editStoreItemState.content) },
       ]
 
-      return await client
-        .post(`privated/store/item/edit/${id}`)
-        .pipe(withJsonBody(body))
-        .exec()
+      return await client.raw
+        .post(`/privated/store/item/edit/{id}`, { json: body, params: { path: { id } } })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx) => {
@@ -213,9 +210,8 @@ storeState.searchParams.onChange(async (ctx, state) => {
 
     // The public store list does not expose command/refund_cmd. The private
     // GET returns the full item for the edit form.
-    const item = await client
-      .get<StoreItem>(`privated/store/item/${id}`)
-      .exec()
+    const item = await client.raw
+      .get<StoreItem>("/privated/store/item/{id}", { params: { path: { id } } })
       .catch(() => null);
 
     if (!item) {

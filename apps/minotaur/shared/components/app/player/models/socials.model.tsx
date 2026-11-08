@@ -9,7 +9,7 @@ type PlayerSocialsPayload = ExtractApiData<"getServerSocialsListByNickname">["da
 export type PlayerSocialsItem = PlayerSocialsPayload[number];
 
 export async function getPlayerSocials(nickname: string, init?: RequestInit) {
-  return client<PlayerSocialsPayload>(`server/socials/list/${nickname}`, { ...init }).exec()
+  return client.get("/server/socials/list/{nickname}", { ...init, params: { path: { nickname } } })
 }
 
 export const playerSocials = atom(null, "playerSocials").pipe(

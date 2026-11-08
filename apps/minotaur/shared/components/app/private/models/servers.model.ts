@@ -112,7 +112,7 @@ export const servers = atom(null, "servers").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client.get<ServerPayload[]>("privated/servers").exec()
+        client.get("/privated/servers/")
       )
     }, `${name}.fetch`).pipe(
       withDataAtom(null),
@@ -121,7 +121,7 @@ export const servers = atom(null, "servers").pipe(
     ),
     save: reatomAsync(async (ctx, input: { id: number; patch: ServerPatch }) => {
       return await ctx.schedule(() =>
-        client.patch<ServerPayload>(`privated/servers/${input.id}`, { json: input.patch }).exec()
+        client.raw.patch<ServerPayload>("/privated/servers/{id}", { json: input.patch, params: { path: { id: input.id } } })
       )
     }, {
       name: `${name}.save`,

@@ -3,7 +3,7 @@ import { reatomAsync, sleep, withAssign, withConcurrency, withInit, withStatuses
 import { type PageContextServer } from "vike/types";
 import { logError } from "@/shared/lib/log";
 import { snapshots } from "@/shared/models/ssr";
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { getRecipient } from "../../settings/models/settings-store.model";
 import { navigate } from "vike/client/router";
 import { withSsr } from "@/shared/models/ssr";
@@ -15,14 +15,22 @@ import { userState } from "@/shared/models/app/index.model";
 
 export type CartListPayload = ExtractApiData<"getStoreCartList">["data"]
 export type CartFinalPrice = ExtractApiData<"getStoreCartPrice">["data"]
+
+export const EMPTY_CART_PRICE: CartFinalPrice = {
+	BELKOIN: 0,
+	CHARISM: 0,
+	server: "",
+	available: false,
+	purchasable: false,
+}
 export type CartItem = CartListPayload["data"][number]
 
 async function getCartData(init?: RequestInit) {
-	return client<CartListPayload>("store/cart/list", { ...init }).exec();
+	return client.get("/store/cart/list", { ...init });
 }
 
 async function getCartPrice(init?: RequestInit) {
-	return client<CartFinalPrice>("store/cart/price", { ...init }).exec();
+	return client.get("/store/cart/price", { ...init });
 }
 
 export const cartDataSelectedAtom = atom<CartItem[]>((ctx) =>
@@ -49,7 +57,7 @@ export const cartIsValidAtom = atom((ctx) => {
 export const cartState = atom(null, "cartState").pipe(
 	withAssign((_, name) => ({
 		isTriggered: atom(false),
-		price: atom<CartFinalPrice>({ BELKOIN: 0, CHARISM: 0 }, `${name}.price`).pipe(withSsr(`${name}.price`)),
+		price: atom<CartFinalPrice>(EMPTY_CART_PRICE, `${name}.price`).pipe(withSsr(`${name}.price`)),
 		data: atom<CartListPayload["data"]>([], `${name}.data`).pipe(withSsr(`${name}.data`))
 	}))
 )
@@ -70,7 +78,7 @@ export const cart = atom(null, "cart").pipe(
 
 			const isAuthed = getIsAuthed(pageCtx.snapshot);
 			assertDefined(isAuthed, "isAuthed")
-			
+
 			if (!isAuthed) return;
 
 			const ctx = createCtx();
@@ -100,9 +108,7 @@ export const cart = atom(null, "cart").pipe(
 
 			try {
 				const result = await client
-					.post<boolean>(`store/cart/add/${id}`)
-					.pipe(withJsonBody({ recipient }))
-					.exec()
+					.post("/store/cart/add/{id}", { json: { recipient }, params: { path: { id } } })
 
 				return { id, result };
 			} catch (e) {
@@ -134,8 +140,7 @@ export const cart = atom(null, "cart").pipe(
 
 			try {
 				const result = await client
-					.delete<boolean>(`store/cart/remove/${id}`)
-					.exec()
+					.delete("/store/cart/remove/{id}", { params: { path: { id } } })
 
 				return { id, result }
 			} catch (e) {

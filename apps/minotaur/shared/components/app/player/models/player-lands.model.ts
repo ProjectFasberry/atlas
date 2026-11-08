@@ -10,20 +10,20 @@ import type { PageContextServer } from "vike/types"
 import type { LandsSimilarPayload } from "../../lands/models/lands.model"
 
 export async function getLands(nickname: string, init?: RequestInit) {
-  return client
-    .get<LandsSimilarPayload>(`server/lands/similar`, {
-      ...init,
-      searchParams: {
-        variant: "by-player",
-        target: nickname
-      },
-    })
-    .exec()
+  return client.get(`/server/lands/similar`, {
+    ...init,
+    params: {
+      query: { variant: "by-player", target: nickname }
+    },
+  })
 }
 
 export const playerLandsState = atom(null, "playerLandsState").pipe(
   withAssign((_, name) => ({
-    data: atom<Nullable<LandsSimilarPayload>>(null, `${name}.data`).pipe(withSsr(`${name}.data`), withReset())
+    data: atom<Nullable<LandsSimilarPayload>>(null, `${name}.data`).pipe(
+      withSsr(`${name}.data`),
+      withReset()
+    )
   }))
 )
 

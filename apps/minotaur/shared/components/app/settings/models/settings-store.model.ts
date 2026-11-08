@@ -4,7 +4,7 @@ import { withLocalStorage } from "@reatom/persist-web-storage";
 import { reatomAsync, sleep, withAssign, withReset, withStatusesAtom } from "@reatom/framework";
 import { logError } from "@/shared/lib/log";
 import { toast } from "sonner";
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import { nicknameSchema } from "@/shared/schemas/auth";
 import { DIALOG_DELAY } from "@/shared/consts/index";
@@ -71,10 +71,8 @@ export const changeLocalRecipient = atom(null, "changeLocalRecipient").pipe(
 
       const json = { key: "recipient", value: validatedRecipient };
 
-      const result = await client
-        .post<string>(`store/cart/edit/${id}`)
-        .pipe(withJsonBody(json))
-        .exec()
+      const result = await client.raw
+        .post<string>(`/store/cart/edit/${id}`, { json })
 
       return { id, result, cb }
     }, {

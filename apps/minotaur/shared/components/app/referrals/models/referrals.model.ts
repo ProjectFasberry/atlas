@@ -11,7 +11,7 @@ export const referrals = atom(null, "referrals").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client<ReferralListPayload>("server/referrals/list").exec()
+        client.get("/server/referrals/list")
       )
     }, `${name}.fetch`).pipe(
       withDataAtom(null, (_, data) => data.length === 0 ? null : data),

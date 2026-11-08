@@ -1,4 +1,4 @@
-import { client, withQueryParams } from "@/shared/lib/client-wrapper"
+import { client } from "@/shared/lib/client-wrapper"
 import {
   atom, reatomAsync,
   withAbort, withAssign, withDataAtom, withErrorAtom, withStatusesAtom,
@@ -8,25 +8,9 @@ import { notifyAboutRestrictRole } from "./actions.model"
 
 export type ReleaseChannel = "prod" | "dev"
 
-export type ReleaseFile = {
-  name: string
-  size: number
-  checksum: Nullable<string>
-}
-
-export type ReleasePlatform = {
-  platform: string
-  files: ReleaseFile[]
-}
-
-export type Release = {
-  channel: ReleaseChannel
-  version: string
-  pub_date: Nullable<string>
-  notes: string
-  latest: boolean
-  platforms: ReleasePlatform[]
-}
+export type Release = ExtractApiData<"getPrivatedReleases">["data"][number]
+export type ReleasePlatform = Release["platforms"][number]
+export type ReleaseFile = ReleasePlatform["files"][number]
 
 export const RELEASE_CHANNELS: { label: string, value: ReleaseChannel }[] = [
   { label: "Prod", value: "prod" },
@@ -46,10 +30,10 @@ export const releases = atom(null, "releases").pipe(
     fetch: reatomAsync(async (ctx) => {
       const channel = ctx.get(releasesState.channel)
 
-      return await ctx.schedule(() =>
-        client<Release[]>("privated/releases")
-          .pipe(withQueryParams({ channel }))
-          .exec()
+      return await ctx.schedule(() => client
+        .get("/privated/releases", {
+          params: { query: { channel } }
+        })
       )
     }, {
       name: `${name}.fetch`,
@@ -74,7 +58,7 @@ releasesState.channel.onChange((ctx) => {
 /** Direct link to the permission-checked download route (302 -> presigned S3). */
 export function releaseDownloadUrl(
   base: string | undefined,
-  channel: ReleaseChannel,
+  channel: string,
   version: string,
   platform: string,
   file: string

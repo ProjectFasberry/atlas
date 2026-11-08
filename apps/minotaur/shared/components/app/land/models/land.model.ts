@@ -5,7 +5,7 @@ import { currentUserState } from "@/shared/models/current-user/index.model";
 import { withHistory } from "@/shared/lib/reatom/helpers";
 import { withSsr } from "@/shared/models/ssr";
 import { logError } from "@/shared/lib/log";
-import { client, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { isEmpty, isEmptyArray } from "@/shared/lib/utils";
 import type { PageContextServer } from "vike/types";
 import { render } from "vike/abort";
@@ -64,7 +64,7 @@ export const land = atom(null, "lands").pipe(
       const headers = pageCtx.headers ?? undefined;
       const ulid = pageCtx.routeParams.id;
 
-      const land = await client<Land>(`server/lands/${ulid}`, { headers }).exec().catch(e => {
+      const land = await client.get("/server/lands/{ulid}", { headers, params: { path: { ulid } } }).catch(e => {
         console.error("Land error", e);
         return null;
       })
@@ -86,12 +86,11 @@ export const land = atom(null, "lands").pipe(
       const exclude = ctx.get(landParamAtom);
       if (!exclude) return;
 
-      return await ctx.schedule(() => client
-        .get<ExtractApiData<"getServerLandsList">["data"]>(`server/lands/similar`, {
-          signal: ctx.controller.signal
-        })
-        .pipe(withQueryParams({ exclude }))
-        .exec(),
+      return await ctx.schedule(() => client.raw
+        .get<ExtractApiData<"getServerLandsList">["data"]>(`/server/lands/similar`, {
+          signal: ctx.controller.signal,
+          params: { query: { exclude } }
+        }),
       );
     }, {
       name: `${name}.fetchSimilar`,

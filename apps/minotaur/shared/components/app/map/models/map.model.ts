@@ -12,7 +12,7 @@ export const availableServers = atom(null, "availableServers").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client<AvailableServersPayload>("servers-with-map", { signal: ctx.controller.signal }).exec()
+        client.get("/servers-with-map", { signal: ctx.controller.signal })
       )
     }, {
       name: `${name}.fetch`,

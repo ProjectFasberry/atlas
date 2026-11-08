@@ -1,4 +1,4 @@
-import { client, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { atom } from "@reatom/framework";
 import { withAssign } from "@reatom/framework";
 import { withSsr } from "@/shared/models/ssr";
@@ -9,9 +9,7 @@ export type EventsSingle = EventsList[number]
 type EventsParams = ExtractApiParams<"getServerEventsList">["query"]
 
 export async function getEvents(params: Partial<EventsParams>, init?: RequestInit) {
-  return client<EventsList>("server/events/list", init)
-    .pipe(withQueryParams(params))
-    .exec()
+  return client.raw.get<EventsList>("/server/events/list", { ...init, params: { query: params } })
 }
 
 export const eventsState = atom(null, "eventsState").pipe(

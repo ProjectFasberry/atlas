@@ -47,13 +47,3 @@ export const panelClient = createClient<PanelPaths>({
 	credentials: "include",
 	fetch: apiFetch,
 });
-
-/** Raw request for the few callers that need response headers or a body they parse themselves. */
-export async function mainFetch(path: string, init: RequestInit = {}) {
-	return apiFetch(
-		new Request(new URL(path, env.VITE_API_URL), {
-			credentials: "include",
-			...init,
-		}),
-	);
-}
