@@ -1,3 +1,14 @@
+const browserOrigin = typeof window === "undefined" ? "" : window.location.origin;
+const devProxy = import.meta.env.DEV && browserOrigin.length > 0;
+
+/** Browser calls in dev go through the Vite proxy to avoid CORS; SSR stays direct. */
+export const apiBaseUrl = devProxy
+  ? `${browserOrigin}/api`
+  : import.meta.env.VITE_API_URL;
+export const panelApiBaseUrl = devProxy
+  ? `${browserOrigin}/panel-api`
+  : import.meta.env.VITE_PANEL_API_URL;
+
 export const env = {
   VITE_APP_URL: import.meta.env.VITE_APP_URL,
   VITE_APP_PORT: import.meta.env.VITE_APP_PORT,

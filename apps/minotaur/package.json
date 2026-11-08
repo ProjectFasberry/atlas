@@ -6,6 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "infisical run --env=dev --path=/minotaur -- bun --bun run vike dev",
+		"dev:prod": "infisical run --env=prod --path=/minotaur -- bun --bun run vike dev",
 		"build:staging": "cross-env STAGE=staging infisical run --env=staging --path=/minotaur -- bun --bun run vike build",
 		"start:staging": "infisical run --env=staging --path=/minotaur -- bun --bun run ./dist/server/index.mjs",
 		"build:prod": "cross-env NODE_ENV=production STAGE=prod infisical run --env=prod --path=/minotaur -- bun --bun run vike build",
