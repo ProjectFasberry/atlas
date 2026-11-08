@@ -114,6 +114,27 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
   )
 }, "ServerEditorFields")
 
+const ServersDialog = reatomComponent(({ ctx }) => {
+  return (
+    <Dialog.Root
+      open={ctx.spy(serverEditor.isOpen)}
+      onOpenChange={({ open }) => serverEditor.isOpen(ctx, open)}
+    >
+      <Portal>
+        <Dialog.Backdrop className={dialogVariant.backdrop()} />
+        <Dialog.Positioner className={dialogVariant.positioner()}>
+          <Dialog.Content className={dialogVariant.content()}>
+            <DialogClose />
+            <Dialog.Title className={dialogVariant.title()}>
+              Изменить сервер
+            </Dialog.Title>
+            <ServerEditorFields />
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
+  )
+})
 export const Servers = reatomComponent(({ ctx }) => {
   useUpdate(servers.fetch, [])
 
@@ -146,6 +167,7 @@ export const Servers = reatomComponent(({ ctx }) => {
           Обновить
         </Button>
       </div>
+      <ServersDialog />
       <Table>
         <TableHeader>
           <TableRow>
@@ -194,36 +216,14 @@ export const Servers = reatomComponent(({ ctx }) => {
                   >
                     {s.available ? "Закрыть вход" : "Открыть вход"}
                   </Button>
-                  <Dialog.Root
-                    onOpenChange={({ open }) => {
-                      if (!open) {
-                        serverEditor.close(ctx)
-                      }
-                    }}
+                  <Button
+                    background="default"
+                    className="h-8 text-xs"
+                    disabled={!canEdit || isSaving}
+                    onClick={() => serverEditor.open(ctx, s)}
                   >
-                    <Dialog.Trigger asChild>
-                      <Button
-                        background="default"
-                        className="h-8 text-xs"
-                        disabled={!canEdit || isSaving}
-                        onPointerDown={() => serverEditor.open(ctx, s)}
-                      >
-                        Изменить
-                      </Button>
-                    </Dialog.Trigger>
-                    <Portal>
-                      <Dialog.Backdrop className={dialogVariant.backdrop()} />
-                      <Dialog.Positioner>
-                        <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-w-2xl max-h-[85vh] overflow-y-auto")}>
-                          <DialogClose />
-                          <Dialog.Title className={dialogVariant.title()}>
-                            Изменить сервер
-                          </Dialog.Title>
-                          <ServerEditorFields />
-                        </Dialog.Content>
-                      </Dialog.Positioner>
-                    </Portal>
-                  </Dialog.Root>
+                    Изменить
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>

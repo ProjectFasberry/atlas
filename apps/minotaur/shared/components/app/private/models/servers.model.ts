@@ -94,7 +94,9 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
   withAssign((_, name) => ({
     target: atom<ServerPayload | null>(null, `${name}.target`),
     form: atom<ServerForm>(emptyForm, `${name}.form`),
+    isOpen: atom(false, `${name}.isOpen`),
     open: action((ctx, s: ServerPayload) => {
+      serverEditor.isOpen(ctx, true)
       serverEditor.target(ctx, s)
       serverEditor.form(ctx, formOf(s))
     }, `${name}.open`),
@@ -107,6 +109,11 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
     }, `${name}.set`),
   }))
 )
+serverEditor.isOpen.onChange((ctx, state) => {
+  if (!state) {
+    serverEditor.close(ctx)
+  }
+})
 
 export const servers = atom(null, "servers").pipe(
   withAssign((_, name) => ({
