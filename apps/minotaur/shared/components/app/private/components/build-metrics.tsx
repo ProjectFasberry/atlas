@@ -124,9 +124,9 @@ export const BuildMetrics = reatomComponent(({ ctx }) => {
 								formatter={(value) => `${Number(value).toFixed(2)} MB`}
 							/>
 							<Legend />
-							<Line type="monotone" dataKey="total" name="total" stroke={COLORS.total} strokeWidth={2} dot={false} />
-							<Line type="monotone" dataKey="client" name="client JS" stroke={COLORS.client} strokeWidth={2} dot={false} />
-							<Line type="monotone" dataKey="server" name="server JS" stroke={COLORS.server} strokeWidth={2} dot={false} />
+							<Line type="monotone" dataKey="total" name="total" stroke={COLORS.total} strokeWidth={2} dot={{ r: 2 }} />
+							<Line type="monotone" dataKey="client" name="client JS" stroke={COLORS.client} strokeWidth={2} dot={{ r: 2 }} />
+							<Line type="monotone" dataKey="server" name="server JS" stroke={COLORS.server} strokeWidth={2} dot={{ r: 2 }} />
 						</LineChart>
 					</ResponsiveContainer>
 				</div>
