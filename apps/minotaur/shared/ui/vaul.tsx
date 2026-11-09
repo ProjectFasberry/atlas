@@ -1,31 +1,39 @@
 import type { AtomMut } from "@reatom/framework"
 import { reatomComponent } from "@reatom/npm-react"
-import { createContext, type PropsWithChildren, useContext } from "react"
+import type { PropsWithChildren } from "react"
 import { tv } from "tailwind-variants"
-import { Drawer } from "vaul"
+import { Drawer } from "@ark-ui/react/drawer"
+import { Portal } from "@ark-ui/react/portal"
 
 const vaulVariants = tv({
-  base: `bg-neutral-900 fixed p-2 h-fit max-h-3/4 z-50 flex flex-col gap-4 border-neutral-700/60`,
+  base: `relative h-fit flex flex-col gap-4 bg-neutral-900 p-2 border-neutral-700/60
+    pointer-events-auto after:absolute after:inset-x-0 after:top-full after:h-[200%]
+    after:bg-neutral-900 after:content-['']`,
   variants: {
     side: {
-      bottom: "rounded-t-xl inset-x-0 bottom-0 h-auto border-t",
-      left: "rounded-r-xl inset-y-0 left-0 h-full w-3/4 border-r",
-      right: "rounded-l-xl inset-y-0 right-0 h-full w-3/4 border-l"
+      bottom: "w-full max-h-3/4 rounded-t-xl border-t",
+      left: "h-full w-3/4 rounded-r-xl border-r",
+      right: "h-full w-3/4 rounded-l-xl border-l"
     }
+  },
+  defaultVariants: {
+    side: "bottom"
   }
 })
 
-const VaulSlider = () => {
-  return <div aria-hidden className="mx-auto bg-neutral-600 my-2 cursor-grab active:cursor-grabbing h-1 w-9 rounded-sm" />
-}
-
-const vaulCtx = createContext<VaulProps | null>(null)
-
-const useVaul = () => {
-  const ctx = useContext(vaulCtx)
-  if (!ctx) throw new Error('Vaul ctx is not provided')
-  return ctx
-}
+const positionerVariants = tv({
+  base: "fixed inset-0 z-50 flex",
+  variants: {
+    side: {
+      bottom: "items-end justify-center",
+      left: "items-stretch justify-start",
+      right: "items-stretch justify-end"
+    }
+  },
+  defaultVariants: {
+    side: "bottom"
+  }
+})
 
 type VaulContentProps = PropsWithChildren & {
   side?: "left" | "right" | "bottom",
@@ -58,26 +66,18 @@ const VaulHeader = ({
   )
 }
 
-type VaulProps = {
-  open: boolean,
-  onOpenChange: (val: boolean) => void
-} & PropsWithChildren
-
 const Vaul = reatomComponent<PropsWithChildren & { openAtom: AtomMut<boolean> }>(({ ctx, children, openAtom }) => {
-  const open = ctx.spy(openAtom);
-  const onOpenChange = (value: boolean) => openAtom(ctx, value)
+  const open = ctx.spy(openAtom)
 
   return (
-    <vaulCtx.Provider
-      value={{
-        open,
-        onOpenChange
-      }}
+    <Drawer.Root
+      open={open}
+      onOpenChange={({ open: next }) => openAtom(ctx, next)}
+      lazyMount
+      unmountOnExit
     >
-      <Drawer.Root open={open} onOpenChange={onOpenChange}>
-        {children}
-      </Drawer.Root>
-    </vaulCtx.Provider>
+      {children}
+    </Drawer.Root>
   )
 }, "Vaul")
 
@@ -85,13 +85,17 @@ const VaulContent = ({
   side = "bottom", className, children
 }: VaulContentProps) => {
   return (
-    <Drawer.Portal>
-      <Drawer.Overlay className="fixed inset-0 z-50 backdrop-blur bg-black/30" />
-      <Drawer.Content className={vaulVariants({ side, className })}>
-        <VaulSlider />
-        {children}
-      </Drawer.Content>
-    </Drawer.Portal>
+    <Portal>
+      <Drawer.Backdrop className="fixed inset-0 z-50 bg-black/30 backdrop-blur" />
+      <Drawer.Positioner className={positionerVariants({ side })}>
+        <Drawer.Content className={vaulVariants({ side, className })}>
+          <Drawer.Grabber className="mx-auto -my-2 flex h-10 w-full shrink-0 cursor-grab items-center justify-center active:cursor-grabbing">
+            <Drawer.GrabberIndicator className="h-1 w-9 rounded-sm bg-neutral-600" />
+          </Drawer.Grabber>
+          {children}
+        </Drawer.Content>
+      </Drawer.Positioner>
+    </Portal>
   )
 }
 
@@ -100,6 +104,5 @@ export {
   VaulTrigger,
   VaulContent,
   VaulHeader,
-  useVaul,
   vaulVariants
 }
