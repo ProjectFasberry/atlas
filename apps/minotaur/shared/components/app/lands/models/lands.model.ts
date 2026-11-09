@@ -1,8 +1,11 @@
 import { isEmptyArray } from "@/shared/lib/utils";
-import { client, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { logError } from "@/shared/lib/log";
 import { pageState } from "@/shared/models/page-context.model";
-import { atom, reatomAsync, withAbort, withAssign, withCache, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
+import {
+  atom, reatomAsync,
+  withAbort, withAssign, withCache, withDataAtom, withErrorAtom, withStatusesAtom
+} from "@reatom/framework";
 
 export type LandsSimilarParams = ExtractApiParams<"getServerLandsSimilar">["query"];
 
@@ -26,11 +29,10 @@ export const lands = atom(null, "lands").pipe(
       }
 
       return await ctx.schedule(() => client
-        .get<LandsSimilarPayload>("server/lands/similar", {
+        .get("/server/lands/similar", {
           signal: ctx.controller.signal,
+          params: { query: searchParams }
         })
-        .pipe(withQueryParams(searchParams))
-        .exec()
       )
     }, {
       name: `${name}.fetch`,

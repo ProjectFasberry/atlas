@@ -1,6 +1,6 @@
 import { DeleteButton, EditButton, SectionWrapper, LinkButton } from "@/shared/components/app/private/components/ui"
 import {
-  itemToEditAtom, editStoreItem, deleteStoreItem,
+  itemToEditAtom, editStoreItem, editStoreItemState, deleteStoreItem,
   storeState, storeItems, createStoreItem, createStoreItemState
 } from "@/shared/components/app/private/models/store.model"
 import { EditorMenuBar } from "@/shared/components/config/editor/editor"
@@ -73,6 +73,11 @@ export const CreateItem = reatomComponent(({ ctx }) => {
         placeholder="Команда для выдачи"
       />
       <Input
+        value={ctx.spy(createStoreItemState.refundCmd) ?? ""}
+        onChange={e => createStoreItemState.refundCmd(ctx, e.target.value)}
+        placeholder="Команда для возврата (необязательно)"
+      />
+      <Input
         type="file"
         onChange={e => {
           if (!e.target.files) return;
@@ -137,7 +142,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
           <Select.Control className={selectVariant.control()}>
             <Select.Trigger className={selectVariant.trigger()}>
               <Select.ValueText className="border border-neutral-800 h-8 px-4">
-                {getCurrencyTitle(ctx, ctx.spy(createStoreItemState.currency))}
+                {TYPE_ITEMS.find((item) => item.value === ctx.spy(createStoreItemState.type))?.title ?? ""}
               </Select.ValueText>
             </Select.Trigger>
             <div className={selectVariant.indicators()}>
@@ -295,12 +300,17 @@ const EditItem = reatomComponent(({ ctx }) => {
 
   const editor = useEditor({
     extensions: editorExtensions,
+    onUpdate: ({ editor }) => {
+      editStoreItemState.content(ctx, editor.getJSON())
+    }
   })
 
   useUpdate((ctx) => {
     if (!data) return;
-    editor.commands.setContent(data.content as JSONContent)
-  }, [data?.content, editor])
+
+    editStoreItem.load(ctx, data);
+    editor.commands.setContent((data.content ?? {}) as JSONContent)
+  }, [data?.id, editor])
 
   if (ctx.spy(storeItems.fetch.statusesAtom).isPending) {
     return <Skeleton className="h-24 w-full" />
@@ -310,60 +320,140 @@ const EditItem = reatomComponent(({ ctx }) => {
     return <Typography>Товар не найден</Typography>;
   }
 
-  const { id, content, title, currency, command, imageUrl, price, value, type, description } = data
-
-  if (!content) throw new Error("Content is not defined")
-
-  const currencyTitle = getFromDictionary(ctx, currency)
+  const currencyCollection = createListCollection({ items: CURRENCY_ITEMS(ctx) })
+  const typeCollection = createListCollection({ items: TYPE_ITEMS })
+  const typeTitle = TYPE_ITEMS.find((item) => item.value === ctx.spy(editStoreItemState.type))?.title ?? ""
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full">
+    <div className="flex flex-col gap-3 w-full h-full">
       <Typography className="text-2xl font-semibold">
-        {title}
+        {ctx.spy(editStoreItemState.title)}
       </Typography>
       <div className="flex overflow-hidden h-40">
         <img
-          src={imageUrl}
+          src={ctx.spy(editStoreItemState.imageUrl)}
           alt=""
           draggable={false}
           className="object-cover w-auto h-full"
         />
       </div>
+      <Input
+        value={ctx.spy(editStoreItemState.title)}
+        onChange={e => editStoreItemState.title(ctx, e.target.value)}
+        placeholder="Заголовок"
+      />
+      <Input
+        value={ctx.spy(editStoreItemState.value)}
+        onChange={e => editStoreItemState.value(ctx, e.target.value)}
+        placeholder="Значение"
+      />
+      <Input
+        value={ctx.spy(editStoreItemState.command)}
+        onChange={e => editStoreItemState.command(ctx, e.target.value)}
+        placeholder="Команда для выдачи"
+      />
+      <Input
+        value={ctx.spy(editStoreItemState.refundCmd) ?? ""}
+        onChange={e => editStoreItemState.refundCmd(ctx, e.target.value || null)}
+        placeholder="Команда для возврата (необязательно)"
+      />
+      <div className="flex items-center gap-2 w-full">
+        <Input
+          value={ctx.spy(editStoreItemState.price)}
+          onChange={e => editStoreItemState.price(ctx, e.target.value)}
+          placeholder="Цена"
+          type="number"
+          className="bg-transparent border border-neutral-800 text-sm h-8 w-fit"
+        />
+        <Select.Root
+          collection={currencyCollection}
+          value={[ctx.spy(editStoreItemState.currency)]}
+          onValueChange={({ value }) => editStoreItemState.currency(ctx, value[0])}
+          className="flex flex-col gap-1 w-full"
+        >
+          <Select.Control className={selectVariant.control()}>
+            <Select.Trigger className={selectVariant.trigger()}>
+              <Select.ValueText className="border border-neutral-800 h-8 px-4">
+                {getCurrencyTitle(ctx, ctx.spy(editStoreItemState.currency))}
+              </Select.ValueText>
+            </Select.Trigger>
+            <div className={selectVariant.indicators()}>
+              <Select.ClearTrigger className={selectVariant.clearTrigger()}>
+                <Icon name="sprite:x" className="size-5" />
+              </Select.ClearTrigger>
+              <Select.Indicator className={selectVariant.indicator()}>
+                <Icon name="sprite:selector" className="size-5" />
+              </Select.Indicator>
+            </div>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content className={selectVariant.content()} style={selectContentBaseStyle}>
+                <Select.ItemGroup className={selectVariant.itemGroup()}>
+                  {CURRENCY_ITEMS(ctx).map((item) => (
+                    <Select.Item key={item.value} item={item} className={selectVariant.item()}>
+                      <Select.ItemText className={selectVariant.itemText()}>
+                        {item.title}
+                      </Select.ItemText>
+                      <Select.ItemIndicator className={selectVariant.itemIndicator()}>
+                        <Icon name="sprite:check" className="size-4"/>
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                  ))}
+                </Select.ItemGroup>
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+          <Select.HiddenSelect />
+        </Select.Root>
+        <Select.Root
+          collection={typeCollection}
+          value={[ctx.spy(editStoreItemState.type)]}
+          onValueChange={({ value }) => editStoreItemState.type(ctx, value[0])}
+          className="flex flex-col gap-1 w-full"
+        >
+          <Select.Control className={selectVariant.control()}>
+            <Select.Trigger className={selectVariant.trigger()}>
+              <Select.ValueText className="border border-neutral-800 h-8 px-4">
+                {typeTitle}
+              </Select.ValueText>
+            </Select.Trigger>
+            <div className={selectVariant.indicators()}>
+              <Select.ClearTrigger className={selectVariant.clearTrigger()}>
+                <Icon name="sprite:x" className="size-5" />
+              </Select.ClearTrigger>
+              <Select.Indicator className={selectVariant.indicator()}>
+                <Icon name="sprite:selector" className="size-5" />
+              </Select.Indicator>
+            </div>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content className={selectVariant.content()} style={selectContentBaseStyle}>
+                <Select.ItemGroup className={selectVariant.itemGroup()}>
+                  {TYPE_ITEMS.map((item) => (
+                    <Select.Item key={item.value} item={item} className={selectVariant.item()}>
+                      <Select.ItemText className={selectVariant.itemText()}>
+                        {item.title}
+                      </Select.ItemText>
+                      <Select.ItemIndicator className={selectVariant.itemIndicator()}>
+                        <Icon name="sprite:check" className="size-4"/>
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                  ))}
+                </Select.ItemGroup>
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+          <Select.HiddenSelect />
+        </Select.Root>
+      </div>
       <div className="flex flex-col gap-4 rounded-lg border border-neutral-800 w-full p-2">
         <EditorMenuBar editor={editor} />
         <EditorContent editor={editor} />
       </div>
-      <div className="flex flex-wrap *:grow *:sm:grow-0 items-center gap-2 w-full justify-start">
-        <div className="flex items-center gap-1 border px-2 py-1 border-neutral-800 rounded-lg">
-          <Typography className="font-semibold">
-            Цена: {price}
-          </Typography>
-          <img src={CURRENCY_IMAGE[currency]} alt="" width={20} height={20} />
-        </div>
-        <div className="flex items-center gap-1 border px-2 py-1 border-neutral-800 rounded-lg">
-          <Typography className="font-semibold">
-            Валюта: {currencyTitle}
-          </Typography>
-          <img src={CURRENCY_IMAGE[currency]} alt="" width={20} height={20} />
-        </div>
-        <div className="flex items-center gap-1 border px-2 py-1 border-neutral-800 rounded-lg">
-          <Typography className="font-semibold">
-            Тип товара: {type}
-          </Typography>
-        </div>
-        <div className="flex items-center gap-1 border px-2 py-1 border-neutral-800 rounded-lg">
-          <Typography className="font-semibold">
-            Значение товара: {value}
-          </Typography>
-        </div>
-        <div className="flex items-center gap-1 border px-2 py-1 border-neutral-800 rounded-lg">
-          <Typography className="font-semibold">
-            Команда выдачи товара: {command ?? "нет"}
-          </Typography>
-        </div>
-      </div>
       <Button
-        onClick={() => editStoreItem.submit(ctx, id)}
+        onClick={() => editStoreItem.submit(ctx, data.id)}
         disabled={ctx.spy(editStoreItem.submit.statusesAtom).isPending}
         className="bg-neutral-50 text-neutral-950 font-semibold text-lg self-end"
       >

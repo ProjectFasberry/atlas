@@ -1,4 +1,5 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
+import { atom } from "@reatom/framework"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { Typography } from "@/shared/ui/typography"
 import { Button } from "@/shared/ui/button"
@@ -26,6 +27,7 @@ import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
 import { Noop } from "@/shared/ui/noop"
 import { ErrorBlock } from "@/shared/ui/error-block"
+import { Input } from "@/shared/ui/input"
 
 type RolePayload = {
   id: number;
@@ -50,6 +52,8 @@ const rolesListPermItemVariant = tv({
     id: "flex items-center justify-center h-6 min-w-6 aspect-auto w-fit bg-neutral-700 rounded-sm p-1"
   }
 })
+
+const rolesPermQuery = atom("", "rolesPermQuery")
 
 const RolesListItemPermsItemSkeleton = () => {
   return (
@@ -171,14 +175,28 @@ const RolesListItemSaveChanges = reatomComponent(({ ctx }) => {
 
 const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
   const id = ctx.spy(roleEditableAtom)?.id
+  const query = ctx.spy(rolesPermQuery)
+
   if (!id) return null;
 
   const availablePerms = ctx.spy(permission.availablePerms)
+  const normalized = query.trim().toLowerCase()
+  const filtered = normalized
+    ? availablePerms.filter((permission) => permission.name.toLowerCase().includes(normalized))
+    : availablePerms
+
+  const groups = filtered.reduce<Record<string, typeof availablePerms>>((acc, item) => {
+    const namespace = item.name.split(".")[0] ?? "other"
+    const list = acc[namespace] ?? []
+    list.push(item)
+    acc[namespace] = list
+    return acc
+  }, {})
 
   const isDisabled = availablePerms.length === 0
 
   return (
-    <Menu.Root>
+    <Menu.Root onOpenChange={({ open }) => !open && rolesPermQuery(ctx, "")}>
       <Menu.Trigger asChild>
         <Button
           className="gap-2 font-semibold h-8 text-sm bg-neutral-800"
@@ -197,10 +215,30 @@ const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
             <Typography className="text-neutral-400 text-sm">
               Доступные разрешения
             </Typography>
-            <div className="flex flex-col scrollbar scrollbar-thumb-neutral-800 gap-1 max-h-[200px] overflow-y-auto w-full">
-              {availablePerms.map((permission) => (
-                <RolesListItemAvailableItem key={permission.id} {...permission} />
+            <Input
+              value={query}
+              onChange={(e) => rolesPermQuery(ctx, e.target.value)}
+              onKeyDown={(event) => event.stopPropagation()}
+              placeholder="Поиск по названию"
+              className="h-8 w-full"
+              maxLength={64}
+            />
+            <div className="flex flex-col scrollbar scrollbar-thumb-neutral-800 gap-2 max-h-[240px] overflow-y-auto w-full">
+              {Object.entries(groups).map(([namespace, perms]) => (
+                <div key={namespace} className="flex flex-col gap-1">
+                  <Typography className="text-[11px] uppercase tracking-wide text-neutral-500">
+                    {namespace}
+                  </Typography>
+                  {perms.map((permission) => (
+                    <RolesListItemAvailableItem key={permission.id} {...permission} />
+                  ))}
+                </div>
               ))}
+              {filtered.length === 0 && (
+                <Typography className="text-sm text-neutral-500">
+                  Ничего не найдено
+                </Typography>
+              )}
             </div>
           </div>
         </Menu.Content>
@@ -298,7 +336,7 @@ const RolesEditablePermHeader = reatomComponent(({ ctx }) => {
       <Typography className="text-neutral-50 text-base">
         Разрешения
       </Typography>
-      <div className="flex items-center text-sm">
+      <div className="flex items-center gap-2 text-sm">
         <Typography>
           {"("}всего: {ctx.spy(permissionsByRole.fetchList.dataAtom)?.permissions.length ?? 0},&nbsp;
         </Typography>
@@ -308,6 +346,11 @@ const RolesEditablePermHeader = reatomComponent(({ ctx }) => {
         <Typography className="text-red">
           -: {ctx.spy(roleDeletedPermsAtom).length}{")"}
         </Typography>
+        {ctx.spy(saveChangesIsValidAtom) && (
+          <Typography className="text-[11px] font-semibold text-yellow-400">
+            не сохранено
+          </Typography>
+        )}
       </div>
     </div>
   )

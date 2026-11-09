@@ -55,24 +55,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/traefik/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Traefik dynamic configuration */
-        get: operations["getTraefik"];
-        put?: never;
-        /** Update Traefik dynamic configuration */
-        post: operations["postTraefik"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -154,67 +136,6 @@ export interface operations {
             };
             /** @description Response for status 500 */
             500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error: string;
-                    };
-                };
-            };
-        };
-    };
-    getTraefik: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: ({
-                            /** @description YAML string representation of the config */
-                            yaml: string;
-                            /** @description Number of raw keys in the config */
-                            rawKeysCount: number;
-                        } | null) | null;
-                    };
-                };
-            };
-        };
-    };
-    postTraefik: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description Number of updated keys */
-                        data: number;
-                    };
-                };
-            };
-            /** @description Response for status 400 */
-            400: {
                 headers: {
                     [name: string]: unknown;
                 };

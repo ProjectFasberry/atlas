@@ -1,4 +1,4 @@
-import { client, withJsonBody } from "@/shared/lib/client-wrapper"
+import { client } from "@/shared/lib/client-wrapper"
 import { reatomAsync, withCache, withDataAtom, withErrorAtom, withStatusesAtom, type AsyncAction } from "@reatom/framework"
 import { notifyAboutRestrictRole } from "./actions.model"
 import { toast } from "sonner"
@@ -18,7 +18,7 @@ export type RolesRolePermissionListPayload = {
 
 export const rolesList = {
   fetch: reatomAsync(async (ctx) => {
-    return await ctx.schedule(() => client<RolesPayload>("privated/role/list").exec())
+    return await ctx.schedule(() => client.get("/privated/role/list"))
   }, {
     name: "rolesList.fetch",
     onReject: (_, e) => notifyAboutRestrictRole(e)
@@ -33,7 +33,7 @@ export const rolesList = {
 export const permissionsAllList = {
   fetch: reatomAsync(async (ctx) => {
     return await ctx.schedule(() =>
-      client<RolesPayload>(`privated/permissions/list/all`, { signal: ctx.controller.signal }).exec()
+      client.get("/privated/permissions/list/all", { signal: ctx.controller.signal })
     )
   }, {
     name: "permissionsAllList.fetch",
@@ -49,10 +49,10 @@ export const permissionsByRole = atom(null, "permissionsByRole").pipe(
   withAssign((_, name) => ({
     fetchList: reatomAsync(async (ctx, roleId: number) => {
       return await ctx.schedule(() => client
-        .get<RolesRolePermissionListPayload>(`privated/role/${roleId}/permission/list`, {
-          signal: ctx.controller.signal
+        .get("/privated/role/{id}/permission/list", {
+          signal: ctx.controller.signal,
+          params: { path: { id: roleId } }
         })
-        .exec()
       )
     }, {
       name: `${name}.fetchList`,
@@ -70,9 +70,10 @@ export const permissionsByRole = atom(null, "permissionsByRole").pipe(
       }
 
       const result = await client
-        .post<ExtractApiData<"postPrivatedRoleByIdPermissionAdd">["data"]>(`privated/role/${roleId}/permission/add`)
-        .pipe(withJsonBody(body))
-        .exec()
+        .post("/privated/role/{id}/permission/add", {
+          json: body,
+          params: { path: { id: roleId } }
+        })
 
       return { roleId, result }
     }, {
@@ -101,9 +102,10 @@ export const permissionsByRole = atom(null, "permissionsByRole").pipe(
       }
 
       const result = await client
-        .delete<ExtractApiData<"deletePrivatedRoleByIdPermissionRemove">["data"]>(`privated/role/${roleId}/permission/remove`)
-        .pipe(withJsonBody(json))
-        .exec()
+        .delete("/privated/role/{id}/permission/remove", {
+          json,
+          params: { path: { id: roleId } }
+        })
 
       return { roleId, result }
     }, {

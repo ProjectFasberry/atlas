@@ -94,19 +94,6 @@ export const CartActions = () => {
           <div className="flex-1 flex w-full">
             <CartActionsSubmit />
           </div>
-          <div className="flex-1 flex w-full">
-            <Link
-              href="/store/cart/topup"
-              className="
-                flex-1 flex rounded-xl items-center justify-center
-                bg-neutral-50 text-neutral-950 font-semibold
-                text-nowrap truncate gap-1 min-w-0 h-10
-              "
-            >
-              <Icon name="sprite:credit-card-pay" className="size-5" />
-              {translate["cart.content.top-up"]()}
-            </Link>
-          </div>
         </div>
         <div
           className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full h-full"

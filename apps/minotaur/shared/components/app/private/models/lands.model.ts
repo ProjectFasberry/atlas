@@ -36,10 +36,9 @@ export const lands = atom(null, "lands").pipe(
       }
 
       const result = await client
-        .post<ExtractApiData<PathType>["data"]>("privated/lands/create", {
+        .post("/privated/lands/create", {
           json
         })
-        .exec()
 
       return { result }
     }, {
@@ -88,8 +87,7 @@ export const lands = atom(null, "lands").pipe(
       }
 
       const result = await client
-        .delete<ExtractApiData<"deletePrivatedLandsByUlid">["data"]>(`privated/lands/${ulid}`)
-        .exec()
+        .delete("/privated/lands/{ulid}", { params: { path: { ulid } } })
 
       return { result }
     }, {

@@ -17,7 +17,7 @@ export const banner = atom(null, "banner").pipe(
     }),
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client<BannerPayload>("banner/latest", { signal: ctx.controller.signal }).exec()
+        client.get("/banner/latest", { signal: ctx.controller.signal })
       )
     }, `${name}.fetch`).pipe(
       withDataAtom(null),
@@ -27,8 +27,7 @@ export const banner = atom(null, "banner").pipe(
     ),
     createView: reatomAsync(async (ctx, id: number) => {
       return await ctx.schedule(() => client
-        .post<ExtractApiData<"postBannerViewById">["data"]>(`banner/view/${id}`)
-        .exec()
+        .post("/banner/view/{id}", { params: { path: { id } } })
       )
     }, {
       name: `${name}.createView`,

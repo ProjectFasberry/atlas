@@ -13,10 +13,10 @@ import { pageState } from '@/shared/models/page-context.model';
 import { getIsMobile } from "@/shared/lib/helpers";
 
 async function fetchAppState(init: RequestInit) {
-  return client<AppOptionsPayload>("app/options", init).exec();
+  return client.get("/app/options", init);
 }
 async function fetchAppDictionaries(init: RequestInit) {
-  return client<AppDictionaries>("app/dictionaries", init).exec();
+  return client.get("/app/dictionaries", init);
 }
 
 function fetchSharedData(ctx: ReturnType<typeof createCtx>) {

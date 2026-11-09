@@ -1,6 +1,7 @@
-import { reatomComponent } from "@reatom/npm-react";
+import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import {
-  isCheckedAtom, userIsSelectedAtom, type PrivatedUser, users, usersRestrict, usersRestrictState, usersDataArrAtom
+  isCheckedAtom, userIsSelectedAtom, type PrivatedUser, users, usersListInView, usersRestrict,
+  usersRestrictState, usersState, usersDataArrAtom
 } from "../../models/users.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { tv } from "tailwind-variants";
@@ -14,10 +15,11 @@ import { checkboxVariant } from "@/shared/ui/checkbox";
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu";
 import { Portal } from "@ark-ui/react/portal";
-import { atom } from "@reatom/framework";
+import { atom, spawn } from "@reatom/framework";
 import { isEmptyArray } from "@/shared/lib/utils";
 import { Noop } from "@/shared/ui/noop";
 import { Checkbox } from "@ark-ui/react/checkbox";
+import { Button } from "@/shared/ui/button";
 
 const userItemVariant = tv({
   base: `flex flex-col rounded-lg w-full px-4 border`,
@@ -136,6 +138,51 @@ const UsersSkeleton = ({ length = 32 }: { length?: number }) => {
 const UsersUpdatingSkeleton = reatomComponent(({ ctx }) =>
   ctx.spy(users.update.statusesAtom).isPending && <UsersSkeleton length={3} />
 )
+
+
+/**
+ * Loads the next page while the sentinel is in view.
+ *
+ * The previous `inView.onChange` only fired when the sentinel crossed the
+ * viewport edge: a page shorter than the viewport (or a browser that keeps the
+ * sentinel visible) stalled the list. The effect watches the cursor instead, so
+ * it keeps loading until the viewport is filled or the feed is exhausted.
+ */
+export const UsersAutoLoad = reatomComponent(({ ctx }) => {
+  const inView = ctx.spy(usersListInView);
+  const meta = ctx.spy(usersState.meta);
+  const pending = ctx.spy(users.update.statusesAtom).isPending;
+  const error = ctx.spy(users.update.errorAtom);
+
+  useUpdate((ctx) => {
+    if (!inView || !meta?.hasNextPage || pending || error) return;
+
+    spawn(ctx, (spawnCtx) => users.update(spawnCtx));
+  }, [inView, meta?.hasNextPage, meta?.endCursor, pending, error]);
+
+  return null;
+}, "UsersAutoLoad")
+
+export const UsersLoadMoreError = reatomComponent(({ ctx }) => {
+  const error = ctx.spy(users.update.errorAtom);
+  if (!error) return null;
+
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-lg border border-red/40 px-3 py-2">
+      <Typography className="text-sm text-red">{error.message}</Typography>
+      <Button
+        size="small"
+        background="default"
+        onClick={() => {
+          users.update.errorAtom.reset(ctx);
+          users.update(ctx);
+        }}
+      >
+        Повторить
+      </Button>
+    </div>
+  );
+}, "UsersLoadMoreError")
 
 export const Users = reatomComponent(({ ctx }) => {
   if (ctx.spy(users.fetch.statusesAtom).isPending) return <UsersSkeleton />

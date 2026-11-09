@@ -2,7 +2,6 @@ import { reatomComponent, useAtom } from "@reatom/npm-react"
 import { Button } from "@/shared/ui/button"
 import { Link } from "@/shared/components/config/link/link"
 import { Typography } from "@/shared/ui/typography"
-import { dayjs } from "@/shared/lib/dayjs"
 import { createPageModel } from "@/shared/lib/events"
 import { logout } from "@/shared/components/app/auth/models/logout.model"
 import { banned } from "@/shared/components/app/auth/models/banned.model"
@@ -32,8 +31,6 @@ const Banned = reatomComponent(({ ctx }) => {
   const data = ctx.spy(banned.fetch.dataAtom)
   if (!data) return null;
 
-  const expires = data.expires ? dayjs(data.expires).format('DD.MM.YYYY HH:mm') : translate["banned.never"]()
-
   return (
     <div className="flex flex-col gap-y-4 justify-center h-full items-center relative">
       <Typography color="gray" className="text-md font-semibold">
@@ -46,12 +43,6 @@ const Banned = reatomComponent(({ ctx }) => {
         <div className="flex flex-col items-center">
           <Typography className="text-lg font-semibold text-red">
             {translate["banned.reason"]()}: <span className="text-neutral-50">{data?.reason ?? translate["banned.reason-not-specified"]()}</span>
-          </Typography>
-          <Typography className="text-lg font-semibold text-red">
-            {translate["banned.unban"]()}:{' '}
-            <span className="text-neutral-50">
-              {expires}
-            </span>
           </Typography>
         </div>
         <div className="w-full *:w-full">

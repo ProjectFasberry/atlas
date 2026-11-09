@@ -2,22 +2,21 @@ import { reatomAsync, withInit, withReset, withStatusesAtom } from "@reatom/fram
 import { action, atom } from "@reatom/framework";
 import { cart, cartState } from "./store-cart.model";
 import { logError } from "@/shared/lib/log";
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { withSsr } from "@/shared/models/ssr";
 import { withAssign } from "@reatom/framework";
 import { type SelectItemToCartOptions, storeItemsState } from "./store.model";
 import { invariant } from "@/shared/lib/utils";
 import { appState } from "@/shared/models/app/index.model";
-import { renderToHTMLString } from "@tiptap/static-renderer";
-import { editorExtensions } from "@/shared/components/config/editor/editor.model";
-import type { JSONContent } from "@tiptap/react";
 
-export type StoreItem = ExtractApiData<"getStoreItems">["data"]["data"][number]
+export type StoreItem = ExtractApiData<"getStoreItems">["data"]["data"][number] & {
+  command?: string | null;
+  refund_cmd?: string | null;
+}
 
 export async function getStoreItem(id: string, init: RequestInit) {
-  return client
-    .get<StoreItem>(`store/item/${id}`, init)
-    .exec()
+  return client.raw
+    .get<StoreItem>(`/store/item/${id}`, init)
 }
 
 type UpdateItemStatusOptions =
@@ -44,30 +43,7 @@ export const storeItemState = atom(null, "storeItemState").pipe(
   }))
 )
 
-export const selectedDonateDataAtom = atom((ctx) => {
-  const data = ctx.spy(storeItemState.data)
-  if (!data) return null;
 
-  const rawData = data.content as JSONContent;
-
-  const getContent = () => {
-    const isExpanded = ctx.spy(storeItemState.isExpanded)
-
-    if (!isExpanded) {
-      const content = rawData.content?.slice(0, 1);
-      return { ...rawData, content }
-    };
-
-    return rawData
-  }
-
-  const html = renderToHTMLString({
-    extensions: editorExtensions,
-    content: getContent()
-  })
-
-  return html
-})
 
 appState.current.isMobile.onChange((ctx, state) => {
   if (state) {
@@ -116,14 +92,13 @@ export const storeItem = atom(null, "storeItem").pipe(
       invariant(current, "Current is not defined")
 
       const result = await client
-        .post<boolean>(`store/cart/edit/${id}`)
-        .pipe(
-          withJsonBody({
+        .post("/store/cart/edit/{id}", {
+          json: {
             key: "selected",
             value: !current.selected
-          })
-        )
-        .exec()
+          },
+          params: { path: { id } }
+        })
 
       return { id, result }
     }, {

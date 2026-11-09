@@ -1,4 +1,4 @@
-import { client, withJsonBody } from "@/shared/lib/client-wrapper"
+import { client } from "@/shared/lib/client-wrapper"
 import { reatomAsync, withCache, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework"
 import { action, atom } from "@reatom/framework"
 import { withAssign, withReset } from "@reatom/framework"
@@ -13,8 +13,7 @@ export const banners = atom(null, "banners").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() => client
-        .get<BannerList>(`banner/list`, { signal: ctx.controller.signal })
-        .exec()
+        .get(`/banner/list`, { signal: ctx.controller.signal })
       )
     }, `${name}.fetch`).pipe(
       withDataAtom(null),
@@ -53,9 +52,9 @@ export const createBanner = atom(null, "createBanner").pipe(
       }
 
       return await client
-        .post<ExtractApiData<"postPrivatedBannersCreate">["data"]>("privated/banners/create")
-        .pipe(withJsonBody(json))
-        .exec()
+        .post("/privated/banners/create", {
+          json
+        })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -88,8 +87,7 @@ export const deleteBanner = atom(null, "deleteBanner").pipe(
     }, `${name}.deleteBefore`),
     submit: reatomAsync(async (_, id: number) => {
       const result = await client
-        .delete<ExtractApiData<"deletePrivatedBannersById">["data"]>(`privated/banners/${id}`)
-        .exec();
+        .delete("/privated/banners/{id}", { params: { path: { id } } })
 
       return { result, id }
     }, {

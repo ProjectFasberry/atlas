@@ -9,9 +9,8 @@ import { translate } from "@/shared/locales/helpers";
 type CurrentSession = ExtractApiData<"getAuthSessionCurrent">["data"]
 type SessionRow = ExtractApiData<"getAuthSessionList">["data"][number]
 
-/** The API returns the session id for termination; the published schema still omits it. */
-export type SessionPayload = CurrentSession & { id: string }
-export type SesssionsPayload = Array<SessionRow & { id: string }>;
+export type SessionPayload = CurrentSession
+export type SesssionsPayload = SessionRow[];
 
 export const sessionsState = atom(null, "sessionsState").pipe(
   withAssign((_, name) => ({
@@ -28,7 +27,7 @@ export const sessions = atom(null, "sessions").pipe(
     }, `${name}.init`),
     fetchCurrent: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client<SessionPayload>("auth/session/current").exec()
+        client.get("/auth/session/current")
       );
     }, {
       name: `${name}.fetchCurrent`,
@@ -43,7 +42,7 @@ export const sessions = atom(null, "sessions").pipe(
     ),
     fetchActive: reatomAsync(async (ctx) => {
       const result = await ctx.schedule(() =>
-        client.get<SesssionsPayload>("auth/session/list", { signal: ctx.controller.signal }).exec()
+        client.get("/auth/session/list", { signal: ctx.controller.signal })
       );
 
       return result
@@ -74,8 +73,7 @@ export const sessions = atom(null, "sessions").pipe(
       if (!id) throw new Error("SESSION_ID_MISSING");
 
       return await client
-        .delete<ExtractApiData<"deleteAuthSessionById">["data"]>(`auth/session/${id}`)
-        .exec()
+        .delete("/auth/session/{id}", { params: { path: { id } } })
     }, {
       name: `${name}.terminateById`,
       onFulfill: (ctx) => {
@@ -121,8 +119,7 @@ export const sessions = atom(null, "sessions").pipe(
       }
 
       return await client
-        .delete<ExtractApiData<"deleteAuthSessionAll">["data"]>(`auth/session/all`)
-        .exec()
+        .delete(`/auth/session/all`)
     }, {
       name: `${name}.terminateAll`,
       onFulfill: (ctx, res) => {

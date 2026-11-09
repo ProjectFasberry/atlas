@@ -51,7 +51,7 @@ const UsersFiltersLength = reatomComponent(({ ctx }) => {
   return (
     <div className="flex items-center gap-4 w-full text-neutral-400 text-sm">
       <div className="flex text-sm items-center gap-1">
-        Показано:&nbsp;
+        Загружено:&nbsp;
         {ctx.spy(users.fetch.statusesAtom).isPending ? <Skeleton className="h-5 w-5" /> : ctx.spy(usersLengthAtom)}
       </div>
       <div className="flex text-sm items-center gap-1">
@@ -62,12 +62,15 @@ const UsersFiltersLength = reatomComponent(({ ctx }) => {
 }, "UsersFiltersLength")
 
 const UsersFiltersAsc = reatomComponent(({ ctx }) => {
+  const searching = Boolean(ctx.spy(usersState.filters.searchQuery)?.trim())
+
   return (
     <Button
       background="default"
       className="h-8 aspect-square p-0"
       onClick={() => usersState.filters.asc(ctx, (state) => !state)}
-      disabled={ctx.spy(users.fetch.statusesAtom).isPending}
+      disabled={ctx.spy(users.fetch.statusesAtom).isPending || searching}
+      title={searching ? "При поиске результаты упорядочены по релевантности" : undefined}
     >
       {ctx.spy(usersState.filters.asc) ? <Icon name="sprite:arrow-up" className="size-4" /> : <Icon name="sprite:arrow-down" className="size-4" />}
     </Button>
@@ -87,7 +90,7 @@ const UsersFiltersSelect = reatomComponent(({ ctx }) => {
           <Checkbox.Control className={checkboxVariant.control()} />
           <Checkbox.HiddenInput />
         </Checkbox.Root>
-        <label htmlFor="checkbox:users-filter-selectAll:input">Выбрать все</label>
+        <label htmlFor="checkbox:users-filter-selectAll:input">Выбрать загруженных</label>
       </div>
       <UsersGlobalActions />
     </div>
@@ -113,8 +116,17 @@ const SORTS = [
 ] as const
 
 const UsersFiltersSort = reatomComponent(({ ctx }) => {
+  const searching = Boolean(ctx.spy(usersState.filters.searchQuery)?.trim())
   const current = SORTS.find(d => d.value === ctx.spy(usersState.filters.sortBy))
   if (!current) return null;
+
+  if (searching) {
+    return (
+      <Button className="px-4 h-8 w-full text-nowrap truncate min-w-0" background="default" disabled>
+        По релевантности
+      </Button>
+    )
+  }
 
   return (
     <Menu.Root

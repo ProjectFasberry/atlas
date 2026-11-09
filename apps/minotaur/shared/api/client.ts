@@ -1,7 +1,7 @@
 import createClient from "openapi-fetch";
 import type { paths as MainPaths } from "@/shared/types/gen/api/main.schema";
 import type { paths as PanelPaths } from "@/shared/types/gen/api/panel.schema";
-import { env } from "../env";
+import { apiBaseUrl, panelApiBaseUrl } from "../env";
 
 const DEFAULT_TIMEOUT_MS = 5000;
 
@@ -37,23 +37,13 @@ async function apiFetch(input: Request): Promise<Response> {
 }
 
 export const mainClient = createClient<MainPaths>({
-	baseUrl: env.VITE_API_URL,
+	baseUrl: apiBaseUrl,
 	credentials: "include",
 	fetch: apiFetch,
 });
 
 export const panelClient = createClient<PanelPaths>({
-	baseUrl: env.VITE_PANEL_API_URL,
+	baseUrl: panelApiBaseUrl,
 	credentials: "include",
 	fetch: apiFetch,
 });
-
-/** Raw request for the few callers that need response headers or a body they parse themselves. */
-export async function mainFetch(path: string, init: RequestInit = {}) {
-	return apiFetch(
-		new Request(new URL(path, env.VITE_API_URL), {
-			credentials: "include",
-			...init,
-		}),
-	);
-}

@@ -1,7 +1,8 @@
 import { reatomComponent, } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
 import { tv } from "tailwind-variants";
-import { selectedDonateDataAtom, storeItemState } from "@/shared/components/app/shop/models/store-item.model";
+import { storeItemState } from "@/shared/components/app/shop/models/store-item.model";
+import { selectedDonateDataAtom } from "@/shared/components/app/shop/models/store-item-description.model";
 import { ItemPrice, ItemSelectToCart } from "@/shared/components/app/shop/components/items/store-item";
 import { appState } from "@/shared/models/app/index.model";
 import { Skeleton } from "@/shared/ui/skeleton";

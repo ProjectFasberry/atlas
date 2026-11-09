@@ -3,14 +3,13 @@ import { logError } from "@/shared/lib/log";
 import { action, atom, type AtomState, batch, withErrorAtom } from "@reatom/framework";
 import { reatomAsync, reatomRecord, withAssign, withCache, withDataAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { getStoreItems, type StoreItemsParams } from "../../shop/models/store.model";
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { toast } from "sonner";
 import { notifyAboutRestrictRole } from "./actions.model";
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 import * as z from "zod";
 import type { JSONContent } from "@tiptap/react";
 import { navigate } from "vike/client/router";
-import { newsUpdateSchema } from "@/shared/schemas/news";
 import { type StoreItem } from '../../shop/models/store-item.model';
 
 type CreateItemStoreSchema = z.infer<typeof storeItemCreateSchema>
@@ -24,6 +23,7 @@ export const createStoreItemState = atom(null, "createStoreItemState").pipe(
     content: atom<JSONContent>({}, `${name}.content`).pipe(withReset()),
     price: atom<CreateItemStoreSchema["price"]>("0", `${name}.price`).pipe(withReset()),
     command: atom<CreateItemStoreSchema["command"]>("", `${name}.command`).pipe(withReset()),
+    refundCmd: atom<Nullable<CreateItemStoreSchema["refund_cmd"]>>(null, `${name}.refundCmd`).pipe(withReset()),
     type: atom<Nullable<CreateItemStoreSchema["type"]>>(null, `${name}.type`).pipe(withReset())
   }))
 )
@@ -37,6 +37,7 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
       createStoreItemState.content.reset(ctx)
       createStoreItemState.price.reset(ctx)
       createStoreItemState.command.reset(ctx)
+      createStoreItemState.refundCmd.reset(ctx)
       createStoreItemState.type.reset(ctx)
     }),
     submit: reatomAsync(async (ctx) => {
@@ -48,13 +49,14 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
         content: ctx.get(createStoreItemState.content),
         price: ctx.get(createStoreItemState.price),
         command: ctx.get(createStoreItemState.command),
+        refund_cmd: ctx.get(createStoreItemState.refundCmd),
         type: ctx.get(createStoreItemState.type)
       }
 
-      return await client
-        .post<StoreItem>("privated/store/item/create")
-        .pipe(withJsonBody(body))
-        .exec()
+      return await client.raw
+        .post<StoreItem>("/privated/store/item/create", {
+          json: body
+        })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -90,8 +92,7 @@ export const deleteStoreItem = atom(null, "deleteStoreItem").pipe(
     }),
     submit: reatomAsync(async (ctx, id: number) => {
       return await client
-        .delete<{ id: number }>(`privated/store/item/${id}`)
-        .exec()
+        .delete("/privated/store/item/{id}", { params: { path: { id } } })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -109,22 +110,60 @@ export const deleteStoreItem = atom(null, "deleteStoreItem").pipe(
 )
 
 export const itemToEditAtom = atom<StoreItem | null>(null).pipe(withReset())
+
+export const editStoreItemState = atom(null, "editStoreItemState").pipe(
+  withAssign((_, name) => ({
+    title: atom<string>("", `${name}.title`),
+    description: atom<string | null>(null, `${name}.description`),
+    imageUrl: atom<string>("", `${name}.imageUrl`),
+    currency: atom<string>("CHARISM", `${name}.currency`),
+    value: atom<string>("", `${name}.value`),
+    content: atom<JSONContent>({}, `${name}.content`),
+    price: atom<string>("0", `${name}.price`),
+    command: atom<string>("", `${name}.command`),
+    refundCmd: atom<string | null>(null, `${name}.refundCmd`),
+    type: atom<string>("event", `${name}.type`)
+  }))
+)
+
 export const editStoreItem = atom(null, "editStoreItem").pipe(
   withAssign((_, name) => ({
+    load: action((ctx, item: StoreItem) => {
+      editStoreItemState.title(ctx, item.title)
+      editStoreItemState.description(ctx, item.description ?? null)
+      editStoreItemState.imageUrl(ctx, item.imageUrl)
+      editStoreItemState.currency(ctx, item.currency)
+      editStoreItemState.value(ctx, item.value)
+      editStoreItemState.content(ctx, (item.content ?? {}) as JSONContent)
+      editStoreItemState.price(ctx, String(item.price))
+      editStoreItemState.command(ctx, item.command ?? "")
+      editStoreItemState.refundCmd(ctx, item.refund_cmd ?? null)
+      editStoreItemState.type(ctx, item.type)
+    }),
     submit: reatomAsync(async (ctx, id: number) => {
-      const json = {}
+      const body = [
+        { field: "title", value: ctx.get(editStoreItemState.title) },
+        { field: "description", value: ctx.get(editStoreItemState.description) },
+        { field: "imageUrl", value: ctx.get(editStoreItemState.imageUrl) },
+        { field: "type", value: ctx.get(editStoreItemState.type) },
+        { field: "command", value: ctx.get(editStoreItemState.command) },
+        { field: "refund_cmd", value: ctx.get(editStoreItemState.refundCmd) },
+        { field: "value", value: ctx.get(editStoreItemState.value) },
+        { field: "currency", value: ctx.get(editStoreItemState.currency) },
+        { field: "price", value: Number(ctx.get(editStoreItemState.price)) },
+        { field: "content", value: ctx.get(editStoreItemState.content) },
+      ]
 
-      const body = Object.entries(json).map(([field, value]) => ({
-        field,
-        value
-      })) as z.infer<typeof newsUpdateSchema>
-
-      return await client
-        .post(`privated/store/item/edit/${id}`)
-        .pipe(withJsonBody(body))
-        .exec()
+      return await client.raw
+        .post(`/privated/store/item/edit/{id}`, { json: body, params: { path: { id } } })
     }, {
       name: `${name}.submit`,
+      onFulfill: (ctx) => {
+        toast.success("Товар обновлён");
+        storeItems.fetch.cacheAtom.reset(ctx);
+        storeItems.fetch(ctx);
+        ctx.schedule(() => navigate("/private/store"));
+      },
       onReject: (_, e) => logError(e, { type: "combined" })
     }).pipe(
       withStatusesAtom()
@@ -167,25 +206,13 @@ storeState.searchParams.onChange(async (ctx, state) => {
   storeState.searchParamTarget(ctx, target ?? "view");
 
   if (target === 'edit') {
-    const data = ctx.get(storeItems.fetch.dataAtom)?.data;
-    const id = state["id"];
+    const id = Number(state["id"]);
 
-    let item: StoreItem | null = null;
-
-    if (!data) {
-      const requestedData = await storeItems.fetch(ctx);
-      const requestedItem = requestedData.data.find(d => d.id === Number(id))
-
-      if (requestedItem) {
-        item = requestedItem
-      }
-    } else {
-      const currentItem = data.find((d) => d.id === Number(id))
-
-      if (currentItem) {
-        item = currentItem
-      }
-    }
+    // The public store list does not expose command/refund_cmd. The private
+    // GET returns the full item for the edit form.
+    const item = await client.raw
+      .get<StoreItem>("/privated/store/item/{id}", { params: { path: { id } } })
+      .catch(() => null);
 
     if (!item) {
       throw new Error('Товар не найден')

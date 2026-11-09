@@ -8,26 +8,15 @@ export type PlayerActivityPayload =
   | { type: "online"; nickname: string; server: string; issued_date: Date; }
   | { type: "offline"; nickname: string; issued_date: Date | null };
 
-type PlayerLocation = {
-  world: string,
-  x: number,
-  y: number,
-  z: number,
-  pitch: number,
-  yaw: number,
-  customLocation: string | null
-}
-
 export const playerActivity = atom(null, "playerActivity").pipe(
   withAssign((_, name) => ({
     online: atom(null, `${name}.online`).pipe(
       withAssign((_, name) => ({
         fetch: reatomAsync(async (ctx, nickname: string) => {
           return await ctx.schedule(() => client
-            .get<PlayerActivityPayload>(`server/activity/now/${nickname}`, {
+            .raw.get<PlayerActivityPayload>(`/server/activity/now/${nickname}`, {
               retry: 1
             })
-            .exec()
           )
         }, {
           name: `${name}.fetch`,
@@ -44,7 +33,7 @@ export const playerActivity = atom(null, "playerActivity").pipe(
       withAssign((_, name) => ({
         fetch: reatomAsync(async (ctx, nickname: string) => {
           return await ctx.schedule(() =>
-            client<PlayerLocation>(`server/location/${nickname}`, { retry: 1 }).exec()
+            client.get("/server/location/{nickname}", { retry: 1, params: { path: { nickname } } })
           )
         }, {
           name: `${name}.fetch`,

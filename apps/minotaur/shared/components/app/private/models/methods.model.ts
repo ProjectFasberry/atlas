@@ -1,4 +1,4 @@
-import { client, withJsonBody } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { action, atom, reatomAsync, reatomMap, withAssign, withCache, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { notifyAboutRestrictRole } from "./actions.model";
 import { invariant } from "@/shared/lib/utils";
@@ -22,8 +22,7 @@ const methods = atom(null, "methods").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() => client
-        .get<PrivatedMethodsPayload>("privated/store/methods/list", { signal: ctx.controller.signal })
-        .exec()
+        .get("/privated/store/methods/list", { signal: ctx.controller.signal })
       )
     }, {
       name: `${name}.fetch`,
@@ -63,9 +62,9 @@ const methodsControl = atom(null, "methodsControl").pipe(
         });
 
         const result = await client
-          .post<ExtractApiData<"postPrivatedStoreMethodsEditByMethod">["data"]>(`privated/store/methods/edit/${methodValue}`)
-          .pipe(withJsonBody(body))
-          .exec()
+          .raw.post<ExtractApiData<"postPrivatedStoreMethodsEditByMethod">["data"]>(`/privated/store/methods/edit/${methodValue}`, {
+            json: body
+          })
 
         methodsControl.updateMethod(ctx, id, {
           meta: { isLoading: false },

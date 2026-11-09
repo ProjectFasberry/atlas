@@ -5,6 +5,7 @@ import { tv } from "tailwind-variants";
 import { methodsModel, type PrivatedMethodsPayload } from "../models/methods.model";
 import { Switch } from "@/shared/ui/switch";
 import { ErrorBlock } from "@/shared/ui/error-block";
+import { Button } from "@/shared/ui/button";
 
 const { methods, methodsControl, getMethodIsLoading } = methodsModel()
 
@@ -43,8 +44,26 @@ const Method = reatomComponent<PrivatedMethodsPayload[number]>(({
 }) => {
   const isLoading = ctx.spy(getMethodIsLoading(id));
 
+  const toggle = () => {
+    if (isLoading) return;
+    methodsControl.update(ctx, id, "isAvailable", !isAvailable);
+  }
+
   return (
-    <div id={id.toString()} className={methodVariant().base()}>
+    // biome-ignore lint/a11y/useSemanticElements: the row contains the switch control, a nested <button> is invalid
+    <div
+      id={id.toString()}
+      role="button"
+      tabIndex={0}
+      aria-pressed={isAvailable}
+      onClick={toggle}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        toggle();
+      }}
+      className={methodVariant().base() + " cursor-pointer select-none duration-150 hover:border-neutral-700"}
+    >
       <div className={methodVariant().first_parent()}>
         <img
           src={imageUrl}
@@ -56,11 +75,15 @@ const Method = reatomComponent<PrivatedMethodsPayload[number]>(({
           {title}
         </Typography>
       </div>
-      <div className={methodVariant().second_parent()}>
+      <div className={methodVariant().second_parent()} onClick={(event) => event.stopPropagation()}>
+        <span className="text-[11px] font-semibold text-neutral-400">
+          {isAvailable ? "Вкл" : "Выкл"}
+        </span>
         <Switch
           checked={isAvailable}
-          onCheckedChange={({ checked }) => methodsControl.update(ctx, id, "isAvailable", !isAvailable)}
+          onCheckedChange={({ checked }) => methodsControl.update(ctx, id, "isAvailable", checked)}
           isLoading={isLoading}
+          disabled={isLoading}
         />
       </div>
     </div>
@@ -75,7 +98,16 @@ export const Methods = reatomComponent(({ ctx }) => {
   }
 
   const error = ctx.spy(methods.fetch.errorAtom)
-  if (error) return <ErrorBlock title={error.message} />
+  if (error) {
+    return (
+      <div className="flex flex-col items-start gap-2">
+        <ErrorBlock title={error.message} />
+        <Button background="default" className="h-8 text-sm" onClick={() => methods.fetch(ctx)}>
+          Повторить
+        </Button>
+      </div>
+    )
+  }
 
   const data = ctx.spy(methods.fetch.dataAtom);
   if (!data) return null;

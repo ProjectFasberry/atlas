@@ -164,7 +164,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Get a store item for editing */
+        get: operations["getPrivatedStoreItemById"];
         put?: never;
         post?: never;
         /** Delete store item */
@@ -667,56 +668,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/privated/chat/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get chat history */
-        get: operations["getPrivatedChatList"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/privated/chat/subscribe": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/privated/chat/{id}/views": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get chat message views */
-        get: operations["getPrivatedChatByIdViews"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/privated/dictionaries/list": {
         parameters: {
             query?: never;
@@ -819,6 +770,264 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/releases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List launcher releases */
+        get: operations["getPrivatedReleases"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/releases/{channel}/{version}/{platform}/{file}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download a launcher release artifact */
+        get: operations["getPrivatedReleasesByChannelByVersionByPlatformByFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/wallet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a player wallet */
+        get: operations["getPrivatedEconomyWallet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/ledger": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a player ledger */
+        get: operations["getPrivatedEconomyLedger"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adjust a player balance */
+        post: operations["postPrivatedEconomyAdjust"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refund a game order */
+        post: operations["postPrivatedEconomyRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/migrate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Migrate plugin balances into wallets */
+        post: operations["postPrivatedEconomyMigrate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List exchange rates */
+        get: operations["getPrivatedEconomyRates"];
+        put?: never;
+        /** Add an exchange rate */
+        post: operations["postPrivatedEconomyRates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/rates/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview a currency conversion */
+        get: operations["getPrivatedEconomyRatesConvert"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/rates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete an exchange rate */
+        delete: operations["deletePrivatedEconomyRatesById"];
+        options?: never;
+        head?: never;
+        /** Update an exchange rate */
+        patch: operations["patchPrivatedEconomyRatesById"];
+        trace?: never;
+    };
+    "/privated/economy/reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reconcile wallets with plugin balances */
+        get: operations["getPrivatedEconomyReconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List payment orders */
+        get: operations["getPrivatedEconomyOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/economy/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Economy faucet, sink and payments report */
+        get: operations["getPrivatedEconomyReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/servers/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List servers with their descriptions */
+        get: operations["getPrivatedServers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/servers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a server with its description */
+        get: operations["getPrivatedServersById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a server: availability, runtime and presentation */
+        patch: operations["patchPrivatedServersById"];
+        trace?: never;
+    };
     "/privated/api/keys/create": {
         parameters: {
             query?: never;
@@ -828,7 +1037,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create an API key [withExternal] */
+        /** Create an API key */
         post: operations["postPrivatedApiKeysCreate"];
         delete?: never;
         options?: never;
@@ -843,7 +1052,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List all API keys [withExternal] */
+        /** List all API keys */
         get: operations["getPrivatedApiKeysList"];
         put?: never;
         post?: never;
@@ -863,7 +1072,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Delete an API key [withExternal] */
+        /** Delete an API key */
         delete: operations["deletePrivatedApiKeysById"];
         options?: never;
         head?: never;
@@ -1470,23 +1679,6 @@ export interface paths {
         };
         /** Download the latest launcher build for a platform */
         get: operations["getReleasesDownloadByPlatform"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/releases/{channel}/latest": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Latest launcher release */
-        get: operations["getReleasesByChannelLatest"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2123,6 +2315,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/server/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get server runtime catalog */
+        get: operations["getServerCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/server/status": {
         parameters: {
             query?: never;
@@ -2561,22 +2770,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/store/hooks/process-order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postStoreHooksProcess-order"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/store/item/{id}": {
         parameters: {
             query?: never;
@@ -2696,118 +2889,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/store/order/external/create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postStoreOrderExternalCreate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/store/order/external/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getStoreOrderExternalList"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/store/order/external/methods/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getStoreOrderExternalMethodsList"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/store/order/external/currencies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getStoreOrderExternalCurrencies"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/store/order/external/exchange-rates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getStoreOrderExternalExchange-rates"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/store/order/external/{uniqueId}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getStoreOrderExternalByUniqueId"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/store/order/external/{uniqueId}/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getStoreOrderExternalByUniqueIdEvents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/store/order/internal/create": {
         parameters: {
             query?: never;
@@ -2831,9 +2912,160 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List game orders */
         get: operations["getStoreOrderInternalList"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/store/order/internal/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a game order */
+        get: operations["getStoreOrderInternalById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List payment providers */
+        get: operations["getPaymentsProviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/invoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a payment invoice */
+        post: operations["postPaymentsInvoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List my payment orders */
+        get: operations["getPaymentsOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/orders/{orderId}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refund a payment */
+        post: operations["postPaymentsOrdersByOrderIdRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/fake/{orderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPaymentsFakeByOrderId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/fake/{orderId}/pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postPaymentsFakeByOrderIdPay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/fake/{orderId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postPaymentsFakeByOrderIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payments/webhook/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Payment provider webhook */
+        post: operations["postPaymentsWebhookByProvider"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3159,6 +3391,18 @@ export interface operations {
         requestBody?: never;
         responses: never;
     };
+    getPrivatedStoreItemById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
     deletePrivatedStoreItemById: {
         parameters: {
             query?: never;
@@ -3347,6 +3591,17 @@ export interface operations {
                                 endCursor?: string;
                             };
                         };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
@@ -4306,64 +4561,27 @@ export interface operations {
     };
     getPrivatedHistoryList: {
         parameters: {
-            query?: never;
+            query?: {
+                limit?: number;
+                endCursor?: string;
+                initiator?: string;
+                event?: string;
+                severity?: "info" | "warning" | "danger";
+                from?: string;
+                to?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            id: number;
-                            /** Format: date-time */
-                            created_at: string;
-                            event: string;
-                            initiator: string;
-                        }[];
-                    };
-                };
-            };
-        };
+        responses: never;
     };
     getPrivatedHistoryEvents: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: never;
-    };
-    getPrivatedChatList: {
-        parameters: {
-            query?: {
-                asc?: boolean | string;
-                endCursor?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: never;
-    };
-    getPrivatedChatByIdViews: {
-        parameters: {
-            query?: {
-                endCursor?: string;
-            };
-            header?: never;
-            path: {
-                id: number;
-            };
             cookie?: never;
         };
         requestBody?: never;
@@ -4684,6 +4902,622 @@ export interface operations {
             };
         };
     };
+    getPrivatedReleases: {
+        parameters: {
+            query?: {
+                channel?: "prod" | "dev";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            channel: string;
+                            version: string;
+                            pub_date: (string | null) | null;
+                            notes: string;
+                            latest: boolean;
+                            platforms: {
+                                platform: string;
+                                files: {
+                                    name: string;
+                                    size: number;
+                                    checksum: (string | null) | null;
+                                }[];
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedReleasesByChannelByVersionByPlatformByFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                channel: string;
+                version: string;
+                platform: string;
+                file: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getPrivatedEconomyWallet: {
+        parameters: {
+            query: {
+                nickname: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getPrivatedEconomyLedger: {
+        parameters: {
+            query: {
+                nickname: string;
+                limit?: string;
+                endCursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postPrivatedEconomyAdjust: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    nickname: string;
+                    /**
+                     * @default BELKOIN
+                     * @enum {string}
+                     */
+                    currency: "BELKOIN" | "CHARISM";
+                    /**
+                     * @default credit
+                     * @enum {string}
+                     */
+                    operation: "credit" | "debit";
+                    amount: string | number;
+                    reason: string;
+                    idempotencyKey: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    nickname: string;
+                    /**
+                     * @default BELKOIN
+                     * @enum {string}
+                     */
+                    currency: "BELKOIN" | "CHARISM";
+                    /**
+                     * @default credit
+                     * @enum {string}
+                     */
+                    operation: "credit" | "debit";
+                    amount: string | number;
+                    reason: string;
+                    idempotencyKey: string;
+                };
+                "multipart/form-data": {
+                    nickname: string;
+                    /**
+                     * @default BELKOIN
+                     * @enum {string}
+                     */
+                    currency: "BELKOIN" | "CHARISM";
+                    /**
+                     * @default credit
+                     * @enum {string}
+                     */
+                    operation: "credit" | "debit";
+                    amount: string | number;
+                    reason: string;
+                    idempotencyKey: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    postPrivatedEconomyRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    orderId: string;
+                    reason: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    orderId: string;
+                    reason: string;
+                };
+                "multipart/form-data": {
+                    orderId: string;
+                    reason: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    postPrivatedEconomyMigrate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    cursor?: string;
+                    limit?: string | number;
+                };
+                "application/x-www-form-urlencoded": {
+                    cursor?: string;
+                    limit?: string | number;
+                };
+                "multipart/form-data": {
+                    cursor?: string;
+                    limit?: string | number;
+                };
+            };
+        };
+        responses: never;
+    };
+    getPrivatedEconomyRates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postPrivatedEconomyRates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    rate: number;
+                    spread?: number;
+                    effectiveFrom?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    rate: number;
+                    spread?: number;
+                    effectiveFrom?: string;
+                };
+                "multipart/form-data": {
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    rate: number;
+                    spread?: number;
+                    effectiveFrom?: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    getPrivatedEconomyRatesConvert: {
+        parameters: {
+            query: {
+                amount: string;
+                from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    deletePrivatedEconomyRatesById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    patchPrivatedEconomyRatesById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    from?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    to?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    rate?: number;
+                    spread?: number;
+                    effectiveFrom?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    from?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    to?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    rate?: number;
+                    spread?: number;
+                    effectiveFrom?: string;
+                };
+                "multipart/form-data": {
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    from?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    to?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    rate?: number;
+                    spread?: number;
+                    effectiveFrom?: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    getPrivatedEconomyReconciliation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getPrivatedEconomyOrders: {
+        parameters: {
+            query?: {
+                status?: string;
+                nickname?: string;
+                provider?: string;
+                sort?: "date" | "amount";
+                order?: "asc" | "desc";
+                limit?: string;
+                endCursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getPrivatedEconomyReport: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    getPrivatedServers: {
+        parameters: {
+            query?: {
+                available?: boolean;
+                excluded?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            fullname: string;
+                            description: (string | null) | null;
+                            thumbnail: string;
+                            origin: string;
+                            available: boolean;
+                            excluded: boolean;
+                            is_default: boolean;
+                            client_version: string;
+                            client_mod: string;
+                            java_major: number;
+                            loader: string;
+                            loader_version: (string | null) | null;
+                            resource_pack: (string | null) | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedServersById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            fullname: string;
+                            description: (string | null) | null;
+                            thumbnail: string;
+                            origin: string;
+                            available: boolean;
+                            excluded: boolean;
+                            is_default: boolean;
+                            client_version: string;
+                            client_mod: string;
+                            java_major: number;
+                            loader: string;
+                            loader_version: (string | null) | null;
+                            resource_pack: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    patchPrivatedServersById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    fullname?: string;
+                    description?: (string | null) | null;
+                    thumbnail?: string;
+                    available?: boolean;
+                    excluded?: boolean;
+                    is_default?: boolean;
+                    client_version?: string;
+                    /**
+                     * @default fabric
+                     * @enum {string}
+                     */
+                    loader?: "fabric" | "quilt" | "neoforge" | "forge" | "vanilla";
+                    loader_version?: (string | null) | null;
+                    java_major?: string | number;
+                    resource_pack?: (string | null) | null;
+                    /**
+                     * @default required
+                     * @enum {string}
+                     */
+                    client_mod?: "required" | "optional";
+                };
+                "application/x-www-form-urlencoded": {
+                    fullname?: string;
+                    description?: (string | null) | null;
+                    thumbnail?: string;
+                    available?: boolean;
+                    excluded?: boolean;
+                    is_default?: boolean;
+                    client_version?: string;
+                    /**
+                     * @default fabric
+                     * @enum {string}
+                     */
+                    loader?: "fabric" | "quilt" | "neoforge" | "forge" | "vanilla";
+                    loader_version?: (string | null) | null;
+                    java_major?: string | number;
+                    resource_pack?: (string | null) | null;
+                    /**
+                     * @default required
+                     * @enum {string}
+                     */
+                    client_mod?: "required" | "optional";
+                };
+                "multipart/form-data": {
+                    fullname?: string;
+                    description?: (string | null) | null;
+                    thumbnail?: string;
+                    available?: boolean;
+                    excluded?: boolean;
+                    is_default?: boolean;
+                    client_version?: string;
+                    /**
+                     * @default fabric
+                     * @enum {string}
+                     */
+                    loader?: "fabric" | "quilt" | "neoforge" | "forge" | "vanilla";
+                    loader_version?: (string | null) | null;
+                    java_major?: string | number;
+                    resource_pack?: (string | null) | null;
+                    /**
+                     * @default required
+                     * @enum {string}
+                     */
+                    client_mod?: "required" | "optional";
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            fullname: string;
+                            description: (string | null) | null;
+                            thumbnail: string;
+                            origin: string;
+                            available: boolean;
+                            excluded: boolean;
+                            is_default: boolean;
+                            client_version: string;
+                            client_mod: string;
+                            java_major: number;
+                            loader: string;
+                            loader_version: (string | null) | null;
+                            resource_pack: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     postPrivatedApiKeysCreate: {
         parameters: {
             query?: never;
@@ -4694,15 +5528,15 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    duration?: number;
+                    duration?: string | number;
                     description?: string;
                 };
                 "application/x-www-form-urlencoded": {
-                    duration?: number;
+                    duration?: string | number;
                     description?: string;
                 };
                 "multipart/form-data": {
-                    duration?: number;
+                    duration?: string | number;
                     description?: string;
                 };
             };
@@ -4718,7 +5552,7 @@ export interface operations {
                         data: {
                             id: number;
                             description: (string | null) | null;
-                            duration: number;
+                            duration: (number | null) | null;
                             /** Format: date-time */
                             created_at: string;
                             rawKey: string;
@@ -4759,7 +5593,7 @@ export interface operations {
                         data: {
                             id: number;
                             description: (string | null) | null;
-                            duration: number;
+                            duration: (number | null) | null;
                             /** Format: date-time */
                             created_at: string;
                         }[];
@@ -5395,6 +6229,17 @@ export interface operations {
                     };
                 };
             };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
             /** @description Response for status 429 */
             429: {
                 headers: {
@@ -5965,18 +6810,6 @@ export interface operations {
             header?: never;
             path: {
                 platform: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: never;
-    };
-    getReleasesByChannelLatest: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                channel: string;
             };
             cookie?: never;
         };
@@ -6917,6 +7750,7 @@ export interface operations {
                             ip: string;
                             /** Format: date-time */
                             created_at: string;
+                            id: string;
                             browser: {
                                 name: string;
                                 version: string;
@@ -6955,6 +7789,7 @@ export interface operations {
                             ip: string;
                             /** Format: date-time */
                             created_at: string;
+                            id: string;
                             browser: {
                                 name: string;
                                 version: string;
@@ -7004,7 +7839,7 @@ export interface operations {
                          * @default INSUFFICIENT_PERMISSION_BY_TIME
                          * @enum {string}
                          */
-                        error: "INSUFFICIENT_PERMISSION_BY_TIME" | "INSUFFICIENT_PERMISSION_BY_EXISTANCE";
+                        error: "INSUFFICIENT_PERMISSION_BY_TIME" | "INSUFFICIENT_PERMISSION_BY_EXISTANCE" | "CANNOT_DELETE_CURRENT";
                     };
                 };
             };
@@ -7055,7 +7890,7 @@ export interface operations {
                          * @default INSUFFICIENT_PERMISSION_BY_TIME
                          * @enum {string}
                          */
-                        error: "INSUFFICIENT_PERMISSION_BY_TIME" | "INSUFFICIENT_PERMISSION_BY_EXISTANCE";
+                        error: "INSUFFICIENT_PERMISSION_BY_TIME" | "INSUFFICIENT_PERMISSION_BY_EXISTANCE" | "CANNOT_DELETE_CURRENT";
                     };
                 };
             };
@@ -7439,6 +8274,48 @@ export interface operations {
             };
         };
     };
+    getServerCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            default: (string | null) | null;
+                            servers: {
+                                [key: string]: {
+                                    id: string;
+                                    fullname: string;
+                                    available: boolean;
+                                    excluded: boolean;
+                                    runtime: {
+                                        minecraft: string;
+                                        loader: string;
+                                        loaderVersion: (string | null) | null;
+                                        javaMajor: number;
+                                    };
+                                    content: {
+                                        pack: (string | null) | null;
+                                    };
+                                    clientMod: "required" | "optional";
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
     getServerStatus: {
         parameters: {
             query?: {
@@ -7474,6 +8351,17 @@ export interface operations {
                                     status: string;
                                     available: boolean;
                                     description?: (string | null) | null;
+                                    runtime: {
+                                        minecraft: string;
+                                        loader: string;
+                                        loaderVersion: (string | null) | null;
+                                        javaMajor: number;
+                                    };
+                                    content: {
+                                        pack: (string | null) | null;
+                                    };
+                                    default: boolean;
+                                    clientMod: "required" | "optional";
                                 };
                             };
                         } | null) | null;
@@ -8048,6 +8936,9 @@ export interface operations {
                         data: {
                             CHARISM: number;
                             BELKOIN: number;
+                            server: string;
+                            available: boolean;
+                            purchasable: boolean;
                         };
                     };
                 };
@@ -8237,16 +9128,6 @@ export interface operations {
             };
         };
     };
-    "postStoreHooksProcess-order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: never;
-    };
     getStoreItemById: {
         parameters: {
             query?: never;
@@ -8271,7 +9152,6 @@ export interface operations {
                             description: (string | null) | null;
                             imageUrl: string;
                             type: string;
-                            command: (string | null) | null;
                             value: string;
                             currency: string;
                             price: number;
@@ -8310,7 +9190,6 @@ export interface operations {
                                 description: (string | null) | null;
                                 imageUrl: string;
                                 type: string;
-                                command: (string | null) | null;
                                 value: string;
                                 currency: string;
                                 price: number;
@@ -8330,7 +9209,9 @@ export interface operations {
     };
     getStoreCartList: {
         parameters: {
-            query?: never;
+            query?: {
+                server?: "bisquite" | "muffin";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -8351,12 +9232,13 @@ export interface operations {
                                 description: (string | null) | null;
                                 imageUrl: string;
                                 price: number;
+                                priceSnapshot: number;
+                                priceChanged: boolean;
                                 recipient: string;
                                 selected: boolean;
                                 quantity: number;
                                 value: string;
                                 type: string;
-                                command: (string | null) | null;
                                 currency: string;
                             }[];
                             meta: {
@@ -8364,6 +9246,9 @@ export interface operations {
                                 hasPrevPage: boolean;
                                 startCursor?: string;
                                 endCursor?: string;
+                                server: string;
+                                available: boolean;
+                                purchasable: boolean;
                             };
                         };
                     };
@@ -8373,7 +9258,9 @@ export interface operations {
     };
     getStoreCartPrice: {
         parameters: {
-            query?: never;
+            query?: {
+                server?: "bisquite" | "muffin";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -8390,6 +9277,9 @@ export interface operations {
                         data: {
                             CHARISM: number;
                             BELKOIN: number;
+                            server: string;
+                            available: boolean;
+                            purchasable: boolean;
                         };
                     };
                 };
@@ -8537,264 +9427,6 @@ export interface operations {
             };
         };
     };
-    postStoreOrderExternalCreate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            url: string;
-                            orderId: string;
-                            invoiceId: number;
-                            totalPrice: number;
-                            uniqueId: string;
-                        };
-                    };
-                };
-            };
-            /** @description Response for status 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default INCORRECT_PAYMENT_METHOD
-                         * @enum {string}
-                         */
-                        error: "INCORRECT_PAYMENT_METHOD";
-                    };
-                };
-            };
-            /** @description Response for status 500 */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default INTERNAL_ERROR
-                         * @enum {string}
-                         */
-                        error: "INTERNAL_ERROR";
-                    };
-                };
-            };
-        };
-    };
-    getStoreOrderExternalList: {
-        parameters: {
-            query: {
-                status: "pending" | "succeeded" | "all";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            unique_id: string;
-                            /**
-                             * @default USDT
-                             * @enum {string}
-                             */
-                            asset: "USDT" | "TON" | "BTC" | "ETH" | "LTC" | "BNB" | "TRX" | "USDC";
-                            price: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /**
-                             * @default canceled
-                             * @enum {string}
-                             */
-                            status: "canceled" | "pending" | "succeeded" | "waitingForCapture";
-                            payload: string;
-                            order_id: string;
-                            invoice_id: number;
-                            pay_url: string;
-                            initiator: string;
-                            comment: (string | null) | null;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    getStoreOrderExternalMethodsList: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            id: number;
-                            description: (string | null) | null;
-                            imageUrl: string;
-                            title: string;
-                            value: string;
-                            currencies: string[];
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    getStoreOrderExternalCurrencies: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            id: number;
-                            imageUrl: string;
-                            isAvailable: boolean;
-                            title: string;
-                            value: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "getStoreOrderExternalExchange-rates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            [key: string]: {
-                                [key: string]: number;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Response for status 500 */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default EXCHANGES_NOT_FOUND
-                         * @enum {string}
-                         */
-                        error: "EXCHANGES_NOT_FOUND" | "STRUCTURE_INCORRECT";
-                    };
-                };
-            };
-        };
-    };
-    getStoreOrderExternalByUniqueId: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                uniqueId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: ({
-                            unique_id: string;
-                            /**
-                             * @default USDT
-                             * @enum {string}
-                             */
-                            asset: "USDT" | "TON" | "BTC" | "ETH" | "LTC" | "BNB" | "TRX" | "USDC";
-                            price: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /**
-                             * @default canceled
-                             * @enum {string}
-                             */
-                            status: "canceled" | "pending" | "succeeded" | "waitingForCapture";
-                            payload: string;
-                            order_id: string;
-                            invoice_id: number;
-                            pay_url: string;
-                            initiator: string;
-                            comment: (string | null) | null;
-                        } | null) | null;
-                    };
-                };
-            };
-        };
-    };
-    getStoreOrderExternalByUniqueIdEvents: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: never;
-    };
     postStoreOrderInternalCreate: {
         parameters: {
             query?: never;
@@ -8802,7 +9434,34 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default bisquite
+                     * @enum {string}
+                     */
+                    server?: "bisquite" | "muffin";
+                    idempotencyKey?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default bisquite
+                     * @enum {string}
+                     */
+                    server?: "bisquite" | "muffin";
+                    idempotencyKey?: string;
+                };
+                "multipart/form-data": {
+                    /**
+                     * @default bisquite
+                     * @enum {string}
+                     */
+                    server?: "bisquite" | "muffin";
+                    idempotencyKey?: string;
+                };
+            };
+        };
         responses: {
             /** @description Response for status 400 */
             400: {
@@ -8812,6 +9471,16 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                        skipped?: {
+                            id: number;
+                            title: string;
+                            recipient: string;
+                            /**
+                             * @default PERMISSION_ALREADY_PRESENT
+                             * @enum {string}
+                             */
+                            reason: "PERMISSION_ALREADY_PRESENT";
+                        }[];
                     };
                 };
             };
@@ -8830,7 +9499,13 @@ export interface operations {
     };
     getStoreOrderInternalList: {
         parameters: {
-            query?: never;
+            query?: {
+                sort?: "date" | "amount";
+                order?: "asc" | "desc";
+                status?: "pending" | "succeeded" | "refunded";
+                limit?: string;
+                endCursor?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -8844,19 +9519,240 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: ({
-                            /** Format: date-time */
-                            created_at: string;
-                            initiator: string;
-                            unique_id: string;
-                            finished_at: (string | null) | null;
-                            /** @constant */
-                            status: "succeeded";
-                        }[] | null) | null;
+                        data: {
+                            data: {
+                                unique_id: string;
+                                initiator: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                finished_at: (string | null) | null;
+                                /**
+                                 * @default pending
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "succeeded" | "refunded";
+                                price: unknown;
+                                items_count: number;
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                endCursor?: string;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
         };
+    };
+    getStoreOrderInternalById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            initiator: string;
+                            unique_id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            finished_at: (string | null) | null;
+                            /**
+                             * @default pending
+                             * @enum {string}
+                             */
+                            status: "pending" | "succeeded" | "refunded";
+                            price: unknown;
+                            items: {
+                                id: number;
+                                store_item_id: number;
+                                name: string;
+                                recipient: string;
+                                delivery_status?: string;
+                                revoked_at?: (string | null) | null;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    getPaymentsProviders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postPaymentsInvoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default fake
+                     * @enum {string}
+                     */
+                    provider: "fake" | "sbp" | "heleket";
+                    amountMinor: string | number;
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    currency: "RUB" | "USDT" | "USDC";
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default fake
+                     * @enum {string}
+                     */
+                    provider: "fake" | "sbp" | "heleket";
+                    amountMinor: string | number;
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    currency: "RUB" | "USDT" | "USDC";
+                };
+                "multipart/form-data": {
+                    /**
+                     * @default fake
+                     * @enum {string}
+                     */
+                    provider: "fake" | "sbp" | "heleket";
+                    amountMinor: string | number;
+                    /**
+                     * @default RUB
+                     * @enum {string}
+                     */
+                    currency: "RUB" | "USDT" | "USDC";
+                };
+            };
+        };
+        responses: never;
+    };
+    getPaymentsOrders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postPaymentsOrdersByOrderIdRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    reason: string;
+                };
+                "multipart/form-data": {
+                    reason: string;
+                };
+            };
+        };
+        responses: never;
+    };
+    getPaymentsFakeByOrderId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postPaymentsFakeByOrderIdPay: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postPaymentsFakeByOrderIdCancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    postPaymentsWebhookByProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
     };
     getRateListByNickname: {
         parameters: {

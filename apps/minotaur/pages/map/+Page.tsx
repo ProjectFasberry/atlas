@@ -1,42 +1,15 @@
-import { client } from "@/shared/lib/client-wrapper"
 import { createPageModel } from "@/shared/lib/events"
+import { availableServers, type AvailableServer } from "@/shared/components/app/map/models/map.model"
 import { getStaticImage } from "@/shared/lib/helpers"
 import { translate } from "@/shared/locales/helpers"
 import { PageHeaderImage } from "@/shared/ui/header-image"
-import {
-  atom, reatomAsync,
-  withAbort, withAssign, withCache, withDataAtom, withErrorAtom, withStatusesAtom
-} from "@reatom/framework"
 import { reatomComponent, useAtom } from "@reatom/npm-react"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { Typography } from "@/shared/ui/typography"
 import { Icon } from "@/shared/ui/icon"
-import { logError } from "@/shared/lib/log"
 import { ErrorBlock } from "@/shared/ui/error-block"
 
 const mapImage = getStaticImage("arts/6.jpg")
-
-type AvailableServersPayload = ExtractApiData<"getServers-with-map">["data"]
-type AvailableServer = AvailableServersPayload[number];
-
-const availableServers = atom(null, "availableServers").pipe(
-  withAssign((_, name) => ({
-    fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() =>
-        client<AvailableServersPayload>("servers-with-map", { signal: ctx.controller.signal }).exec()
-      )
-    }, {
-      name: `${name}.fetch`,
-      onReject: (_, e) => logError(e)
-    }).pipe(
-      withDataAtom(null),
-      withCache({ swr: false }),
-      withStatusesAtom(),
-      withAbort(),
-      withErrorAtom()
-    )
-  }))
-)
 
 const serversListClassname = "grid grid-cols-1 sm:grid-cols-2 auto-rows-auto gap-2 w-full"
 const serversListItemClassname = `

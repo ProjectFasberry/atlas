@@ -1,6 +1,6 @@
 import { newsSection } from "./news"
 import { actionsState, type ActionParent, type ActionType } from "../models/actions.model"
-import type { ReactNode } from "react"
+import { type ReactNode } from "react"
 import { bannersSection } from "./banners"
 import { dictionariesSection } from "./dictionaries"
 import { eventsSection } from "./events"
@@ -11,8 +11,11 @@ import { Methods } from "./methods"
 import { Options } from "./options"
 import { atom } from "@reatom/framework"
 import { modpackSection } from "./modpack"
+import { configSectionsOpen, toggleConfigSection } from "../models/config.model"
 import { landsSection } from "./lands"
 import { apiKeysSection } from "./api"
+import { Icon } from "@/shared/ui/icon"
+import { Typography } from "@/shared/ui/typography"
 
 type ComponentType = Nullable<() => ReactNode>;
 
@@ -70,65 +73,158 @@ const ActionsHeaderSlot = reatomComponent<{ parent: ActionParent }>(({ ctx, pare
   return <Component />
 }, "ActionsHeaderSlot")
 
+type ConfigSectionProps = {
+  id: string
+  title: string
+  action?: ReactNode
+  children: ReactNode
+}
+
+/**
+ * One dashboard section. The page grew into a ten-screen scroll; a sticky
+ * section menu plus collapsible blocks keeps the common settings one click
+ * away without splitting the state across routes.
+ *
+ * Children stay mounted when collapsed: an open editor or a half-edited role
+ * must not lose its state when the section is folded away.
+ */
+const ConfigSection = reatomComponent<ConfigSectionProps>(({ ctx, id, title, action, children }) => {
+  const open = ctx.spy(configSectionsOpen)[id] ?? true
+
+  return (
+    <SectionWrapper id={id} className="flex flex-col gap-2 w-full scroll-mt-24">
+      <div className="flex items-center justify-between gap-2 w-full">
+        <button
+          type="button"
+          onClick={() => toggleConfigSection(ctx, id)}
+          className="flex items-center gap-2 text-left"
+          aria-expanded={open}
+        >
+          <Icon
+            name="sprite:chevron-down"
+            className={`size-4 text-neutral-400 duration-150 ${open ? "rotate-0" : "-rotate-90"}`}
+          />
+          <Typography className="text-base font-semibold">{title}</Typography>
+        </button>
+        {action}
+      </div>
+      <div className={open ? "flex flex-col gap-2 w-full" : "hidden"}>
+        {children}
+      </div>
+    </SectionWrapper>
+  )
+}, "ConfigSection")
+
+const SECTIONS: { id: string, title: string }[] = [
+  { id: "config-general", title: "Основное" },
+  { id: "config-roles", title: "Роли" },
+  { id: "config-events", title: "Ивенты" },
+  { id: "config-modpacks", title: "Модпаки" },
+  { id: "config-banners", title: "Баннеры" },
+  { id: "config-news", title: "Новости" },
+  { id: "config-dictionaries", title: "Справочник" },
+  { id: "config-api", title: "API Ключи" },
+  { id: "config-lands", title: "Регионы" },
+]
+
+const ConfigNav = () => {
+  const jump = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  return (
+    <nav className="sticky top-14 lg:top-2 z-20 flex items-center gap-1 overflow-x-auto rounded-xl bg-neutral-900 p-2 scrollbar-h-1">
+      {SECTIONS.map((section) => (
+        <button
+          key={section.id}
+          type="button"
+          onClick={() => jump(section.id)}
+          className="shrink-0 rounded-lg px-3 py-1 text-sm font-semibold text-neutral-300 duration-150 hover:bg-neutral-800 hover:text-neutral-50"
+        >
+          {section.title}
+        </button>
+      ))}
+    </nav>
+  )
+}
+
 export const Config = () => {
   return (
     <div className="flex flex-col gap-4 w-full h-full">
-      <SectionWrapper className="flex flex-col sm:flex-row gap-2 sm:items-stretch h-full w-full">
-        <div className="flex flex-col gap-1 w-full">
-          <WithHeader title="Глобальные параметры" />
-          <Options />
+      <ConfigNav />
+
+      <ConfigSection id="config-general" title="Основное">
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-stretch w-full">
+          <div className="flex flex-col gap-1 w-full">
+            <WithHeader title="Глобальные параметры" />
+            <Options />
+          </div>
+          <div className="flex flex-col gap-1 w-full">
+            <WithHeader title="Платежные методы" />
+            <Methods />
+          </div>
         </div>
-        <div className="flex flex-col gap-1 w-full">
-          <WithHeader title="Платежные методы" />
-          <Methods />
-        </div>
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-1 w-full h-full">
-        <WithHeader title="Роли" />
+      </ConfigSection>
+
+      <ConfigSection id="config-roles" title="Роли">
         <Roles />
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-1 w-full h-fulll">
-        <WithHeader title="Ивенты">
-          <ActionsHeaderSlot parent="event" />
-        </WithHeader>
+      </ConfigSection>
+
+      <ConfigSection
+        id="config-events"
+        title="Ивенты"
+        action={<ActionsHeaderSlot parent="event" />}
+      >
         <eventsSection.Wrapper />
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-2 w-full h-full">
-        <WithHeader title="Модпаки">
-          <ActionsHeaderSlot parent="modpack" />
-        </WithHeader>
+      </ConfigSection>
+
+      <ConfigSection
+        id="config-modpacks"
+        title="Модпаки"
+        action={<ActionsHeaderSlot parent="modpack" />}
+      >
         <modpackSection.Wrapper />
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-2 w-full h-full">
-        <WithHeader title="Баннеры">
-          <ActionsHeaderSlot parent="banner" />
-        </WithHeader>
+      </ConfigSection>
+
+      <ConfigSection
+        id="config-banners"
+        title="Баннеры"
+        action={<ActionsHeaderSlot parent="banner" />}
+      >
         <bannersSection.Wrapper />
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-2 w-full h-full">
-        <WithHeader title="Новости" >
-          <ActionsHeaderSlot parent="news" />
-        </WithHeader>
+      </ConfigSection>
+
+      <ConfigSection
+        id="config-news"
+        title="Новости"
+        action={<ActionsHeaderSlot parent="news" />}
+      >
         <newsSection.Wrapper />
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-2 w-full h-full">
-        <WithHeader title="Справочник">
-          <ActionsHeaderSlot parent="dictionaries" />
-        </WithHeader>
+      </ConfigSection>
+
+      <ConfigSection
+        id="config-dictionaries"
+        title="Справочник"
+        action={<ActionsHeaderSlot parent="dictionaries" />}
+      >
         <dictionariesSection.Wrapper />
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-2 w-full h-full">
-        <WithHeader title="API Ключи">
-          <ActionsHeaderSlot parent="api" />
-        </WithHeader>
+      </ConfigSection>
+
+      <ConfigSection
+        id="config-api"
+        title="API Ключи"
+        action={<ActionsHeaderSlot parent="api" />}
+      >
         <apiKeysSection.Wrapper />
-      </SectionWrapper>
-      <SectionWrapper className="flex flex-col gap-2 w-full h-full">
-        <WithHeader title="Регионы">
-          <ActionsHeaderSlot parent="lands" />
-        </WithHeader>
+      </ConfigSection>
+
+      <ConfigSection
+        id="config-lands"
+        title="Регионы"
+        action={<ActionsHeaderSlot parent="lands" />}
+      >
         <landsSection.Wrapper />
-      </SectionWrapper>
+      </ConfigSection>
     </div>
   )
 }

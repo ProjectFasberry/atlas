@@ -28,7 +28,7 @@ async function init(ctx: Ctx, pageCtx: PageContextServer) {
   const headers = pageCtx.headers ?? undefined;
   const id = pageCtx.routeParams.id
 
-  const news = await client<News>(`news/${id}`, { headers }).exec().catch(e => {
+  const news = await client.get("/news/{id}", { headers, params: { path: { id: Number(id) } } }).catch(e => {
     console.error("News error", e)
     return null;
   })

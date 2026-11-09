@@ -1,7 +1,6 @@
 import { action, atom } from "@reatom/framework";
 import { withAssign, withReset } from "@reatom/framework";
-import { mainFetch } from "../../api/client";
-import { parseWrappedJson } from '../../lib/client-wrapper';
+import { client } from "../../lib/client-wrapper";
 import { withSsr } from "../ssr";
 import { invariant } from "@/shared/lib/utils";
 import type { PageContextServer } from 'vike/types';
@@ -11,7 +10,11 @@ import { isError } from "@/shared/lib/utils";
 export type MePayload = ExtractApiData<"getMe">['data'];
 
 export const CURRENT_USER_KEY = 'currentUser' as const
-export const CONFIG_PANEL_READ_PERMISSION = "config.panel.read"
+export {
+  CONFIG_PANEL_READ_PERMISSION,
+  ECONOMY_READ_PERMISSION,
+  RELEASES_READ_PERMISSION,
+} from "@/shared/consts/permissions"
 
 export const currentUserState = atom<MePayload | null>(null, "currentUser").pipe(
   withAssign((target, name) => ({
@@ -56,14 +59,10 @@ export const currentUser = atom(null, "currentUser").pipe(
 )
 
 export async function getMe(init: RequestInit) {
-  const headers = new Headers(init.headers);
-
-  const res = await mainFetch("me", {
-    ...init,
-    headers,
+  return client.get("/me", {
+    headers: init.headers,
+    signal: init.signal,
   })
-
-  return parseWrappedJson<MePayload>(res)
 }
 
 export const CURRENT_USER_CALLBACK_MAP: Record<"BANNED", (pageCtx: PageContextServer) => void> = {

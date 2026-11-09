@@ -1,5 +1,5 @@
 import { DEFAULT_SOFT_DELAY } from "@/shared/consts/index";
-import { client, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { isEmptyArray } from "@/shared/lib/utils";
 import { reatomAsync, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { action, atom, sleep, withAssign, withConcurrency } from "@reatom/framework";
@@ -35,15 +35,11 @@ export const tasks = atom(null, "tasks").pipe(
         searchQuery: ctx.get(tasksState.filters.searchQuery)
       }
 
-      return await ctx.schedule(() =>
-        client
-          .get<TasksPayload>("server/task/list", {
-            signal: ctx.controller.signal
-          })
-          .pipe(
-            withQueryParams(params)
-          )
-          .exec()
+      return await ctx.schedule(() => client.raw
+        .get<TasksPayload>("/server/task/list", {
+          signal: ctx.controller.signal,
+          params: { query: params }
+        })
       )
     }, `${name}.fetch`).pipe(
       withDataAtom(null, (_, data) => isEmptyArray(data.data) ? null : data),

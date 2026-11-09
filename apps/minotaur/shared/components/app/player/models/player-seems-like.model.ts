@@ -47,12 +47,11 @@ export const playerSLP = atom(null, "playerSLP").pipe(
     fetch: reatomAsync(async (ctx, nickname: string) => {
       playerSLP.fetch.dataAtom.reset(ctx);
 
-      const result = await client
-        .get<SeemsLikePlayersPayload>(`server/seems-like/${nickname}`, {
+      const result = await client.raw
+        .get<SeemsLikePlayersPayload>(`/server/seems-like/${nickname}`, {
           signal: ctx.controller.signal,
-          searchParams: { limit: 8 }
+          params: { query: { limit: 8 } }
         })
-        .exec()
 
       return result
     }, `${name}.fetch`).pipe(

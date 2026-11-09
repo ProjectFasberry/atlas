@@ -1,8 +1,6 @@
 {
 	"name": "taurus",
-	"version": "1.0.0",
 	"private": true,
-	"license": "MIT",
 	"type": "module",
 	"scripts": {
 		"dev": "infisical run --env=dev --path=/taurus -- vike dev --port 3005 --host",
@@ -40,7 +38,7 @@
 		"@tiptap/starter-kit": "3.10.5",
 		"@tiptap/static-renderer": "3.10.5",
 		"@vikejs/hono": "0.2.1",
-		"cnfast": "0.0.6",
+		"cnfast": "0.2.0",
 		"dayjs": "1.11.11",
 		"hono": "4.12.26",
 		"openapi-fetch": "0.17.0",

@@ -23,10 +23,6 @@ export type QREventsPayload = {
   event: QREventsEvent;
 };
 
-type QRGeneratePayload = ExtractApiData<"postAuthLoginQrGenerate">["data"]
-type GameGeneratePayload = ExtractApiData<"postAuthLoginGameGenerate">["data"]
-type QRValidateTokenPayload = ExtractApiData<"getAuthLoginQrValidate">["data"]
-
 export type AuthLoginVariant = "qr" | "game" | "password";
 export type AuthLoginQRStatus = QREventsEvent | "idle"
 
@@ -100,15 +96,12 @@ export const login = atom(null, "login").pipe(
 
           if (!success) return error;
 
-          return await client
-            .post<ExtractApiData<"postAuthLoginBasic">["data"]>(`auth/login/basic`, {
-              searchParams: {
-                token: token ?? ""
-              },
+          return await client.raw
+            .post<ExtractApiData<"postAuthLoginBasic">["data"]>(`/auth/login/basic`, {
+              params: { query: { token: token ?? "" } },
+              json,
               timeout: 10000,
-              json
             })
-            .exec()
         }, {
           name: `${name}.submit`,
           onFulfill: (ctx, res) => {
@@ -146,8 +139,7 @@ export const login = atom(null, "login").pipe(
           const visitorId = await login.getVisitorId();
 
           const res = await client
-            .post<QRGeneratePayload>("auth/login/qr/generate", { json: { visitorId } })
-            .exec();
+            .post("/auth/login/qr/generate", { json: { visitorId } })
 
           // The request may finish after the QR view was closed.
           if (ctx.get(loginState.qr.generation) !== generation) return;
@@ -168,10 +160,7 @@ export const login = atom(null, "login").pipe(
           invariant(token, "Token is not defined");
 
           return await client
-            .post<ExtractApiData<"postAuthLoginQrCreate">["data"]>("auth/login/qr/create", {
-              searchParams: { token }
-            })
-            .exec()
+            .post("/auth/login/qr/create", { params: { query: { token } } })
         }, {
           name: `${name}.createSession`,
           onFulfill: () => {
@@ -232,7 +221,7 @@ export const login = atom(null, "login").pipe(
           withAssign((_, name) => ({
             validateToken: reatomAsync(async (ctx, token: string) => {
               const result = await ctx.schedule(() =>
-                client<QRValidateTokenPayload>("auth/login/qr/validate", { searchParams: { token } }).exec(),
+                client.get("/auth/login/qr/validate", { params: { query: { token } } }),
               );
 
               return { result, params: { token } }
@@ -252,10 +241,7 @@ export const login = atom(null, "login").pipe(
               invariant(token, "Token is not defined");
 
               return await client
-                .post<"ok">("auth/login/qr/confirm", {
-                  searchParams: { token }
-                })
-                .exec()
+                .post("/auth/login/qr/confirm", { params: { query: { token } } })
             }, {
               name: `${name}.confirm`,
               onFulfill: (ctx) => {
@@ -270,10 +256,7 @@ export const login = atom(null, "login").pipe(
               invariant(token, "Token is not defined");
 
               return await client
-                .post<"ok">("auth/login/qr/decline", {
-                  searchParams: { token }
-                })
-                .exec()
+                .post("/auth/login/qr/decline", { params: { query: { token } } })
             }, {
               name: `${name}.decline`,
               onFulfill: (ctx) => {
@@ -293,8 +276,7 @@ export const login = atom(null, "login").pipe(
           const visitorId = await login.getVisitorId();
 
           const res = await client
-            .post<GameGeneratePayload>("auth/login/game/generate", { json: { visitorId } })
-            .exec();
+            .post("/auth/login/game/generate", { json: { visitorId } })
 
           loginState.game.code(ctx, res.code);
         }, `${name}.generate`).pipe(

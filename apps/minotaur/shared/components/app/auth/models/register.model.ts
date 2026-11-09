@@ -110,11 +110,10 @@ export const register = atom(null, "register").pipe(
       if (!success) throw error
 
       const res = await client
-        .post<ExtractApiData<"postAuthRegister">["data"]>("auth/register", {
-          searchParams: { token: token ?? "" },
+        .raw.post<ExtractApiData<"postAuthRegister">["data"]>("/auth/register", {
+          params: { query: { token: token ?? "" } },
           json: data
         })
-        .exec()
 
       return res;
     }, {

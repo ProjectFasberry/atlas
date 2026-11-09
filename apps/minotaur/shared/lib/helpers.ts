@@ -1,4 +1,4 @@
-import { env } from "../env";
+import { apiBaseUrl, env } from "../env";
 
 export const getApiMiscRoute = (path: string) => `${env.VITE_API_URL}/misc/${path}`;
 export const getApiHost = () => new URL(env.VITE_API_URL).hostname;
@@ -23,7 +23,7 @@ export const createWsUrl = ({
 };
 
 export const createEs = (path: string, init: EventSourceInit) => {
-  return new EventSource(`${env.VITE_API_URL}/${path}`, init)
+  return new EventSource(`${apiBaseUrl}/${path}`, init)
 };
 
 const softwareRenderers = [

@@ -11,7 +11,7 @@ import { actions } from "./actions.model";
 export const apiKeysState = atom(null, "apiKeysState").pipe(
   withAssign((_, name) => ({
     data: atom<ApiKeys | null>(null, `${name}.data`).pipe(withReset()),
-    duration: atom(60000, `${name}.duration`).pipe(withReset()),
+    duration: atom(2592000, `${name}.duration`).pipe(withReset()),
     description: atom("", `${name}.description`).pipe(withReset()),
     afterCreate: atom(null, `${name}.afterCreate`).pipe(
       withAssign((_, name) => ({
@@ -22,8 +22,9 @@ export const apiKeysState = atom(null, "apiKeysState").pipe(
   }))
 )
 
-type ApiKeys = ExtractApiData<"getPrivatedApiKeysList">["data"]
-export type ApiKey = ApiKeys[number]
+type ApiKeysResponse = ExtractApiData<"getPrivatedApiKeysList">["data"]
+export type ApiKey = Omit<ApiKeysResponse[number], "duration"> & { duration: number | null }
+type ApiKeys = ApiKey[]
 
 type ApiKeyCreatePayload = ExtractApiData<"postPrivatedApiKeysCreate">["data"];
 
@@ -31,7 +32,7 @@ export const apiKeys = atom(null, "apiKeys").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
-        client<ApiKeys>("privated/api/keys/list", { signal: ctx.controller.signal }).exec()
+        client.get("/privated/api/keys/list", { signal: ctx.controller.signal })
       )
     }, {
       name: `${name}.fetch`,
@@ -49,8 +50,7 @@ export const apiKeys = atom(null, "apiKeys").pipe(
       }
 
       const result = await client
-        .post<ApiKeyCreatePayload>("privated/api/keys/create", { json })
-        .exec()
+        .post("/privated/api/keys/create", { json })
 
       return { result };
     }, {
@@ -73,8 +73,7 @@ export const apiKeys = atom(null, "apiKeys").pipe(
     ),
     delete: reatomAsync(async (_, id: ApiKey["id"], cb?: (ctx: Ctx) => void) => {
       const result = await client
-        .delete<ExtractApiData<"deletePrivatedApiKeysById">["data"]>(`privated/api/keys/${id}`)
-        .exec()
+        .delete("/privated/api/keys/{id}", { params: { path: { id } } })
 
       return { result, id, cb };
     }, {

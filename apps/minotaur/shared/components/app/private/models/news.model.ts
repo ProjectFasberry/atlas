@@ -3,7 +3,7 @@ import { action, atom, withErrorAtom, type AtomMut } from "@reatom/framework";
 import { reatomAsync, withAssign, withCache, withDataAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { createNewsSchema, newsUpdateSchema } from "@/shared/schemas/news";
 import { toast } from "sonner";
-import { client, withJsonBody, withQueryParams } from "@/shared/lib/client-wrapper";
+import { client } from "@/shared/lib/client-wrapper";
 import { generateHTML, type JSONContent } from "@tiptap/react"
 import { actions, actionsState, collectChanges, compareChanges, notifyAboutRestrictRole } from "./actions.model";
 import { withUndo } from "@reatom/undo";
@@ -16,14 +16,16 @@ export type NewsSingle = NewsPayload["data"][number];
 
 export const newsList = {
   fetch: reatomAsync(async (ctx) => {
-    return await ctx.schedule(() =>
-      client
-        .get<NewsPayload>("privated/news/list", { signal: ctx.controller.signal })
-        .pipe(withQueryParams({
-          asc: false,
-          content: true
-        }))
-        .exec()
+    return await ctx.schedule(() => client.raw
+      .get<NewsPayload>("/privated/news/list", {
+        signal: ctx.controller.signal,
+        params: {
+          query: {
+            asc: false,
+            content: true
+          }
+        }
+      })
     )
   }, `newsList.fetch`).pipe(
     withDataAtom(null),
@@ -32,6 +34,11 @@ export const newsList = {
     withErrorAtom()
   )
 }
+
+export type NewsImageVariant = "input-url" | "null"
+
+/** Image source picker state for the news editor. */
+export const newsImageVariant = atom<NewsImageVariant>("null", "newsImageVariant")
 
 export const createNewsState = atom(null, "createNewsState").pipe(
   withAssign((_, name) => ({
@@ -62,6 +69,7 @@ export const createNews = atom(null, "createNews").pipe(
       createNewsState.imageUrl.data.reset(ctx)
       createNewsState.content.reset(ctx)
       createNewsState.tempContent.reset(ctx)
+      newsImageVariant(ctx, "null")
     }),
     isValid: atom((ctx) =>
       createNewsSchema.safeParse({
@@ -121,10 +129,8 @@ export const createNews = atom(null, "createNews").pipe(
         content: ctx.get(createNewsState.content)
       }
 
-      return await client
-        .post<NewsSingle>("privated/news/create")
-        .pipe(withJsonBody(json))
-        .exec()
+      return await client.raw
+        .post<NewsSingle>("/privated/news/create", { json })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -256,10 +262,10 @@ export const editNews = atom(null, "editNews").pipe(
 
       const body = Object.entries(changes).map(([field, value]) => ({ field, value })) as z.infer<typeof newsUpdateSchema>
 
-      const result = await client
-        .post<ExtractApiData<"postPrivatedNewsByIdEdit">["data"]>(`privated/news/${id}/edit`)
-        .pipe(withJsonBody(body))
-        .exec()
+      const result = await client.raw
+        .post<ExtractApiData<"postPrivatedNewsByIdEdit">["data"]>(`/privated/news/${id}/edit`, {
+          json: body
+        })
 
       return result
     }, {
@@ -299,9 +305,8 @@ export const deleteNews = atom(null, "deleteNews").pipe(
       });
     }),
     submit: reatomAsync(async (_, id: number) => {
-      const result = await client
-        .delete<ExtractApiData<"deletePrivatedNewsById">["data"]>(`privated/news/${id}`)
-        .exec();
+      const result = await client.raw
+        .delete<ExtractApiData<"deletePrivatedNewsById">["data"]>(`/privated/news/${id}`)
 
       return { result, id }
     }, {

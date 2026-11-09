@@ -1,4 +1,4 @@
-import { client, withQueryParams } from "@/shared/lib/client-wrapper"
+import { client } from "@/shared/lib/client-wrapper"
 import { atom } from "@reatom/framework";
 import { withSsr } from "@/shared/models/ssr";
 import { withAssign } from "@reatom/framework";
@@ -8,10 +8,8 @@ export type PublicNewsParams = ExtractApiParams<"getNewsList">["query"]
 export type PublicNewsSingle = PublicNewsPayload["data"][number]
 
 export const getNews = async (params: Partial<PublicNewsParams>, init?: RequestInit) => {
-  return client
-    .get<PublicNewsPayload>("news/list", { ...init })
-    .pipe(withQueryParams(params))
-    .exec()
+  return client.raw
+    .get<PublicNewsPayload>("/news/list", { ...init, params: { query: params } })
 }
 
 export const newsState = atom(null, "newsState").pipe(

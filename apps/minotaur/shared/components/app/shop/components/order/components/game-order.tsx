@@ -31,9 +31,11 @@ export const GameOrder = reatomComponent(({ ctx }) => {
           </span>
         </Typography>
         <Typography className="text-neutral-50 text-lg">
-          {translate["store.order.status"]()}: {data.finished_at
-            ? <span className="text-green-600" title={dayjs(data.finished_at).format("DD MMM YYYY, HH:mm")}>{translate["store.order.completed"]()}</span>
-            : <span className="text-neutral-400">{translate["store.order.in-progress"]()}</span>
+          {translate["store.order.status"]()}: {data.status === "refunded"
+            ? <span className="text-red">{translate["store.orders.status.refunded"]()}</span>
+            : data.finished_at
+              ? <span className="text-green-600" title={dayjs(data.finished_at).format("DD MMM YYYY, HH:mm")}>{translate["store.order.completed"]()}</span>
+              : <span className="text-neutral-400">{translate["store.order.in-progress"]()}</span>
           }
         </Typography>
       </header>
@@ -57,8 +59,22 @@ export const GameOrder = reatomComponent(({ ctx }) => {
                   ID: {item.store_item_id}
                 </Typography>
               </div>
-              <div className="text-neutral-300 text-sm md:text-base">
-                {translate["store.order.recipient"]()}: {item.recipient}
+              <div className="flex flex-col items-start gap-1 text-neutral-300 text-sm md:items-end md:text-base">
+                <span>{translate["store.order.recipient"]()}: {item.recipient}</span>
+                {item.delivery_status === "revoked" && (
+                  <span className="text-xs text-red">Возвращён</span>
+                )}
+                {item.delivery_status === "pending" && (
+                  <span className="text-xs text-amber-400">Выдаётся</span>
+                )}
+                {item.delivery_status === "failed" && (
+                  <span className="text-xs text-red">Ошибка выдачи</span>
+                )}
+                {item.delivery_status === "skipped" && (
+                  <span className="text-xs text-neutral-400">
+                    {translate["store.orders.status.skipped"]()}
+                  </span>
+                )}
               </div>
             </Link>
           ))}

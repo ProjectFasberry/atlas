@@ -11,6 +11,7 @@ This directory is the entry point. Read in order:
 | `architecture.md` | Routes, rendering, data flow, `proxy.ts`, llms/og |
 | `data.md` | Drizzle schema and migrations, the `sync:wiki` flow, environment variables |
 | `editor.md` | Inline editor: component, Reatom model, save and upload APIs |
+| `i18n.md` | Paraglide messages, locale resolution, content translation |
 | `ui.md` | Theme and circle animation, 80px header, favicons, palette |
 | `conventions.md` | Code style, Reatom v3 rules, pitfalls, deploy and preview |
 
