@@ -59,6 +59,38 @@ jobs:
             printf '@projectfasberry:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\nalways-auth=true\n' "$NODE_AUTH_TOKEN" > "$HOME/.npmrc"
           fi
 
+      - name: Check Infisical credentials
+        id: infisical
+        env:
+          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          INFISICAL_PROJECT_ID: ${{ secrets.INFISICAL_PROJECT_ID }}
+        run: |
+          if [ -n "${INFISICAL_CLIENT_ID:-}" ] && [ -n "${INFISICAL_CLIENT_SECRET:-}" ] && [ -n "${INFISICAL_PROJECT_ID:-}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Infisical credentials are not configured; using GitHub variables"
+          fi
+
+      - name: Load Infisical build env
+        if: steps.infisical.outputs.enabled == 'true'
+        uses: Infisical/secrets-action@v1.0.16
+        with:
+          method: "universal"
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: ${{ secrets.INFISICAL_PROJECT_ID }}
+          env-slug: ${{ steps.stage.outputs.stage }}
+          secret-path: /minotaur
+
+      - name: Fallback build env
+        if: steps.infisical.outputs.enabled != 'true'
+        run: |
+          echo "VITE_CAP_SITE_KEY=${{ vars.VITE_CAP_SITE_KEY }}" >> "$GITHUB_ENV"
+          echo "VITE_APAY_TAG=${{ vars.VITE_APAY_TAG }}" >> "$GITHUB_ENV"
+          echo "VITE_SENTRY_DSN=${{ vars.VITE_SENTRY_DSN }}" >> "$GITHUB_ENV"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter minotaur... --ignore-scripts
 
@@ -78,9 +110,6 @@ jobs:
           VITE_MAIN_DOMAIN: ${{ vars.VITE_MAIN_DOMAIN || 'fasberry.fun' }}
           VITE_APP_PORT: ${{ vars.VITE_APP_PORT || '3003' }}
           VITE_CAP_URL: ${{ vars.VITE_CAP_URL || 'https://cap.fasberry.fun' }}
-          VITE_CAP_SITE_KEY: ${{ vars.VITE_CAP_SITE_KEY }}
-          VITE_APAY_TAG: ${{ vars.VITE_APAY_TAG }}
-          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
 
       - name: Measure build size
         if: github.ref == 'refs/heads/main'
