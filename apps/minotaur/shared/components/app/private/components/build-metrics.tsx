@@ -1,13 +1,6 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
 import {
-	CartesianGrid,
-	Legend,
-	Line,
-	LineChart,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
+	CartesianGrid,	Legend,	Line,	LineChart,	ResponsiveContainer,	Tooltip,	XAxis,	YAxis,
 } from "recharts"
 import { clsx } from "cnfast"
 import { Button } from "@/shared/ui/button"
@@ -94,7 +87,6 @@ export const BuildMetrics = reatomComponent(({ ctx }) => {
 					main · последние {data.length} записей
 				</Typography>
 			</div>
-
 			{latest && (
 				<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
 					<StatCard title="Всего" value={formatBytes(latest.metrics.totalBytes)} hint={dayjs(latest.createdAt).format("DD.MM.YYYY HH:mm")} />
@@ -103,11 +95,10 @@ export const BuildMetrics = reatomComponent(({ ctx }) => {
 					<StatCard title="Commit" value={latest.commitSha.slice(0, 7)} hint={latest.stage} />
 				</div>
 			)}
-
 			{chartData.length === 0 ? (
 				<Noop title="Для этого приложения ещё нет замеров" />
 			) : (
-				<div className="h-[360px] w-full rounded-xl border border-neutral-800 bg-neutral-900 p-2 sm:p-4">
+				<div className="h-90 w-full rounded-xl border border-neutral-800 bg-neutral-900 p-2 sm:p-4">
 					<ResponsiveContainer width="100%" height="100%">
 						<LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
 							<CartesianGrid stroke="#2b2b2b" strokeDasharray="3 3" />
