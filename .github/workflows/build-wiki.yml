@@ -102,10 +102,16 @@ jobs:
         continue-on-error: true
         env:
           BUILD_METRICS_TOKEN: ${{ secrets.BUILD_METRICS_TOKEN }}
+          BUILD_METRICS_URL: ${{ secrets.BUILD_METRICS_URL }}
         run: |
           node scripts/build-size.mjs --app wiki --stage prod --out build-metrics.json
           if [ -n "${BUILD_METRICS_TOKEN:-}" ]; then
-            curl -fsS -X POST https://panel.fasberry.fun/metrics/build \
+            url="${BUILD_METRICS_URL%/}"
+            case "$url" in
+              */metrics/build) ;;
+              *) url="$url/metrics/build" ;;
+            esac
+            curl -fsS -X POST "$url" \
               -H "Authorization: Bearer ${BUILD_METRICS_TOKEN}" \
               -H "content-type: application/json" \
               --data @build-metrics.json

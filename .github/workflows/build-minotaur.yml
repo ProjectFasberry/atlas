@@ -66,7 +66,7 @@ jobs:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-id: ${{ secrets.INFISICAL_PROJECT_ID }}
-          domain: https://infisical.fasberry.fun
+          domain: ${{ secrets.INFISICAL_DOMAIN }}
           env-slug: ${{ steps.stage.outputs.stage }}
           secret-path: /minotaur
 
@@ -87,10 +87,16 @@ jobs:
         continue-on-error: true
         env:
           BUILD_METRICS_TOKEN: ${{ secrets.BUILD_METRICS_TOKEN }}
+          BUILD_METRICS_URL: ${{ secrets.BUILD_METRICS_URL }}
         run: |
           node scripts/build-size.mjs --app minotaur --stage ${{ steps.stage.outputs.stage }} --out build-metrics.json
           if [ -n "${BUILD_METRICS_TOKEN:-}" ]; then
-            curl -fsS -X POST https://panel.fasberry.fun/metrics/build \
+            url="${BUILD_METRICS_URL%/}"
+            case "$url" in
+              */metrics/build) ;;
+              *) url="$url/metrics/build" ;;
+            esac
+            curl -fsS -X POST "$url" \
               -H "Authorization: Bearer ${BUILD_METRICS_TOKEN}" \
               -H "content-type: application/json" \
               --data @build-metrics.json
