@@ -226,6 +226,7 @@ const links: SidebarLink[] = [
   { title: "История", value: "/private/history", permission: HISTORY_READ_PERMISSION },
   { title: "Релизы", value: "/private/releases", permission: RELEASES_READ_PERMISSION },
   { title: "Серверы", value: "/private/servers", permission: SERVERS_READ_PERMISSION },
+  { title: "Метрики", value: "/private/metrics", permission: SERVERS_READ_PERMISSION },
   { title: "Экономика", value: "/private/economy", permission: ECONOMY_READ_PERMISSION },
 ]
 

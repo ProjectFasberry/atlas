@@ -1,6 +1,8 @@
 {
 	"name": "minotaur",
+	"version": "1.0.0",
 	"private": true,
+	"license": "MIT",
 	"type": "module",
 	"scripts": {
 		"dev": "infisical run --env=dev --path=/minotaur -- bun --bun run vike dev",
@@ -58,6 +60,8 @@
 		"openapi-fetch": "0.17.0",
 		"react": "19.3.1",
 		"react-dom": "19.3.1",
+		"react-is": "19.3.1",
+		"recharts": "3.10.1",
 		"react-error-boundary": "6.0.0",
 		"react-intersection-observer": "10.0.0",
 		"react-skinview3d": "7.0.0",
