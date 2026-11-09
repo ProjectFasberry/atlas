@@ -5,11 +5,13 @@ atoms and call actions.
 
 ## Hard rules
 
-- **No React state/effect hooks.** Use `atom`, `action`, `reatomAsync`,
-  `withAssign`, `withReset`, `withDataAtom`, `withStatusesAtom`, `withErrorAtom`,
-  `withAbort`, `withCache`, `withSsr`. In components use `reatomComponent`,
-  `useAtom`, `useUpdate` from `@reatom/npm-react`. Vike/TipTap/`useInView`
-  integration hooks are the only exception, at the integration boundary.
+- **State and hooks.** The React baseline is in
+  [`atlas/AGENTS.md`](../../../AGENTS.md#react-apps). Use `atom`, `action`,
+  `reatomAsync`, `withAssign`, `withReset`, `withDataAtom`, `withStatusesAtom`,
+  `withErrorAtom`, `withAbort`, `withCache`, `withSsr`. In components use
+  `reatomComponent`, `useAtom`, `useUpdate` from `@reatom/npm-react`.
+  Vike/TipTap/`useInView` integration hooks are the only exception, at the
+  integration boundary.
 - **One model per feature**, under
   `shared/components/app/<feature>/models/<feature>.model.ts` or
   `shared/models/` for cross-feature state.

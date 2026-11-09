@@ -1,38 +1,38 @@
 ## Overview
-The app provides an interactive interface for Minecraft server management, including:
-- User authentication and profile management
-- Server control and monitoring dashboard
-- Land and world management
-- Player ratings and leaderboards
-- Store integration
-- Task management
-- News and announcements
-- Settings and preferences
 
-## Tech Stack
-- **Frontend Framework**: React 19.1.0
-- **Meta-framework**: >= Vike 0.4.257
-- **Build Tool**: >= Vite 7.2.7
-- **Language**: >= TypeScript 5.8.3
-- **State Management**: Reatom v3
-- **Styling**: Tailwind CSS v4
-- **UI Components**: Radix UI, Tabler Icons
-- **Editor**: TipTap (rich text editor)
-- **Runtime**: >= Bun 1.3.0
+Project web-app for minecraft server at `https://app.fasberry.fun`: auth and profiles, server control, lands and
+worlds, ratings, store, tasks, news and settings.
 
-## Installation / Setup -> ./SETUP.md
+## Stack
+
+React, Vike, Vite, TypeScript, Bun, Reatom v3, Tailwind CSS v4, Ark UI, TipTap.
+
+## Installation / Setup
+
+See [SETUP.md](./SETUP.md).
 
 ## Deploy
 
-The image is built by `.github/workflows/build-minotaur.yml`, not on a workstation: push to
-`main` for prod or `dev`/`staging` for staging. The workflow builds the client bundle on
-`ubuntu-latest`, pushes `registry.fasberry.fun/<stage>/minotaur:latest` and
-`:sha-<commit>`, and the deploy host pulls it on a cron timer
-(`scripts/deploy/pull-update.sh`). Staging bakes the `*.alpha.fasberry.fun` URLs.
+Images are built by `.github/workflows/build-minotaur.yml`: push to `main` for
+prod, `dev`/`staging` for staging. CI builds on `ubuntu-latest`, pushes
+`registry.fasberry.fun/<stage>/minotaur:latest` and `:sha-<commit>`, and the host
+pulls it with `fasberry-pull-update.timer` from the `infra` repository. Staging
+bakes the `*.alpha.fasberry.fun` URLs.
 
-## Additional Resources
-- [Vike Documentation](https://vike.dev/)
-- [React Documentation](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Reatom](https://reatom.dev/)
-- [Vite Guide](https://vitejs.dev/)
+## Development
+
+- `bun run dev` - dev API through Infisical.
+- `bun run dev:prod` - production API; browser calls go through the Vite proxy
+  (`/api`, `/panel-api`) to avoid CORS.
+- Checks: `bun run type-check`, `bun run lint`, `bun run circular-check`.
+
+## Agents
+
+Rules and architecture notes are in [AGENTS.md](./AGENTS.md) and [`agent-docs/`](./agent-docs).
+The typed API client is generated from the OpenAPI schema in
+`pkgs/shared/types/gen`; regenerate it with `pnpm openapi:prod`.
+
+## Resources
+
+[Vike](https://vike.dev/) · [React](https://react.dev/) ·
+[Tailwind](https://tailwindcss.com/) · [Reatom](https://reatom.dev/) · [Vite](https://vitejs.dev/)

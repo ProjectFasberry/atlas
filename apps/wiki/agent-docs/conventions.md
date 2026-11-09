@@ -11,12 +11,9 @@
 
 ## Reatom v3
 
-Hard rule: **no React hooks for business or UI logic**. No `useState`, `useEffect`, `useMemo`,
-`useCallback`, `useReducer` or `useContext` for state. All state and logic lives in models built
-from `@reatom/*`; components only render. `useRef` is fine for DOM access only, and `useAtom` /
-`useCtx` are for library components that require a hook. Local UI state (open/closed, hover,
-selected tab, drafts) goes to atoms as well. The locale follows the same rule: `$locale` atom in
-`shared/models/locale.model.ts`, hydrated by `locale-sync.tsx` from the server value.
+The repository baseline is in [`atlas/AGENTS.md`](../../../AGENTS.md#react-apps):
+no view-layer state, Reatom models own state and logic, components only render,
+refs for DOM only. Below are the wiki naming and model conventions.
 
 - Atoms are prefixed with `$`, without the `Atom` suffix; the name is the second argument:
   `atom(x, 'theme')`.

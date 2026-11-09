@@ -2,19 +2,15 @@
 
 Minotaur is the Fasberry web app (`app.fasberry.fun`) built on Vike + React 19,
 Reatom v3, Tailwind v4 and Ark UI. This file is the entry point for agents; the
-detailed rules live in `agents/` and are linked below.
+detailed rules live in `agent-docs/` and are linked below.
 
 ## Hard rules
 
-- **No React state/effect hooks in feature code.** Do not use `useState`,
-  `useEffect`, `useReducer`, `useMemo`, `useCallback`, `useRef` or custom hooks.
-  State, effects, forms and async work belong to Reatom atoms/actions. `useAtom`,
-  `useUpdate` and `reatomComponent` from `@reatom/npm-react` are the sanctioned
-  bindings. Framework/library integration hooks are allowed only at the
-  boundary: `usePageContext`/`useConfig` (Vike), `useEditor`/`useEditorState`
-  (TipTap), `useInView` (react-intersection-observer). Never use them for
-  feature state. Existing UI primitives may use React hooks internally; do not
-  copy that pattern into new feature code.
+- **State and hooks.** Follow the React rules in
+  [`atlas/AGENTS.md`](../../AGENTS.md#react-apps): no React state/effect hooks
+  in feature code, state and async work in Reatom, integration hooks only at the
+  boundary. Minotaur bindings are `reatomComponent`, `useAtom` and `useUpdate`
+  from `@reatom/npm-react`; Vike, TipTap and `useInView` are the boundary hooks.
 - **Pages are thin.** A `+Page.tsx` renders one feature component from
   `shared/components/**`; it must not contain business logic, fetching or a
   large tree. Put the state in a sibling `*.model.ts`.
@@ -45,14 +41,14 @@ detailed rules live in `agents/` and are linked below.
 
 | Topic | File |
 | --- | --- |
-| Pages, layouts, components, SSR views | [`agents/views.md`](./agents/views.md) |
-| Reatom models, atoms, async, forms, SSR | [`agents/models.md`](./agents/models.md) |
-| API clients, generated types, errors | [`agents/data-api.md`](./agents/data-api.md) |
-| Tailwind, `tv`, UI primitives, dialogs | [`agents/ui-styling.md`](./agents/ui-styling.md) |
-| Routes, guards, permissions, auth | [`agents/routing-auth.md`](./agents/routing-auth.md) |
-| Paraglide and message files | [`agents/i18n.md`](./agents/i18n.md) |
-| Commands, checks, deploy, generated files | [`agents/checks-deploy.md`](./agents/checks-deploy.md) |
-| Canonical snippets | [`agents/examples.md`](./agents/examples.md) |
+| Pages, layouts, components, SSR views | [`agent-docs/views.md`](./agent-docs/views.md) |
+| Reatom models, atoms, async, forms, SSR | [`agent-docs/models.md`](./agent-docs/models.md) |
+| API clients, generated types, errors | [`agent-docs/data-api.md`](./agent-docs/data-api.md) |
+| Tailwind, `tv`, UI primitives, dialogs | [`agent-docs/ui-styling.md`](./agent-docs/ui-styling.md) |
+| Routes, guards, permissions, auth | [`agent-docs/routing-auth.md`](./agent-docs/routing-auth.md) |
+| Paraglide and message files | [`agent-docs/i18n.md`](./agent-docs/i18n.md) |
+| Commands, checks, deploy, generated files | [`agent-docs/checks-deploy.md`](./agent-docs/checks-deploy.md) |
+| Canonical snippets | [`agent-docs/examples.md`](./agent-docs/examples.md) |
 
 ## Quick checklist before finishing
 

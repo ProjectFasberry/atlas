@@ -8,7 +8,10 @@ scripts.
 ## Hard rules
 
 - **Never commit, push, merge or deploy without an explicit request.** Ask about
-  scope first: the working tree may contain another task's changes.
+  scope first: the working tree may contain another task's changes. A commit is
+  not permission to push: ask for each step, and one question may cover both only
+  when it is answered before anything is staged. This overrides earlier "commit
+  and push" instructions for a task.
 - **One package manager.** The workspace uses `pnpm` and `pnpm-lock.yaml`; never
   add npm/yarn lockfiles. Apps whose scripts call `bun` run them with bun - use
   what the app's `package.json` declares.
@@ -25,10 +28,47 @@ scripts.
 - **Do not edit generated files** - Paraglide output, generated icon sprites,
   `dist` and similar build artifacts. Regenerate them with the app's script.
 
+## State and logic
+
+- **No view-layer state.** State, forms and async work belong to Reatom models:
+  `atom`, `action`, `reatomAsync`, `withAssign`, `onConnect`, `ctx.schedule`.
+  Components only render and read atoms through the app's binding. Do not keep
+  view state in React hooks, Solid signals, context or refs.
+- **Local UI state is state too**: open/closed, hover, active tab and drafts go
+  to atoms, not to components.
+- Apps may extend these rules with naming and provider details, but must not
+  contradict them.
+
+### React apps
+
+`minotaur` and `wiki` share these rules.
+
+- Do not use `useState`, `useEffect`, `useMemo`, `useCallback`, `useReducer` or
+  `useContext` for business or UI logic.
+- Connect components with `reatomComponent` + `ctx.spy`; `useAtom`/`useCtx` from
+  `@reatom/npm-react` are for library components that require a hook.
+- `useRef` is for DOM access only (focus, measurements, file inputs, editor
+  instances), never as a state container.
+- Integration hooks stay at the boundary: `usePageContext`, `useConfig`,
+  `useEditor`, `useEditorState`, `useInView` and similar may only connect a
+  framework/library, never hold feature state.
+- Existing UI primitives may use React hooks internally; do not copy that
+  pattern into new feature code.
+
+### Solid apps
+
+`taurus` uses Solid + Reatom.
+
+- No Solid signals, stores or context for business or UI state; use `useAtom` /
+  `useCtx` from `@reatom/npm-solid-js` and read atom accessors in JSX.
+- DOM refs are for element access only, never as a state container.
+
 ## Layout
 
 - `apps/*` - deployable apps. Each has its own README/docs, build, checks and
-  deploy; app-specific agent rules live next to the app.
+  deploy; app-specific agent rules live next to the app. App agent docs live in
+  `apps/<app>/agent-docs/`; the rules in this file apply to every app and take
+  precedence.
 - `pkgs/*` - shared packages (configs, UI, shared libs). Consume them through
   workspace dependencies, never through relative paths into another workspace.
   App-local aliases are declared in that app's tsconfig/vite config.
