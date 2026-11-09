@@ -36,6 +36,28 @@ The same scripts work from `pkgs/shared`. Prod URLs come from
 `API_PANEL_AUTHORIZATION_KEY`); the generator renders them into Redocly because this
 version does not expand `${VAR}` itself. Never commit `.env.local`.
 
+## Build size tracking
+
+BundleMon records gzipped build output per release for `minotaur`, `wiki` and
+`taurus` (client JS/CSS/fonts/images and the server bundle; Docker image size is
+not tracked).
+
+- Configs: `apps/<app>/bundlemon.config.cjs`; one BundleMon project covers all
+  three apps through `subProject`.
+- Required repo/org secrets: `BUNDLEMON_PROJECT_ID` and
+  `BUNDLEMON_PROJECT_APIKEY`. Create the project at `app.bundlemon.dev`, then
+  read the charts under the project reports (branch `main`, filter by
+  subproject).
+- `minotaur` and `wiki` upload after the production build on `main`
+  (`build-*.yml`); the steps are skipped until the secrets exist.
+- `taurus` deploys manually with `wrangler`: `pnpm --filter taurus size` prints
+  a local report, `pnpm --filter taurus size:prod` uploads it through
+  `infisical run --env=prod --path=/taurus`, and `deploy:all` calls `size:prod`
+  automatically. Put `BUNDLEMON_PROJECT_ID`/`BUNDLEMON_PROJECT_APIKEY` in
+  Infisical `/taurus`.
+- The free hosted BundleMon keeps branch history thinned to one record per day
+  after 60 days; self-host it with MongoDB if longer retention is needed.
+
 ## Build and deploy
 
 Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:

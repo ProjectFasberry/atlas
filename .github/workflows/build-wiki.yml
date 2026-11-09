@@ -63,3 +63,50 @@ jobs:
             ${{ vars.REGISTRY_HOST || 'registry.fasberry.fun' }}/${{ steps.stage.outputs.stage }}/wiki:sha-${{ github.sha }}
           cache-from: type=gha,scope=wiki
           cache-to: type=gha,mode=max,scope=wiki
+
+  size:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Configure npm auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+        run: |
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            printf '@projectfasberry:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\nalways-auth=true\n' "$NODE_AUTH_TOKEN" > "$HOME/.npmrc"
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter wiki... --ignore-scripts
+
+      - name: Build
+        working-directory: apps/wiki
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL_PROD || 'https://wiki.fasberry.fun' }}
+        run: pnpm build
+
+      - name: Measure bundle size
+        continue-on-error: true
+        working-directory: apps/wiki
+        env:
+          BUNDLEMON_PROJECT_ID: ${{ secrets.BUNDLEMON_PROJECT_ID }}
+          BUNDLEMON_PROJECT_APIKEY: ${{ secrets.BUNDLEMON_PROJECT_APIKEY }}
+        run: |
+          if [ -z "${BUNDLEMON_PROJECT_ID:-}" ]; then
+            echo "BundleMon is not configured"
+            exit 0
+          fi
+          pnpm dlx bundlemon@3.2.0 --config bundlemon.config.cjs

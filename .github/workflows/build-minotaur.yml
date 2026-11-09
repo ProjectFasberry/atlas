@@ -82,6 +82,20 @@ jobs:
           VITE_APAY_TAG: ${{ vars.VITE_APAY_TAG }}
           VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
 
+      - name: Measure bundle size
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
+        working-directory: apps/minotaur
+        env:
+          BUNDLEMON_PROJECT_ID: ${{ secrets.BUNDLEMON_PROJECT_ID }}
+          BUNDLEMON_PROJECT_APIKEY: ${{ secrets.BUNDLEMON_PROJECT_APIKEY }}
+        run: |
+          if [ -z "${BUNDLEMON_PROJECT_ID:-}" ]; then
+            echo "BundleMon is not configured"
+            exit 0
+          fi
+          pnpm dlx bundlemon@3.2.0 --config bundlemon.config.cjs
+
       - name: Login to registry
         uses: docker/login-action@v3
         with:
