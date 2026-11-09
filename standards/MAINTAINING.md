@@ -36,6 +36,25 @@ The same scripts work from `pkgs/shared`. Prod URLs come from
 `API_PANEL_AUTHORIZATION_KEY`); the generator renders them into Redocly because this
 version does not expand `${VAR}` itself. Never commit `.env.local`.
 
+## Build size tracking
+
+`scripts/build-size.mjs` measures gzipped build output per release for
+`minotaur`, `wiki` and `taurus` (client JS/CSS/fonts/images, other client files
+and the server bundle; Docker image size is not tracked). It writes the payload
+consumed by `POST /metrics/build` on glaux, which stores rows in the
+`build_metrics` database on the general Postgres server.
+
+- `minotaur` and `wiki` upload after the production build on `main`
+  (`build-*.yml`) when `BUILD_METRICS_TOKEN` is set.
+- `taurus` deploys manually with `wrangler`: `pnpm --filter taurus size` prints
+  a local report, `pnpm --filter taurus size:prod` uploads it through
+  `infisical run --env=prod --path=/glaux`, and `deploy:all` calls `size:prod`.
+- Repo secret `BUILD_METRICS_TOKEN` must match `BUILD_METRICS_TOKEN` in
+  Infisical `/glaux`; glaux also needs `BUILD_METRICS_POSTGRES_URI` pointing at
+  the `build_metrics` database.
+- The table is created by glaux on boot; the database itself is provisioned on
+  the host.
+
 ## Build and deploy
 
 Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:

@@ -63,3 +63,52 @@ jobs:
             ${{ vars.REGISTRY_HOST || 'registry.fasberry.fun' }}/${{ steps.stage.outputs.stage }}/wiki:sha-${{ github.sha }}
           cache-from: type=gha,scope=wiki
           cache-to: type=gha,mode=max,scope=wiki
+
+  size:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Configure npm auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+        run: |
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            printf '@projectfasberry:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\nalways-auth=true\n' "$NODE_AUTH_TOKEN" > "$HOME/.npmrc"
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter wiki... --ignore-scripts
+
+      - name: Build
+        working-directory: apps/wiki
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL_PROD || 'https://wiki.fasberry.fun' }}
+        run: pnpm build
+
+      - name: Measure build size
+        continue-on-error: true
+        env:
+          BUILD_METRICS_TOKEN: ${{ secrets.BUILD_METRICS_TOKEN }}
+        run: |
+          node scripts/build-size.mjs --app wiki --stage prod --out build-metrics.json
+          if [ -n "${BUILD_METRICS_TOKEN:-}" ]; then
+            curl -fsS -X POST https://panel.fasberry.fun/metrics/build \
+              -H "Authorization: Bearer ${BUILD_METRICS_TOKEN}" \
+              -H "content-type: application/json" \
+              --data @build-metrics.json
+          else
+            echo "BUILD_METRICS_TOKEN is not set, metrics were not uploaded"
+          fi

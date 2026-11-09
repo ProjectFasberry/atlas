@@ -82,6 +82,22 @@ jobs:
           VITE_APAY_TAG: ${{ vars.VITE_APAY_TAG }}
           VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
 
+      - name: Measure build size
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
+        env:
+          BUILD_METRICS_TOKEN: ${{ secrets.BUILD_METRICS_TOKEN }}
+        run: |
+          node scripts/build-size.mjs --app minotaur --stage ${{ steps.stage.outputs.stage }} --out build-metrics.json
+          if [ -n "${BUILD_METRICS_TOKEN:-}" ]; then
+            curl -fsS -X POST https://panel.fasberry.fun/metrics/build \
+              -H "Authorization: Bearer ${BUILD_METRICS_TOKEN}" \
+              -H "content-type: application/json" \
+              --data @build-metrics.json
+          else
+            echo "BUILD_METRICS_TOKEN is not set, metrics were not uploaded"
+          fi
+
       - name: Login to registry
         uses: docker/login-action@v3
         with:
