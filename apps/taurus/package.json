@@ -1,8 +1,6 @@
 {
 	"name": "taurus",
-	"version": "1.0.0",
 	"private": true,
-	"license": "MIT",
 	"type": "module",
 	"scripts": {
 		"dev": "infisical run --env=dev --path=/taurus -- vike dev --port 3005 --host",

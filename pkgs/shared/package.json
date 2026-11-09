@@ -1,8 +1,6 @@
 {
 	"name": "@repo/shared",
-	"version": "1.0.0",
 	"private": true,
-	"license": "MIT",
 	"type": "module",
 	"scripts": {
 		"openapi": "node scripts/openapi.mjs --stage prod",
