@@ -66,6 +66,7 @@ jobs:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-id: ${{ secrets.INFISICAL_PROJECT_ID }}
+          domain: https://infisical.fasberry.fun
           env-slug: ${{ steps.stage.outputs.stage }}
           secret-path: /minotaur
 
@@ -73,21 +74,13 @@ jobs:
         run: pnpm install --frozen-lockfile --filter minotaur... --ignore-scripts
 
       # The image only contains the runtime; the client bundle is built here,
-      # on native amd64. The per-stage URLs are baked into the bundle by Vite.
+      # on native amd64. Vite reads the VITE_* values injected by Infisical.
       - name: Build client bundle
         working-directory: apps/minotaur
         run: bun --bun run vike build
         env:
           STAGE: ${{ steps.stage.outputs.stage }}
           NODE_ENV: production
-          VITE_API_URL: ${{ steps.stage.outputs.stage == 'prod' && (vars.VITE_API_URL_PROD || 'https://api.fasberry.fun') || (vars.VITE_API_URL_STAGING || 'https://api.alpha.fasberry.fun') }}
-          VITE_APP_URL: ${{ steps.stage.outputs.stage == 'prod' && (vars.VITE_APP_URL_PROD || 'https://app.fasberry.fun') || (vars.VITE_APP_URL_STAGING || 'https://app.alpha.fasberry.fun') }}
-          VITE_PANEL_API_URL: ${{ steps.stage.outputs.stage == 'prod' && (vars.VITE_PANEL_API_URL_PROD || 'https://panel.fasberry.fun') || (vars.VITE_PANEL_API_URL_STAGING || 'https://panel.alpha.fasberry.fun') }}
-          VITE_LANDING_URL: ${{ vars.VITE_LANDING_URL || 'https://fasberry.fun' }}
-          VITE_VOLUME_URL: ${{ vars.VITE_VOLUME_URL || 'https://volume.fasberry.fun' }}
-          VITE_MAIN_DOMAIN: ${{ vars.VITE_MAIN_DOMAIN || 'fasberry.fun' }}
-          VITE_APP_PORT: ${{ vars.VITE_APP_PORT || '3003' }}
-          VITE_CAP_URL: ${{ vars.VITE_CAP_URL || 'https://cap.fasberry.fun' }}
 
       - name: Measure build size
         if: github.ref == 'refs/heads/main'
