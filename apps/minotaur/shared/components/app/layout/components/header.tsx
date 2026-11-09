@@ -1,7 +1,7 @@
 import { Icon } from "@/shared/ui/icon"
 import { Link } from '@/shared/components/config/link/link';
 import { reatomComponent } from "@reatom/npm-react";
-import { cartDataSelectedItemsLengthAtom, cartState } from "../../shop/models/store-cart.model";
+import { cartDataSelectedItemsLengthAtom, cartState } from "../../shop/models/store-cart.state";
 import { Logotype } from "./logotype";
 import {
   createHeaderLinks, type HeaderLink, showAuthorizeButtonAtom, showCartIconAtom, showCurrentUserMenuAtom

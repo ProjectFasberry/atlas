@@ -1,29 +1,19 @@
 import { action, atom, batch, createCtx } from "@reatom/framework";
-import { reatomAsync, sleep, withAssign, withConcurrency, withInit, withStatusesAtom } from "@reatom/framework";
+import { reatomAsync, sleep, withAssign, withConcurrency, withStatusesAtom } from "@reatom/framework";
 import { type PageContextServer } from "vike/types";
 import { logError } from "@/shared/lib/log";
 import { snapshots } from "@/shared/models/ssr";
 import { client } from "@/shared/lib/client-wrapper";
 import { getRecipient } from "../../settings/models/settings-store.model";
 import { navigate } from "vike/client/router";
-import { withSsr } from "@/shared/models/ssr";
 import { invariant } from "@/shared/lib/utils";
 import { storeItem } from "./store-item.model";
 import { storeItems } from "./store.model";
 import { getIsAuthed } from "@/shared/models/app/utils";
 import { userState } from "@/shared/models/app/index.model";
+import { cartState } from "./store-cart.state";
 
-export type CartListPayload = ExtractApiData<"getStoreCartList">["data"]
-export type CartFinalPrice = ExtractApiData<"getStoreCartPrice">["data"]
-
-export const EMPTY_CART_PRICE: CartFinalPrice = {
-	BELKOIN: 0,
-	CHARISM: 0,
-	server: "",
-	available: false,
-	purchasable: false,
-}
-export type CartItem = CartListPayload["data"][number]
+export * from "./store-cart.state";
 
 async function getCartData(init?: RequestInit) {
 	return client.get("/store/cart/list", { ...init });
@@ -32,35 +22,6 @@ async function getCartData(init?: RequestInit) {
 async function getCartPrice(init?: RequestInit) {
 	return client.get("/store/cart/price", { ...init });
 }
-
-export const cartDataSelectedAtom = atom<CartItem[]>((ctx) =>
-	ctx.spy(cartState.data).filter((t) => t.selected)
-).pipe(
-	withInit((ctx) => ctx.get(cartState.data).filter((t) => t.selected)),
-);
-
-export const cartDataIsEmptyAtom = atom((ctx) => ctx.spy(cartState.data).length === 0)
-
-export const cartDataItemIsSelectAtom = (id: number) => atom((ctx) => {
-	const data = ctx.spy(cartDataSelectedAtom).find((d) => d.id === id);
-	return data?.selected ?? false;
-}, `${id}.selectedStatus`);
-
-export const cartDataSelectedItemsLengthAtom = atom((ctx) => ctx.spy(cartDataSelectedAtom).length);
-
-export const cartIsValidAtom = atom((ctx) => {
-	const productsLengthValidate = ctx.spy(cartDataSelectedItemsLengthAtom) >= 1;
-	const productsRecipientValidate = ctx.spy(cartDataSelectedAtom).filter((target) => target.recipient).length >= 1;
-	return productsLengthValidate && productsRecipientValidate;
-});
-
-export const cartState = atom(null, "cartState").pipe(
-	withAssign((_, name) => ({
-		isTriggered: atom(false),
-		price: atom<CartFinalPrice>(EMPTY_CART_PRICE, `${name}.price`).pipe(withSsr(`${name}.price`)),
-		data: atom<CartListPayload["data"]>([], `${name}.data`).pipe(withSsr(`${name}.data`))
-	}))
-)
 
 function assertDefined<T>(val: T, name: string): asserts val is NonNullable<T> {
 	if (val === undefined || val === null) {
