@@ -38,25 +38,22 @@ version does not expand `${VAR}` itself. Never commit `.env.local`.
 
 ## Build size tracking
 
-BundleMon records gzipped build output per release for `minotaur`, `wiki` and
-`taurus` (client JS/CSS/fonts/images and the server bundle; Docker image size is
-not tracked).
+`scripts/build-size.mjs` measures gzipped build output per release for
+`minotaur`, `wiki` and `taurus` (client JS/CSS/fonts/images, other client files
+and the server bundle; Docker image size is not tracked). It writes the payload
+consumed by `POST /metrics/build` on glaux, which stores rows in the
+`build_metrics` database on the general Postgres server.
 
-- Configs: `apps/<app>/bundlemon.config.cjs`; one BundleMon project covers all
-  three apps through `subProject`.
-- Required repo/org secrets: `BUNDLEMON_PROJECT_ID` and
-  `BUNDLEMON_PROJECT_APIKEY`. Create the project at `app.bundlemon.dev`, then
-  read the charts under the project reports (branch `main`, filter by
-  subproject).
 - `minotaur` and `wiki` upload after the production build on `main`
-  (`build-*.yml`); the steps are skipped until the secrets exist.
+  (`build-*.yml`) when `BUILD_METRICS_TOKEN` is set.
 - `taurus` deploys manually with `wrangler`: `pnpm --filter taurus size` prints
   a local report, `pnpm --filter taurus size:prod` uploads it through
-  `infisical run --env=prod --path=/taurus`, and `deploy:all` calls `size:prod`
-  automatically. Put `BUNDLEMON_PROJECT_ID`/`BUNDLEMON_PROJECT_APIKEY` in
-  Infisical `/taurus`.
-- The free hosted BundleMon keeps branch history thinned to one record per day
-  after 60 days; self-host it with MongoDB if longer retention is needed.
+  `infisical run --env=prod --path=/glaux`, and `deploy:all` calls `size:prod`.
+- Repo secret `BUILD_METRICS_TOKEN` must match `BUILD_METRICS_TOKEN` in
+  Infisical `/glaux`; glaux also needs `BUILD_METRICS_POSTGRES_URI` pointing at
+  the `build_metrics` database.
+- The table is created by glaux on boot; the database itself is provisioned on
+  the host.
 
 ## Build and deploy
 

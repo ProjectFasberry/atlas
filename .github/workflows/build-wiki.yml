@@ -98,15 +98,17 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL_PROD || 'https://wiki.fasberry.fun' }}
         run: pnpm build
 
-      - name: Measure bundle size
+      - name: Measure build size
         continue-on-error: true
-        working-directory: apps/wiki
         env:
-          BUNDLEMON_PROJECT_ID: ${{ secrets.BUNDLEMON_PROJECT_ID }}
-          BUNDLEMON_PROJECT_APIKEY: ${{ secrets.BUNDLEMON_PROJECT_APIKEY }}
+          BUILD_METRICS_TOKEN: ${{ secrets.BUILD_METRICS_TOKEN }}
         run: |
-          if [ -z "${BUNDLEMON_PROJECT_ID:-}" ]; then
-            echo "BundleMon is not configured"
-            exit 0
+          node scripts/build-size.mjs --app wiki --stage prod --out build-metrics.json
+          if [ -n "${BUILD_METRICS_TOKEN:-}" ]; then
+            curl -fsS -X POST https://panel.fasberry.fun/metrics/build \
+              -H "Authorization: Bearer ${BUILD_METRICS_TOKEN}" \
+              -H "content-type: application/json" \
+              --data @build-metrics.json
+          else
+            echo "BUILD_METRICS_TOKEN is not set, metrics were not uploaded"
           fi
-          pnpm dlx bundlemon@3.2.0 --config bundlemon.config.cjs
