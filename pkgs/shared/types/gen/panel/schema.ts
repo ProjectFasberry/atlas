@@ -38,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/watchtower": {
+    "/webhooks/github": {
         parameters: {
             query?: never;
             header?: never;
@@ -47,8 +47,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Webhook for receiving all watchtower alerts */
-        post: operations["postWatchtower"];
+        /** GitHub organization webhook for push notifications */
+        post: operations["postWebhooksGithub"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/build": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List stored build sizes for charts */
+        get: operations["getMetricsBuild"];
+        put?: never;
+        /** Store build output sizes for an atlas app */
+        post: operations["postMetricsBuild"];
         delete?: never;
         options?: never;
         head?: never;
@@ -109,7 +127,85 @@ export interface operations {
             };
         };
     };
-    postWatchtower: {
+    postWebhooksGithub: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "text/plain": string;
+            };
+        };
+        responses: never;
+    };
+    getMetricsBuild: {
+        parameters: {
+            query?: {
+                app?: string;
+                branch?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            app: string;
+                            stage: string;
+                            branch: string;
+                            commitSha: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            metrics: {
+                                clientJsBytes: number;
+                                clientCssBytes: number;
+                                clientFontsBytes: number;
+                                clientImagesBytes: number;
+                                clientOtherBytes: number;
+                                serverJsBytes: number;
+                                totalBytes: number;
+                            };
+                        }[];
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postMetricsBuild: {
         parameters: {
             query?: never;
             header?: never;
@@ -119,23 +215,92 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    message: string;
-                    title: string;
+                    /** @enum {string} */
+                    app: "minotaur" | "wiki" | "taurus";
+                    stage: string;
+                    branch: string;
+                    commitSha: string;
+                    metrics: {
+                        clientJsBytes: number;
+                        clientCssBytes: number;
+                        clientFontsBytes: number;
+                        clientImagesBytes: number;
+                        clientOtherBytes: number;
+                        serverJsBytes: number;
+                        totalBytes: number;
+                    };
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @enum {string} */
+                    app: "minotaur" | "wiki" | "taurus";
+                    stage: string;
+                    branch: string;
+                    commitSha: string;
+                    metrics: {
+                        clientJsBytes: number;
+                        clientCssBytes: number;
+                        clientFontsBytes: number;
+                        clientImagesBytes: number;
+                        clientOtherBytes: number;
+                        serverJsBytes: number;
+                        totalBytes: number;
+                    };
+                };
+                "multipart/form-data": {
+                    /** @enum {string} */
+                    app: "minotaur" | "wiki" | "taurus";
+                    stage: string;
+                    branch: string;
+                    commitSha: string;
+                    metrics: {
+                        clientJsBytes: number;
+                        clientCssBytes: number;
+                        clientFontsBytes: number;
+                        clientImagesBytes: number;
+                        clientOtherBytes: number;
+                        serverJsBytes: number;
+                        totalBytes: number;
+                    };
                 };
             };
         };
         responses: {
-            /** @description Response for status 200 */
-            200: {
+            /** @description Response for status 201 */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "text/plain": "OK";
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
                 };
             };
             /** @description Response for status 500 */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
