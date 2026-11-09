@@ -1,7 +1,6 @@
 {
 	"name": "fasberry-client",
 	"private": true,
-	"packageManager": "pnpm@12.4.2",
 	"scripts": {
 		"start": "pnpm --filter * start",
 		"build": "pnpm --filter * build",
