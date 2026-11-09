@@ -8,9 +8,6 @@ import { withAssign } from "@reatom/framework";
 import { type SelectItemToCartOptions, storeItemsState } from "./store.model";
 import { invariant } from "@/shared/lib/utils";
 import { appState } from "@/shared/models/app/index.model";
-import { renderToHTMLString } from "@tiptap/static-renderer";
-import { editorExtensions } from "@/shared/components/config/editor/editor.model";
-import type { JSONContent } from "@tiptap/react";
 
 export type StoreItem = ExtractApiData<"getStoreItems">["data"]["data"][number] & {
   command?: string | null;
@@ -46,30 +43,7 @@ export const storeItemState = atom(null, "storeItemState").pipe(
   }))
 )
 
-export const selectedDonateDataAtom = atom((ctx) => {
-  const data = ctx.spy(storeItemState.data)
-  if (!data) return null;
 
-  const rawData = data.content as JSONContent;
-
-  const getContent = () => {
-    const isExpanded = ctx.spy(storeItemState.isExpanded)
-
-    if (!isExpanded) {
-      const content = rawData.content?.slice(0, 1);
-      return { ...rawData, content }
-    };
-
-    return rawData
-  }
-
-  const html = renderToHTMLString({
-    extensions: editorExtensions,
-    content: getContent()
-  })
-
-  return html
-})
 
 appState.current.isMobile.onChange((ctx, state) => {
   if (state) {
