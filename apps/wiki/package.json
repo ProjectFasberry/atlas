@@ -26,6 +26,7 @@
     "@reatom/framework": "3.4.68",
     "@reatom/npm-react": "3.10.6",
     "@reatom/primitives": "3.11.0",
+    "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tabler/icons-react": "3.50.0",
     "@tiptap/extension-image": "3.10.5",

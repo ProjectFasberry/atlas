@@ -394,6 +394,9 @@ importers:
       '@reatom/primitives':
         specifier: 3.11.0
         version: 3.11.0
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../pkgs/shared
       '@repo/ui':
         specifier: workspace:*
         version: link:../../pkgs/ui
