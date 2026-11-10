@@ -103,7 +103,7 @@ export function notifyAboutRestrictRole(e: unknown, { withToast = true } = {}) {
   }
 }
 
-export const compareChanges = (actual: Record<string, string | null>, old: Record<string, string | null>) => {
+export const compareChanges = (actual: Record<string, unknown>, old: Record<string, unknown>) => {
   return Object.keys(actual).some((key) => {
     const value = actual[key]
     let oldValue = old[key]
