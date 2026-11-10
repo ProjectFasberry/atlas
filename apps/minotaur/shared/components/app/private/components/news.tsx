@@ -380,7 +380,7 @@ const NewsListItem = reatomComponent<NewsSingle>(({ ctx, id, title, imageUrl, cr
       <div className="flex items-center gap-1">
         <LinkButton link={createLink("news", id)} />
         <EditButton
-          onClick={() => actions.createLinkValue(ctx, { parent: "news", type: "edit", target: id.toString() })}
+          onClick={() => actions.open(ctx, { parent: "news", type: "edit", target: id })}
         />
         <DeleteButton
           onClick={() => deleteNews.deleteBefore(ctx, { id, title })}

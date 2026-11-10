@@ -9,13 +9,9 @@ const createEditNewsParams = action(async (ctx) => {
   const id = ctx.get(newsSingleState.data)?.id;
   if (!id) return;
 
-  const { actions } = await import("../../private/models/actions.model");
+  const { configLink } = await import("../../private/models/actions.model");
 
-  const params = new URLSearchParams(
-    actions.createLinkValue(ctx, { parent: "news", type: "edit", target: id.toString() }).next
-  )
-
-  newsSingleState.editParams(ctx, `/private/config?${params}`)
+  newsSingleState.editParams(ctx, configLink({ parent: "news", type: "edit", target: id }))
 }, "createEditNewsParams")
 
 export const defineNewsMeta = action((ctx, snapshot: Snapshot) => {

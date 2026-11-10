@@ -1,7 +1,8 @@
 import { isError } from "@/shared/lib/utils";
-import { action, atom, withAssign, type AtomState } from "@reatom/framework"
-import { isDeepEqual, reatomRecord, withReset } from "@reatom/framework"
+import { action, atom, isDeepEqual, withAssign } from "@reatom/framework"
+import { navigate } from "vike/client/router";
 import { toast } from "sonner";
+import { pageState } from "@/shared/models/page-context.model";
 
 const PARENTS = ["news", "banner", "event", "dictionaries", "modpack", "lands", "api"] as const
 const TYPES = ["create", "edit", "view"] as const;
@@ -9,109 +10,77 @@ const TYPES = ["create", "edit", "view"] as const;
 export type ActionParent = typeof PARENTS[number]
 export type ActionType = typeof TYPES[number]
 
+/** Config panel route. Sections and modes only exist as query params on it. */
+export const PANEL_PATH = "/private"
+
+const isParent = (value: unknown): value is ActionParent =>
+  PARENTS.includes(value as ActionParent)
+
+const isType = (value: unknown): value is ActionType =>
+  TYPES.includes(value as ActionType)
+
+/**
+ * The URL is the only source of truth for the open section and mode. Deriving
+ * instead of mirroring keeps deep links, reload, back/forward and the
+ * post-submit redirect in agreement for free.
+ */
 export const actionsState = atom(null, "actionsState").pipe(
   withAssign((_, name) => ({
-    searchParams: reatomRecord<Record<string, string>>({}, `${name}.searchParams`).pipe(withReset()),
-    parent: atom<ActionParent | null>(null, `${name}.parent`).pipe(withReset()),
-    type: atom<ActionType>("view", `${name}.type`).pipe(withReset()),
-    target: atom<Nullable<string>>(null, `${name}.target`).pipe(withReset()),
+    parent: atom((ctx): ActionParent | null => {
+      const value = ctx.spy(pageState.urlParsed)?.search?.parent
+      return isParent(value) ? value : null
+    }, `${name}.parent`),
+    type: atom((ctx): ActionType => {
+      const value = ctx.spy(pageState.urlParsed)?.search?.type
+      return isType(value) ? value : "view"
+    }, `${name}.type`),
+    target: atom((ctx): string | null => {
+      const value = ctx.spy(pageState.urlParsed)?.search?.target
+      return typeof value === "string" && value.trim().length > 0 ? value.trim() : null
+    }, `${name}.target`),
   }))
 )
+
+export type ConfigLinkParams = {
+  parent: ActionParent
+  type: ActionType
+  target?: string | number | null
+}
+
+/** Pure panel URL for a section mode; the only place that encodes the params. */
+export const configLink = ({ parent, type, target }: ConfigLinkParams): string => {
+  const search = new URLSearchParams({ parent, type })
+  const targetValue = target === null || target === undefined ? "" : String(target).trim()
+
+  if (type === "edit" && targetValue.length > 0) {
+    search.set("target", targetValue)
+  }
+
+  return `${PANEL_PATH}?${search.toString()}`
+}
+
+const go = (url: string) => {
+  void navigate(url).catch(() => {})
+}
+
 export const actions = atom(null, "actions").pipe(
   withAssign((_, name) => ({
-    createLinkValue: action((ctx, params: CreateLinkParams) => {
-      const url = new URL(window.location.href);
-      const next = { ...ctx.get(actionsState.searchParams) }
-
-      const parent = params.parent;
-      const type = params.type;
-
-      if (!parent || !type) throw new Error("Parent or type is not defined")
-      if (!PARENTS.includes(parent)) throw new Error("Parent is not defined")
-      if (!TYPES.includes(type)) throw new Error("Type is not defined")
-
-      next.parent = parent
-      url.searchParams.set('parent', parent)
-
-      next.type = type
-      url.searchParams.set('type', type)
-
-      if (params.type === 'create') {
-        delete next.target
-        url.searchParams.delete('target')
-      }
-
-      if (params.type !== 'create' && params.target?.trim()) {
-        next.target = params.target
-        url.searchParams.set('target', params.target)
-      }
-
-      return { next, url }
-    }, `${name}.createLinkValue`),
-    createLink: action((ctx, params: CreateLinkParams) => {
-      const { next, url } = actions.createLinkValue(ctx, params)
-
-      actionsState.searchParams(ctx, next)
-      window.history.pushState({}, '', url)
-    }, `${name}.createLink`),
+    open: action((ctx, params: ConfigLinkParams) => {
+      const url = configLink(params)
+      ctx.schedule(() => go(url))
+    }, `${name}.open`),
     goBack: action((ctx) => {
-      const url = new URL(window.location.href)
-
-      url.searchParams.delete('parent')
-      url.searchParams.delete('type')
-      url.searchParams.delete('target')
-
-      window.history.pushState({}, '', url)
-
-      actionsState.searchParams.reset(ctx)
-      actionsState.parent.reset(ctx)
-      actionsState.type.reset(ctx)
-      actionsState.target.reset(ctx)
-    }, `${name}.goBack`)
+      const url = ctx.get(pageState.urlPathname)
+      ctx.schedule(() => go(url))
+    }, `${name}.goBack`),
   }))
 )
+
+export const getSelectedParentAtom = (parent: ActionParent) => atom((ctx) => ctx.spy(actionsState.parent) === parent)
 
 export const getIsSelectedActionAtom = (targetParent: ActionParent, targetType: ActionType) => atom((ctx) =>
   (ctx.spy(actionsState.parent) === targetParent) && (ctx.spy(actionsState.type) === targetType)
 )
-
-actionsState.searchParams.onChange((ctx, state) => {
-  const { parent, type, target } = state
-
-  if (!PARENTS.includes(parent as ActionParent) || !TYPES.includes(type as ActionType)) return;
-
-  actionsState.parent(ctx, parent as ActionParent)
-  actionsState.type(ctx, type as ActionType)
-
-  if (type !== 'create') {
-    if (target.trim().length >= 1) {
-      actionsState.target(ctx, target)
-    }
-  } else {
-    actionsState.target(ctx, null)
-  }
-})
-
-type CreateLinkParams = {
-  parent?: AtomState<typeof actionsState.parent>,
-  type?: AtomState<typeof actionsState.type>,
-  target?: string,
-}
-
-export const actionsCanGoBackAtom = (inputParent: AtomState<typeof actionsState.parent>) => atom((ctx) => {
-  const state = ctx.spy(actionsState.searchParams);
-  const { parent: currentParent, type, target } = state;
-
-  const isThisParent = currentParent === inputParent
-  if (!isThisParent) return false;
-
-  const validParent = PARENTS.includes(currentParent)
-  const validType = type === 'create' || type === 'edit' || type === 'view'
-  const validTarget = type !== 'create' ? typeof target === 'string' && target.trim() !== '' : true
-
-  const result = validParent && validType && validTarget
-  return result
-}, 'actionsCanGoBack')
 
 const ERRORS_MAP: Record<string, string> = {
   "RESTRICTED_BY_ROLE": "Действие недоступно из-за политики ролей",
@@ -133,8 +102,6 @@ export function notifyAboutRestrictRole(e: unknown, { withToast = true } = {}) {
     }
   }
 }
-
-export const getSelectedParentAtom = (parent: ActionParent) => atom((ctx) => ctx.spy(actionsState.parent) === parent)
 
 export const compareChanges = (actual: Record<string, string | null>, old: Record<string, string | null>) => {
   return Object.keys(actual).some((key) => {

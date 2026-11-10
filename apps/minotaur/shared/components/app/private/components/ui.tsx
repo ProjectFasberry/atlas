@@ -126,7 +126,7 @@ export const ToActionButtonX = reatomComponent<{
     if (isSelected) {
       actions.goBack(ctx)
     } else {
-      actions.createLink(ctx, { parent: parent as ActionParent, type: type as ActionType })
+      actions.open(ctx, { parent: parent as ActionParent, type: type as ActionType })
     }
   }
 
