@@ -11,10 +11,8 @@ import { Methods } from "./methods"
 import { Options } from "./options"
 import { atom } from "@reatom/framework"
 import { modpackSection } from "./modpack"
-import { configSectionsOpen, toggleConfigSection } from "../models/config.model"
 import { landsSection } from "./lands"
 import { apiKeysSection } from "./api"
-import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
 
 type ComponentType = Nullable<() => ReactNode>;
@@ -80,42 +78,23 @@ type ConfigSectionProps = {
   children: ReactNode
 }
 
-/**
- * One dashboard section. The page grew into a ten-screen scroll; a sticky
- * section menu plus collapsible blocks keeps the common settings one click
- * away without splitting the state across routes.
- *
- * Children stay mounted when collapsed: an open editor or a half-edited role
- * must not lose its state when the section is folded away.
- */
-const ConfigSection = reatomComponent<ConfigSectionProps>(({ ctx, id, title, action, children }) => {
-  const open = ctx.spy(configSectionsOpen)[id] ?? true
-
+const ConfigSection = ({ id, title, action, children }: ConfigSectionProps) => {
   return (
     <SectionWrapper id={id} className="flex flex-col gap-2 w-full scroll-mt-24">
       <div className="flex items-center justify-between gap-2 w-full">
-        <button
-          type="button"
-          onClick={() => toggleConfigSection(ctx, id)}
-          className="flex items-center gap-2 text-left"
-          aria-expanded={open}
-        >
-          <Icon
-            name="sprite:chevron-down"
-            className={`size-4 text-neutral-400 duration-150 ${open ? "rotate-0" : "-rotate-90"}`}
-          />
-          <Typography className="text-base font-semibold">{title}</Typography>
-        </button>
+        <Typography className="text-base font-semibold">{title}</Typography>
         {action}
       </div>
-      <div className={open ? "flex flex-col gap-2 w-full" : "hidden"}>
+      <div className="flex flex-col gap-2 w-full">
         {children}
       </div>
     </SectionWrapper>
   )
-}, "ConfigSection")
+}
 
-const SECTIONS: { id: string, title: string }[] = [
+type SectionBase = { id: string, title: string }
+
+const SECTIONS: SectionBase[] = [
   { id: "config-general", title: "Основное" },
   { id: "config-roles", title: "Роли" },
   { id: "config-events", title: "Ивенты" },
@@ -128,20 +107,28 @@ const SECTIONS: { id: string, title: string }[] = [
 ]
 
 const ConfigNav = () => {
-  const jump = (id: string) => {
+  const jump = (id: SectionBase["id"]) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
   return (
-    <nav className="sticky top-14 lg:top-2 z-20 flex items-center gap-1 overflow-x-auto rounded-xl bg-neutral-900 p-2 scrollbar-h-1">
-      {SECTIONS.map((section) => (
+    <nav
+      className="
+        sticky top-14 lg:top-2 z-20 flex items-center gap-1 overflow-x-auto
+        rounded-xl border border-neutral-800 bg-neutral-900 p-2 scrollbar-h-1
+      "
+    >
+      {SECTIONS.map(({ id, title }) => (
         <button
-          key={section.id}
+          key={id}
           type="button"
-          onClick={() => jump(section.id)}
-          className="shrink-0 rounded-lg px-3 py-1 text-sm font-semibold text-neutral-300 duration-150 hover:bg-neutral-800 hover:text-neutral-50"
+          onClick={() => jump(id)}
+          className="
+            shrink-0 rounded-lg px-3 py-1 duration-150 hover:bg-neutral-800
+            text-sm font-semibold text-neutral-300 hover:text-neutral-50
+          "
         >
-          {section.title}
+          {title}
         </button>
       ))}
     </nav>
@@ -152,7 +139,6 @@ export const Config = () => {
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <ConfigNav />
-
       <ConfigSection id="config-general" title="Основное">
         <div className="flex flex-col sm:flex-row gap-2 sm:items-stretch w-full">
           <div className="flex flex-col gap-1 w-full">
@@ -165,11 +151,9 @@ export const Config = () => {
           </div>
         </div>
       </ConfigSection>
-
       <ConfigSection id="config-roles" title="Роли">
         <Roles />
       </ConfigSection>
-
       <ConfigSection
         id="config-events"
         title="Ивенты"
@@ -177,7 +161,6 @@ export const Config = () => {
       >
         <eventsSection.Wrapper />
       </ConfigSection>
-
       <ConfigSection
         id="config-modpacks"
         title="Модпаки"
@@ -185,7 +168,6 @@ export const Config = () => {
       >
         <modpackSection.Wrapper />
       </ConfigSection>
-
       <ConfigSection
         id="config-banners"
         title="Баннеры"
@@ -193,7 +175,6 @@ export const Config = () => {
       >
         <bannersSection.Wrapper />
       </ConfigSection>
-
       <ConfigSection
         id="config-news"
         title="Новости"
@@ -201,7 +182,6 @@ export const Config = () => {
       >
         <newsSection.Wrapper />
       </ConfigSection>
-
       <ConfigSection
         id="config-dictionaries"
         title="Справочник"
@@ -209,7 +189,6 @@ export const Config = () => {
       >
         <dictionariesSection.Wrapper />
       </ConfigSection>
-
       <ConfigSection
         id="config-api"
         title="API Ключи"
@@ -217,7 +196,6 @@ export const Config = () => {
       >
         <apiKeysSection.Wrapper />
       </ConfigSection>
-
       <ConfigSection
         id="config-lands"
         title="Регионы"
