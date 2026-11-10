@@ -11,7 +11,7 @@
 		"openapi:dev": "pnpm --filter @repo/shared openapi:dev",
 		"openapi:prod": "pnpm --filter @repo/shared openapi:prod",
 		"openapi:check": "pnpm --filter @repo/shared openapi:check",
-		"circular-check": "pnpm --filter * circlular-check",
+		"circular-check": "pnpm --filter * circular-check",
 		"postinstall": "lefthook install"
 	},
 	"devDependencies": {
