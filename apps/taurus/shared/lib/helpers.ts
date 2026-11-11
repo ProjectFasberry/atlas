@@ -13,6 +13,11 @@ export type LauncherPlatform = "windows-x86_64" | "darwin-aarch64"
 export const getLauncherDownloadUrl = (platform: LauncherPlatform) =>
   `${env.PUBLIC_ENV__API_URL}/releases/download/${platform}`
 
-export const wrapTitle = (i: string) => `Fasberry › ${i}`
+/**
+ * Title suffix. A title that already carries the brand stays as is, so the
+ * landing page can lead with the keyword instead of repeating "Fasberry".
+ */
+export const wrapTitle = (title: string) =>
+  /fasberry/i.test(title) ? title : `${title} - Fasberry`
 
 export const isError = (e: Error | unknown): e is Error => e instanceof Error;
