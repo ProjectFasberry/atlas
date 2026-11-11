@@ -76,6 +76,12 @@ export const Footer = reatomComponent(({ ctx }) => {
                 <Link href="/news">
                   {translate["shared.footer.about.news"]()}
                 </Link>
+                <Link href="/join">
+                  {translate["shared.footer.about.team"]()}
+                </Link>
+                <Link href="/report">
+                  {translate["shared.footer.about.report"]()}
+                </Link>
                 <a href="https://status.fasberry.fun">
                   {translate["shared.footer.about.status"]()}
                 </a>

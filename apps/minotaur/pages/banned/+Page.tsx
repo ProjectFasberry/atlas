@@ -49,7 +49,7 @@ const Banned = reatomComponent(({ ctx }) => {
           <BannedActionButton />
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
-          <Link href="/support" className="w-full">
+          <Link href="/report" className="w-full">
             <Button background="default" className="w-full font-semibold">
               {translate["banned.appeal"]()}
             </Button>
