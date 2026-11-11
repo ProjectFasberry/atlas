@@ -1,3 +1,3 @@
 import { wrapTitle } from "@/shared/lib/helpers";
 
-export default wrapTitle("Метрики сборок")
+export default wrapTitle("Метрики")

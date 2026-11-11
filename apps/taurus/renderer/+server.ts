@@ -5,7 +5,8 @@ import { env } from "@/shared/env";
 import { paraglideMiddleware } from "../paraglide/server";
 import { contextStorage } from "hono/context-storage";
 
-const port = 3005;
+// The container sets PORT; 3005 stays the default for local runs.
+const port = Number(process.env.PORT ?? 3005);
 process.env.PORT = String(port)
 
 const app = new Hono<Env>()

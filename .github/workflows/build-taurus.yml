@@ -1,0 +1,129 @@
+name: Build taurus
+
+on:
+  push:
+    branches: [main, dev, staging]
+    paths:
+      - "apps/taurus/**"
+      - "pkgs/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/build-taurus.yml"
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Image stage
+        type: choice
+        options: [prod, staging]
+        default: prod
+
+concurrency:
+  group: build-taurus-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve stage
+        id: stage
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            stage="${{ inputs.stage }}"
+          else
+            stage=prod
+          fi
+          echo "stage=$stage" >> "$GITHUB_OUTPUT"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.2
+
+      # Taurus needs module.registerHooks (Node >= 22.15); .nvmrc pins an older 22.x.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: "@projectfasberry"
+          always-auth: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Load Infisical build env
+        uses: Infisical/secrets-action@v1.0.18
+        with:
+          method: "universal"
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: ${{ secrets.INFISICAL_PROJECT_ID }}
+          domain: ${{ secrets.INFISICAL_DOMAIN }}
+          env-slug: ${{ steps.stage.outputs.stage }}
+          secret-path: /taurus
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter taurus... --ignore-scripts
+
+      # The image only contains the runtime; the client bundle is built here,
+      # on native amd64. Vite reads the VITE_* values injected by Infisical.
+      - name: Build client bundle
+        working-directory: apps/taurus
+        # node, not bun: the rolldown adapter needs module.registerHooks, which
+        # bun's node:module shim does not export.
+        run: pnpm exec vike build
+        env:
+          STAGE: ${{ steps.stage.outputs.stage }}
+          NODE_ENV: production
+          # Self-hosted runtime: no Cloudflare plugin, plain Node server entry.
+          DEPLOY_TARGET: node
+          VITE_MAIN_DOMAIN: ${{ vars.VITE_MAIN_DOMAIN || 'fasberry.fun' }}
+          VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL || 'support@fasberry.fun' }}
+          VITE_LANDING_ENDPOINT: ${{ vars.VITE_LANDING_ENDPOINT || 'https://fasberry.fun' }}
+          PUBLIC_ENV__TG_NAME: ${{ vars.PUBLIC_ENV__TG_NAME || 'fasberry' }}
+
+      - name: Measure build size
+        if: github.ref_name == github.event.repository.default_branch
+        continue-on-error: true
+        env:
+          BUILD_METRICS_TOKEN: ${{ secrets.BUILD_METRICS_TOKEN }}
+          BUILD_METRICS_URL: ${{ secrets.BUILD_METRICS_URL }}
+        run: |
+          node scripts/build-size.mjs --app taurus --stage ${{ steps.stage.outputs.stage }} --out build-metrics.json
+          url="${BUILD_METRICS_URL%/}"
+          case "$url" in
+            */metrics/build) ;;
+            *) url="$url/metrics/build" ;;
+          esac
+          curl -fsS -X POST "$url" \
+            -H "Authorization: Bearer ${BUILD_METRICS_TOKEN}" \
+            -H "content-type: application/json" \
+            --data @build-metrics.json
+
+      - name: Login to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.REGISTRY_HOST }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+          logout: false
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/taurus/Dockerfile
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            STAGE=${{ steps.stage.outputs.stage }}
+          tags: |
+            ${{ vars.REGISTRY_HOST }}/${{ steps.stage.outputs.stage }}/taurus:latest
+            ${{ vars.REGISTRY_HOST }}/${{ steps.stage.outputs.stage }}/taurus:sha-${{ github.sha }}
+          cache-from: type=gha,scope=taurus
+          cache-to: type=gha,mode=max,scope=taurus
