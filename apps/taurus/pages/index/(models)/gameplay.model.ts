@@ -1,6 +1,6 @@
 import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
-import { action, atom, withAssign } from "@reatom/framework";
+import { action, atom, withAssign, type Ctx } from "@reatom/framework";
 
 export const createIdeas = () => ([
   {
@@ -52,14 +52,16 @@ export const createIdeas = () => ([
 ]);
 
 export const selectedKeyAtom = atom(0, "selectedKey").pipe(
-  withAssign((atom) => ({
-    prev: action((ctx) => {
+  withAssign((atom) => {
+    const move = (ctx: Ctx, delta: number) => {
+      const ideas = createIdeas();
       const current = ctx.get(atom);
-      atom(ctx, (current - 1 + createIdeas.length) % createIdeas.length);
-    }),
-    next: action((ctx) => {
-      const current = ctx.get(atom);
-      atom(ctx, (current + 1) % createIdeas.length);
-    })
-  }))
+      atom(ctx, (current + delta + ideas.length) % ideas.length);
+    };
+
+    return {
+      prev: action((ctx) => move(ctx, -1)),
+      next: action((ctx) => move(ctx, 1))
+    }
+  })
 )

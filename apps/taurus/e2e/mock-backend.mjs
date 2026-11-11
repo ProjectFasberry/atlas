@@ -24,7 +24,39 @@ const routes = {
     ],
   }),
   '/modpack/list': () => ({
-    data: [{ name: 'E2E Modpack', version: '1.0.0', url: 'https://example.test/modpack.zip' }],
+    data: [
+      {
+        id: 1,
+        name: 'E2E Modpack',
+        created_at: '2026-01-01T00:00:00.000Z',
+        downloadLink: 'https://example.test/modpack.zip',
+      },
+    ],
+  }),
+  '/news/list': () => ({
+    data: {
+      data: [
+        {
+          id: 1,
+          title: 'E2E новость',
+          created_at: '2026-01-01T00:00:00.000Z',
+          description: 'Новость для теста',
+          imageUrl: 'https://example.test/news.webp',
+          views: 1,
+          creator: { nickname: 'e2e', avatar: '' },
+        },
+      ],
+      meta: { hasNextPage: false, hasPrevPage: false },
+    },
+  }),
+  '/server/status': () => ({
+    data: {
+      proxy: { status: 'online', online: 0, max: 200, players: [] },
+      servers: {
+        lobby: { online: 0, fullname: 'Лобби', max: 200, status: 'online' },
+        bisquite: { online: 0, fullname: 'Бисквит', max: 200, status: 'online' },
+      },
+    },
   }),
 };
 

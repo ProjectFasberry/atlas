@@ -74,13 +74,19 @@ const ActionsHeaderSlot = reatomComponent<{ parent: ActionParent }>(({ ctx, pare
 type ConfigSectionProps = {
   id: string
   title: string
+  /** Section key of the actions model, so a mode switch can scroll back here. */
+  parent?: ActionParent
   action?: ReactNode
   children: ReactNode
 }
 
-const ConfigSection = ({ id, title, action, children }: ConfigSectionProps) => {
+const ConfigSection = ({ id, title, parent, action, children }: ConfigSectionProps) => {
   return (
-    <SectionWrapper id={id} className="flex flex-col gap-2 w-full scroll-mt-24">
+    <SectionWrapper
+      id={id}
+      data-config-section={parent}
+      className="flex flex-col gap-2 w-full scroll-mt-24"
+    >
       <div className="flex items-center justify-between gap-2 w-full">
         <Typography className="text-base font-semibold">{title}</Typography>
         {action}
@@ -156,6 +162,7 @@ export const Config = () => {
       </ConfigSection>
       <ConfigSection
         id="config-events"
+        parent="event"
         title="Ивенты"
         action={<ActionsHeaderSlot parent="event" />}
       >
@@ -163,6 +170,7 @@ export const Config = () => {
       </ConfigSection>
       <ConfigSection
         id="config-modpacks"
+        parent="modpack"
         title="Модпаки"
         action={<ActionsHeaderSlot parent="modpack" />}
       >
@@ -170,6 +178,7 @@ export const Config = () => {
       </ConfigSection>
       <ConfigSection
         id="config-banners"
+        parent="banner"
         title="Баннеры"
         action={<ActionsHeaderSlot parent="banner" />}
       >
@@ -177,6 +186,7 @@ export const Config = () => {
       </ConfigSection>
       <ConfigSection
         id="config-news"
+        parent="news"
         title="Новости"
         action={<ActionsHeaderSlot parent="news" />}
       >
@@ -184,6 +194,7 @@ export const Config = () => {
       </ConfigSection>
       <ConfigSection
         id="config-dictionaries"
+        parent="dictionaries"
         title="Справочник"
         action={<ActionsHeaderSlot parent="dictionaries" />}
       >
@@ -191,6 +202,7 @@ export const Config = () => {
       </ConfigSection>
       <ConfigSection
         id="config-api"
+        parent="api"
         title="API Ключи"
         action={<ActionsHeaderSlot parent="api" />}
       >
@@ -198,6 +210,7 @@ export const Config = () => {
       </ConfigSection>
       <ConfigSection
         id="config-lands"
+        parent="lands"
         title="Регионы"
         action={<ActionsHeaderSlot parent="lands" />}
       >

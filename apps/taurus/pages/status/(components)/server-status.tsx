@@ -1,6 +1,5 @@
 import { createEffect, For, mergeProps, onMount, onCleanup, Show } from "solid-js";
 import { type PlayerStatusProps, fetchPlayerAvatars, playerAvatars, serverStatus } from "../(models)/server-status.model";
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { pageState } from "@/shared/models/page.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Dialog } from '@ark-ui/solid/dialog';
@@ -10,6 +9,8 @@ import { env } from "@/shared/env";
 import { Portal } from "solid-js/web";
 import { dialogVariant } from "@/shared/ui/dialog";
 import { getStaticObject } from "@/shared/lib/helpers";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
 const APP_URL = env.VITE_APP_URL
 const FALLBACK_HEAD = getStaticObject("fallback", "steve_head.png")
@@ -17,11 +18,13 @@ const FALLBACK_HEAD = getStaticObject("fallback", "steve_head.png")
 type PlayerStatusImageProps = { type?: "small" | "full" } & PlayerStatusProps
 
 const PlayerStatusImage = (props: PlayerStatusImageProps) => {
-  const [avatars] = useAtom(playerAvatars)
+  const avatars = useAtomAccessor(playerAvatars)
   const merged = mergeProps({ type: "small" }, props);
+
   const size = () => merged.type === 'small'
     ? 'max-w-[36px] max-h-[36px]'
     : 'max-w-[164px] max-h-[164px]'
+
   const isLoading = () => !Object.hasOwn(avatars(), merged.nickname)
 
   return (
@@ -65,7 +68,7 @@ const PlayerStatus = (props: PlayerStatusProps) => {
       <Portal>
         <Dialog.Backdrop class={dialogVariant.backdrop()} />
         <Dialog.Positioner>
-          <Dialog.Content class="justify-center !max-w-xl">
+          <Dialog.Content class="justify-center max-w-xl!">
             <Dialog.Title class={dialogVariant.title()}>{props.nickname}</Dialog.Title>
             <div class="flex flex-col items-center gap-8 w-full">
               <PlayerStatusImage type="full" nickname={props.nickname} />
@@ -113,9 +116,8 @@ const ServerStatusSkeleton = () => {
   )
 }
 
-export const ServerStatus = () => {
-  const ctx = useCtx();
-  const [isClientAtom] = useAtom(pageState.isClient)
+export const ServerStatus = reatomComponent(({ ctx }) => {
+  const isClient = useAtomAccessor(pageState.isClient)
 
   onMount(() => {
     serverStatus.fetch(ctx)
@@ -125,20 +127,20 @@ export const ServerStatus = () => {
     serverStatus.fetch.abort(ctx)
   })
 
-  const [dataAtom] = useAtom(serverStatus.fetch.dataAtom)
-  const [statuses] = useAtom(serverStatus.fetch.statusesAtom);
+  const data = useAtomAccessor(serverStatus.fetch.dataAtom)
+  const statuses = useAtomAccessor(serverStatus.fetch.statusesAtom);
 
   createEffect(() => {
-    const players = dataAtom()?.proxy.players ?? []
+    const players = data()?.proxy.players ?? []
     if (players.length > 0) fetchPlayerAvatars(ctx, players)
   })
 
   return (
     <Show
-      when={isClientAtom() && !statuses().isPending}
+      when={isClient() && !statuses().isPending}
       fallback={<ServerStatusSkeleton />}
     >
-      <Show when={dataAtom()}>
+      <Show when={data()}>
         {(data) => {
           const isServerOnline = data().proxy.status === 'online'
           const playersList = data().proxy.players
@@ -173,4 +175,4 @@ export const ServerStatus = () => {
       </Show>
     </Show>
   )
-}
+}, "ServerStatus")

@@ -8,15 +8,19 @@ import { pageState } from "@/shared/models/page.model";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/shared/ui/drawer";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { ClientOnly } from "vike-solid/ClientOnly";
-import { expImage, logoImage, createMainHeaderLinks, headerDrawerState, type MainHeaderLink } from "./header.model";
+import {
+  expImage, logoImage, createMainHeaderLinks, headerDrawerState,
+  type MainHeaderLink
+} from "./header.model";
 import { tv } from "tailwind-variants";
 import { menuVariant } from "../../ui/menu";
-import { cn } from "../../lib/utils";
+import { cn, useAtomAccessor } from "../../lib/utils";
 
 const bellImg = getStaticObject("minecraft/icons", "bell.webp");
 const bgImage = getStaticObject("minecraft/static", "cracked_polished_blacked.webp")
 
-const HeaderDrawerContent = lazy(() => import("./header-drawer").then(m => ({ default: m.HeaderDrawerContent })))
+const HeaderDrawerContent = lazy(() => import("./header-drawer")
+  .then(m => ({ default: m.HeaderDrawerContent })))
 
 const HeaderDrawer = () => {
   const [isOpenAtom, setIsOpenAtom] = useAtom(headerDrawerState.isOpen)
@@ -33,7 +37,7 @@ const HeaderDrawer = () => {
     >
       <DrawerTrigger
         aria-label={isOpenAtom() ? "Открыто" : "Закрыто"}
-        class="xl:hidden absolute top-[10px] right-[8px] z-[3000]"
+        class="xl:hidden absolute top-2.5 right-2 z-3000"
       >
         <img src={chestStatusImage} alt="" width={48} height={48} />
       </DrawerTrigger>
@@ -62,9 +66,9 @@ const headerItemVariant = tv({
 })
 
 const HeaderItemMenu = (props: MainHeaderLink) => {
-  const [urlParsedAtom] = useAtom(pageState.urlParsed);
+  const urlParsed = useAtomAccessor(pageState.urlParsed);
 
-  const pathname = () => urlParsedAtom()?.pathname
+  const pathname = () => urlParsed()?.pathname
   const isActive = () => pathname() === props.href;
 
   const handlePathDetect = (href: string) => {
@@ -97,7 +101,7 @@ const HeaderItemMenu = (props: MainHeaderLink) => {
             </div>
           </Menu.Trigger>
           <Menu.Positioner>
-            <Menu.Content class={menuVariant.content({ class: "flex flex-col gap-2 w-full min-w-[200px]" })}>
+            <Menu.Content class={menuVariant.content({ class: "flex flex-col gap-2 w-full min-w-50" })}>
               <Show when={props.childs}>
                 {(childs) => (
                   <For each={childs()}>
@@ -148,10 +152,10 @@ export const Header = () => {
       class={`header flex items-center justify-between absolute top-0 transition w-full bg-repeat-x z-50`}
       style={{ "background-size": '160px', "background-image": `url(${bgImage})` }}
     >
-      <Link href="/" class="bg-transparent cursor-pointer relative md:-right-[40px] top-3 xl:-right-[60px]">
+      <Link href="/" class="bg-transparent cursor-pointer relative md:-right-10 top-3 xl:-right-15">
         <img src={logoImage} draggable={false} width={224} height={64} title="Fasberry" alt="Fasberry" />
       </Link>
-      <div class="hidden xl:flex gap-8 items-center justify-start pr-[132px]">
+      <div class="hidden xl:flex gap-8 items-center justify-start pr-33">
         <For each={createMainHeaderLinks()}>
           {/* @ts-expect-error */}
           {(item) => <HeaderItemMenu {...item} />}

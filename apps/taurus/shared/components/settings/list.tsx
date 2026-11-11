@@ -1,20 +1,20 @@
 import { For, Index } from "solid-js";
 import { settingsListAtom } from "./settings.model";
-import { useAtom } from "@reatom/npm-solid-js";
 import { entries } from "@reatom/framework";
 import { Select } from "@ark-ui/solid/select";
 import { Typography } from "@/shared/ui/typography";
 import { selectVariant } from "@/shared/ui/select";
 import { Icon } from "@/shared/ui/icon";
 import { Portal } from "solid-js/web";
+import { useAtomAccessor } from "@/shared/lib/utils";
 
 export const SettingsList = () => {
-  const [list] = useAtom(settingsListAtom);
+  const list = useAtomAccessor(settingsListAtom);
 
   return (
     <For each={entries(list())}>
       {([_, data]) => {
-        const [current] = useAtom(data.current);
+        const current = useAtomAccessor(data.current);
 
         return (
           <div class="flex items-center justify-between w-full gap-1">

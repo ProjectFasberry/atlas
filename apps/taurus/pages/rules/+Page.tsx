@@ -6,8 +6,7 @@ import { Overlay } from "@/shared/ui/overlay";
 import { Typography } from "@/shared/ui/typography";
 import { WrapperTitle } from "@/shared/ui/wrapper-title";
 import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
-import { Rules } from "./(components)/rules-list";
-import { RulesTags } from "./(components)/rules-tags";
+import { RulesContent } from "./(components)/rules-list";
 import { translate } from "@/shared/locales/helpers";
 
 const url = getStaticObject("backgrounds", "rules_background.png")
@@ -40,23 +39,9 @@ export default function Page() {
           </div>
         </WrapperTitle>
       </div>
-      <div class="full-screen-section py-32">
-        <div class="flex flex-col gap-10 responsive mx-auto">
-          <div
-            class="transparent-achievement-panel lg:gap-4 p-2 lg:p-4 flex flex-col md:flex-row w-full gap-2 justify-between"
-          >
-            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2">
-              <Typography title="Актуальные теги" color="white" class="text-md lg:text-lg xl:text-xl">
-                {translate["rules.tags.title"]()}
-              </Typography>
-              <div class="flex flex-wrap gap-2">
-                <RulesTags />
-              </div>
-            </div>
-          </div>
-          <div id="rules-list" class="flex flex-col gap-6 w-full h-full">
-            <Rules />
-          </div>
+      <div class="full-screen-section py-16 lg:py-24">
+        <div class="responsive mx-auto">
+          <RulesContent />
         </div>
       </div>
     </MainWrapperPage>

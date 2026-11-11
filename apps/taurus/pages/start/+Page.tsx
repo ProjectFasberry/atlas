@@ -7,7 +7,6 @@ import { translate } from "@/shared/locales/helpers";
 
 const APP_URL = env.VITE_APP_URL
 const WINDOWS_URL = getLauncherDownloadUrl("windows-x86_64")
-const MACOS_URL = getLauncherDownloadUrl("darwin-aarch64")
 const NumericItem = ({ index }: { index: number }) => {
   return (
     <div class="flex items-center justify-center aspect-square border-shark-800">
@@ -48,7 +47,7 @@ export default function Page() {
                     class="text-green text-shadow-lg hover:underline-offset-8 hover:underline"
                   >
                     {translate["start.template.register"]()}
-                  </a>&nbsp;{translate["start.template.register-project"]()}
+                  </a>&nbsp;{translate["start.template.register-project"]()}{" "}
                   {translate["start.template.register-after"]()}
                 </Typography>
               </div>
@@ -83,16 +82,19 @@ export default function Page() {
                         {translate["start.template.steps.download-windows"]()}
                       </Typography>
                     </a>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href={MACOS_URL}
-                      class="flex justify-center items-center button px-4 py-1"
+                    <button
+                      type="button"
+                      disabled
+                      title={translate["shared.soon"]()}
+                      class="flex cursor-not-allowed items-center justify-center button px-4 py-1 opacity-70"
                     >
                       <Typography class="text-nowrap">
                         {translate["start.template.steps.download-macos"]()}
+                        <span class="ml-2 border border-neutral-400/60 px-1 text-[10px] uppercase tracking-wide text-neutral-200">
+                          {translate["shared.soon"]()}
+                        </span>
                       </Typography>
-                    </a>
+                    </button>
                   </div>
                   <Typography color="gray" class="text-sm md:text-base">
                     {translate["start.template.steps.download-hint"]()}

@@ -1,18 +1,20 @@
-import { createSignal, Index } from "solid-js"
+import { Index } from "solid-js"
 import { Carousel } from '@ark-ui/solid/carousel'
-import { SPAWN_IMAGES } from "../(models)/spawn-carousel.model"
+import { SPAWN_IMAGES, setSpawnPage, spawnCarouselState } from "../(models)/spawn-carousel.model"
 import { carouselVariant } from "@/shared/ui/carousel"
+import { useAtomAccessor } from "@/shared/lib/utils"
+import { reatomComponent } from "@/shared/lib/reatom"
 
-export const SpawnCarousel = () => {
-  const [selected, setSelected] = createSignal(0)
+export const SpawnCarousel = reatomComponent(({ ctx }) => {
+  const page = useAtomAccessor(spawnCarouselState.page)
 
   return (
     <Carousel.Root
       slideCount={SPAWN_IMAGES.length}
       class={carouselVariant.root()}
-      page={selected()}
+      page={page()}
       allowMouseDrag={true}
-      onPageChange={(details) => setSelected(details.page)}
+      onPageChange={(details) => setSpawnPage(ctx, details.page)}
       loop
       autoplay
       slidesPerPage={1.4}
@@ -26,7 +28,7 @@ export const SpawnCarousel = () => {
               <img
                 src={image()}
                 draggable={false}
-                class="max-h-[1080px] brightness-75"
+                class="max-h-270 brightness-75"
                 loading="lazy"
                 alt=""
               />
@@ -43,4 +45,4 @@ export const SpawnCarousel = () => {
       </div>
     </Carousel.Root>
   )
-}
+}, "SpawnCarousel")

@@ -1,36 +1,38 @@
 import { Dialog } from "@ark-ui/solid/dialog";
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
+import { useAtom } from "@reatom/npm-solid-js";
 import { Portal } from 'solid-js/web'
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { layoutSettingsState, layoutSettings } from "./settings.model";
 import { translate } from "../../locales/helpers";
 import { lazy, Suspense } from "solid-js";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
-const SettingsList = lazy(() => import("./list").then(m => ({ default: m.SettingsList })))
+const SettingsList = lazy(() => import("./list")
+  .then(m => ({ default: m.SettingsList })))
 
 const spyglassImg = getStaticObject("minecraft", "icons/fishing_bobber.webp")
 
-const LayoutSettingsTrigger = () => {
-  const ctx = useCtx();
-
-  const [isTriggeredAtom] = useAtom(layoutSettingsState.isTriggered)
-  const [isOpenAtom] = useAtom(layoutSettingsState.isOpen)
+const LayoutSettingsTrigger = reatomComponent(({ ctx }) => {
+  const isTriggered = useAtomAccessor(layoutSettingsState.isTriggered)
+  const isOpen = useAtomAccessor(layoutSettingsState.isOpen)
 
   return (
     <button
       aria-label="Открыть настройки сайта"
       name="open-settings"
       onClick={() => layoutSettings.open(ctx)}
-      class={`top-2/3 group -translate-y-1/4 focus:scale-[1.1] cursor-pointer absolute right-4 w-12 h-12 z-11 duration-500 ease-in-out
-        ${isTriggeredAtom() ? "-translate-y-[9999px]" : "translate-y-0"}
-        ${isOpenAtom() ? "hidden" : "block"}
+      class={`top-2/3 group -translate-y-1/4 focus:scale-[1.1]
+        cursor-pointer absolute right-4 w-12 h-12 z-11 duration-500 ease-in-out
+        ${isTriggered() ? "-translate-y-[9999px]" : "translate-y-0"}
+        ${isOpen() ? "hidden" : "block"}
       `}
     >
       <img src={spyglassImg} alt="" draggable={false} width={46} height={46} />
     </button>
   )
-}
+}, "LayoutSettingsTrigger")
 
 const LayoutSettingsDialog = () => {
   const [isOpenAtom, setIsOpenAtom] = useAtom(layoutSettingsState.isOpen);

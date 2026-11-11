@@ -1,12 +1,8 @@
-import createClient, { type ClientOptions } from "openapi-fetch";
+import createClient from "openapi-fetch";
 import type { paths as mainClientPaths } from "../types/gen";
 import { env } from "../env";
 
-const baseOptions: ClientOptions = {
-  credentials: "include"
-}
-
 export const mainClient = createClient<mainClientPaths>({
-  ...baseOptions,
+  credentials: "include",
   baseUrl: env.PUBLIC_ENV__API_URL,
 });
