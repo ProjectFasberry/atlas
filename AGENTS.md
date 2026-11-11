@@ -10,8 +10,9 @@ scripts.
 - **Never commit, push, merge or deploy without an explicit request.** Ask about
   scope first: the working tree may contain another task's changes. A commit is
   not permission to push: ask for each step, and one question may cover both only
-  when it is answered before anything is staged. This overrides earlier "commit
-  and push" instructions for a task.
+  when it is answered before anything is staged. Do not invent a deploy step, and
+  never ship from a dirty tree without confirming what ships. This overrides
+  earlier "commit and push" instructions for a task.
 - **One package manager.** The workspace uses `pnpm` and `pnpm-lock.yaml`; never
   add npm/yarn lockfiles. Apps whose scripts call `bun` run them with bun - use
   what the app's `package.json` declares.
@@ -23,8 +24,7 @@ scripts.
   CI-built images pulled by the host; host, registry and compose changes belong
   to the infra repo.
 - **Deploy only on an explicit request**, by pushing the app branch or running
-  its workflow. Do not invent a deploy step or ship from a dirty tree without
-  confirming what ships.
+  its workflow.
 - **Do not edit generated files** - Paraglide output, generated icon sprites,
   `dist` and similar build artifacts. Regenerate them with the app's script.
 
@@ -72,7 +72,7 @@ scripts.
 - `pkgs/*` - shared packages (configs, UI, shared libs). Consume them through
   workspace dependencies, never through relative paths into another workspace.
   App-local aliases are declared in that app's tsconfig/vite config.
-- `standards/` - repo-wide conventions: maintaining, architecture and Linear.
+- `standards/` - repo-wide conventions: maintaining and Linear.
 
 ## Commands
 
@@ -108,8 +108,6 @@ Container apps (`minotaur`, `wiki`) deploy by push: `main` goes to `prod`,
 
 - Required repo secrets: `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`; add
   `NODE_AUTH_TOKEN` only when the build installs private packages.
-- Do not ssh/scp/docker into `i-m` or run compose there. Host-side changes
-  (Traefik, Zot, compose files, the pull script install) belong to the infra repo.
 - Rollback is a compose change to `:sha-<commit>` on the host, not a rebuild.
 - `taurus` is a Cloudflare Worker and still deploys manually with `wrangler`;
   it has no container in this pull path.

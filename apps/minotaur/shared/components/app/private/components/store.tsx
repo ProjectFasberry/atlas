@@ -1,4 +1,4 @@
-import { DeleteButton, EditButton, SectionWrapper, LinkButton } from "@/shared/components/app/private/components/ui"
+import { DeleteButton, EditButton, SectionWrapper, LinkButton, sectionActionVariant } from "@/shared/components/app/private/components/ui"
 import {
   itemToEditAtom, editStoreItem, editStoreItemState, deleteStoreItem,
   storeState, storeItems, createStoreItem, createStoreItemState
@@ -13,7 +13,6 @@ import { Icon } from "@/shared/ui/icon"
 import { type PropsWithChildren, type ReactNode } from "react"
 import { navigate } from "vike/client/router"
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react"
-import { belkoinImage, charismImage } from "@/shared/consts/images"
 import { getFromDictionary } from "@/shared/models/app/utils"
 import { type StoreItem as StoreItemProps } from "../../shop/models/store-item.model"
 import { editorExtensions } from "@/shared/components/config/editor/editor.model"
@@ -25,16 +24,15 @@ import { selectContentBaseStyle, selectVariant } from "@/shared/ui/select"
 import { createLink } from "@/shared/components/config/link/link.model"
 
 const currencyValues = ["CHARISM", "BELKOIN"];
-const getCurrencyTitle = (ctx: Ctx, value: string) => getFromDictionary(ctx, value)
+const getCurrencyTitle = (ctx: Ctx, val: string) => getFromDictionary(ctx, val)
 
 const CURRENCY_ITEMS = (ctx: Ctx) => currencyValues.map((value) => ({
   value,
-  title: getCurrencyTitle(ctx, value)!,
+  title: getCurrencyTitle(ctx, value),
 }));
 
 const TYPE_ITEMS = [
-  { title: "Ивент", value: "event" },
-  { title: "Донат", value: "donate" }
+  { title: "Ивент", value: "event" }, { title: "Донат", value: "donate" }
 ]
 
 export const CreateItem = reatomComponent(({ ctx }) => {
@@ -124,7 +122,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
                         {item.title}
                       </Select.ItemText>
                       <Select.ItemIndicator className={selectVariant.itemIndicator()}>
-                        <Icon name="sprite:check" className="size-4"/>
+                        <Icon name="sprite:check" className="size-4" />
                       </Select.ItemIndicator>
                     </Select.Item>
                   ))}
@@ -164,7 +162,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
                         {item.title}
                       </Select.ItemText>
                       <Select.ItemIndicator className={selectVariant.itemIndicator()}>
-                        <Icon name="sprite:check" className="size-4"/>
+                        <Icon name="sprite:check" className="size-4" />
                       </Select.ItemIndicator>
                     </Select.Item>
                   ))}
@@ -188,7 +186,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
           <Typography className="font-semibold text-lg text-neutral-50">
             Создать
           </Typography>
-          <Icon name="sprite:check" className="size-[18px]" />
+          <Icon name="sprite:check" className="size-4.5" />
         </Button>
       </div>
     </div>
@@ -201,14 +199,20 @@ const titles: Record<AtomState<typeof storeState.searchParamTarget>, string> = {
   "view": "Просмотр товаров"
 }
 
-const headerTitleAtom = atom((ctx) => titles[ctx.spy(storeState.searchParamTarget)], "headerTitle")
-const backIsVisibleAtom = atom((ctx) => !!ctx.spy(storeState.searchParamTarget), "backIsVisible")
+const headerTitleAtom = atom((ctx) =>
+  titles[ctx.spy(storeState.searchParamTarget)], "headerTitle"
+)
 
 const StoreItem = reatomComponent<StoreItemProps>(({ ctx, imageUrl, description, title, id, ...base }) => {
   const item = { imageUrl, description, title, id, ...base }
 
   return (
-    <div className="flex items-center border border-neutral-800 gap-2 sm:gap-4 justify-between px-2 sm:px-4 py-2 w-full h-18 rounded-lg">
+    <div
+      className="
+        flex items-center border border-neutral-800 gap-2 sm:gap-4 justify-between
+        px-2 sm:px-4 py-2 w-full h-18 rounded-lg
+      "
+    >
       <div className="flex items-center gap-2 overflow-hidden">
         <img src={imageUrl} alt="" className="hidden sm:block object-cover min-h-10 min-w-10 h-10 w-10" />
         <div className="flex flex-col min-w-0 w-full">
@@ -237,21 +241,8 @@ const StoreItem = reatomComponent<StoreItemProps>(({ ctx, imageUrl, description,
   )
 }, "StoreItem")
 
-const StoreCreateItem = () => {
-  return (
-    <Button
-      className="h-8 w-fit items-center gap-2 justify-center px-4 border border-neutral-800"
-      onClick={() => navigate("/private/store?target=create")}
-    >
-      <Typography className="font-semibold text-lg text-neutral-50">
-        Создать
-      </Typography>
-      <Icon name="sprite:plus" className="size-[18px]" />
-    </Button>
-  )
-}
-
-const StoreItemsSkeleton = () => Array.from({ length: 12 }).map((_, idx) => <Skeleton key={idx} className="h-18 w-full" />)
+const StoreItemsSkeleton = () => Array.from({ length: 12 }).map((_, idx) =>
+  <Skeleton key={idx} className="h-18 w-full" />)
 
 const StoreItems = reatomComponent(({ ctx }) => {
   useUpdate(storeItems.fetch, []);
@@ -289,11 +280,6 @@ const Wrapper = reatomComponent<PropsWithChildren>(({ ctx, children }) => {
     </SectionWrapper>
   )
 }, "Wrapper")
-
-const CURRENCY_IMAGE: Record<string, string> = {
-  "CHARISM": charismImage,
-  "BELKOIN": belkoinImage
-}
 
 const EditItem = reatomComponent(({ ctx }) => {
   const data = ctx.spy(itemToEditAtom);
@@ -396,7 +382,7 @@ const EditItem = reatomComponent(({ ctx }) => {
                         {item.title}
                       </Select.ItemText>
                       <Select.ItemIndicator className={selectVariant.itemIndicator()}>
-                        <Icon name="sprite:check" className="size-4"/>
+                        <Icon name="sprite:check" className="size-4" />
                       </Select.ItemIndicator>
                     </Select.Item>
                   ))}
@@ -437,7 +423,7 @@ const EditItem = reatomComponent(({ ctx }) => {
                         {item.title}
                       </Select.ItemText>
                       <Select.ItemIndicator className={selectVariant.itemIndicator()}>
-                        <Icon name="sprite:check" className="size-4"/>
+                        <Icon name="sprite:check" className="size-4" />
                       </Select.ItemIndicator>
                     </Select.Item>
                   ))}
@@ -457,7 +443,7 @@ const EditItem = reatomComponent(({ ctx }) => {
         disabled={ctx.spy(editStoreItem.submit.statusesAtom).isPending}
         className="bg-neutral-50 text-neutral-950 font-semibold text-lg self-end"
       >
-        Применить изменения
+        Применить
       </Button>
     </div>
   )
@@ -469,32 +455,24 @@ const COMPONENTS: Record<string, ReactNode> = {
   "edit": <EditItem />
 }
 
-const Back = reatomComponent(({ ctx }) => {
-  const isVisible = ctx.spy(backIsVisibleAtom)
-  if (!isVisible) return null;
-
-  return (
-    <Button
-      className="p-0 h-8 w-8 aspect-square bg-neutral-800"
-      onClick={() => window.history.back()}
-    >
-      <Icon name="sprite:arrow-left" className="size-4" />
-    </Button>
-  )
-}, "Back")
-
 const StoreHeader = reatomComponent(({ ctx }) => {
   const title = ctx.spy(headerTitleAtom);
+  const styles = sectionActionVariant({ state: "default" })
 
   return (
     <div className="flex items-center justify-between gap-1 w-full">
-      <div className="flex gap-2 items-center justify-start w-full">
-        <Back />
-        <Typography className='text-lg font-semibold text-neutral-50'>
+      <div className="flex gap-1 items-center justify-start w-full">
+        <Typography className='text-base font-semibold'>
           {title}
         </Typography>
       </div>
-      <StoreCreateItem />
+      <Button
+        onClick={() => navigate("/private/store?target=create")}
+        className={styles.root()}
+      >
+        <Typography className={styles.label()}>Создать</Typography>
+        <Icon name="sprite:plus" className={styles.icon()} />
+      </Button>
     </div>
   )
 }, "Header")

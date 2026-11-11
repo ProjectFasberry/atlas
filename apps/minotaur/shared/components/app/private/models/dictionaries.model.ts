@@ -3,7 +3,6 @@ import { reatomAsync, withCache, withDataAtom, withErrorAtom, withStatusesAtom }
 import { action, atom } from "@reatom/framework";
 import { actions, compareChanges, notifyAboutRestrictRole } from "./actions.model";
 import { withAssign, withReset } from "@reatom/framework";
-import { withUndo } from '@reatom/undo'
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 import { isEmptyArray } from "@/shared/lib/utils";
 
@@ -17,8 +16,8 @@ export type DictionariesItem = {
 export const dictState = atom(null, "dictState").pipe(
   withAssign((_, name) => ({
     editId: atom<Nullable<number>>(null, `${name}.editId`).pipe(withReset()),
-    editKey: atom<Nullable<string>>(null, `${name}.editKey`).pipe(withReset(), withUndo({ length: 200 })),
-    editValue: atom<Nullable<string>>(null, `${name}.editValue`).pipe(withReset(), withUndo({ length: 200 })),
+    editKey: atom<Nullable<string>>(null, `${name}.editKey`).pipe(withReset()),
+    editValue: atom<Nullable<string>>(null, `${name}.editValue`).pipe(withReset()),
     createKey: atom<string>("", `${name}.createKey`).pipe(withReset()),
     createValue: atom<string>("", `${name}.createValue`).pipe(withReset())
   }))
@@ -41,17 +40,13 @@ export const dictionariesEdit = atom(null, "dictionariesEdit").pipe(
     }),
     getIsEdit: (id: number) => atom((ctx) => ctx.spy(dictState.editId) === id),
     isValid: atom((ctx) => {
-      const payload = {
-        key: ctx.spy(dictState.editKey),
-        value: ctx.spy(dictState.editValue)
-      }
+      const target = ctx.spy(dict.fetchList.dataAtom)?.find((item) => item.id === ctx.spy(dictState.editId))
+      if (!target) return false
 
-      const old = {
-        key: ctx.get(dictState.editKey.historyAtom)[1],
-        value: ctx.get(dictState.editValue.historyAtom)[1]
-      }
-
-      return compareChanges(payload, old)
+      return compareChanges(
+        { key: ctx.spy(dictState.editKey), value: ctx.spy(dictState.editValue) },
+        { key: target.key, value: target.value }
+      )
     }),
   }))
 )

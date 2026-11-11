@@ -1,7 +1,19 @@
 import type { ReactNode } from "react";
-import { ToActionButtonX } from "../components/ui";
+import { SectionAction } from "../components/ui";
 import { reatomComponent } from "@reatom/npm-react";
 import { actionsState, getSelectedParentAtom, type ActionParent, type ActionType } from "./actions.model";
+
+/** Toggle plus the section's own submit button, same shape for every section. */
+const SectionActions = ({ parent, type, submit }: {
+  parent: ActionParent,
+  type: "create" | "edit",
+  submit: ReactNode
+}) => (
+  <div className="flex items-center gap-1">
+    <SectionAction parent={parent} type={type} />
+    {submit}
+  </div>
+)
 
 export const createPrivatedSectionModel = ({
   event, components
@@ -13,26 +25,16 @@ export const createPrivatedSectionModel = ({
   }
 }) => {
   const HeaderViewElement = () => (
-    <ToActionButtonX title="Создать" parent={event} type="create" />
+    <SectionAction title="Создать" parent={event} type="create" />
   );
 
-  const HeaderCreateElement = () => {
-    return (
-      <div className="flex items-center gap-1">
-        <ToActionButtonX parent={event} type="create" />
-        {components.header.create}
-      </div>
-    )
-  }
+  const HeaderCreateElement = () => (
+    <SectionActions parent={event} type="create" submit={components.header.create} />
+  )
 
-  const HeaderEditElement = () => {
-    return (
-      <div className="flex items-center gap-1">
-        <ToActionButtonX parent={event} type="edit" />
-        {components.header.edit}
-      </div>
-    )
-  }
+  const HeaderEditElement = () => (
+    <SectionActions parent={event} type="edit" submit={components.header.edit} />
+  )
 
   const VARIANTS: Record<ActionType, ReactNode> = {
     create: components.content.create,
@@ -41,7 +43,7 @@ export const createPrivatedSectionModel = ({
   }
 
   const Wrapper = reatomComponent(({ ctx }) => {
-    if (!ctx.spy(getSelectedParentAtom(event as ActionParent))) return VARIANTS["view"]
+    if (!ctx.spy(getSelectedParentAtom(event))) return VARIANTS["view"]
     return VARIANTS[ctx.spy(actionsState.type)]
   }, `${event}.Wrapper`)
 

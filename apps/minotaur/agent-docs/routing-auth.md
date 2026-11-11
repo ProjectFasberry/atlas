@@ -89,4 +89,8 @@ cannot open.
 - Use the shared `Link`/`Button` primitives, not raw `<a>` for internal routes.
 - Keep URL/search state in the page model (`pageState.urlParsed`) or Reatom URL
   atoms; do not parse `window.location` in components.
+- The config panel keeps the open section and mode in `parent`/`type`/`target`
+  on `/private`. Derive them from `pageState.urlParsed` and change them with
+  `actions.open`/`actions.goBack` (`private/models/actions.model.ts`); never
+  mirror the query into a second atom or call `history.pushState` by hand.
 - Preserve filters/pagination in the query string when the page supports it.

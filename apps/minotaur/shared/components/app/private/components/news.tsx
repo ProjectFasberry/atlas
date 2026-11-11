@@ -11,8 +11,7 @@ import {
   deleteNews, newsList,
   createNewsStateFullImageUrlAtom,
   newsImageVariant,
-  type NewsImageVariant,
-  type NewsSingle
+  type NewsImageVariant, type NewsSingle
 } from "../models/news.model"
 import { Input } from "@/shared/ui/input"
 import { type Atom, type AtomMut, type Ctx } from "@reatom/framework"
@@ -120,32 +119,38 @@ const EditNewsSubmit = reatomComponent(({ ctx }) => {
   )
 }, "EditNewsSubmit")
 const EditNewsTitleInput = reatomComponent(({ ctx }) => {
-  const old = ctx.get(editNewsState.title.historyAtom)[1]
-  const value = ctx.spy(editNewsState.title)
-
   return (
     <Input
-      value={value ?? old ?? ''}
+      value={ctx.spy(editNewsState.title)}
       onChange={e => editNews.updateField(ctx, 'title', e.target.value)}
       placeholder="Заголовок"
     />
   )
 }, "EditNewsTitleInput")
 const EditNewsDescInput = reatomComponent(({ ctx }) => {
-  const old = ctx.get(editNewsState.description.historyAtom)[1]
-  const value = ctx.spy(editNewsState.description)
-
   return (
     <Input
-      value={value ?? old ?? ''}
+      value={ctx.spy(editNewsState.description)}
       onChange={e => editNews.updateField(ctx, 'description', e.target.value)}
       placeholder="Описание"
     />
   )
 }, "EditNewsDescInput")
 const EditNewsForm = reatomComponent(({ ctx }) => {
+  // The form is the owner of the edit state: fill it when it opens, clear it when it closes.
+  useUpdate((ctx) => { editNews.reset(ctx) }, [])
+  useUpdate((ctx, item) => { if (item) editNews.fill(ctx, item) }, [editNews.item])
+
   const item = ctx.spy(editNews.item);
-  if (!item) return <Typography>Выбранный объект не найден</Typography>
+  if (!item) {
+    const isLoading = ctx.spy(newsList.fetch.statusesAtom).isPending;
+
+    if (isLoading) {
+      return <Skeleton className="h-40 w-full" />
+    }
+
+    return <Typography>Выбранный объект не найден</Typography>
+  }
 
   return (
     <div className="flex flex-col w-full gap-2">
@@ -153,7 +158,7 @@ const EditNewsForm = reatomComponent(({ ctx }) => {
       <EditNewsDescInput />
       <div className="flex flex-col gap-2 w-full">
         <NewsContent
-          isValidAtom={editNews.isValid}
+          isValidAtom={editNews.contentIsValid}
           initValue={item.content as JSONContent}
           tempContentAtom={editNewsState.tempContent}
           saveAction={editNews.saveContent}
@@ -282,7 +287,7 @@ const CreateNewsImage = reatomComponent(({ ctx }) => {
             <Portal>
               <Dialog.Backdrop className={dialogVariant.backdrop()} />
               <Dialog.Positioner className={dialogVariant.positioner()}>
-                <Dialog.Content className={dialogVariant.content("p-0! max-h-[720px]")}>
+                <Dialog.Content className={dialogVariant.content("p-0! max-h-180")}>
                   <img
                     src={ctx.spy(createNewsStateFullImageUrlAtom)}
                     alt=""
@@ -380,7 +385,7 @@ const NewsListItem = reatomComponent<NewsSingle>(({ ctx, id, title, imageUrl, cr
       <div className="flex items-center gap-1">
         <LinkButton link={createLink("news", id)} />
         <EditButton
-          onClick={() => actions.createLinkValue(ctx, { parent: "news", type: "edit", target: id.toString() })}
+          onClick={() => actions.open(ctx, { parent: "news", type: "edit", target: id })}
         />
         <DeleteButton
           onClick={() => deleteNews.deleteBefore(ctx, { id, title })}
