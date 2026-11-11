@@ -669,5 +669,23 @@
     "unban": "Unban",
     "appeal": "Appeal the ban",
     "rules": "Project rules"
+  },
+  "team": {
+    "join": {
+      "title": "Join the project team",
+      "description": "We are looking for builders, developers, designers, moderators and content people. Tell us about yourself and we will reply on Telegram.",
+      "roles": "Roles",
+      "about": "About you",
+      "about-placeholder": "Experience, skills and how much time you can give the project",
+      "portfolio": "Portfolio",
+      "portfolio-placeholder": "Links to your work, GitHub, build screenshots",
+      "submit": "Send application",
+      "sending": "Sending…",
+      "cap-note": "We will ask you to pass a bot check before sending.",
+      "error": "Could not send",
+      "success-title": "Application sent",
+      "success-text": "Thanks! We will review it and message you on Telegram.",
+      "cta": "Join the team"
+    }
   }
 }

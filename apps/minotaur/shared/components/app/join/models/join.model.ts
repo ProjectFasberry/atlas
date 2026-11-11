@@ -1,0 +1,90 @@
+import { action, atom, withAssign, withReset } from "@reatom/framework"
+import { client } from "@/shared/lib/client-wrapper"
+import { pof } from "@/shared/components/config/cap/models/cap.model"
+import { maybeSpyOptionAtom } from "@/shared/models/app/utils"
+import { teamApplySchema, type TeamRole } from "@/shared/schemas/team"
+
+export const joinState = atom(null, "joinState").pipe(
+  withAssign((_, name) => ({
+    roles: atom<TeamRole[]>([], `${name}.roles`).pipe(withReset()),
+    about: atom("", `${name}.about`).pipe(withReset()),
+    telegram: atom("", `${name}.telegram`).pipe(withReset()),
+    email: atom("", `${name}.email`).pipe(withReset()),
+    portfolio: atom("", `${name}.portfolio`).pipe(withReset()),
+    token: atom<string | null>(null, `${name}.token`).pipe(withReset()),
+    error: atom<string | null>(null, `${name}.error`),
+    submitted: atom(false, `${name}.submitted`),
+    isProcessing: atom(false, `${name}.isProcessing`),
+  }))
+)
+
+export const toggleJoinRole = action((ctx, role: TeamRole) => {
+  joinState.roles(ctx, (roles) =>
+    roles.includes(role) ? roles.filter((item) => item !== role) : [...roles, role]
+  )
+}, "toggleJoinRole")
+
+const openCap = (ctx: Parameters<typeof toggleJoinRole>[0]) => {
+  joinState.isProcessing(ctx, true)
+  pof.isOpen(ctx, true)
+  pof.data(ctx, {
+    cb: {
+      onSolve: (token) => {
+        pof.isOpen(ctx, false)
+        joinState.token(ctx, token)
+        joinState.isProcessing(ctx, false)
+        submitJoin(ctx)
+      },
+      onError: () => {
+        pof.isOpen(ctx, false)
+        joinState.isProcessing(ctx, false)
+        joinState.error(ctx, "CAP_FAILED")
+      },
+    },
+  })
+}
+
+export const submitJoin = action((ctx) => {
+  joinState.error(ctx, null)
+
+  const parsed = teamApplySchema.safeParse({
+    roles: ctx.get(joinState.roles),
+    about: ctx.get(joinState.about),
+    telegram: ctx.get(joinState.telegram),
+    email: ctx.get(joinState.email),
+    portfolio: ctx.get(joinState.portfolio),
+  })
+
+  if (!parsed.success) {
+    joinState.error(ctx, parsed.error.issues[0]?.message ?? "INVALID_FORM")
+    return
+  }
+
+  const pofActive = maybeSpyOptionAtom(ctx, "flags", "isPof", true)
+  const token = ctx.get(joinState.token)
+
+  if (pofActive && !token) {
+    openCap(ctx)
+    return
+  }
+
+  // CAP tokens are single use.
+  joinState.token(ctx, null)
+  joinState.isProcessing(ctx, true)
+
+  void client.raw.post<{ data: { id: number } }>("/team/apply", {
+    json: parsed.data,
+    headers: { "x-cap-token": token ?? "" },
+  }).then(() => {
+    joinState.submitted(ctx, true)
+    joinState.roles.reset(ctx)
+    joinState.about.reset(ctx)
+    joinState.telegram.reset(ctx)
+    joinState.email.reset(ctx)
+    joinState.portfolio.reset(ctx)
+  }).catch((error: unknown) => {
+    joinState.error(ctx, error instanceof Error ? error.message : String(error))
+  }).finally(() => {
+    joinState.isProcessing(ctx, false)
+  })
+}, "submitJoin")
