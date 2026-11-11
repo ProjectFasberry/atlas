@@ -4,7 +4,6 @@ import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import { For } from "solid-js";
-import { useAtom } from "@reatom/npm-solid-js";
 import { SpawnCarousel } from "./(components)/spawn-carousel";
 import { IdeaPreviewCard, IdeasList } from "./(components)/gameplay";
 import { getStaticObject } from "@/shared/lib/helpers";
@@ -16,6 +15,7 @@ import { JoinSection } from "./(components)/join";
 import { NewsSection } from "./(components)/news";
 import { CommunitySection } from "./(components)/community";
 import { FaqSection } from "./(components)/faq";
+import { useAtomAccessor } from "@/shared/lib/utils";
 
 const introImage = getStaticObject("arts", "server-status-widget.webp")
 const shareImage = getStaticObject("arts", "bzzvanet-.jpg")
@@ -26,7 +26,7 @@ const CONTACTS_LIST = [
 ];
 
 const Weather = () => {
-  const [data] = useAtom(appState.selectedWeather)
+  const data = useAtomAccessor(appState.selectedWeather)
   return <div class={`weather ${data()} absolute z-1 w-full h-full top-0 right-0 left-0`} />
 }
 
@@ -59,12 +59,15 @@ export default function Page() {
               <h1 class={sectionVariantChild().title({ className: "text-pink-300" })}>
                 Fasberry Project
               </h1>
-              <h2 class={sectionVariantChild().subtitle({ className: "mb-4" })}>
+              <h2 class={sectionVariantChild().subtitle({ className: "mb-4 text-balance" })}>
                 {translate["welcome.subtitle"]()}
               </h2>
-              <h3 class={sectionVariantChild().description({ className: "text-shadow-lg" })}>
+              <h3 class={sectionVariantChild().description({ className: "text-shadow-lg text-pretty" })}>
                 {translate["welcome.description"]()}
               </h3>
+              <div class="mt-2">
+                <span class="text-sm text-neutral-300">{translate["welcome.simple"]()}</span>
+              </div>
             </div>
             <div class="flex w-full flex-col items-stretch gap-2 pt-1 sm:flex-row sm:items-center">
               <Link href="/start" class="w-full sm:w-auto">

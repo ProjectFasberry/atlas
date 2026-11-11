@@ -16,7 +16,6 @@ export const CommunitySection = () => {
             {translate["community.subtitle"]()}
           </Typography>
         </div>
-
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <For each={createCommunityItems()}>
             {(item) => (

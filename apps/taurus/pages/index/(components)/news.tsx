@@ -1,4 +1,3 @@
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { For, onCleanup, onMount, Show } from "solid-js";
 import { env } from "@/shared/env";
 import { translate } from "@/shared/locales/helpers";
@@ -8,6 +7,8 @@ import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Typography } from "@/shared/ui/typography";
 import { newsList, type NewsItem } from "../(models)/news.model";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
 const APP_URL = env.VITE_APP_URL
 
@@ -23,7 +24,7 @@ const formatDate = (value: string, locale: string) => {
 }
 
 const NewsCard = (props: { item: NewsItem }) => {
-  const [locale] = useAtom(appState.locale)
+  const locale = useAtomAccessor(appState.locale)
 
   return (
     <Link
@@ -75,12 +76,10 @@ const NewsSkeleton = () => (
   </div>
 )
 
-export const NewsSection = () => {
-  const ctx = useCtx();
-
-  const [items] = useAtom(newsList.dataAtom)
-  const [statuses] = useAtom(newsList.statusesAtom)
-  const [error] = useAtom(newsList.errorAtom)
+export const NewsSection = reatomComponent(({ ctx }) => {
+  const items = useAtomAccessor(newsList.dataAtom)
+  const statuses = useAtomAccessor(newsList.statusesAtom)
+  const error = useAtomAccessor(newsList.errorAtom)
 
   onMount(() => {
     if (!statuses().isPending) newsList(ctx)
@@ -114,7 +113,6 @@ export const NewsSection = () => {
             {translate["news.action"]()}
           </Link>
         </div>
-
         <Show
           when={!isLoading()}
           fallback={
@@ -161,4 +159,4 @@ export const NewsSection = () => {
       </div>
     </div>
   )
-}
+}, "NewsSection")

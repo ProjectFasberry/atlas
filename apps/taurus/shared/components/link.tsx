@@ -9,12 +9,12 @@ type LinkProps = JSX.AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 export const Link = (props: LinkProps) => {
-  const pageContext = usePageContext();
+  const pageCtx = usePageContext();
   const [local, rest] = splitProps(props, ["href", "locale", "class", "className"]);
 
   const initWithLocale = !!local.locale;
 
-  const pathname = () => pageContext.urlPathname;
+  const pathname = () => pageCtx.urlPathname;
 
   const isActive = () => {
     const hrefVal = local.href

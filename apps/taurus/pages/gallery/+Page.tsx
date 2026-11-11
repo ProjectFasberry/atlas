@@ -39,7 +39,6 @@ export default function GalleryPage() {
           </div>
         </WrapperTitle>
       </div>
-
       <div class="full-screen-section py-16 lg:py-24">
         <div class="responsive mx-auto">
           <GalleryGrid />

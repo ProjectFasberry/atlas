@@ -1,5 +1,4 @@
 import { Accordion } from "@ark-ui/solid/accordion";
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { For, type JSX } from "solid-js";
 import { Link } from "@/shared/components/link";
 import { getStaticObject } from "@/shared/lib/helpers";
@@ -13,6 +12,8 @@ import {
   supportState,
   telegramShareLink
 } from "../(models)/support.model";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
 const voteUrl = "https://hotmc.ru/vote-259308"
 const voteIcon = getStaticObject("minecraft", "icons/experience_big.webp")
@@ -85,9 +86,8 @@ const ActionButton = (props: { children: JSX.Element; onClick?: () => void; href
     : <div class="w-full">{content}</div>
 }
 
-export const SupportContent = () => {
-  const ctx = useCtx()
-  const [faqOpen] = useAtom(supportState.faqOpen)
+export const SupportContent = reatomComponent(({ ctx }) => {
+  const faqOpen = useAtomAccessor(supportState.faqOpen)
 
   return (
     <div class="responsive mx-auto flex flex-col gap-10 sm:gap-12">
@@ -102,7 +102,6 @@ export const SupportContent = () => {
           {translate["support.description"]()}
         </Typography>
       </header>
-
       <div class="grid gap-3 lg:grid-cols-3">
         <SupportCard
           icon={voteIcon}
@@ -116,7 +115,6 @@ export const SupportContent = () => {
             {translate["support.cards.vote.note"]()}
           </Typography>
         </SupportCard>
-
         <SupportCard
           icon={shareIcon}
           title={translate["support.cards.share.title"]()}
@@ -129,7 +127,6 @@ export const SupportContent = () => {
             {translate["support.cards.share.copy"]()}
           </ActionButton>
         </SupportCard>
-
         <SupportCard
           icon={helpIcon}
           title={translate["support.cards.help.title"]()}
@@ -151,7 +148,6 @@ export const SupportContent = () => {
           </a>
         </SupportCard>
       </div>
-
       <div class="grid gap-3 lg:grid-cols-[1.1fr_.9fr]">
         <section class="transparent-achievement-panel flex flex-col gap-4 p-4 sm:p-5">
           <h3 class="text-xl sm:text-2xl">
@@ -177,7 +173,6 @@ export const SupportContent = () => {
             </For>
           </div>
         </section>
-
         <section class="transparent-achievement-panel flex flex-col gap-4 p-4 sm:p-5">
           <h3 class="text-xl sm:text-2xl">
             {translate["support.thanks.title"]()}
@@ -215,7 +210,6 @@ export const SupportContent = () => {
           </div>
         </section>
       </div>
-
       <section class="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:gap-10">
         <div class="flex flex-col gap-1">
           <h2 class="text-2xl sm:text-3xl lg:text-4xl">
@@ -225,7 +219,6 @@ export const SupportContent = () => {
             {translate["support.faq.subtitle"]()}
           </Typography>
         </div>
-
         <Accordion.Root
           multiple
           collapsible
@@ -254,7 +247,6 @@ export const SupportContent = () => {
           </For>
         </Accordion.Root>
       </section>
-
       <section class="transparent-achievement-panel flex flex-col items-center justify-between gap-4 p-4 sm:flex-row sm:p-5">
         <div class="flex flex-col gap-1">
           <h2 class="text-xl">
@@ -283,4 +275,4 @@ export const SupportContent = () => {
       </section>
     </div>
   )
-}
+}, "SupportContent")

@@ -1,14 +1,10 @@
-import { useAtom } from "@reatom/npm-solid-js";
 import { Typography } from "@/shared/ui/typography";
 import { translate } from "@/shared/locales/helpers";
 import { serverStatus } from "@/shared/models/server-status.model";
+import { useAtomAccessor } from "@/shared/lib/utils";
 
-/**
- * Compact "players online" chip for the hero. Data comes from the shared
- * status model, which the join section requests once per page.
- */
 export const OnlineBadge = () => {
-  const [status] = useAtom(serverStatus.fetch.dataAtom)
+  const status = useAtomAccessor(serverStatus.fetch.dataAtom)
 
   const isOnline = () => status()?.proxy.status === "online"
   const players = () => status()?.proxy.online

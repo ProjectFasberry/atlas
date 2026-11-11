@@ -1,4 +1,3 @@
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { pageState } from "@/shared/models/page.model";
 import { tv } from "tailwind-variants";
 import { For, Show } from "solid-js";
@@ -6,6 +5,8 @@ import { Accordion } from "@ark-ui/solid/accordion";
 import { Typography } from "@/shared/ui/typography";
 import { expImage, createMainHeaderLinks, headerDrawerState } from "./header.model";
 import { accordionVariant } from "../../ui/accordion";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
 const ExperienceCircle = () => {
   return (
@@ -24,11 +25,9 @@ const itemVariant = tv({
   base: `flex border-2 border-neutral-600 hover:bg-neutral-600 group bg-neutral-800 rounded-md gap-6 py-2 px-2 w-full`
 })
 
-export const HeaderDrawerContent = () => {
-  const ctx = useCtx();
-  const [urlParsedAtom] = useAtom(pageState.urlParsed)
-
-  const pathname = () => urlParsedAtom()?.pathname;
+export const HeaderDrawerContent = reatomComponent(({ ctx }) => {
+  const urlParsed = useAtomAccessor(pageState.urlParsed)
+  const pathname = () => urlParsed()?.pathname;
 
   const handleToPage = (href?: string) => {
     if (!href) return;
@@ -77,7 +76,7 @@ export const HeaderDrawerContent = () => {
                     <Typography>{item.name}</Typography>
                   </Accordion.ItemTrigger>
                   <Accordion.ItemContent class={accordionVariant.itemContent({ class: "flex gap-1 pt-1" })}>
-                    <div class="w-[2px] mt-1 bg-neutral-700" />
+                    <div class="w-0.5 mt-1 bg-neutral-700" />
                     <div class="flex flex-col gap-2 w-full">
                       <For each={data()}>
                         {(item) => (
@@ -105,4 +104,4 @@ export const HeaderDrawerContent = () => {
       </For>
     </div>
   )
-}
+}, "HeaderDrawerContent")

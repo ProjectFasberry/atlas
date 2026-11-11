@@ -1,12 +1,12 @@
 import { Index } from "solid-js"
 import { Carousel } from '@ark-ui/solid/carousel'
-import { useAtom, useCtx } from "@reatom/npm-solid-js"
 import { SPAWN_IMAGES, setSpawnPage, spawnCarouselState } from "../(models)/spawn-carousel.model"
 import { carouselVariant } from "@/shared/ui/carousel"
+import { useAtomAccessor } from "@/shared/lib/utils"
+import { reatomComponent } from "@/shared/lib/reatom"
 
-export const SpawnCarousel = () => {
-  const ctx = useCtx();
-  const [page] = useAtom(spawnCarouselState.page)
+export const SpawnCarousel = reatomComponent(({ ctx }) => {
+  const page = useAtomAccessor(spawnCarouselState.page)
 
   return (
     <Carousel.Root
@@ -28,7 +28,7 @@ export const SpawnCarousel = () => {
               <img
                 src={image()}
                 draggable={false}
-                class="max-h-[1080px] brightness-75"
+                class="max-h-270 brightness-75"
                 loading="lazy"
                 alt=""
               />
@@ -45,4 +45,4 @@ export const SpawnCarousel = () => {
       </div>
     </Carousel.Root>
   )
-}
+}, "SpawnCarousel")

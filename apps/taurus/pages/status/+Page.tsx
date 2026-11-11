@@ -3,10 +3,10 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { Typography, typographyVariants } from "@/shared/ui/typography";
 import { tv } from "tailwind-variants";
 import { Show } from "solid-js";
-import { useAtom } from "@reatom/npm-solid-js";
 import { serverStatus } from "./(models)/server-status.model";
 import { ServerStatus } from "./(components)/server-status";
 import { getStaticObject } from "@/shared/lib/helpers";
+import { useAtomAccessor } from "@/shared/lib/utils";
 
 const serverTitle = tv({
   extend: typographyVariants,
@@ -19,8 +19,8 @@ const descTitle = tv({
 })
 
 const StatusItem = () => {
-  const [statusAtom] = useAtom(serverStatus.fetch.dataAtom)
-  const [statusesAtom] = useAtom(serverStatus.fetch.statusesAtom)
+  const status = useAtomAccessor(serverStatus.fetch.dataAtom)
+  const statuses = useAtomAccessor(serverStatus.fetch.statusesAtom)
 
   return (
     <div class="card-wrapper flex flex-col h-fit gap-4">
@@ -45,7 +45,7 @@ const StatusItem = () => {
             <div class="flex items-center w-full justify-end gap-3">
               <Typography color="gray" class={descTitle()}>
                 <span class="hidden sm:inline">играет</span>
-                <Show when={statusAtom()} fallback={0}>
+                <Show when={status()} fallback={0}>
                   {(data) => data()?.servers.bisquite.online}
                 </Show>
                 &nbsp;игроков
@@ -68,7 +68,7 @@ const StatusItem = () => {
             <div class="flex items-center w-full justify-end gap-3">
               <Typography color="gray" class={descTitle()}>
                 <span class="hidden sm:inline">играет</span>
-                <Show when={statusAtom()} fallback={0}>
+                <Show when={status()} fallback={0}>
                   {(data) => data()?.servers.muffin.online}
                 </Show>
                 &nbsp;игроков
@@ -78,7 +78,7 @@ const StatusItem = () => {
         </div>
         <div class="flex items-center justify-between w-full">
           <Show
-            when={!statusesAtom().isPending}
+            when={!statuses().isPending}
             fallback={
               <div class="flex items-center gap-2">
                 <Typography class={descTitle({ className: "text-right" })}>
@@ -88,7 +88,7 @@ const StatusItem = () => {
               </div>
             }
           >
-            <Show when={statusAtom()}>
+            <Show when={status()}>
               {(data) => (
                 <Typography class={descTitle({ className: "text-right" })}>
                   Всего: {data().proxy.online ?? 0}
@@ -113,13 +113,13 @@ export default function Page() {
             height="500"
             // @ts-ignore
             allowtransparency={true.toString()}
-            className="rounded-[4px]! border-2 border-[#454545] w-full lg:w-1/4"
+            className="rounded-sm! border-2 border-[#454545] w-full lg:w-1/4"
             sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
           />
           <div class="flex flex-col w-full gap-6 lg:w-3/4 h-full">
             <StatusItem />
             <div
-              class="flex flex-col max-h-[496px] overflow-y-scroll gap-6 card-wrapper w-full h-full"
+              class="flex flex-col max-h-124 overflow-y-scroll gap-6 card-wrapper w-full h-full"
             >
               <ServerStatus />
             </div>

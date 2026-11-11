@@ -39,7 +39,6 @@ export default function Page() {
           </div>
         </WrapperTitle>
       </div>
-
       <div id="support-list" class="full-screen-section py-16 lg:py-24">
         <SupportContent />
       </div>

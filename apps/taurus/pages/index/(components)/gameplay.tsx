@@ -1,10 +1,11 @@
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { createMemo, For, Show } from "solid-js";
 import { tv } from "tailwind-variants";
 import { createIdeas, selectedKeyAtom } from "../(models)/gameplay.model";
 import { Typography } from "@/shared/ui/typography";
 import { Link } from "@/shared/components/link";
 import { atom } from "@reatom/framework";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
 const navigationBadge = tv({
   base: `justify-center cursor-pointer duration-150 px-4 py-2`,
@@ -45,9 +46,9 @@ const previewLink = tv({
 })
 
 export const IdeaPreviewCard = () => {
-  const [selectedAtom] = useAtom(selectedKeyAtom)
+  const selectedKey = useAtomAccessor(selectedKeyAtom)
 
-  const idea = createMemo(() => createIdeas()[selectedAtom()]);
+  const idea = createMemo(() => createIdeas()[selectedKey()]);
   const variant = idea().type as "module" | "full"
 
   return (
@@ -100,9 +101,8 @@ export const IdeaPreviewCard = () => {
 
 const getIsActiveAtom = (id: number) => atom((ctx) => ctx.spy(selectedKeyAtom) === id)
 
-const Item = (props: { idx: number, title: string }) => {
-  const ctx = useCtx();
-  const [isActive] = useAtom(getIsActiveAtom(props.idx))
+const IdeasItem = reatomComponent<{ idx: number, title: string }>(({ ctx, ...props }) => {
+  const isActive = useAtomAccessor(getIsActiveAtom(props.idx))
 
   return (
     <button
@@ -115,12 +115,12 @@ const Item = (props: { idx: number, title: string }) => {
       <span class="truncate">{props.title}</span>
     </button>
   )
-}
+}, "IdeasItem")
 
 export const IdeasList = () => {
   return (
     <For each={createIdeas()}>
-      {(preview, idx) => <Item idx={idx()} title={preview.title} />}
+      {(preview, idx) => <IdeasItem idx={idx()} title={preview.title} />}
     </For>
   )
 }

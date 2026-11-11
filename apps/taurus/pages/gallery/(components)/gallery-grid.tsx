@@ -1,4 +1,3 @@
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { For, Show, createMemo } from "solid-js";
 import { Link } from "@/shared/components/link";
 import { getStaticObject } from "@/shared/lib/helpers";
@@ -13,6 +12,8 @@ import {
   setGalleryFilter
 } from "../(models)/gallery.model";
 import { GalleryLightbox } from "./gallery-lightbox";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
 const infoIcon = getStaticObject("minecraft", "icons/book_big.webp")
 
@@ -29,9 +30,8 @@ const countFor = (filter: GalleryFilter) =>
     ? GALLERY_ITEMS.length
     : GALLERY_ITEMS.filter((item) => item.tag === filter).length
 
-export const GalleryGrid = () => {
-  const ctx = useCtx()
-  const [filter] = useAtom(galleryState.filter)
+export const GalleryGrid = reatomComponent(({ ctx }) => {
+  const filter = useAtomAccessor(galleryState.filter)
 
   const visible = createMemo(() =>
     GALLERY_ITEMS
@@ -52,7 +52,6 @@ export const GalleryGrid = () => {
             {translate["gallery.count"]({ count: GALLERY_ITEMS.length })}
           </span>
         </div>
-
         <div class="flex flex-wrap gap-2">
           <For each={filters}>
             {(item) => (
@@ -60,7 +59,11 @@ export const GalleryGrid = () => {
                 type="button"
                 aria-pressed={filter() === item.value}
                 onClick={() => setGalleryFilter(ctx, item.value)}
-                class={`${filter() === item.value ? "raised-slot-active text-neutral-100" : "raised-slot text-neutral-800"} cursor-pointer px-3 py-1.5 text-xs transition-all duration-150 hover:brightness-110 sm:text-sm`}
+                class={`${filter() === item.value
+                  ? "raised-slot-active text-neutral-100"
+                  : "raised-slot text-neutral-800"} cursor-pointer px-3 py-1.5 text-xs
+                  transition-all duration-150 hover:brightness-110 sm:text-sm`
+                }
               >
                 {item.label()} · {countFor(item.value)}
               </button>
@@ -68,8 +71,10 @@ export const GalleryGrid = () => {
           </For>
         </div>
       </div>
-
-      <div class="grid auto-rows-[120px] grid-cols-2 gap-2 sm:auto-rows-[150px] md:grid-cols-3 md:gap-3 lg:auto-rows-[190px]">
+      <div
+        class="grid auto-rows-30 grid-cols-2 gap-2
+        sm:auto-rows-37.5 md:grid-cols-3 md:gap-3 lg:auto-rows-47.5"
+      >
         <For each={visible()}>
           {(entry, index) => {
             const featured = () => isAll() && index() === 0
@@ -78,7 +83,8 @@ export const GalleryGrid = () => {
               <button
                 type="button"
                 onClick={() => openGallery(ctx, entry.index)}
-                class={`group relative overflow-hidden p-1 text-left transparent-achievement-panel ${featured() ? "col-span-2 row-span-2" : ""}`}
+                class={`group relative overflow-hidden p-1 text-left transparent-achievement-panel
+                  ${featured() ? "col-span-2 row-span-2" : ""}`}
               >
                 <div class="relative h-full w-full overflow-hidden bg-neutral-900">
                   <img
@@ -89,7 +95,10 @@ export const GalleryGrid = () => {
                     loading={index() === 0 ? "eager" : "lazy"}
                     class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-90" />
+                  <div
+                    class="absolute inset-0 bg-linear-to-t
+                    from-black/85 via-black/10 to-transparent opacity-90"
+                  />
                   <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3">
                     <div class="flex min-w-0 flex-col gap-0.5">
                       <span class="line-clamp-2 text-sm text-white sm:text-base">
@@ -105,7 +114,6 @@ export const GalleryGrid = () => {
             )
           }}
         </For>
-
         <Show when={isAll()}>
           <div class="col-span-2 flex flex-col justify-between gap-3 p-3 transparent-achievement-panel sm:p-4 md:col-span-1">
             <img
@@ -133,8 +141,7 @@ export const GalleryGrid = () => {
           </div>
         </Show>
       </div>
-
       <GalleryLightbox />
     </div>
   )
-}
+}, "GalleryGrid")

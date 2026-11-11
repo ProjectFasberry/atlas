@@ -1,5 +1,4 @@
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
-import { For, onMount } from "solid-js";
+import { For, Show, onMount } from "solid-js";
 import { tv } from "tailwind-variants";
 import { Typography } from "@/shared/ui/typography";
 import { Button } from "@/shared/ui/button";
@@ -9,10 +8,11 @@ import { env } from "@/shared/env";
 import { getLauncherDownloadUrl, getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { serverStatus } from "@/shared/models/server-status.model";
+import { reatomComponent } from "@/shared/lib/reatom";
+import { useAtomAccessor } from "@/shared/lib/utils";
 
 const APP_URL = env.VITE_APP_URL
 const WINDOWS_URL = getLauncherDownloadUrl("windows-x86_64")
-const MACOS_URL = getLauncherDownloadUrl("darwin-aarch64")
 
 const joinSection = tv({
   base: `full-screen-section relative flex flex-col items-center justify-center py-16 sm:py-20 lg:py-28`
@@ -41,11 +41,9 @@ const getSteps = () => [
   }
 ]
 
-export const JoinSection = () => {
-  const ctx = useCtx();
-
-  const [status] = useAtom(serverStatus.fetch.dataAtom)
-  const [statuses] = useAtom(serverStatus.fetch.statusesAtom)
+export const JoinSection = reatomComponent(({ ctx }) => {
+  const status = useAtomAccessor(serverStatus.fetch.dataAtom)
+  const statuses = useAtomAccessor(serverStatus.fetch.statusesAtom)
 
   onMount(() => {
     if (!status() && !statuses().isPending) serverStatus.fetch(ctx)
@@ -122,19 +120,23 @@ export const JoinSection = () => {
                 </Typography>
               </Button>
             </a>
-            <a href={MACOS_URL} target="_blank" rel="noreferrer" class="w-full sm:w-auto">
-              <Button class="w-full sm:w-auto">
-                <Typography color="white" class="text-sm sm:text-base text-nowrap">
-                  {translate["join.action-macos"]()}
-                </Typography>
-              </Button>
-            </a>
+            <Button
+              disabled
+              title={translate["shared.soon"]()}
+              class="w-full sm:w-auto"
+            >
+              <Typography color="white" class="text-sm sm:text-base text-nowrap">
+                {translate["join.action-macos"]()}
+                <span class="ml-2 border border-neutral-400/60 px-1 text-[10px] uppercase tracking-wide text-neutral-200">
+                  {translate["shared.soon"]()}
+                </span>
+              </Typography>
+            </Button>
             <Link href="/start" class="text-sm text-neutral-300 underline underline-offset-4 hover:text-white sm:whitespace-nowrap">
               {translate["join.action-guide"]()}
             </Link>
           </div>
         </div>
-
         <div class="transparent-achievement-panel flex flex-col gap-5 bg-black/30 p-4 backdrop-blur-sm sm:p-6">
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-2">
@@ -154,11 +156,7 @@ export const JoinSection = () => {
                     : translate["join.status.offline"]()}
               </Typography>
             </div>
-            <Typography color="gray" class="text-xs">
-              {translate["join.status.version"]()}
-            </Typography>
           </div>
-
           <div class="flex flex-col gap-1">
             <Typography color="gray" class="text-xs sm:text-sm">
               {translate["join.status.players"]()}
@@ -178,7 +176,6 @@ export const JoinSection = () => {
               />
             </div>
           </div>
-
           <div class="flex flex-col gap-2">
             <For each={servers()}>
               {([key, server]) => (
@@ -188,13 +185,17 @@ export const JoinSection = () => {
                     <Typography class="truncate text-sm text-neutral-300">
                       {server.fullname || key}
                     </Typography>
+                    <Show when={key === "bisquite"}>
+                      <span class="shrink-0 border border-neutral-700 px-1 py-0.5 text-[10px] uppercase tracking-wider text-neutral-500">
+                        {translate["join.status.semi-vanilla"]()}
+                      </span>
+                    </Show>
                   </div>
                   <span class="text-sm text-neutral-400 tabular-nums">{server.online}</span>
                 </div>
               )}
             </For>
           </div>
-
           <div class="mt-auto flex items-center gap-2 text-[11px] leading-4 text-neutral-500">
             <img
               src={getStaticObject("minecraft", "icons/book_big.webp")}
@@ -210,4 +211,4 @@ export const JoinSection = () => {
       </div>
     </div>
   )
-}
+}, "JoinSection")

@@ -1,13 +1,13 @@
 import { Accordion } from "@ark-ui/solid/accordion";
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { For } from "solid-js";
 import { Typography } from "@/shared/ui/typography";
 import { translate } from "@/shared/locales/helpers";
 import { createFaqItems, faqOpenAtom, setFaqOpen } from "../(models)/faq.model";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
-export const FaqSection = () => {
-  const ctx = useCtx();
-  const [open] = useAtom(faqOpenAtom)
+export const FaqSection = reatomComponent(({ ctx }) => {
+  const open = useAtomAccessor(faqOpenAtom)
 
   return (
     <div id="faq" class="section-edge relative flex w-full flex-col items-center py-16 sm:py-20 lg:py-28">
@@ -20,7 +20,6 @@ export const FaqSection = () => {
             {translate["faq.subtitle"]()}
           </Typography>
         </div>
-
         <Accordion.Root
           multiple
           collapsible
@@ -51,4 +50,4 @@ export const FaqSection = () => {
       </div>
     </div>
   )
-}
+}, "FaqSection")

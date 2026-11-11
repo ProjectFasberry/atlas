@@ -14,7 +14,7 @@ test.describe('landing pages', () => {
   test('renders the home page with the header and the footer', async ({ request }) => {
     const { response, body } = await text(request, '/');
     expect(response.status()).toBe(200);
-    expect(body).toContain('Полуванильный сервер');
+    expect(body).toContain('Minecraft-проект: разные режимы');
     expect(body).toContain('Правила');
     expect(body).toContain('Конфиденциальность');
   });
@@ -50,7 +50,7 @@ test.describe('landing pages', () => {
     const { response, body } = await text(request, '/support');
     expect(response.status()).toBe(200);
     expect(body).toContain('Как помочь проекту');
-    expect(body).toContain('На что уходит время команды');
+    expect(body).toContain('Чем занимается команда');
     expect(body).toContain('Скопировать ссылку');
   });
 
@@ -69,11 +69,11 @@ test.describe('landing pages', () => {
     expect(body).toContain('E2E Modpack');
   });
 
-  test('links the stable launcher downloads', async ({ request }) => {
+  test('links the stable launcher download', async ({ request }) => {
     const { response, body } = await text(request, '/start');
     expect(response.status()).toBe(200);
     expect(body).toContain('/releases/download/windows-x86_64');
-    expect(body).toContain('/releases/download/darwin-aarch64');
+    expect(body).not.toContain('/releases/download/darwin-aarch64');
   });
 
   test('answers 404 for an unknown page', async ({ request }) => {

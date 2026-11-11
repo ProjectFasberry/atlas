@@ -1,5 +1,4 @@
 import { Accordion } from "@ark-ui/solid/accordion";
-import { useAtom, useCtx } from "@reatom/npm-solid-js";
 import { For, Show, createMemo, onMount } from "solid-js";
 import { useData } from "vike-solid/useData";
 import { renderToHTMLString } from "@tiptap/static-renderer";
@@ -10,6 +9,8 @@ import { Typography } from "@/shared/ui/typography";
 import { translate } from "@/shared/locales/helpers";
 import type { Data } from "../+data";
 import { rulesState, setRulesOpen, setRulesSearch } from "../(models)/rules.model";
+import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
 
 type RawCategory = {
   category?: string
@@ -53,7 +54,6 @@ const splitDenseParagraph = (block: JSONContent): JSONContent[] => {
 
 const toBlocks = (doc?: JSONContent): JSONContent[] => {
   if (!Array.isArray(doc?.content)) return []
-
   return doc.content.flatMap(splitDenseParagraph)
 }
 
@@ -118,12 +118,11 @@ const RuleHtml = (props: { blocks: JSONContent[] }) => {
   )
 }
 
-export const RulesContent = () => {
-  const ctx = useCtx()
+export const RulesContent = reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()?.data
 
-  const [search] = useAtom(rulesState.search)
-  const [open] = useAtom(rulesState.open)
+  const search = useAtomAccessor(rulesState.search)
+  const open = useAtomAccessor(rulesState.open)
 
   onMount(() => setRulesSearch(ctx, ""))
 
@@ -177,7 +176,6 @@ export const RulesContent = () => {
           </Show>
         </div>
       </div>
-
       <div class="grid gap-6 lg:grid-cols-[280px_1fr] lg:gap-10">
         <aside class="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           <div class="flex flex-col gap-2">
@@ -201,7 +199,6 @@ export const RulesContent = () => {
                 </button>
               </Show>
             </div>
-
             <div class="flex items-center justify-between gap-2">
               <span class="text-[10px] uppercase tracking-wider text-neutral-500">
                 {translate["rules.nav.title"]()}
@@ -217,13 +214,13 @@ export const RulesContent = () => {
               </Show>
             </div>
           </div>
-
           <nav class="hidden flex-col gap-1 lg:flex">
             <For each={categories()}>
               {(category) => (
                 <a
                   href={`#${category.id}`}
-                  class="flex items-center justify-between gap-3 px-2 py-1.5 text-sm text-neutral-300 transition-colors hover:bg-neutral-800/70 hover:text-white"
+                  class="flex items-center justify-between gap-3 px-2 py-1.5
+                  text-sm text-neutral-300 transition-colors hover:bg-neutral-800/70 hover:text-white"
                 >
                   <span class="truncate">{category.title}</span>
                   <span class="shrink-0 text-xs text-neutral-500 tabular-nums">{category.count}</span>
@@ -231,7 +228,6 @@ export const RulesContent = () => {
               )}
             </For>
           </nav>
-
           <div class="flex gap-1.5 overflow-x-auto pb-1 lg:hidden scrollbar scrollbar-h-0 scrollbar-thumb-neutral-800">
             <For each={categories()}>
               {(category) => (
@@ -244,7 +240,6 @@ export const RulesContent = () => {
               )}
             </For>
           </div>
-
           <Show when={tags().length > 0}>
             <div class="hidden flex-wrap gap-1 lg:flex">
               <For each={tags()}>
@@ -257,7 +252,6 @@ export const RulesContent = () => {
             </div>
           </Show>
         </aside>
-
         <div class="min-w-0">
           <Show
             when={filtered().length > 0}
@@ -305,7 +299,8 @@ export const RulesContent = () => {
                           </span>
                         </span>
                         <Show when={!isSearching()}>
-                          <Accordion.ItemIndicator class="ml-auto shrink-0 text-xl text-green-400 transition-transform duration-200 data-[state=open]:rotate-45">
+                          <Accordion.ItemIndicator class="ml-auto shrink-0
+                            text-xl text-green-400 transition-transform duration-200 data-[state=open]:rotate-45">
                             +
                           </Accordion.ItemIndicator>
                         </Show>
@@ -332,4 +327,4 @@ export const RulesContent = () => {
       </div>
     </div>
   )
-}
+}, "RulesContent")
