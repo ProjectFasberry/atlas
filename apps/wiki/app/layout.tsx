@@ -44,7 +44,7 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
     >
       <body className="flex flex-col min-h-screen">
         <Script
-          src="https://umami.fasberry.fun/script.js"
+          src="https://umami.fasberry.fun/k7.js"
           data-website-id="dd3d8a0c-1c06-4a52-b00d-29ca926d949e"
           data-domains="wiki.fasberry.fun"
           strategy="afterInteractive"

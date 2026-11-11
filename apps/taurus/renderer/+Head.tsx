@@ -36,7 +36,7 @@ export default function HeadDefault() {
       <meta property="twitter:image:type" content="image/jpeg" />
       <meta property="twitter:image:width" content="1200" />
       <meta property="twitter:image:height" content="630" />
-      <script defer src="https://umami.fasberry.fun/script.js" data-website-id="e94a6edf-fb13-4699-9fb3-48eb2efa2e02" />
+      <script defer src="https://umami.fasberry.fun/k7.js" data-website-id="e94a6edf-fb13-4699-9fb3-48eb2efa2e02" />
       <meta name="robots" content="index, follow" />
       <meta name="googlebot" content="index, follow, noimageindex, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
       <link rel="preconnect" href={env.PUBLIC_ENV__API_URL} crossOrigin="" />

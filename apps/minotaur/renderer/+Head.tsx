@@ -61,7 +61,7 @@ export default function HeadDefault() {
       <meta name="apay-tag" content={env.VITE_APAY_TAG} />
       <script
         defer
-        src="https://umami.fasberry.fun/script.js"
+        src="https://umami.fasberry.fun/k7.js"
         data-website-id="d9222f29-9944-45f7-a127-72cd13dbb7c7"
         data-domains="app.fasberry.fun"
         data-exclude-search="true"
