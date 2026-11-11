@@ -47,7 +47,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** GitHub organization webhook for push notifications */
+        /** GitHub organization webhook for pushes and failed workflow runs */
         post: operations["postWebhooksGithub"];
         delete?: never;
         options?: never;
@@ -67,6 +67,57 @@ export interface paths {
         put?: never;
         /** Store build output sizes for an atlas app */
         post: operations["postMetricsBuild"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get logging state */
+        get: operations["getServiceState"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service/state/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update a logging state flag */
+        post: operations["postServiceStateByKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Fan out an infrastructure alert */
+        post: operations["postInternalAlerts"];
         delete?: never;
         options?: never;
         head?: never;
@@ -122,6 +173,18 @@ export interface operations {
                     "application/json": {
                         /** @constant */
                         error: "INTERNAL_SERVER_ERROR";
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        error: "SHUTTING_DOWN";
                     };
                 };
             };
@@ -301,6 +364,185 @@ export interface operations {
             };
             /** @description Response for status 503 */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    getServiceState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            logging: {
+                                validators: boolean;
+                                globalError: boolean;
+                                services: boolean;
+                                requests: boolean;
+                                outboundRequests: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postServiceStateByKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    value: boolean;
+                };
+                "application/x-www-form-urlencoded": {
+                    value: boolean;
+                };
+                "multipart/form-data": {
+                    value: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            logging: {
+                                validators: boolean;
+                                globalError: boolean;
+                                services: boolean;
+                                requests: boolean;
+                                outboundRequests: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default UNKNOWN_STATE_KEY
+                         * @enum {string}
+                         */
+                        error: "UNKNOWN_STATE_KEY";
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postInternalAlerts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    from: string;
+                    message: string;
+                    title?: string;
+                    /**
+                     * @default info
+                     * @enum {string}
+                     */
+                    severity?: "info" | "warning" | "critical";
+                };
+                "application/x-www-form-urlencoded": {
+                    from: string;
+                    message: string;
+                    title?: string;
+                    /**
+                     * @default info
+                     * @enum {string}
+                     */
+                    severity?: "info" | "warning" | "critical";
+                };
+                "multipart/form-data": {
+                    from: string;
+                    message: string;
+                    title?: string;
+                    /**
+                     * @default info
+                     * @enum {string}
+                     */
+                    severity?: "info" | "warning" | "critical";
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            delivered: number;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 401 */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
