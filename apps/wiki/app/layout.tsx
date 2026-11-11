@@ -2,6 +2,7 @@ import { i18nProvider } from 'fumadocs-ui/i18n';
 import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import { getViewer } from '@/lib/auth';
 import { getPageTree } from '@/lib/content/pages';
 import { getLocale } from '@/lib/i18n/locale';
@@ -42,6 +43,12 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
+        <Script
+          src="https://umami.fasberry.fun/script.js"
+          data-website-id="dd3d8a0c-1c06-4a52-b00d-29ca926d949e"
+          data-domains="wiki.fasberry.fun"
+          strategy="afterInteractive"
+        />
         <RootProvider
           i18n={i18nProvider(locale === 'ru' ? translations : defaultTranslations)}
           theme={{ enabled: false }}
