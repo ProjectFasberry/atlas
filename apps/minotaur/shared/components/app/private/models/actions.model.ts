@@ -59,19 +59,31 @@ export const configLink = ({ parent, type, target }: ConfigLinkParams): string =
   return `${PANEL_PATH}?${search.toString()}`
 }
 
-const go = (url: string) => {
-  void navigate(url).catch(() => {})
+/** A mode switch is a navigation on the same page, so keep the section in view. */
+const scrollToSection = (parent: ActionParent | null) => {
+  if (!parent || typeof document === "undefined") return
+
+  document
+    .querySelector(`[data-config-section="${parent}"]`)
+    ?.scrollIntoView({ behavior: "smooth", block: "start" })
+}
+
+const go = (url: string, parent: ActionParent | null) => {
+  void navigate(url)
+    .then(() => { requestAnimationFrame(() => scrollToSection(parent)) })
+    .catch(() => {})
 }
 
 export const actions = atom(null, "actions").pipe(
   withAssign((_, name) => ({
     open: action((ctx, params: ConfigLinkParams) => {
       const url = configLink(params)
-      ctx.schedule(() => go(url))
+      ctx.schedule(() => go(url, params.parent))
     }, `${name}.open`),
     goBack: action((ctx) => {
       const url = ctx.get(pageState.urlPathname)
-      ctx.schedule(() => go(url))
+      const parent = ctx.get(actionsState.parent)
+      ctx.schedule(() => go(url, parent))
     }, `${name}.goBack`),
   }))
 )
