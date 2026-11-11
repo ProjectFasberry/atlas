@@ -11,8 +11,7 @@ import {
   deleteNews, newsList,
   createNewsStateFullImageUrlAtom,
   newsImageVariant,
-  type NewsImageVariant,
-  type NewsSingle
+  type NewsImageVariant, type NewsSingle
 } from "../models/news.model"
 import { Input } from "@/shared/ui/input"
 import { type Atom, type AtomMut, type Ctx } from "@reatom/framework"
@@ -144,10 +143,13 @@ const EditNewsForm = reatomComponent(({ ctx }) => {
 
   const item = ctx.spy(editNews.item);
   if (!item) {
-    const isLoading = ctx.spy(newsList.fetch.statusesAtom).isPending
-    return isLoading
-      ? <Skeleton className="h-40 w-full" />
-      : <Typography>Выбранный объект не найден</Typography>
+    const isLoading = ctx.spy(newsList.fetch.statusesAtom).isPending;
+
+    if (isLoading) {
+      return <Skeleton className="h-40 w-full" />
+    }
+
+    return <Typography>Выбранный объект не найден</Typography>
   }
 
   return (
@@ -285,7 +287,7 @@ const CreateNewsImage = reatomComponent(({ ctx }) => {
             <Portal>
               <Dialog.Backdrop className={dialogVariant.backdrop()} />
               <Dialog.Positioner className={dialogVariant.positioner()}>
-                <Dialog.Content className={dialogVariant.content("p-0! max-h-[720px]")}>
+                <Dialog.Content className={dialogVariant.content("p-0! max-h-180")}>
                   <img
                     src={ctx.spy(createNewsStateFullImageUrlAtom)}
                     alt=""
