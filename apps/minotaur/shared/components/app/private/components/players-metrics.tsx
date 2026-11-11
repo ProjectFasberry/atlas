@@ -176,7 +176,15 @@ export const PlayersMetrics = reatomComponent(({ ctx }) => {
   const error = ctx.spy(playersMetrics.errorAtom)
 
   if (statuses.isFirstPending) return <PageLoader />
-  if (error) return <ErrorBlock title={error.message} />
+  if (error) {
+    const notDeployed = /NOT_FOUND|404/i.test(error.message)
+
+    return (
+      <ErrorBlock
+        title={notDeployed ? "Метрики игроков ещё не задеплоены" : error.message}
+      />
+    )
+  }
   if (!response) return <Noop />
 
   const summary = response.data

@@ -1,9 +1,10 @@
 import {
-  action, atom, onConnect, onDisconnect, reatomAsync,
+  action, atom, type Ctx, onConnect, onDisconnect, reatomAsync,
   withAssign, withDataAtom, withErrorAtom, withReset, withStatusesAtom,
 } from "@reatom/framework"
 import { apiBaseUrl } from "@/shared/env"
 import { client } from "@/shared/lib/client-wrapper"
+import { createMockSummary, isMockEnabled, startMockStream } from "./players-metrics.mock"
 
 export type PlayersRange = "24h" | "7d" | "30d"
 
@@ -65,6 +66,8 @@ export const playersMetrics = reatomAsync(async (ctx) => {
   const to = new Date()
   const from = new Date(to.getTime() - RANGE_MS[range])
 
+  if (isMockEnabled()) return { data: createMockSummary(range, server) }
+
   return await client.raw.get<{ data: PlayersSummary }>("/privated/metrics/players", {
     params: {
       query: {
@@ -87,29 +90,41 @@ export const playersMetrics = reatomAsync(async (ctx) => {
   withErrorAtom()
 )
 
+const applyPresence = (ctx: Ctx, presence: PresenceEvent) => {
+  const server = presence.server || "unknown"
+  const delta = presence.type === "join" ? 1 : -1
+
+  playersState.live(ctx, (state) => ({ ...state, [server]: (state[server] ?? 0) + delta }))
+  playersState.recent(ctx, (state) => [presence, ...state].slice(0, 20))
+}
+
 let source: EventSource | null = null
+let stopMock: (() => void) | null = null
 
 export const connectPlayersStream = action((ctx) => {
-  if (typeof window === "undefined" || typeof EventSource === "undefined") return
-  if (source) return
+  if (typeof window === "undefined") return
+  if (source || stopMock) return
+
+  if (isMockEnabled()) {
+    stopMock = startMockStream((presence) => applyPresence(ctx, presence))
+    playersState.connected(ctx, true)
+    return
+  }
+
+  if (typeof EventSource === "undefined") return
 
   source = new EventSource(`${apiBaseUrl}/privated/metrics/players/stream`, { withCredentials: true })
 
   source.onopen = () => playersState.connected(ctx, true)
   source.onerror = () => playersState.connected(ctx, false)
-  source.onmessage = (event) => {
-    const presence = JSON.parse(event.data) as PresenceEvent
-    const server = presence.server || "unknown"
-    const delta = presence.type === "join" ? 1 : -1
-
-    playersState.live(ctx, (state) => ({ ...state, [server]: (state[server] ?? 0) + delta }))
-    playersState.recent(ctx, (state) => [presence, ...state].slice(0, 20))
-  }
+  source.onmessage = (event) => applyPresence(ctx, JSON.parse(event.data) as PresenceEvent)
 }, "connectPlayersStream")
 
 export const disconnectPlayersStream = action((ctx) => {
   source?.close()
   source = null
+  stopMock?.()
+  stopMock = null
   playersState.connected(ctx, false)
 }, "disconnectPlayersStream")
 
