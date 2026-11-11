@@ -89,7 +89,9 @@
       "about": {
         "title": "About the project",
         "news": "News",
-        "status": "Status"
+        "status": "Status",
+        "team": "Team",
+        "report": "Report a problem"
       },
       "info": {
         "title": "Information",
@@ -685,7 +687,42 @@
       "error": "Could not send",
       "success-title": "Application sent",
       "success-text": "Thanks! We will review it and message you on Telegram.",
-      "cta": "Join the team"
+      "cta": "Join the team",
+      "badge": "Hiring",
+      "contact": "How to reach you",
+      "contact-telegram": "Telegram",
+      "contact-email": "Email",
+      "steps-title": "How it works",
+      "step-1-title": "Application",
+      "step-1-text": "Fill in the form - it takes a couple of minutes.",
+      "step-2-title": "Review",
+      "step-2-text": "The team looks at your experience, portfolio and roles.",
+      "step-3-title": "Reply",
+      "step-3-text": "We write to the contact you chose, Telegram or email.",
+      "role-builder": "Builder",
+      "role-builder-desc": "Builds, cities and event locations",
+      "role-developer": "Developer",
+      "role-developer-desc": "Plugins, API, launcher and website",
+      "role-designer": "Designer",
+      "role-designer-desc": "UI, graphics, banners and visuals",
+      "role-moderator": "Moderator",
+      "role-moderator-desc": "Order in the chat and on the servers",
+      "role-content": "Content and translations",
+      "role-content-desc": "Texts, guides, news and localization",
+      "role-other": "Other",
+      "role-other-desc": "Tell us how you can help"
     }
+  },
+  "report": {
+    "title": "Report a problem",
+    "description": "Found a rule violation, a bug or a payment issue? Message us with the nickname, time and screenshots so we can look into it faster.",
+    "what-title": "What you can report",
+    "what-1": "Rule violations: cheats, griefing, abuse",
+    "what-2": "Bugs on the website, in the launcher or on a server",
+    "what-3": "Payment or purchase delivery issues",
+    "contact-title": "Where to write",
+    "discord": "Open Discord",
+    "telegram": "Message on Telegram",
+    "rules": "Project rules"
   }
 }

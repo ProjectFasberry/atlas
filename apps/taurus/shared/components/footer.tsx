@@ -2,6 +2,7 @@ import { Link } from '@/shared/components/link';
 import { getStaticObject } from '@/shared/lib/helpers';
 import { For } from 'solid-js';
 import { translate } from '../locales/helpers';
+import { env } from '@/shared/env';
 
 const createFooterLinks = () => ([
   { name: translate["footer.links.privacy"](), href: 'privacy' },
@@ -9,6 +10,9 @@ const createFooterLinks = () => ([
   { name: translate["footer.links.contacts"](), href: 'contacts' },
   { name: translate["footer.links.credits"](), href: 'credits' },
 ]);
+
+/** Hiring lives in the app, the landing only links to it. */
+const teamHref = () => `${env.VITE_APP_URL}/join`;
 
 const bedrockImage = getStaticObject("minecraft", "static/bedrock.webp")
 
@@ -31,6 +35,10 @@ export const Footer = () => {
             </>
           )}
         </For>
+        <span class="text-neutral-400 hidden lg:block mx-2">&</span>
+        <a href={teamHref()} class="hover:text-white duration-150">
+          <p>{translate["footer.links.team"]()}</p>
+        </a>
       </div>
       <div class="flex flex-col items-center justify-center gap-2 responsive mx-auto">
         <p class="text-center">
