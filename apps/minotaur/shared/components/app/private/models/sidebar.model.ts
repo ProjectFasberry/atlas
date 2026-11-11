@@ -10,6 +10,7 @@ import {
   PLAYERS_READ_PERMISSION,
   RELEASES_READ_PERMISSION,
   SERVERS_READ_PERMISSION,
+  TEAM_APPLICATIONS_READ_PERMISSION,
   STORE_ITEM_READ_PERMISSION,
 } from "@/shared/consts/permissions";
 
@@ -79,4 +80,5 @@ export const sidebarLinks: SidebarLink[] = [
   { title: "Серверы", value: "/private/servers", permission: SERVERS_READ_PERMISSION, icon: "sprite:device-desktop" },
   { title: "Метрики", value: "/private/metrics", permission: METRICS_READ_PERMISSION, icon: "sprite:aspect-ratio" },
   { title: "Экономика", value: "/private/economy", permission: ECONOMY_READ_PERMISSION, icon: "sprite:credit-card-pay" },
+  { title: "Команда", value: "/private/team", permission: TEAM_APPLICATIONS_READ_PERMISSION, icon: "sprite:stars" },
 ]

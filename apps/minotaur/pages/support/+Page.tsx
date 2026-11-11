@@ -31,6 +31,11 @@ const SupportContent = reatomComponent(({ ctx }) => {
             </Button>
           </a>
         )}
+        <a href="/join">
+          <Button background="positive" className="w-full sm:w-fit h-11 font-semibold">
+            {translate["team.join.cta"]()}
+          </Button>
+        </a>
         <a href="/contacts" target="_blank" rel="noreferrer">
           <Button background="default" className="w-full sm:w-fit h-11 font-semibold">
             {translate["support.contacts"]()}
