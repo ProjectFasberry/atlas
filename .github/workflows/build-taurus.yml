@@ -24,7 +24,9 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Self-hosted: the image is pushed to the local registry over loopback;
+    # GitHub-hosted runners cannot upload large layers over the home uplink.
+    runs-on: [self-hosted, linux, x64, fasberry]
     permissions:
       contents: read
     steps:
@@ -118,6 +120,7 @@ jobs:
         with:
           context: .
           file: apps/taurus/Dockerfile
+          builder: fasberry
           platforms: linux/amd64
           push: true
           build-args: |
