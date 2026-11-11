@@ -10,14 +10,15 @@ import { PageLoader } from "@/shared/ui/page-loader"
 import { Typography } from "@/shared/ui/typography"
 import { dayjs } from "@/shared/lib/dayjs"
 import {
-  PLAYERS_RANGES, playersMetrics, playersState, setPlayersRange, setPlayersServer,
-  type PlayersPoint, type PlayersRange,
+  PLAYERS_CHARTS, PLAYERS_RANGES, playersMetrics, playersState, setPlayersRange, setPlayersServer,
+  type PlayersChartMode, type PlayersPoint, type PlayersRange,
 } from "../models/players-metrics.model"
 
 const COLORS = {
   joins: "#1db954",
   quits: "#f4645a",
   unique: "#5b8def",
+  online: "#a78bfa",
 }
 
 const card = "flex flex-col gap-1 rounded-xl border border-neutral-800 bg-neutral-900 p-3"
@@ -33,12 +34,28 @@ const StatCard = ({ title, value, hint }: { title: string, value: string, hint?:
 const formatPoint = (at: string, range: PlayersRange) =>
   dayjs(at).format(range === "24h" ? "HH:mm" : "DD.MM HH:mm")
 
-const PlayersChart = ({ series, range }: { series: PlayersPoint[], range: PlayersRange }) => {
-  const data = series.map((point) => ({
+/**
+ * Concurrency per bucket: the running balance of joins minus quits. The window
+ * starts at zero, so the first points can undercount a session that began
+ * before the range; the shape is right, the absolute value slowly catches up.
+ */
+const withOnline = (series: PlayersPoint[]) => {
+  let balance = 0
+
+  return series.map((point) => {
+    balance = Math.max(0, balance + point.joins - point.quits)
+
+    return { ...point, online: balance }
+  })
+}
+
+const PlayersChart = ({ series, range, mode }: { series: PlayersPoint[], range: PlayersRange, mode: PlayersChartMode }) => {
+  const data = withOnline(series).map((point) => ({
     label: formatPoint(point.at, range),
     joins: point.joins,
     quits: point.quits,
     unique: point.unique,
+    online: point.online,
   }))
 
   return (
@@ -52,13 +69,42 @@ const PlayersChart = ({ series, range }: { series: PlayersPoint[], range: Player
             contentStyle={{ background: "#171717", border: "1px solid #262626", borderRadius: 12, fontSize: 12 }}
             labelStyle={{ color: "#a3a3a3" }}
           />
-          <Area type="monotone" dataKey="joins" name="Входы" stroke={COLORS.joins} fill={COLORS.joins} fillOpacity={0.15} strokeWidth={2} />
-          <Area type="monotone" dataKey="quits" name="Выходы" stroke={COLORS.quits} fill={COLORS.quits} fillOpacity={0.1} strokeWidth={2} />
+          {(mode === "all" || mode === "joins") && (
+            <Area type="monotone" dataKey="joins" name="Входы" stroke={COLORS.joins} fill={COLORS.joins} fillOpacity={0.15} strokeWidth={2} />
+          )}
+          {(mode === "all" || mode === "quits") && (
+            <Area type="monotone" dataKey="quits" name="Выходы" stroke={COLORS.quits} fill={COLORS.quits} fillOpacity={0.1} strokeWidth={2} />
+          )}
+          {mode === "online" && (
+            <Area type="monotone" dataKey="online" name="Онлайн" stroke={COLORS.online} fill={COLORS.online} fillOpacity={0.15} strokeWidth={2} />
+          )}
         </AreaChart>
       </ResponsiveContainer>
     </div>
   )
 }
+
+const ChartSwitch = reatomComponent(({ ctx }) => {
+  const mode = ctx.spy(playersState.chart)
+
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {PLAYERS_CHARTS.map((option) => (
+        <Button
+          key={option.value}
+          background="default"
+          className={clsx(
+            "h-7 rounded-lg px-2 text-xs",
+            mode === option.value ? "bg-neutral-50! text-neutral-950!" : "bg-neutral-800",
+          )}
+          onClick={() => playersState.chart(ctx, option.value)}
+        >
+          {option.label}
+        </Button>
+      ))}
+    </div>
+  )
+}, "PlayersChartSwitch")
 
 const ServersChart = ({ servers }: { servers: { server: string, online: number }[] }) => {
   return (
@@ -189,6 +235,7 @@ export const PlayersMetrics = reatomComponent(({ ctx }) => {
 
   const summary = response
   const range = ctx.spy(playersState.range)
+  const chartMode = ctx.spy(playersState.chart)
   const live = ctx.spy(playersState.live)
 
   // The snapshot is the base; SSE deltas keep the counters moving until the next fetch.
@@ -234,8 +281,18 @@ export const PlayersMetrics = reatomComponent(({ ctx }) => {
       </div>
 
       <div className={card}>
-        <Typography className="text-sm font-semibold">Входы и выходы</Typography>
-        <PlayersChart series={summary.series} range={range} />
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Typography className="text-sm font-semibold">Активность</Typography>
+            {chartMode === "online" && (
+              <span className="text-lg font-semibold text-neutral-50" title="Игроков сейчас">
+                {onlineTotal}
+              </span>
+            )}
+          </div>
+          <ChartSwitch />
+        </div>
+        <PlayersChart series={summary.series} range={range} mode={chartMode} />
       </div>
 
       <div className="grid gap-2 lg:grid-cols-2">

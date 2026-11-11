@@ -3,8 +3,10 @@ import { tv } from "tailwind-variants"
 import { getFromDictionary } from "@/shared/models/app/utils";
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
+import { clsx } from "cnfast";
 import { Typography } from "@/shared/ui/typography"
 import { Icon } from "@/shared/ui/icon"
+import { Button } from "@/shared/ui/button"
 import { Dialog } from '@ark-ui/react/dialog'
 import { Portal } from '@ark-ui/react/portal'
 import { dialogVariant, DialogClose } from "@/shared/ui/dialog";
@@ -12,7 +14,7 @@ import { scrollableVariant } from "@/shared/consts/style-variants";
 import { Avatar } from "@/shared/ui/avatar";
 import { Noop } from "@/shared/ui/noop";
 import {
-  formatAccountDate, groupsAtom, sidebar, sidebarLinks,
+  formatAccountDate, groupsAtom, sidebar, sidebarLinks, toggleSidebar,
   transformPermsByNamespace
 } from "../models/sidebar.model";
 
@@ -25,6 +27,7 @@ const InfoCell = ({ label, value }: { label: string, value: string }) => (
 
 const UserInfo = reatomComponent(({ ctx }) => {
   const open = ctx.spy(sidebar.infoIsOpened)
+  const collapsed = ctx.spy(sidebar.isCollapsed)
 
   useUpdate(transformPermsByNamespace, []);
 
@@ -45,11 +48,14 @@ const UserInfo = reatomComponent(({ ctx }) => {
       onOpenChange={({ open: next }) => sidebar.infoIsOpened(ctx, next)}
     >
       <Dialog.Trigger
-        className="
-          group flex w-full min-w-0 items-center justify-between
-          gap-2 rounded-xl bg-neutral-800 px-2 py-0.5 text-left
-          duration-150 hover:bg-neutral-700 sm:h-10 sm:px-3 sm:py-0
-        "
+        className={clsx(
+          `
+            group flex w-full min-w-0 items-center justify-between
+            gap-2 rounded-xl bg-neutral-800 px-2 py-0.5 text-left
+            duration-150 hover:bg-neutral-700 sm:h-10 sm:px-3 sm:py-0
+          `,
+          collapsed && "lg:justify-center lg:px-0",
+        )}
       >
         <div className="flex min-w-0 items-center gap-2">
           <Avatar
@@ -57,19 +63,19 @@ const UserInfo = reatomComponent(({ ctx }) => {
             nickname={currentUser.nickname}
             className="size-6 shrink-0 sm:size-7"
           />
-          <Typography className="hidden max-w-24 truncate text-sm font-semibold sm:block">
+          <Typography className={clsx("hidden max-w-24 truncate text-sm font-semibold sm:block", collapsed && "lg:hidden")}>
             {currentUser.nickname}
           </Typography>
           <span
-            className="
-              truncate rounded-lg bg-green-500/15 px-1.5
-              py-0.5 text-[11px] font-semibold text-green-400
-            "
+            className={clsx(
+              "truncate rounded-lg bg-green-500/15 px-1.5 py-0.5 text-[11px] font-semibold text-green-400",
+              collapsed && "lg:hidden",
+            )}
           >
             {roleTitle}
           </span>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5 text-neutral-400">
+        <div className={clsx("flex shrink-0 items-center gap-1.5 text-neutral-400", collapsed && "lg:hidden")}>
           <span
             title="Всего прав"
             className="hidden rounded-lg bg-neutral-900
@@ -177,34 +183,53 @@ const UserInfo = reatomComponent(({ ctx }) => {
 
 const linkVariant = tv({
   base: `
-    flex justify-start items-center group h-6 sm:h-10 rounded-xl px-2 sm:px-4
+    flex justify-start items-center gap-2 group h-6 sm:h-10 rounded-xl px-2 sm:px-4
     data-[state=inactive]:bg-neutral-800 data-[state=inactive]:text-neutral-50
     data-[state=active]:bg-neutral-50 data-[state=active]:text-neutral-950
   `,
+  variants: {
+    collapsed: {
+      true: "lg:justify-center lg:px-0 lg:size-10 lg:shrink-0",
+      false: ""
+    }
+  },
+  defaultVariants: {
+    collapsed: false
+  },
   slots: {
-    text: "font-semibold text-nowrap text-sm"
+    text: "font-semibold text-nowrap text-sm",
+    icon: "size-4 shrink-0"
   }
 })
 
-const SidebarHeader = () => {
+const SidebarHeader = reatomComponent(({ ctx }) => {
+  const collapsed = ctx.spy(sidebar.isCollapsed)
+
   return (
     <div className="flex flex-col gap-1 w-full">
-      <span className="hidden lg:inline">Инфо</span>
+      <span className={clsx("hidden lg:inline", collapsed && "lg:hidden")}>Инфо</span>
       <UserInfo />
     </div>
   )
-}
+}, "SidebarHeader")
 
 const SidebarBody = reatomComponent(({ ctx }) => {
   const permissions = ctx.spy(currentUserState.perms)
+  const collapsed = ctx.spy(sidebar.isCollapsed)
   const visible = sidebarLinks.filter((link) => permissions.includes(link.permission))
 
   return (
     <div className="flex flex-row items-center lg:items-stretch lg:flex-col gap-1 w-full">
-      <span className="hidden lg:inline">Навигация</span>
+      <span className={clsx("hidden lg:inline", collapsed && "lg:hidden")}>Навигация</span>
       {visible.map((link) => (
-        <Link key={link.title} href={link.value} className={linkVariant().base()}>
-          <Typography className={linkVariant().text()}>
+        <Link
+          key={link.title}
+          href={link.value}
+          title={collapsed ? link.title : undefined}
+          className={linkVariant({ collapsed }).base()}
+        >
+          <Icon name={link.icon} className={linkVariant({ collapsed }).icon()} />
+          <Typography className={clsx(linkVariant({ collapsed }).text(), collapsed && "lg:hidden")}>
             {link.title}
           </Typography>
         </Link>
@@ -213,20 +238,49 @@ const SidebarBody = reatomComponent(({ ctx }) => {
   )
 }, "SidebarBody")
 
-export const Sidebar = () => {
+const SidebarToggle = reatomComponent(({ ctx }) => {
+  const collapsed = ctx.spy(sidebar.isCollapsed)
+
+  return (
+    <Button
+      background="default"
+      title={collapsed ? "Развернуть" : "Свернуть"}
+      className={clsx(
+        "hidden lg:flex h-8 shrink-0 items-center gap-2 rounded-xl px-3 text-neutral-400",
+        collapsed && "lg:justify-center lg:px-0",
+      )}
+      onClick={() => toggleSidebar(ctx)}
+    >
+      <Icon name={collapsed ? "sprite:arrow-right" : "sprite:arrow-left"} className="size-4 shrink-0" />
+      <Typography className={clsx("text-xs font-semibold", collapsed && "lg:hidden")}>
+        Свернуть
+      </Typography>
+    </Button>
+  )
+}, "SidebarToggle")
+
+export const Sidebar = reatomComponent(({ ctx }) => {
+  const collapsed = ctx.spy(sidebar.isCollapsed)
+
   return (
     <div
       className={scrollableVariant({
-        className: `
-          flex sm:h-fit sm:max-h-fit h-12 max-h-12 items-center sm:items-stretch
-          sticky z-20 top-2 flex-row overflow-x-auto lg:flex-col
-          border lg:border-transparent border-neutral-800 gap-2 lg:gap-4 w-full
-          lg:w-1/4 lg:shrink-0 p-2 lg:p-3 bg-neutral-900 rounded-xl scrollbar-h-2 overflow-y-hidden
-        `
+        className: clsx(
+          `
+            flex sm:h-fit sm:max-h-fit h-12 max-h-12 items-center sm:items-stretch
+            sticky z-20 top-2 flex-row overflow-x-auto lg:flex-col
+            border lg:border-transparent border-neutral-800 gap-2 lg:gap-4 w-full
+            lg:shrink-0 p-2 lg:p-3 bg-neutral-900 rounded-xl scrollbar-h-2 overflow-y-hidden
+          `,
+          collapsed ? "lg:w-16" : "lg:w-1/4",
+        )
       })}
     >
       <SidebarHeader />
       <SidebarBody />
+      <div className="hidden lg:flex lg:mt-auto lg:w-full">
+        <SidebarToggle />
+      </div>
     </div>
   )
-}
+}, "Sidebar")

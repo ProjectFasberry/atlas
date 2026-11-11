@@ -1,4 +1,5 @@
 import { currentUserState } from "@/shared/models/current-user/index.model";
+import type { IconName } from "@/shared/ui/icon";
 import { action, atom, withAssign } from "@reatom/framework";
 import dayjs from "dayjs";
 import {
@@ -18,9 +19,14 @@ export type Perms = {
 
 export const sidebar = atom(null).pipe(
   withAssign((_, name) => ({
-    infoIsOpened: atom(false, `${name}.infoIsOpened`)
+    infoIsOpened: atom(false, `${name}.infoIsOpened`),
+    isCollapsed: atom(false, `${name}.isCollapsed`)
   }))
 )
+
+export const toggleSidebar = action((ctx) => {
+  sidebar.isCollapsed(ctx, (collapsed) => !collapsed)
+}, "toggleSidebar")
 
 const permsAtom = atom<Perms>({
   read: [], create: [], update: [], delete: [], unknown: [],
@@ -62,15 +68,15 @@ export function formatAccountDate(value: unknown) {
   return date.isValid() ? date.format("DD.MM.YYYY") : "—";
 }
 
-type SidebarLink = { title: string, value: string, permission: string }
+export type SidebarLink = { title: string, value: string, permission: string, icon: IconName }
 
 export const sidebarLinks: SidebarLink[] = [
-  { title: "Конфигурация", value: "/private/", permission: CONFIG_PANEL_READ_PERMISSION },
-  { title: "Магазин", value: "/private/store", permission: STORE_ITEM_READ_PERMISSION },
-  { title: "Игрок", value: "/private/users", permission: PLAYERS_READ_PERMISSION },
-  { title: "История", value: "/private/history", permission: HISTORY_READ_PERMISSION },
-  { title: "Релизы", value: "/private/releases", permission: RELEASES_READ_PERMISSION },
-  { title: "Серверы", value: "/private/servers", permission: SERVERS_READ_PERMISSION },
-  { title: "Метрики", value: "/private/metrics", permission: METRICS_READ_PERMISSION },
-  { title: "Экономика", value: "/private/economy", permission: ECONOMY_READ_PERMISSION },
+  { title: "Конфигурация", value: "/private/", permission: CONFIG_PANEL_READ_PERMISSION, icon: "sprite:settings" },
+  { title: "Магазин", value: "/private/store", permission: STORE_ITEM_READ_PERMISSION, icon: "sprite:building-store" },
+  { title: "Игрок", value: "/private/users", permission: PLAYERS_READ_PERMISSION, icon: "sprite:user-circle" },
+  { title: "История", value: "/private/history", permission: HISTORY_READ_PERMISSION, icon: "sprite:book" },
+  { title: "Релизы", value: "/private/releases", permission: RELEASES_READ_PERMISSION, icon: "sprite:download" },
+  { title: "Серверы", value: "/private/servers", permission: SERVERS_READ_PERMISSION, icon: "sprite:device-desktop" },
+  { title: "Метрики", value: "/private/metrics", permission: METRICS_READ_PERMISSION, icon: "sprite:aspect-ratio" },
+  { title: "Экономика", value: "/private/economy", permission: ECONOMY_READ_PERMISSION, icon: "sprite:credit-card-pay" },
 ]

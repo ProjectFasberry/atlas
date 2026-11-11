@@ -26,6 +26,15 @@ const RANGE_MS: Record<PlayersRange, number> = {
   "30d": 30 * 24 * 60 * 60 * 1000,
 }
 
+export type PlayersChartMode = "all" | "joins" | "quits" | "online"
+
+export const PLAYERS_CHARTS: { value: PlayersChartMode, label: string }[] = [
+  { value: "all", label: "Все" },
+  { value: "joins", label: "Входы" },
+  { value: "quits", label: "Выходы" },
+  { value: "online", label: "Онлайн" },
+]
+
 export const PLAYERS_RANGES: { value: PlayersRange, label: string }[] = [
   { value: "24h", label: "24 часа" },
   { value: "7d", label: "7 дней" },
@@ -40,6 +49,7 @@ export const playersState = atom(null, "playersState").pipe(
     live: atom<Record<string, number>>({}, `${name}.live`),
     recent: atom<PresenceEvent[]>([], `${name}.recent`),
     connected: atom(false, `${name}.connected`),
+    chart: atom<PlayersChartMode>("all", `${name}.chart`),
   }))
 )
 
