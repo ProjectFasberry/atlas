@@ -2,18 +2,7 @@ import { reatomAsync, withAssign, withDataAtom, withErrorAtom, withStatusesAtom,
 import { client } from "@/shared/lib/client-wrapper"
 import type { TeamStatus } from "@/shared/schemas/team"
 
-export type TeamApplication = {
-  id: number
-  nickname: string
-  uuid: string | null
-  roles: string[]
-  about: string
-  telegram: string
-  email: string | null
-  portfolio: string | null
-  status: TeamStatus
-  createdAt: string
-}
+export type TeamApplication = ExtractApiData<"getPrivatedTeamList">["data"][number]
 
 export const teamState = atom(null, "teamState").pipe(
   withAssign((_, name) => ({
@@ -24,7 +13,7 @@ export const teamState = atom(null, "teamState").pipe(
 export const loadTeamApplications = reatomAsync(async (ctx) => {
   const status = ctx.get(teamState.status)
 
-  return await client.raw.get<TeamApplication[]>("/privated/team/list", {
+  return await client.get("/privated/team/list", {
     params: { query: status ? { status } : {} },
   })
 }, {
@@ -37,7 +26,8 @@ export const loadTeamApplications = reatomAsync(async (ctx) => {
 )
 
 export const setTeamApplicationStatus = reatomAsync(async (ctx, id: number, status: TeamStatus) => {
-  return await client.raw.post<{ id: number, status: TeamStatus }>(`/privated/team/${id}/status`, {
+  return await client.post("/privated/team/{id}/status", {
+    params: { path: { id: String(id) } },
     json: { status },
   })
 }, {

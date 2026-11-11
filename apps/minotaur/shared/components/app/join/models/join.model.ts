@@ -72,7 +72,7 @@ export const submitJoin = action((ctx) => {
   joinState.token(ctx, null)
   joinState.isProcessing(ctx, true)
 
-  void client.raw.post<{ data: { id: number } }>("/team/apply", {
+  void client.post("/team/apply", {
     json: parsed.data,
     headers: { "x-cap-token": token ?? "" },
   }).then(() => {
