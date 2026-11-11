@@ -130,4 +130,3 @@ scope, and leave unrelated changes in the tree untouched.
 Host topology, compose files, Traefik, the registry and the rollout live in
 `ProjectFasberry/infra`. This repository builds and publishes images only: no host
 names, ports, paths or deploy commands belong here.
-
