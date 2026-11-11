@@ -4,7 +4,6 @@ import {
 } from "@reatom/framework"
 import { apiBaseUrl } from "@/shared/env"
 import { client } from "@/shared/lib/client-wrapper"
-import { createMockSummary, isMockEnabled, startMockStream } from "./players-metrics.mock"
 
 export type PlayersRange = "24h" | "7d" | "30d"
 
@@ -12,13 +11,7 @@ export type PlayersPoint = { at: string, joins: number, quits: number, unique: n
 
 export type PlayersOnline = { server: string | null, online: number }
 
-export type PlayersSummary = {
-  online: { total: number, byServer: PlayersOnline[] },
-  servers: string[],
-  series: PlayersPoint[],
-  totals: { joins: number, quits: number, unique: number, peakOnline: number },
-  range: { from: string, to: string, server: string | null },
-}
+export type PlayersSummary = ExtractApiData<"getPrivatedMetricsPlayers">["data"]
 
 export type PresenceEvent = {
   type: "join" | "quit",
@@ -66,9 +59,7 @@ export const playersMetrics = reatomAsync(async (ctx) => {
   const to = new Date()
   const from = new Date(to.getTime() - RANGE_MS[range])
 
-  if (isMockEnabled()) return { data: createMockSummary(range, server) }
-
-  return await client.raw.get<{ data: PlayersSummary }>("/privated/metrics/players", {
+  return await client.get("/privated/metrics/players", {
     params: {
       query: {
         from: from.toISOString(),
@@ -99,17 +90,10 @@ const applyPresence = (ctx: Ctx, presence: PresenceEvent) => {
 }
 
 let source: EventSource | null = null
-let stopMock: (() => void) | null = null
 
 export const connectPlayersStream = action((ctx) => {
   if (typeof window === "undefined") return
-  if (source || stopMock) return
-
-  if (isMockEnabled()) {
-    stopMock = startMockStream((presence) => applyPresence(ctx, presence))
-    playersState.connected(ctx, true)
-    return
-  }
+  if (source) return
 
   if (typeof EventSource === "undefined") return
 
@@ -123,8 +107,6 @@ export const connectPlayersStream = action((ctx) => {
 export const disconnectPlayersStream = action((ctx) => {
   source?.close()
   source = null
-  stopMock?.()
-  stopMock = null
   playersState.connected(ctx, false)
 }, "disconnectPlayersStream")
 

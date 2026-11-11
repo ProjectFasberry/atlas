@@ -187,7 +187,7 @@ export const PlayersMetrics = reatomComponent(({ ctx }) => {
   }
   if (!response) return <Noop />
 
-  const summary = response.data
+  const summary = response
   const range = ctx.spy(playersState.range)
   const live = ctx.spy(playersState.live)
 
