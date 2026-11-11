@@ -1198,6 +1198,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/metrics/players": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get player presence metrics */
+        get: operations["getPrivatedMetricsPlayers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/metrics/players/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream player presence events */
+        get: operations["getPrivatedMetricsPlayersStream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/service/cron": {
         parameters: {
             query?: never;
@@ -3186,6 +3220,21 @@ export interface operations {
                     };
                 };
             };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SHUTTING_DOWN
+                         * @enum {string}
+                         */
+                        error: "SHUTTING_DOWN";
+                    };
+                };
+            };
         };
     };
     getHealthReady: {
@@ -3233,7 +3282,7 @@ export interface operations {
                          * @default DB_CONNECTION_FAILED
                          * @enum {string}
                          */
-                        error: "DB_CONNECTION_FAILED" | "UNKNOWN";
+                        error: "DB_CONNECTION_FAILED" | "DB_UNAVAILABLE" | "UNKNOWN" | "SHUTTING_DOWN";
                     };
                 };
             };
@@ -5894,6 +5943,79 @@ export interface operations {
             };
         };
     };
+    getPrivatedMetricsPlayers: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+                server?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            online: {
+                                total: number;
+                                byServer: {
+                                    server: string | null;
+                                    online: number;
+                                }[];
+                            };
+                            servers: string[];
+                            series: {
+                                at: string;
+                                joins: number;
+                                quits: number;
+                                unique: number;
+                            }[];
+                            totals: {
+                                joins: number;
+                                quits: number;
+                                unique: number;
+                                peakOnline: number;
+                            };
+                            range: {
+                                from: string;
+                                to: string;
+                                server: string | null;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedMetricsPlayersStream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
     getServiceCron: {
         parameters: {
             query?: never;
@@ -5915,6 +6037,10 @@ export interface operations {
                             schedule: boolean;
                             allowIsDev?: boolean;
                             scheduledTo: (Record<string, never> | string | number) | string;
+                            nextRunAt?: (((Record<string, never> | string | number) | string) | null) | null;
+                            lastRunAt?: (((Record<string, never> | string | number) | string) | null) | null;
+                            lastOutcome?: (("ran" | "busy" | "failed") | null) | null;
+                            lastDurationMs?: (number | null) | null;
                             name: string;
                         }[];
                     };
