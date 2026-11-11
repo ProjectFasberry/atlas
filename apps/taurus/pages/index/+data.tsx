@@ -9,6 +9,24 @@ export async function data(pageCtx: PageContextServer) {
   const title = wrapTitle(translate['pages.index.title']());
   const description = translate['pages.index.description']();
 
+  const gameLd = {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    name: "Fasberry",
+    url: getUrl(pageCtx),
+    description,
+    genre: ["Sandbox", "Survival", "MMORPG"],
+    gamePlatform: "PC",
+    operatingSystem: "Windows, macOS, Linux",
+    playMode: "MultiPlayer",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "RUB",
+      availability: "https://schema.org/InStock",
+    },
+  }
+
   config({
     title,
     description,
@@ -19,6 +37,7 @@ export async function data(pageCtx: PageContextServer) {
         <meta property="og:title" content={title} />
         <meta property="og:site_name" content={title} />
         <meta name="twitter:title" content={title} />
+        <script type="application/ld+json" innerHTML={JSON.stringify(gameLd)} />
       </>
     )
   })

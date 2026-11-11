@@ -213,16 +213,16 @@
   },
   "pages": {
     "index": {
-      "title": "Home",
-      "description": ""
+      "title": "Minecraft server Fasberry",
+      "description": "Fasberry is a Minecraft project with vanilla survival, SMP and RP modes. Join through the Fasberry launcher: servers, cities, events and a friendly community."
     },
     "gallery": {
       "title": "Gallery",
-      "description": ""
+      "description": "Fasberry gallery: screenshots of cities, events, builds and nature from the Minecraft project."
     },
     "modpack": {
       "title": "Modpack",
-      "description": ""
+      "description": "Fasberry modpack: mod list, version and installation through the Fasberry launcher."
     },
     "global": {
       "description": "The official page of the Fasberry Minecraft project. Different servers and modes. Play via the Fasberry launcher.",
@@ -240,8 +240,8 @@
       "description-additional": "Rules of our Fasberry server for comfortable gameplay. Follow the established standards and maintain a friendly atmosphere!"
     },
     "status": {
-      "title": "Server Status",
-      "description": ""
+      "title": "Server status",
+      "description": "Live Fasberry server status: online players, availability and versions. Check the servers before joining."
     },
     "support": {
       "title": "Support",
