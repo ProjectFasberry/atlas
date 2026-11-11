@@ -75,7 +75,9 @@ jobs:
       # on native amd64. Vite reads the VITE_* values injected by Infisical.
       - name: Build client bundle
         working-directory: apps/taurus
-        run: bun --bun run vike build
+        # node, not bun: the rolldown adapter needs module.registerHooks, which
+        # bun's node:module shim does not export.
+        run: pnpm exec vike build
         env:
           STAGE: ${{ steps.stage.outputs.stage }}
           NODE_ENV: production
