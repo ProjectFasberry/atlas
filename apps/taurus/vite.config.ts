@@ -16,6 +16,10 @@ export default defineConfig(({ mode }) => {
 
   const stage = process.env["STAGE"] as Maybe<Stage>
   const isProd = stage === 'prod';
+  // Default stays Cloudflare (the worker is the rollback path until the DNS
+  // switch). DEPLOY_TARGET=node produces the plain Node/Bun server entry that
+  // the self-hosted image runs.
+  const isNodeTarget = process.env["DEPLOY_TARGET"] === 'node';
 
   let isSSR = false;
 
@@ -23,11 +27,11 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vike(),
       vikeSolid(),
-      cloudflare({
+      ...(isNodeTarget ? [] : [cloudflare({
         viteEnvironment: {
           name: 'ssr'
         }
-      }),
+      })]),
       tailwindcss(),
       utwm(),
       svg({
