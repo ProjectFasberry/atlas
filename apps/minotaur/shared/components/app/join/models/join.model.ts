@@ -71,8 +71,14 @@ export const submitJoin = action((ctx) => {
   joinState.token(ctx, null)
   joinState.isProcessing(ctx, true)
 
+  // The contact-fields shape is deployed on a rolling update; send the legacy
+  // field as well so the form works on both API versions. Remove after rollout.
+  const legacy = parsed.data.contact.type === "telegram"
+    ? { telegram: parsed.data.contact.value }
+    : { email: parsed.data.contact.value }
+
   void client.raw.post<{ id: number }>("/team/apply", {
-    json: parsed.data,
+    json: { ...parsed.data, ...legacy },
     headers: { "x-cap-token": token ?? "" },
   }).then(() => {
     joinState.submitted(ctx, true)
