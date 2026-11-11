@@ -15,7 +15,7 @@ on:
       stage:
         description: Image stage
         type: choice
-        options: [prod, staging]
+        options: [prod, staging, dev]
         default: prod
 
 concurrency:
@@ -36,7 +36,11 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             stage="${{ inputs.stage }}"
           else
-            stage=prod
+            case "${{ github.ref_name }}" in
+              main) stage=prod ;;
+              staging) stage=staging ;;
+              *) stage=dev ;;
+            esac
           fi
           echo "stage=$stage" >> "$GITHUB_OUTPUT"
 
