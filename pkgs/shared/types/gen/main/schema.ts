@@ -1232,6 +1232,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/team/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List team applications */
+        get: operations["getPrivatedTeamList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/team/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Move a team application status */
+        post: operations["postPrivatedTeamByIdStatus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/service/cron": {
         parameters: {
             query?: never;
@@ -3172,6 +3206,23 @@ export interface paths {
         head?: never;
         /** Change password */
         patch: operations["patchAccountPassword"];
+        trace?: never;
+    };
+    "/team/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply to the project team */
+        post: operations["postTeamApply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -6015,6 +6066,123 @@ export interface operations {
         };
         requestBody?: never;
         responses: never;
+    };
+    getPrivatedTeamList: {
+        parameters: {
+            query?: {
+                status?: "new" | "reviewed" | "invited" | "rejected";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            nickname: string;
+                            uuid: string | null;
+                            roles: string[];
+                            about: string;
+                            telegram: string;
+                            email: string | null;
+                            portfolio: string | null;
+                            /**
+                             * @default new
+                             * @enum {string}
+                             */
+                            status: "new" | "reviewed" | "invited" | "rejected";
+                            createdAt: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedTeamByIdStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default new
+                     * @enum {string}
+                     */
+                    status: "new" | "reviewed" | "invited" | "rejected";
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default new
+                     * @enum {string}
+                     */
+                    status: "new" | "reviewed" | "invited" | "rejected";
+                };
+                "multipart/form-data": {
+                    /**
+                     * @default new
+                     * @enum {string}
+                     */
+                    status: "new" | "reviewed" | "invited" | "rejected";
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            /**
+                             * @default new
+                             * @enum {string}
+                             */
+                            status: "new" | "reviewed" | "invited" | "rejected";
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
     };
     getServiceCron: {
         parameters: {
@@ -10070,6 +10238,90 @@ export interface operations {
             };
             /** @description Response for status 500 */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postTeamApply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    roles: ("builder" | "developer" | "designer" | "moderator" | "content" | "other")[];
+                    about: string;
+                    telegram: string;
+                    /** Format: email */
+                    email?: string;
+                    portfolio?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    roles: ("builder" | "developer" | "designer" | "moderator" | "content" | "other")[];
+                    about: string;
+                    telegram: string;
+                    /** Format: email */
+                    email?: string;
+                    portfolio?: string;
+                };
+                "multipart/form-data": {
+                    roles: ("builder" | "developer" | "designer" | "moderator" | "content" | "other")[];
+                    about: string;
+                    telegram: string;
+                    /** Format: email */
+                    email?: string;
+                    portfolio?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 429 */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
