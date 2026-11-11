@@ -44,9 +44,10 @@ jobs:
         with:
           version: 12.4.2
 
+      # Taurus needs module.registerHooks (Node >= 22.15); .nvmrc pins an older 22.x.
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version: 24
           cache: pnpm
           registry-url: https://npm.pkg.github.com
           scope: "@projectfasberry"

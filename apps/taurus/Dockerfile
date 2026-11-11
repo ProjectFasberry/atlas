@@ -18,7 +18,7 @@ COPY apps/taurus/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENV NODE_ENV=production
-ENV PORT=3005
+ENV PORT=3006
 
 USER bun
 CMD ["/bin/sh", "/entrypoint.sh"]
