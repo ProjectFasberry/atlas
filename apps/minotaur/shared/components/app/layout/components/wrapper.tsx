@@ -1,4 +1,5 @@
 import { useCtx, useIsomorphicEffect, useUpdate } from '@reatom/npm-react';
+import { setupUrlAtomBrowserSettings } from '@reatom/url';
 import { reatomContext } from '@reatom/npm-react'
 import { type PropsWithChildren } from 'react'
 import { usePageContext } from 'vike-react/usePageContext'
@@ -26,6 +27,12 @@ const MobileSync = () => {
 
 const AppProvider = ({ children }: PropsWithChildren) => {
   useUpdate((ctx) => app.init(ctx), []);
+
+  // @reatom/url hooks link clicks and pushes history itself by default, which
+  // duplicates every Vike navigation. Vike owns routing; keep the defaults off.
+  useUpdate((ctx) => {
+    if (ENVIRONMENT === "client") setupUrlAtomBrowserSettings(ctx, false)
+  }, []);
 
   return (
     <>
