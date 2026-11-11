@@ -2,14 +2,14 @@ import { action, atom, withAssign, withReset } from "@reatom/framework"
 import { client } from "@/shared/lib/client-wrapper"
 import { pof } from "@/shared/components/config/cap/models/cap.model"
 import { maybeSpyOptionAtom } from "@/shared/models/app/utils"
-import { teamApplySchema, type TeamRole } from "@/shared/schemas/team"
+import { teamApplySchema, type TeamContactType, type TeamRole } from "@/shared/schemas/team"
 
 export const joinState = atom(null, "joinState").pipe(
   withAssign((_, name) => ({
     roles: atom<TeamRole[]>([], `${name}.roles`).pipe(withReset()),
     about: atom("", `${name}.about`).pipe(withReset()),
-    telegram: atom("", `${name}.telegram`).pipe(withReset()),
-    email: atom("", `${name}.email`).pipe(withReset()),
+    contactType: atom<TeamContactType>("telegram", `${name}.contactType`).pipe(withReset()),
+    contact: atom("", `${name}.contact`).pipe(withReset()),
     portfolio: atom("", `${name}.portfolio`).pipe(withReset()),
     token: atom<string | null>(null, `${name}.token`).pipe(withReset()),
     error: atom<string | null>(null, `${name}.error`),
@@ -50,8 +50,7 @@ export const submitJoin = action((ctx) => {
   const parsed = teamApplySchema.safeParse({
     roles: ctx.get(joinState.roles),
     about: ctx.get(joinState.about),
-    telegram: ctx.get(joinState.telegram),
-    email: ctx.get(joinState.email),
+    contact: { type: ctx.get(joinState.contactType), value: ctx.get(joinState.contact) },
     portfolio: ctx.get(joinState.portfolio),
   })
 
@@ -72,15 +71,15 @@ export const submitJoin = action((ctx) => {
   joinState.token(ctx, null)
   joinState.isProcessing(ctx, true)
 
-  void client.post("/team/apply", {
+  void client.raw.post<{ id: number }>("/team/apply", {
     json: parsed.data,
     headers: { "x-cap-token": token ?? "" },
   }).then(() => {
     joinState.submitted(ctx, true)
     joinState.roles.reset(ctx)
     joinState.about.reset(ctx)
-    joinState.telegram.reset(ctx)
-    joinState.email.reset(ctx)
+    joinState.contactType.reset(ctx)
+    joinState.contact.reset(ctx)
     joinState.portfolio.reset(ctx)
   }).catch((error: unknown) => {
     joinState.error(ctx, error instanceof Error ? error.message : String(error))
