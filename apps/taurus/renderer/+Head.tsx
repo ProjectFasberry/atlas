@@ -20,7 +20,7 @@ export default function HeadDefault() {
         survival, smp, fasberry project, minecraft fasberry, minecraft server play"/>
       <meta name="author" content="Fasberry Team" />
       <meta name="format-detection" content="email=yes, address=yes, telephone=yes" />
-      <meta name="description" content={`${translate["pages.global.description"]({ ip: `play.${env.VITE_MAIN_DOMAIN}` })}`} />
+      <meta name="description" content={translate["pages.global.description"]()} />
       <meta property="og:title" content="Fasberry" />
       <meta property="og:description" content={translate["pages.global.description-global"]()} />
       <meta property="og:locale" content="ru_RU" />

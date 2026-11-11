@@ -142,6 +142,72 @@
     transform: scale(-1);
   }
 
+  /* The torn edge is decorative: it must never eat clicks near a section edge. */
+  .full-screen-section::before,
+  .full-screen-section::after {
+    pointer-events: none;
+  }
+
+  /* Internal sections keep clean edges. The hero and footer seams are the
+     exception: they use the torn texture on both sides, so the two halves meet. */
+  .landing-page #title::before,
+  .landing-page #features::before,
+  .landing-page #spawn::before,
+  .landing-page #share::before {
+    content: none;
+  }
+
+  /* Internal section edges are a clean pixel bevel. The torn borders.webp stays
+     on the page frame (header) where it reads as a deliberate texture. */
+  .landing-page .full-screen-section::after,
+  .landing-page .section-edge::after {
+    content: "";
+    width: 100%;
+    position: absolute;
+    height: 4px;
+    background: linear-gradient(to bottom, #1b1b1b 0 2px, #333333 2px 100%);
+    z-index: 22;
+    bottom: 0px;
+    pointer-events: none;
+  }
+
+  /* The torn texture is reserved for the two image-backed transitions:
+     hero -> content and content -> footer. */
+  .landing-page #title::after,
+  .landing-page #share::after {
+    content: "";
+    width: 100%;
+    position: absolute;
+    height: 50px;
+    background-image: url("_VOLUME_URL/static/minecraft/static/borders.webp");
+    background-size: 960px;
+    background-repeat: repeat-x;
+    z-index: 22;
+    bottom: 0px;
+    transform: scale(-1);
+    pointer-events: none;
+  }
+
+
+  .rules-content .rule-anchor {
+    margin-left: 0.35em;
+    color: #ffaa00;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .rules-content p:hover .rule-anchor,
+  .rules-content .rule-anchor:focus-visible {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .rules-content .rule-anchor {
+      opacity: 0.5;
+    }
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;

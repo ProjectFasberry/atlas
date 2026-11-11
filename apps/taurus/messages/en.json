@@ -3,7 +3,8 @@
   "welcome": {
     "subtitle": "Semi-vanilla server 1.20.1 - 1.20.4",
     "description": "A cozy, vanilla server with a pleasant atmosphere and friendly players!\nJoin with your friends to chill together!",
-    "action-text": "Start playing"
+    "action-text": "Start playing",
+    "online": "{count} playing now"
   },
   "features": {
     "title": "Server Features"
@@ -11,9 +12,6 @@
   "contacts": {
     "title": "Project Socials",
     "item-title": "Go to"
-  },
-  "shared": {
-    "copied-to-clipboard": "Copied to clipboard"
   },
   "header": {
     "links": {
@@ -80,22 +78,116 @@
     },
     "tags": {
       "title": "Current tags:"
-    }
+    },
+    "content": {
+      "title": "Contents"
+    },
+    "meta": {
+      "sections": "Sections: {count}",
+      "points": "Rules: {count}",
+      "updated": "Updated: {date}"
+    },
+    "search": {
+      "placeholder": "Search the rules",
+      "empty": "Nothing found. Try another query.",
+      "clear": "Clear"
+    },
+    "nav": {
+      "title": "Sections",
+      "expand": "Expand all",
+      "collapse": "Collapse all"
+    },
+    "anchor": "Link to this rule",
+    "points": {
+      "one": "rule",
+      "few": "rules",
+      "many": "rules"
+    },
+    "updated": "Updated {date}"
   },
   "support": {
     "title": "Project Support",
     "subtitle": "Here you can find out how to support the development of the project",
     "action-text": "How to support?",
-    "above-description": "Below are the primary ways to help the project for now. Thank you!",
-    "variants": {
-      "monitoring": {
-        "title": "Monitoring",
-        "vote": "Vote"
+    "eyebrow": "Support",
+    "heading": "How to help the project",
+    "description": "You can support us without money: vote, share, or help with content.",
+    "share-text": "Check out this cozy server",
+    "cards": {
+      "vote": {
+        "title": "Vote",
+        "description": "A vote on the monitor moves the project up the list, where new players can find it.",
+        "action": "Vote now",
+        "note": "Usually once every 24 hours"
       },
-      "repost": {
+      "share": {
         "title": "Share",
-        "share": "Share on {target}"
+        "description": "Tell your friends about the project: the best traffic comes from players themselves.",
+        "telegram": "To Telegram",
+        "copy": "Copy the link"
+      },
+      "help": {
+        "title": "Help the project",
+        "description": "Report a bug, suggest an idea, or help with the wiki and art — there is always work to do.",
+        "bugs": "Report a bug",
+        "ideas": "Suggest an idea",
+        "content": "Help with content"
       }
+    },
+    "where": {
+      "title": "What the team spends time on",
+      "items": {
+        "hosting": {
+          "title": "Hosting and servers",
+          "description": "We keep the servers online, back up worlds and watch stability."
+        },
+        "development": {
+          "title": "Development",
+          "description": "Plugins, mechanics and updates."
+        },
+        "content": {
+          "title": "Art and content",
+          "description": "Models, resource pack, texts and the wiki."
+        },
+        "events": {
+          "title": "Events and community",
+          "description": "Events, contests and the atmosphere."
+        }
+      }
+    },
+    "thanks": {
+      "title": "Thank you",
+      "caption": "Steve and Alex are already here",
+      "description": "Thanks to everyone who votes, shares and helps. Support is attention to the project.",
+      "action": "Join Discord"
+    },
+    "faq": {
+      "title": "Frequently asked",
+      "subtitle": "The short version of how it works",
+      "items": {
+        "1": {
+          "question": "Why vote?",
+          "answer": "Votes move the project up the monitors, where new players find it."
+        },
+        "2": {
+          "question": "How often can I vote?",
+          "answer": "Usually once every 24 hours on each monitor. The button opens the voting page."
+        },
+        "3": {
+          "question": "What else helps the project?",
+          "answer": "Tell your friends, report bugs, or help with the wiki and art."
+        },
+        "4": {
+          "question": "Where should I write?",
+          "answer": "To the project's Discord or Telegram."
+        }
+      }
+    },
+    "cta": {
+      "title": "Still have questions?",
+      "description": "Join Discord or Telegram — we will tell you how you can help.",
+      "discord": "Discord",
+      "telegram": "Telegram"
     }
   },
   "start": {
@@ -132,7 +224,7 @@
       "description": ""
     },
     "global": {
-      "description": "Official page of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20+. Play: {ip}",
+      "description": "The official page of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20+. Play: via the Fasberry launcher.",
       "description-global": "How many top Minecraft servers do you know? Now you know one more.",
       "site_name": "Official website of the Fasberry Minecraft server."
     },
@@ -162,7 +254,40 @@
   "gallery": {
     "title": "Gallery",
     "description": "Here are the in-game snapshots",
-    "action-text": "To the scene of events"
+    "action-text": "View the shots",
+    "heading": "Game moments",
+    "count": "Shots: {count}",
+    "tags": {
+      "all": "All",
+      "nature": "Nature",
+      "cities": "Cities",
+      "events": "Events",
+      "builds": "Builds"
+    },
+    "items": {
+      "moon": "Moonlit night",
+      "sunset": "Sunset",
+      "market": "Market",
+      "duck": "Duck monument",
+      "dragon": "Fallen dragon",
+      "hills": "Mountain ridges",
+      "seller": "Market trader",
+      "offenburg": "Offenburg",
+      "night": "Night city",
+      "shore": "The shore",
+      "early-sunset": "Early sunset"
+    },
+    "info": {
+      "title": "Shot on the server",
+      "description": "Every shot is from the game. Send yours in Discord.",
+      "action": "To Discord"
+    },
+    "lightbox": {
+      "original": "Original",
+      "prev": "Previous shot",
+      "next": "Next shot",
+      "close": "Close"
+    }
   },
   "credits": {
     "title": "Special Credits",
@@ -178,7 +303,50 @@
     "error": "Error loading modpacks",
     "retry-later": "Please try again later",
     "empty": "No modpacks available yet",
-    "download": "Download"
+    "download": "Download",
+    "subtitle": "The launcher pulls the version, modpack and resource pack — nothing to install by hand.",
+    "action-text": "How to start",
+    "launcher": {
+      "title": "Play through the launcher",
+      "description": "Download the launcher — it fetches the right version, modpack and resource pack.",
+      "version": "Version and modpack",
+      "version-note": "Pulled automatically",
+      "resourcepack": "Resource pack and client mods",
+      "resourcepack-note": "Installed with the game",
+      "updates": "Updates",
+      "updates-note": "Come with the launcher"
+    },
+    "manual": {
+      "title": "Manual builds",
+      "description": "Separate builds for manual installation. If unsure, use the launcher.",
+      "count": "Builds: {count}",
+      "badge": "Manual install",
+      "created": "Added {date}",
+      "empty": {
+        "title": "No separate builds yet",
+        "description": "Everything is already in the launcher — download it and play.",
+        "action": "Write in Discord"
+      }
+    },
+    "retry": "Retry",
+    "faq": {
+      "title": "Frequently asked",
+      "subtitle": "The short version of installing",
+      "items": {
+        "1": {
+          "question": "Do I install mods by hand?",
+          "answer": "No. The launcher downloads the version, modpack and resource pack."
+        },
+        "2": {
+          "question": "Why manual builds then?",
+          "answer": "For players who mod their own client or want a separate version."
+        },
+        "3": {
+          "question": "Where do I put a manual build?",
+          "answer": "Into the game or launcher folder as described in the archive. If unsure, ask in Discord."
+        }
+      }
+    }
   },
   "languages": {
     "title": "Language",
@@ -197,5 +365,92 @@
   },
   "settings": {
     "title": "Settings"
+  },
+  "join": {
+    "eyebrow": "Getting in",
+    "title": "Three steps to your first day",
+    "description": "A launcher and an account — that's it.",
+    "action-windows": "Download for Windows",
+    "action-macos": "Download for macOS",
+    "action-guide": "Full guide",
+    "steps": {
+      "1": {
+        "title": "Download the launcher",
+        "description": "Windows 10/11 x64 or macOS on Apple Silicon. The launcher updates itself."
+      },
+      "2": {
+        "title": "Create an account",
+        "description": "One account for the game, the forum and your profile."
+      },
+      "3": {
+        "title": "Join the server",
+        "description": "Launch the app and pick a server."
+      }
+    },
+    "status": {
+      "online": "Server online",
+      "offline": "Server offline",
+      "players": "Players online",
+      "version": "1.20.1 – 1.20.4",
+      "connecting": "Connecting…"
+    },
+    "hint": "The resource pack and modpack are pulled in automatically"
+  },
+  "news": {
+    "title": "What is new",
+    "subtitle": "Project, server and wiki updates",
+    "action": "All news",
+    "read": "Read",
+    "empty": "No news yet — the freshest stuff lives in Discord",
+    "error": "Could not load the news",
+    "retry": "Retry"
+  },
+  "community": {
+    "title": "Where to next",
+    "subtitle": "Map, wiki and modpack — all in one place",
+    "items": {
+      "map": {
+        "title": "Map",
+        "description": "Live map of the world and the town"
+      },
+      "wiki": {
+        "title": "Wiki",
+        "description": "Guides, quests and mechanics"
+      },
+      "modpack": {
+        "title": "Modpack",
+        "description": "Modpacks and client mods"
+      },
+      "gallery": {
+        "title": "Gallery",
+        "description": "Screenshots and moments from the server"
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently asked",
+    "subtitle": "The short version of what people ask most",
+    "items": {
+      "1": {
+        "question": "Do I need the launcher to play?",
+        "answer": "Yes. The server is only reachable through the Fasberry launcher: it pulls the right version, modpack and updates."
+      },
+      "2": {
+        "question": "Which versions are supported?",
+        "answer": "Java Edition 1.20.1 – 1.20.4. The launcher picks the right build for you."
+      },
+      "3": {
+        "question": "Is it free to play?",
+        "answer": "Yes, joining the server is free."
+      },
+      "4": {
+        "question": "Where do I report a problem?",
+        "answer": "Discord or Telegram. For account issues use app.fasberry.fun."
+      }
+    }
+  },
+  "shared": {
+    "copy-success": "Link copied",
+    "copy-failed": "Could not copy the link"
   }
 }

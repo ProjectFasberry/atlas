@@ -19,6 +19,16 @@ test.describe('landing pages', () => {
     expect(body).toContain('Конфиденциальность');
   });
 
+  test('renders the join, news, community and faq sections', async ({ request }) => {
+    const { response, body } = await text(request, '/');
+    expect(response.status()).toBe(200);
+    expect(body).toContain('Три шага до первого дня');
+    expect(body).not.toContain('play.fasberry.fun');
+    expect(body).toContain('Что нового');
+    expect(body).toContain('Куда дальше');
+    expect(body).toContain('Частые вопросы');
+  });
+
   test('serves the static pages', async ({ request }) => {
     for (const path of ['/support', '/gallery', '/info/credits', '/status', '/start']) {
       const { response, body } = await text(request, path);
@@ -31,12 +41,31 @@ test.describe('landing pages', () => {
     const { response, body } = await text(request, '/rules');
     expect(response.status()).toBe(200);
     expect(body).toContain('Правила проекта');
+    expect(body).toContain('Содержание');
+    expect(body).toContain('Поиск по правилам');
     expect(body).toContain('E2E правило для теста');
+  });
+
+  test('renders the support options', async ({ request }) => {
+    const { response, body } = await text(request, '/support');
+    expect(response.status()).toBe(200);
+    expect(body).toContain('Как помочь проекту');
+    expect(body).toContain('На что уходит время команды');
+    expect(body).toContain('Скопировать ссылку');
+  });
+
+  test('renders the gallery heading and filters', async ({ request }) => {
+    const { response, body } = await text(request, '/gallery');
+    expect(response.status()).toBe(200);
+    expect(body).toContain('Игровые моменты');
+    expect(body).toContain('Смотреть кадры');
+    expect(body).toContain('Природа');
   });
 
   test('renders the modpack list from the api', async ({ request }) => {
     const { response, body } = await text(request, '/modpack');
     expect(response.status()).toBe(200);
+    expect(body).toContain('Играть через лаунчер');
     expect(body).toContain('E2E Modpack');
   });
 

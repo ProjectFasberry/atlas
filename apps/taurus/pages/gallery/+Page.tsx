@@ -1,30 +1,13 @@
-import { MainWrapperPage } from "@/shared/ui/main-wrapper";
-import { Typography } from "@/shared/ui/typography";
 import { Link } from "@/shared/components/link";
 import { Button } from "@/shared/ui/button";
-import { getStaticObject } from "@/shared/lib/helpers";
-import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
+import { MainWrapperPage } from "@/shared/ui/main-wrapper";
 import { Overlay } from "@/shared/ui/overlay";
+import { Typography } from "@/shared/ui/typography";
 import { WrapperTitle } from "@/shared/ui/wrapper-title";
-import { useAtom } from "@reatom/npm-solid-js";
-import { For } from "solid-js";
-import { GalleryItemDialog } from "./(components)/gallery-carousel";
-import { GALLERY_LIST, selectedKeyAtom } from "./(models)/gallery.model";
+import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
+import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
-
-const CommunityGallery = () => {
-  const [_, update] = useAtom(selectedKeyAtom)
-
-  return (
-    <For each={GALLERY_LIST}>
-      {(image, idx) => (
-        <div onClick={() => update(idx())}>
-          <GalleryItemDialog image={image} />
-        </div>
-      )}
-    </For>
-  )
-}
+import { GalleryGrid } from "./(components)/gallery-grid";
 
 const url = getStaticObject("arts", "adventure-in-blossom.jpg")
 
@@ -46,7 +29,7 @@ export default function GalleryPage() {
                 {translate["gallery.description"]()}
               </Typography>
             </div>
-            <Link href="#commuinity" class={sectionVariantChild().action()}>
+            <Link href="#gallery" class={sectionVariantChild().action()}>
               <Button class="w-full px-6 py-0.5 gap-2">
                 <Typography color="white" class="text-lg">
                   {translate["gallery.action-text"]()}
@@ -56,11 +39,10 @@ export default function GalleryPage() {
           </div>
         </WrapperTitle>
       </div>
-      <div class="full-screen-section py-32">
-        <div id="commuinity" class="flex flex-col gap-6 w-full responsive p-2">
-          <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 2xl:grid-cols-3 auto-rows-auto gap-2">
-            <CommunityGallery />
-          </div>
+
+      <div class="full-screen-section py-16 lg:py-24">
+        <div class="responsive mx-auto">
+          <GalleryGrid />
         </div>
       </div>
     </MainWrapperPage>

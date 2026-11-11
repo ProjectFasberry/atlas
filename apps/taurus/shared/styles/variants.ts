@@ -11,7 +11,7 @@ export const sectionVariantChild = tv({
 })
 
 export const sectionVariant = tv({
-  base: `full-screen-section relative h-[80vh] lg:h-dvh flex-col items-center justify-center`,
+  base: `full-screen-section relative min-h-[80vh] lg:min-h-dvh flex-col items-center justify-center`,
   variants: {
     variant: {
       default: "flex",
