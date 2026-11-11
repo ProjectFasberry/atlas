@@ -24,6 +24,9 @@ export default defineConfig(({ mode }) => {
   let isSSR = false;
 
   return {
+    define: {
+      __STAGE__: JSON.stringify(stage ?? "dev")
+    },
     plugins: [
       vike(),
       vikeSolid(),

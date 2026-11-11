@@ -6,6 +6,9 @@ import type { operations } from "./shared/types/gen";
 import type { Locale } from "./paraglide/runtime";
 
 declare global {
+  /** Build stage, injected by vite (`define` in vite.config.ts). */
+  const __STAGE__: "prod" | "staging" | "dev"
+
   namespace Vike {
     interface Server {
       server: 'hono'
