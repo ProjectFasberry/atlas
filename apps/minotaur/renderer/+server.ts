@@ -6,7 +6,6 @@ import consola from "consola";
 import { env } from "@/shared/env";
 import { sentry } from "@/shared/sentry";
 import { paraglideMiddleware } from "@/paraglide/server";
-import { baseLocale } from "@/paraglide/runtime";
 import { installProcessHandlers, messageOf, sendAlert } from "@repo/shared/notify/alerts";
 
 installProcessHandlers("minotaur");
@@ -31,21 +30,7 @@ function printAppInfo() {
   })
 }
 
-const defineLocale = () => new Elysia()
-  .derive(async (ctx) => {
-    let locale = baseLocale;
-
-    await paraglideMiddleware(ctx.request, ({ locale: newLocale, request: newRequest }) => {
-      ctx.request = newRequest;
-      locale = newLocale;
-    })
-
-    return { request: ctx.request, locale }
-  })
-  .as("global")
-
 const app = new Elysia()
-  .use(defineLocale())
   .onError(({ code, error, request, set }) => {
     const status = typeof code === "number" ? code : typeof set.status === "number" ? set.status : 500;
     if (status < 500) return;
@@ -65,7 +50,13 @@ vike(app, [compress()]);
 printAppInfo();
 
 export default {
-  fetch: app.fetch,
+  /**
+   * Paraglide keeps the request locale in AsyncLocalStorage, so the scope has to
+   * cover the whole render. A per-request override of the global `getLocale`
+   * would leak between parallel requests.
+   */
+  fetch: (request: Request) =>
+    paraglideMiddleware(request, ({ request: scopedRequest }) => app.fetch(scopedRequest)),
   prod: {
     port
   }
