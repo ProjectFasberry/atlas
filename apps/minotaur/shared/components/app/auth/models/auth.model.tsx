@@ -1,4 +1,4 @@
-import { action, atom, type Action } from "@reatom/framework";
+import { action, atom } from "@reatom/framework";
 import { reatomRecord, withAssign, withReset } from "@reatom/framework";
 import { withSearchParamsPersist } from "@reatom/url";
 import { maybeSpyOptionAtom } from "@/shared/models/app/utils";
@@ -12,8 +12,6 @@ const AUTH_TYPE = ["register", "login"] as const;
 export type AuthType = typeof AUTH_TYPE[number];
 const AUTH_ERROR_TYPE = ["nickname", "password", "passwordRepeat", "findout", "acceptRules"] as const;
 export type AuthErrorType = typeof AUTH_ERROR_TYPE[number];
-const AUTH_FINDOUT_TYPE = ["referrer", "custom"] as const;
-export type AuthFindoutType = typeof AUTH_FINDOUT_TYPE[number];
 
 export const authState = atom(null, "authState").pipe(
   withAssign((_, name) => ({
@@ -26,9 +24,10 @@ export const authState = atom(null, "authState").pipe(
         nickname: atom<string>("", `${name}.nickname`).pipe(withReset()),
         password: atom<string>("", `${name}.password`).pipe(withReset()),
         passwordRepeat: atom<string>("", `${name}.passwordRepeat`).pipe(withReset()),
-        // Must be refererr nickname or other findout info
+        // Optional answer to "How did you hear about us?"
         findout: atom<Maybe<string>>(undefined, `${name}.findout`).pipe(withReset()),
-        findoutType: atom<AuthFindoutType | null>(null, `${name}.findoutType`).pipe(withReset()),
+        // Hidden: a link with ?referrer= keeps the attribution type.
+        findoutType: atom<"custom" | "referrer">("custom", `${name}.findoutType`).pipe(withReset()),
         acceptRules: atom(false, `${name}.acceptRules`).pipe(withReset())
       }))
     ),
@@ -111,70 +110,66 @@ export const isPofActiveAtom = atom((ctx) =>
 );
 export const authIsDisabledAtom = atom((ctx) => ctx.spy(isPofActiveAtom) || ctx.spy(authState.isProcessing));
 
-type ScopeName = "auth" | "global" | "captcha"
+type AuthErrorInfo = {
+  message: () => string
+  fields: AuthErrorType[]
+}
 
-type AuthErrorsUnionEnum =
-  | ExtractApiErr<"postAuthLoginBasic", 400>
-  | ExtractApiErr<"postAuthRegister", 400>
-  | "TOKEN_NOT_FOUND";
-
-const createAuthErrors = (): Record<ScopeName, Partial<Record<AuthErrorsUnionEnum, string>>> => ({
-  auth: {
-    "AUTHORIZATION_DISABLED": translate["auth.shared.errors.authorization-disabled"](),
-    "IP_RESTRICTIONS": translate["auth.shared.errors.ip-restricted"](),
-    "NOT_EXISTS": translate["auth.shared.errors.not-exists"](),
-    "PASSWORD_OR_LOGIN_INCORRECT": translate["auth.shared.errors.password-or-login-incorrect"](),
-    "PASSWORD_IS_UNSAFE": translate["auth.shared.errors.password-is-unsafe"](),
+const getAuthErrors = (): Record<string, AuthErrorInfo> => ({
+  "AUTHORIZATION_DISABLED": {
+    message: () => translate["auth.shared.errors.authorization-disabled"](),
+    fields: [],
   },
-  global: {
-    "USER_EXISTS": translate["auth.shared.errors.user-exists"](),
+  "IP_RESTRICTIONS": {
+    message: () => translate["auth.shared.errors.ip-restricted"](),
+    fields: [],
   },
-  captcha: {
-    "TOKEN_NOT_FOUND": translate["auth.shared.errors.token-not-found"](),
+  "NOT_EXISTS": {
+    message: () => translate["auth.shared.errors.not-exists"](),
+    fields: [],
+  },
+  "PASSWORD_OR_LOGIN_INCORRECT": {
+    message: () => translate["auth.shared.errors.password-or-login-incorrect"](),
+    fields: ["nickname", "password"],
+  },
+  "PASSWORD_IS_UNSAFE": {
+    message: () => translate["auth.shared.errors.password-is-unsafe"](),
+    fields: [],
+  },
+  "USER_EXISTS": {
+    message: () => translate["auth.shared.errors.user-exists"](),
+    fields: [],
+  },
+  "TOKEN_NOT_FOUND": {
+    message: () => translate["auth.shared.errors.token-not-found"](),
+    fields: [],
+  },
+  "TOKEN_IS_NOT_PROVIDED": {
+    message: () => translate["auth.shared.errors.token-not-found"](),
+    fields: [],
+  },
+  "CAP_UNAVAILABLE": {
+    message: () => translate["auth.shared.errors.captcha"](),
+    fields: [],
   },
 });
 
-const getAuthErrors = () => createAuthErrors();
+export const defineError = action((ctx, e: Error | unknown) => {
+  if (!isError(e)) return;
 
-const SCOPE_ACTIONS: Record<ScopeName, Action<[], void>> = {
-  auth: action((ctx) => {
-    authState.errorsType(ctx, (state) => [...state, "password"]);
-    authState.errorsType(ctx, (state) => [...state, "nickname"]);
-  }),
-  global: action(() => { }),
-  captcha: action((ctx) => {
-
-  })
-};
-
-export const defineError = action((ctx, e: Error | unknown): ScopeName | null => {
-  if (!isError(e)) return null;
-
-  type ErrorKey = { [S in ScopeName]: keyof ReturnType<typeof createAuthErrors>[S] }[ScopeName];
-
-  function getError(key: ErrorKey): { scope: ScopeName; message: string } | null {
-    for (const [name, errors] of Object.entries(getAuthErrors())) {
-      if (key in errors) {
-        return { scope: name as ScopeName, message: (errors as Record<string, string>)[key] };
-      }
-    }
-    return null;
-  }
-
-  const error = getError(e.message as ErrorKey);
+  const error = getAuthErrors()[e.message];
 
   if (!error) {
     logger.error("Unknown error", e.message)
     authState.globalError(ctx, translate["auth.shared.errors.unknown"]());
-    return null;
+    return;
   }
 
-  const { scope, message } = error;
+  authState.globalError(ctx, error.message());
 
-  authState.globalError(ctx, message);
-  SCOPE_ACTIONS?.[scope](ctx)
-
-  return scope
+  if (error.fields.length) {
+    authState.errorsType(ctx, (state) => [...new Set([...state, ...error.fields])]);
+  }
 }, "defineError")
 
 /** Show the first Zod issue in the shared error block and mark its field. */

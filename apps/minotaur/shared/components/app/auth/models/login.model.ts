@@ -1,77 +1,23 @@
 import { client } from "@/shared/lib/client-wrapper";
-import { invariant } from "@/shared/lib/utils";
-import { atom, action } from "@reatom/framework";
-import { type AsyncCtx, reatomAsync, spawn, withAssign, withDataAtom, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
-import { onEvent } from "@reatom/web";
-import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { auth, applyZodError, authState, defineError, isPofActiveAtom } from "./auth.model";
-import { createWsUrl } from "@/shared/lib/helpers";
-import { getApiHost } from "@/shared/lib/helpers";
-import { env } from "@/shared/env";
-import { logError } from "@/shared/lib/log";
+import { atom, type Ctx } from "@reatom/framework";
+import { reatomAsync, spawn, withAssign, withErrorAtom, withStatusesAtom } from "@reatom/framework";
+import { applyZodError, auth, authState, defineError, isPofActiveAtom } from "./auth.model";
+import { qrLogin } from "./qr.model";
 import { pageState } from "@/shared/models/page-context.model";
 import { getNextPath, goAfterAuth } from "@/shared/lib/auth-redirect";
+import { logError } from "@/shared/lib/log";
+import { maybeSpyOptionAtom } from "@/shared/models/app/utils";
 import * as z from "zod";
 import { authSchema as loginSchema } from "@/shared/schemas/auth";
-import { maybeSpyOptionAtom } from "@/shared/models/app/utils";
 
-export type QREventsEvent =
-  | "expired"
-  | "verified"
-  | "connected" // ws only event
-  | "declined";
+export type AuthLoginVariant = "qr" | "password";
 
-export type QREventsPayload = {
-  event: QREventsEvent;
+const LOGIN_VARIANTS_EVENTS: Partial<Record<AuthLoginVariant, (ctx: Ctx) => void>> = {
+  qr: (ctx) => qrLogin.generate(ctx),
 };
-
-export type AuthLoginVariant = "qr" | "game" | "password";
-export type AuthLoginQRStatus = QREventsEvent | "idle" | "error"
-
-const LOGIN_VARIANTS_EVENTS: Partial<Record<AuthLoginVariant, (ctx: AsyncCtx) => void>> = {
-  qr: (ctx) => login.qr.generate(ctx),
-  game: (ctx) => login.game.generate(ctx),
-};
-
-export const loginState = atom(null, "loginState").pipe(
-  withAssign((_, name) => ({
-    qr: atom(null, `${name}.qr`).pipe(
-      withAssign((_, name) => ({
-        generation: atom(0, `${name}.generation`),
-        socket: atom<WebSocket | null>(null, `${name}.socket`).pipe(withReset()),
-        url: atom<string | null>(null, `${name}.qrUrl`).pipe(withReset()),
-        token: atom<string | null>(null, `${name}.token`).pipe(withReset()),
-        status: atom<AuthLoginQRStatus>("idle", `${name}.status`).pipe(withReset()),
-        verify: atom(null, `${name}.verify`).pipe(
-          withAssign((_, name) => ({
-            status: atom<"idle" | "confirmed" | "declined">("idle", `${name}.status`).pipe(withReset()),
-            token: atom<string | null>(null, `${name}.token`).pipe(withReset())
-          }))
-        )
-      })),
-    ),
-    game: atom(null, `${name}.game`).pipe(
-      withAssign((_, name) => ({
-        code: atom<string | null>(null, `${name}.code`).pipe(withReset()),
-      })),
-    ),
-  })),
-);
-
-loginState.qr.status.onChange((ctx, state) => {
-  if (state === 'verified') {
-    spawn(ctx, (spawnCtx) => login.qr.createSession(spawnCtx))
-  }
-})
 
 export const login = atom(null, "login").pipe(
   withAssign((_, name) => ({
-    getVisitorId: async () => {
-      const fpPromise = FingerprintJS.load();
-      const fp = await fpPromise;
-      const result = await fp.get();
-      return result.visitorId;
-    },
     basic: atom(null, `${name}.basic`).pipe(
       withAssign((_, name) => ({
         submit: reatomAsync(async (ctx) => {
@@ -133,158 +79,6 @@ export const login = atom(null, "login").pipe(
         )
       }))
     ),
-    qr: atom(null, `${name}.qr`).pipe(
-      withAssign((_, name) => ({
-        generate: reatomAsync(async (ctx) => {
-          const generation = ctx.get(loginState.qr.generation);
-          loginState.qr.status(ctx, "idle");
-          const visitorId = await login.getVisitorId();
-
-          const res = await client
-            .post("/auth/login/qr/generate", { json: { visitorId }, timeout: 10000 })
-
-          // The request may finish after the QR view was closed.
-          if (ctx.get(loginState.qr.generation) !== generation) return;
-
-          const pdUrl = new URL(`${env.VITE_API_URL}/auth/login/qr/verify`)
-          pdUrl.searchParams.append("token", res.token)
-
-          loginState.qr.url(ctx, pdUrl.href);
-          loginState.qr.token(ctx, res.token)
-
-          login.qr.events(ctx, res.token)
-        }, `${name}.generate`).pipe(
-          withStatusesAtom(),
-          withErrorAtom(),
-        ),
-        createSession: reatomAsync(async (ctx) => {
-          const token = ctx.get(loginState.qr.token);
-          invariant(token, "Token is not defined");
-
-          return await client
-            .post("/auth/login/qr/create", { params: { query: { token } } })
-        }, {
-          name: `${name}.createSession`,
-          onFulfill: (ctx) => {
-            goAfterAuth(getNextPath(ctx.get(pageState.urlParsed)?.search))
-          },
-          onReject: (ctx, e) => {
-            loginState.qr.status(ctx, "error")
-            logError(e, { type: 'combined' })
-          }
-        }),
-        events: reatomAsync(async (ctx, token: string) => {
-          const currSocket = ctx.get(loginState.qr.socket)
-
-          if (currSocket) {
-            currSocket.close()
-            loginState.qr.socket(ctx, null)
-          }
-
-          const wsUrl = createWsUrl({
-            host: getApiHost(),
-            isSecure: import.meta.env.PROD,
-            path: `auth/login/qr/events?token=${token}`,
-            port: import.meta.env.DEV ? 5104 : undefined,
-          })
-
-          const socket = new WebSocket(wsUrl)
-          loginState.qr.socket(ctx, socket)
-
-          if (socket.readyState !== WebSocket.OPEN) {
-            await onEvent(ctx, socket, 'open')
-          }
-
-          onEvent(ctx, socket, 'message', ({ data: raw }) => {
-            const data = JSON.parse(raw) as QREventsPayload
-            loginState.qr.status(ctx, data.event)
-          })
-          onEvent(ctx, socket, 'close', () => {
-            ctx.controller.abort()
-          })
-          onEvent(ctx, socket, 'error', () => {
-            loginState.qr.status(ctx, "error")
-            ctx.controller.abort()
-          })
-        }, `${name}.events`),
-        close: action((ctx) => {
-          const socket = ctx.get(loginState.qr.socket)
-          socket?.close()
-
-          loginState.qr.generation(ctx, (state) => state + 1)
-          loginState.qr.socket.reset(ctx)
-          loginState.qr.url.reset(ctx)
-          loginState.qr.token.reset(ctx)
-          loginState.qr.status.reset(ctx)
-        }, `${name}.close`),
-        verify: atom(null, `${name}.verify`).pipe(
-          withAssign((_, name) => ({
-            validateToken: reatomAsync(async (ctx, token: string) => {
-              const result = await ctx.schedule(() =>
-                client.get("/auth/login/qr/validate", { params: { query: { token } } }),
-              );
-
-              return { result, params: { token } }
-            }, {
-              name: `${name}.validateToken`,
-              onFulfill: (ctx, { result, params: { token } }) => {
-                loginState.qr.verify.status(ctx, "idle")
-                loginState.qr.verify.token(ctx, token)
-              }
-            }).pipe(
-              withStatusesAtom(),
-              withErrorAtom(),
-              withDataAtom()
-            ),
-            confirm: reatomAsync(async (ctx) => {
-              const token = ctx.get(loginState.qr.verify.token);
-              invariant(token, "Token is not defined");
-
-              return await client
-                .post("/auth/login/qr/confirm", { params: { query: { token } } })
-            }, {
-              name: `${name}.confirm`,
-              onFulfill: (ctx) => {
-                loginState.qr.verify.status(ctx, "confirmed")
-              }
-            }).pipe(
-              withStatusesAtom(),
-              withErrorAtom()
-            ),
-            decline: reatomAsync(async (ctx) => {
-              const token = ctx.get(loginState.qr.verify.token);
-              invariant(token, "Token is not defined");
-
-              return await client
-                .post("/auth/login/qr/decline", { params: { query: { token } } })
-            }, {
-              name: `${name}.decline`,
-              onFulfill: (ctx) => {
-                loginState.qr.verify.status(ctx, "declined")
-              }
-            }).pipe(
-              withStatusesAtom(),
-              withErrorAtom()
-            ),
-          }))
-        ),
-      })),
-    ),
-    game: atom(null, `${name}.game`).pipe(
-      withAssign((_, name) => ({
-        generate: reatomAsync(async (ctx) => {
-          const visitorId = await login.getVisitorId();
-
-          const res = await client
-            .post("/auth/login/game/generate", { json: { visitorId } })
-
-          loginState.game.code(ctx, res.code);
-        }, `${name}.generate`).pipe(
-          withStatusesAtom(),
-          withErrorAtom()
-        ),
-      })),
-    ),
   })),
 );
 
@@ -300,23 +94,19 @@ export const authLoginVariantAtom = atom<AuthLoginVariant>("password", "authLogi
 );
 
 authLoginVariantAtom.onChange((ctx, state) => {
-  if (state !== "qr") login.qr.close(ctx)
+  if (state !== "qr") qrLogin.close(ctx)
 });
 
 authState.type.onChange((ctx, state) => {
   if (state !== "login") {
-    login.qr.close(ctx)
+    qrLogin.close(ctx)
     return;
   }
 
   if (ctx.get(authLoginVariantAtom) === "qr") {
-    login.qr.generate(ctx);
+    qrLogin.generate(ctx);
   }
 });
-
-export const authLoginQRIsErrorAtom = atom((ctx) =>
-  ctx.spy(login.qr.verify.confirm.errorAtom) || ctx.spy(login.qr.verify.decline.errorAtom),
-);
 
 /**
  * The form stays enabled on purpose: validation runs on submit and shows the

@@ -1,12 +1,12 @@
 import { reatomComponent } from "@reatom/npm-react"
 import {
-  login, type AuthLoginQRStatus, loginState,
-  type AuthLoginVariant, authLoginVariantAtom, authSubmitIsDisabledAtom
+  login, type AuthLoginVariant, authLoginVariantAtom, authSubmitIsDisabledAtom
 } from "../models/login.model"
+import { qrLogin, qrState, type AuthLoginQRStatus } from "../models/qr.model"
 import { type ReactNode } from "react"
 import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button"
-import { atom, spawn } from "@reatom/framework"
+import { spawn } from "@reatom/framework"
 import { Separator } from "@/shared/ui/separator"
 import { AuthField, NicknameInput, PasswordInput } from "./auth"
 import { authState } from "../models/auth.model"
@@ -18,9 +18,6 @@ import { qrCodeVariant } from "@/shared/ui/qr-code"
 import { Link } from "@/shared/components/config/link/link"
 import { pageState } from "@/shared/models/page-context.model"
 import { getNextPath } from "@/shared/lib/auth-redirect"
-
-const qrIconAtom = atom<HTMLDivElement | null>(null, "loginQrIcon")
-const qrSpinTimerAtom = atom<ReturnType<typeof setTimeout> | null>(null, "loginQrSpinTimer")
 
 const LoginVariants = reatomComponent(({ ctx }) => (
   <div className="grid grid-cols-2 auto-rows-auto gap-2 w-full [&>*:only-child]:col-span-2">
@@ -91,24 +88,11 @@ const LoginPassword = reatomComponent(({ ctx }) => {
 }, 'LoginPassword')
 
 const LoginQRRetry = reatomComponent<{ reason: "expired" | "error" }>(({ ctx, reason }) => {
+  const isPending = ctx.spy(qrLogin.generate.statusesAtom).isPending
+
   const handleClick = () => {
-    login.qr.generate.errorAtom.reset(ctx);
-    const el = ctx.get(qrIconAtom);
-    if (!el) return;
-
-    const current = ctx.get(qrSpinTimerAtom);
-    if (current) clearTimeout(current);
-
-    el.classList.remove('animate-spin', 'duration-150');
-    void el.offsetWidth;
-    el.classList.add('animate-spin', 'duration-150');
-
-    qrSpinTimerAtom(ctx, setTimeout(() => {
-      el.classList.remove('animate-spin', 'duration-150');
-      qrSpinTimerAtom(ctx, null);
-    }, 600));
-
-    spawn(ctx, (spawnCtx) => login.qr.generate(spawnCtx));
+    qrLogin.generate.errorAtom.reset(ctx);
+    spawn(ctx, (spawnCtx) => qrLogin.generate(spawnCtx));
   };
 
   return (
@@ -125,14 +109,12 @@ const LoginQRRetry = reatomComponent<{ reason: "expired" | "error" }>(({ ctx, re
       )}
       <button
         type="button"
-        disabled={ctx.spy(login.qr.generate.statusesAtom).isPending}
+        disabled={isPending}
         onClick={handleClick}
         aria-label={translate["auth.login.qr.refresh"]()}
         className="group cursor-pointer active:scale-[0.98] duration-150 flex items-center gap-2"
       >
-        <div ref={(element) => { qrIconAtom(ctx, element) }}>
-          <Icon name='sprite:refresh' className="size-[32px] text-neutral-200" />
-        </div>
+        <Icon name='sprite:refresh' className={`size-[32px] text-neutral-200 ${isPending ? "animate-spin" : ""}`} />
         <span className="text-sm font-semibold">{translate["auth.login.qr.refresh"]()}</span>
       </button>
     </div>
@@ -140,8 +122,8 @@ const LoginQRRetry = reatomComponent<{ reason: "expired" | "error" }>(({ ctx, re
 }, "LoginQRRetry")
 
 const LoginQRConnected = reatomComponent(({ ctx }) => {
-  const isPending = ctx.spy(login.qr.generate.statusesAtom).isPending
-  const url = ctx.spy(loginState.qr.url)
+  const isPending = ctx.spy(qrLogin.generate.statusesAtom).isPending
+  const url = ctx.spy(qrState.url)
   if (isPending || !url) return <IconLoader />
 
   return (
@@ -169,7 +151,7 @@ const LoginQRDeclined = reatomComponent(({ ctx }) => (
     <Button
       type="button"
       background="default"
-      onClick={() => spawn(ctx, (spawnCtx) => login.qr.generate(spawnCtx))}
+      onClick={() => spawn(ctx, (spawnCtx) => qrLogin.generate(spawnCtx))}
     >
       {translate["auth.login.qr.retry"]()}
     </Button>
@@ -201,10 +183,10 @@ const LOGIN_QR_COMPONENTS: Partial<Record<AuthLoginQRStatus, ReactNode>> = {
 }
 
 const LoginQRContent = reatomComponent(({ ctx }) => {
-  const error = ctx.spy(login.qr.generate.errorAtom)
+  const error = ctx.spy(qrLogin.generate.errorAtom)
   if (error) return <LoginQRRetry reason="error" />
 
-  return LOGIN_QR_COMPONENTS[ctx.spy(loginState.qr.status)]
+  return LOGIN_QR_COMPONENTS[ctx.spy(qrState.status)]
 }, "LoginQRContent")
 
 const LoginQR = () => {
@@ -224,7 +206,6 @@ const LoginQR = () => {
 
 const createLoginVariants = (): { title: string, value: AuthLoginVariant, component: ReactNode }[] => ([
   { title: translate["auth.login.variants.basic"](), value: "password", component: <LoginPassword /> },
-  // { title: "Через игру", value: "game", component: <LoginGame /> },
   { title: translate["auth.login.variants.qr"](), value: "qr", component: <LoginQR /> }
 ])
 

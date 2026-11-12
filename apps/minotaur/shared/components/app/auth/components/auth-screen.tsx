@@ -5,7 +5,7 @@ import { AuthBrand } from "./auth-brand";
 
 export const AuthScreen = () => {
   return (
-    <div className="grid w-full max-w-6xl gap-6 px-4 py-6 sm:py-10 lg:grid-cols-[1fr_28rem] lg:gap-10 lg:items-stretch">
+    <div className="grid w-full max-w-6xl gap-6 px-4 py-6 sm:py-10 lg:grid-cols-[1fr_28rem] lg:gap-10 lg:items-start">
       <AuthBrand />
 
       <div className="flex flex-col gap-4 w-full max-w-lg mx-auto lg:mx-0 lg:justify-center">

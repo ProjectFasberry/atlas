@@ -1,7 +1,7 @@
 import { listenBackOnce } from "@/shared/lib/events"
 import { action, atom, withAssign, withReset } from "@reatom/framework"
 import type { TrackFunction } from "@yudiel/react-qr-scanner"
-import { login } from "../../auth/models/login.model"
+import { qrLogin } from "../../auth/models/qr.model"
 import { isError } from "@/shared/lib/utils"
 import { toast } from "sonner"
 import { translate } from "@/shared/locales/helpers"
@@ -44,7 +44,7 @@ export const scan = atom(null, "scan").pipe(
 			const token = url.searchParams.get("token");
 			if (!token) throw new Error('Token is not defined')
 
-			login.qr.verify.validateToken(ctx, token)
+			qrLogin.verify.validateToken(ctx, token)
 		}, `${name}.verify`),
 	}))
 )
