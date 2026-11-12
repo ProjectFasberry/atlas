@@ -4,6 +4,7 @@ import { logError } from "@/shared/lib/log";
 import { reatomAsync, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { action, atom } from "@reatom/framework";
 import { withAssign } from "@reatom/framework";
+import { translate } from "@/shared/locales/helpers";
 
 export const logout = atom(null, "logout").pipe(
 	withAssign((_, name) => ({
@@ -17,9 +18,9 @@ export const logout = atom(null, "logout").pipe(
 		),
 		withConfirm: action((ctx) => {
 			alertDialog.open(ctx, {
-				title: "Вы точно хотите выйти?",
+				title: translate["auth.logout.title"](),
 				onConfirm: () => logout.exec(ctx),
-				confirmLabel: "Выйти из аккаунта",
+				confirmLabel: translate["auth.logout.confirm"](),
 			});
 		}, `${name}.withConfirm`),
 	}))

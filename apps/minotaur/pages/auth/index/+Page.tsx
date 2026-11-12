@@ -1,11 +1,11 @@
-import { Auth, AuthError } from "@/shared/components/app/auth/components/auth";
-import { auth, authState } from "@/shared/components/app/auth/models/auth.model";
 import { useAtom } from "@reatom/npm-react";
 import { createPageModel } from "@/shared/lib/events";
 import { pageState } from "@/shared/models/page-context.model";
+import { auth, authState } from "@/shared/components/app/auth/models/auth.model";
 import { register } from "@/shared/components/app/auth/models/register.model";
 import { getDevModulesInfo } from "@/shared/models/app/index.model";
 import { authLoginVariantAtom, login } from "@/shared/components/app/auth/models/login.model";
+import { AuthScreen } from "@/shared/components/app/auth/components/auth-screen";
 
 const page = createPageModel({
   name: "auth",
@@ -44,10 +44,5 @@ const page = createPageModel({
 export default function Page() {
   const [_] = useAtom(page.dataAtom);
 
-  return (
-    <div className="flex flex-col gap-4 items-center py-30 min-h-dvh w-full">
-      <Auth />
-      <AuthError />
-    </div>
-  )
+  return <AuthScreen />;
 }

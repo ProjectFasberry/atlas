@@ -3,6 +3,7 @@ import { Button } from "@/shared/ui/button"
 import { widgetsState } from "../models/widgets.model"
 import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
+import { translate } from "@/shared/locales/helpers"
 
 export const AuthWidgetActions = reatomComponent(({ ctx }) => {
   const current = ctx.spy(widgetsState.current);
@@ -16,7 +17,7 @@ export const AuthWidgetActions = reatomComponent(({ ctx }) => {
       >
         <Icon name="sprite:arrow-right" className="size-5 sm:hidden inline text-neutral-950" />
         <Typography className="hidden sm:inline text-neutral-950 font-semibold text-sm">
-          Авторизоваться
+          {translate["auth.widget.action"]()}
         </Typography>
       </Button>
       <Button
@@ -25,7 +26,7 @@ export const AuthWidgetActions = reatomComponent(({ ctx }) => {
       >
         <Icon name="sprite:x" className="size-5 sm:hidden inline" />
         <Typography className="hidden text-nowrap sm:inline font-semibold text-sm">
-          Не показывать
+          {translate["auth.widget.hide"]()}
         </Typography>
       </Button>
     </div>

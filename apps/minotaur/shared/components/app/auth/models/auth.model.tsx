@@ -6,10 +6,11 @@ import { isError } from "@/shared/lib/utils";
 import { logger } from "@/shared/lib/logger";
 import { pof } from "@/shared/components/config/cap/models/cap.model";
 import { translate } from "@/shared/locales/helpers";
+import * as z from "zod";
 
 const AUTH_TYPE = ["register", "login"] as const;
 export type AuthType = typeof AUTH_TYPE[number];
-const AUTH_ERROR_TYPE = ["nickname", "password", "findout"] as const;
+const AUTH_ERROR_TYPE = ["nickname", "password", "passwordRepeat", "findout", "acceptRules"] as const;
 export type AuthErrorType = typeof AUTH_ERROR_TYPE[number];
 const AUTH_FINDOUT_TYPE = ["referrer", "custom"] as const;
 export type AuthFindoutType = typeof AUTH_FINDOUT_TYPE[number];
@@ -33,7 +34,8 @@ export const authState = atom(null, "authState").pipe(
     ),
     settings: atom(null, `${name}.settings`).pipe(
       withAssign((_, name) => ({
-        showPassword: atom(false, `${name}.showPassword`).pipe(withReset())
+        showPassword: atom(false, `${name}.showPassword`).pipe(withReset()),
+        showPasswordRepeat: atom(false, `${name}.showPasswordRepeat`).pipe(withReset())
       }))
     ),
     globalError: atom<Nullable<string>>(null, `${name}.globalError`).pipe(withReset()),
@@ -77,13 +79,13 @@ export const auth = atom(null, "auth").pipe(
       authState.globalError.reset(ctx);
       authState.errorsType.reset(ctx);
       authState.isProcessing.reset(ctx)
+      authState.token.reset(ctx)
       authState.settings.showPassword.reset(ctx)
+      authState.settings.showPasswordRepeat.reset(ctx)
 
       pof.resetAll(ctx)
     }),
     defineCap: action((ctx) => {
-      pof.isOpen(ctx, true);
-
       pof.data(ctx, {
         cb: {
           onSolve: (token) => {
@@ -94,17 +96,12 @@ export const auth = atom(null, "auth").pipe(
           onError: (e) => {
             pof.isOpen(ctx, false);
             authState.isProcessing(ctx, false);
-
-            if (typeof e === 'string') {
-              authState.globalError(ctx, e);
-            } else if (e instanceof Error) {
-              authState.globalError(ctx, e.message);
-            } else {
-              authState.globalError(ctx, "Captcha error");
-            }
+            logger.error("CAP error", e)
+            authState.globalError(ctx, translate["auth.shared.errors.captcha"]());
           }
         },
       })
+      pof.isOpen(ctx, true);
     })
   })),
 );
@@ -137,7 +134,7 @@ const createAuthErrors = (): Record<ScopeName, Partial<Record<AuthErrorsUnionEnu
   },
 });
 
-const AUTH_ERRORS = createAuthErrors();
+const getAuthErrors = () => createAuthErrors();
 
 const SCOPE_ACTIONS: Record<ScopeName, Action<[], void>> = {
   auth: action((ctx) => {
@@ -153,10 +150,10 @@ const SCOPE_ACTIONS: Record<ScopeName, Action<[], void>> = {
 export const defineError = action((ctx, e: Error | unknown): ScopeName | null => {
   if (!isError(e)) return null;
 
-  type ErrorKey = { [S in ScopeName]: keyof (typeof AUTH_ERRORS)[S] }[ScopeName];
+  type ErrorKey = { [S in ScopeName]: keyof ReturnType<typeof createAuthErrors>[S] }[ScopeName];
 
   function getError(key: ErrorKey): { scope: ScopeName; message: string } | null {
-    for (const [name, errors] of Object.entries(AUTH_ERRORS)) {
+    for (const [name, errors] of Object.entries(getAuthErrors())) {
       if (key in errors) {
         return { scope: name as ScopeName, message: (errors as Record<string, string>)[key] };
       }
@@ -168,7 +165,7 @@ export const defineError = action((ctx, e: Error | unknown): ScopeName | null =>
 
   if (!error) {
     logger.error("Unknown error", e.message)
-    authState.globalError(ctx, e.message);
+    authState.globalError(ctx, translate["auth.shared.errors.unknown"]());
     return null;
   }
 
@@ -179,3 +176,15 @@ export const defineError = action((ctx, e: Error | unknown): ScopeName | null =>
 
   return scope
 }, "defineError")
+
+/** Show the first Zod issue in the shared error block and mark its field. */
+export const applyZodError = action((ctx, error: z.ZodError) => {
+  const issue = error.issues[0];
+  const property = issue?.path[0]?.toString() as AuthErrorType | undefined;
+
+  authState.globalError(ctx, issue?.message ?? translate["auth.shared.errors.unknown"]());
+
+  if (property && AUTH_ERROR_TYPE.includes(property)) {
+    authState.errorsType(ctx, (state) => state.includes(property) ? state : [...state, property]);
+  }
+}, "applyZodError")

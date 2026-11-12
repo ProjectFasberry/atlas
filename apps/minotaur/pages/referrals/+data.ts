@@ -5,6 +5,7 @@ import { useConfig } from "vike-react/useConfig";
 import { redirect } from "vike/abort";
 import { type PageContext } from "vike/types";
 import { translate } from "@/shared/locales/helpers";
+import { buildAuthRedirect } from "@/shared/lib/auth-redirect";
 
 function metadata() {
   const title = wrapTitle(translate["referrals.page.title"]());
@@ -20,7 +21,9 @@ export function data(pageCtx: PageContext) {
   logRouting(pageCtx.urlPathname, "data");
 
   const isAuth = getIsAuthed(pageCtx.snapshot)
-  if (!isAuth) throw redirect("/auth")
+  if (!isAuth) {
+    throw redirect(buildAuthRedirect(pageCtx.urlParsed.pathname, pageCtx.urlParsed.searchOriginal))
+  }
 
   const config = useConfig()
   config(metadata())

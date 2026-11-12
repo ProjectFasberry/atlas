@@ -149,7 +149,14 @@
   "auth": {
     "page": {
       "title": "Authorization",
-      "description": "Join the best Minecraft project. Registration on the Fasberry project"
+      "description": "Join the best Minecraft project. Registration on the Fasberry project",
+      "heading": "Fasberry account",
+      "subheading": "Sign in or create an account to play and manage your purchases.",
+      "brand-title": "Welcome!",
+      "brand-description": "Join the Fasberry community: play, chat and grow with us.",
+      "online": "playing now",
+      "rules": "Project rules",
+      "support": "Support"
     },
     "navigation": {
       "auth": {
@@ -165,7 +172,7 @@
       },
       "qr": {
         "steps": {
-          "1": "1. Open Fasberry on your phone",
+          "1": "1. Open Fasberry on your phone and sign in",
           "2": "2. Open Settings > Devices > Link a device",
           "3": "3. Point your phone at the QR code on the screen"
         },
@@ -173,9 +180,12 @@
         "declined": "The sign-in was cancelled on the phone",
         "refresh": "Refresh the QR code",
         "retry": "Try again",
-        "scanned": "QR code scanned. Confirm the sign-in on the phone."
+        "scanned": "QR code scanned. Confirm the sign-in on the phone.",
+        "error": "Could not load the QR code",
+        "error-description": "Check your connection and try again."
       },
-      "submit": "Sign in"
+      "submit": "Sign in",
+      "forgot": "Forgot password?"
     },
     "register": {
       "success": "You have successfully registered on the Fasberry project!",
@@ -183,7 +193,7 @@
       "toLogin": "Go to login",
       "placeholders": {
         "findoutOther": "For example: Telegram channel",
-        "findout": "How did you hear about us? (optional)",
+        "findout": "Select an option",
         "password-repeat": "Repeat the password"
       },
       "findout": {
@@ -200,7 +210,12 @@
       "existing-player": "This player is already registered",
       "password-hint": "At least 8 characters, no spaces",
       "password-mismatch": "Passwords do not match",
-      "nickname-hint": "Latin letters, up to 16 characters, no spaces"
+      "nickname-hint": "Latin letters, up to 16 characters, no spaces",
+      "labels": {
+        "password-repeat": "Repeat the password",
+        "findout": "How did you hear about us? (optional)"
+      },
+      "acceptRulesAnd": "and"
     },
     "shared": {
       "placeholders": {
@@ -209,17 +224,65 @@
       },
       "errors": {
         "authorization-disabled": "Authorization is disabled",
-        "ip-restricted": "IP restrictions apply",
+        "ip-restricted": "Too many attempts. Try again later.",
         "not-exists": "Such a player is not registered",
-        "password-or-login-incorrect": "Incorrect nickname or login",
+        "password-or-login-incorrect": "Incorrect nickname or password",
         "password-is-unsafe": "Password is too simple",
         "user-exists": "Such a player is already registered",
-        "token-not-found": "Verification is required"
+        "token-not-found": "Verification is required",
+        "unknown": "Something went wrong. Please try again.",
+        "captcha": "Verification failed"
       },
       "password-visibility": {
         "show": "Show password",
         "hide": "Hide password"
+      },
+      "labels": {
+        "nickname": "Nickname",
+        "password": "Password"
       }
+    },
+    "validation": {
+      "nickname-required": "Enter a nickname",
+      "nickname-max": "A nickname cannot be longer than 16 characters",
+      "nickname-cyrillic": "The nickname contains invalid characters",
+      "nickname-spaces": "The nickname cannot contain spaces",
+      "password-required": "Enter a password",
+      "password-min": "The password must be at least 8 characters",
+      "password-max": "The password cannot be longer than 72 characters",
+      "password-spaces": "The password cannot contain spaces",
+      "findout-required": "Tell us how you heard about the project",
+      "findout-max": "The answer cannot be longer than 128 characters",
+      "rules-required": "Accept the project rules"
+    },
+    "logout": {
+      "title": "Are you sure you want to sign out?",
+      "confirm": "Sign out"
+    },
+    "forgot": {
+      "title": "Recover access",
+      "description": "If you forgot your password, recover access through the game or support.",
+      "back": "Back to sign in",
+      "game": {
+        "title": "Through the game",
+        "description": "If the launcher or the game still signs you in, change the password in settings.",
+        "step-1": "Open the Fasberry launcher settings.",
+        "step-2": "Find the password change and enter your current password.",
+        "step-3": "Choose a new password and repeat it.",
+        "note": "If you do not remember the current password, this way will not work."
+      },
+      "support": {
+        "title": "Through support",
+        "description": "Email {email} with your nickname, approximate registration date and a payment receipt if you have one.",
+        "action": "Email support",
+        "telegram": "Or message us on Telegram"
+      }
+    },
+    "widget": {
+      "title": "You are not signed in",
+      "description": "Sign in to get access to the full functionality of the site.",
+      "action": "Sign in",
+      "hide": "Do not show"
     }
   },
   "ratings": {
