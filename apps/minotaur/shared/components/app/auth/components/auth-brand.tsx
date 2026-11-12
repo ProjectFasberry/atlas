@@ -33,7 +33,7 @@ export const AuthBrand = reatomComponent(({ ctx }) => {
     <aside
       className="
         relative hidden lg:flex flex-col justify-between overflow-hidden rounded-2xl
-        border border-neutral-800 min-h-[560px] p-8 bg-neutral-900
+        border border-neutral-800 h-[600px] p-8 bg-neutral-900
       "
     >
       <img

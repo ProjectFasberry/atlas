@@ -189,20 +189,11 @@
     },
     "register": {
       "success": "You have successfully registered on the Fasberry project!",
-      "error": "Something went wrong",
       "toLogin": "Go to login",
       "placeholders": {
         "findoutOther": "For example: Telegram channel",
-        "findout": "Select an option",
         "password-repeat": "Repeat the password"
       },
-      "findout": {
-        "referrer": "From another player",
-        "custom": "Other"
-      },
-      "in-progress": "Registering",
-      "in-progress-subtitle": "this will take a little time...",
-      "to-back": "Go back",
       "acceptRulesTitle": "I agree with the",
       "acceptRulesPrivacy": "privacy policy",
       "acceptRulesProcessing": "terms of service",
@@ -215,7 +206,8 @@
         "password-repeat": "Repeat the password",
         "findout": "How did you hear about us? (optional)"
       },
-      "acceptRulesAnd": "and"
+      "acceptRulesAnd": "and",
+      "submit": "Create account"
     },
     "shared": {
       "placeholders": {

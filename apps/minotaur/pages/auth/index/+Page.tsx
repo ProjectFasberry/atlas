@@ -4,7 +4,8 @@ import { pageState } from "@/shared/models/page-context.model";
 import { auth, authState } from "@/shared/components/app/auth/models/auth.model";
 import { register } from "@/shared/components/app/auth/models/register.model";
 import { getDevModulesInfo } from "@/shared/models/app/index.model";
-import { authLoginVariantAtom, login } from "@/shared/components/app/auth/models/login.model";
+import { authLoginVariantAtom } from "@/shared/components/app/auth/models/login.model";
+import { qrLogin } from "@/shared/components/app/auth/models/qr.model";
 import { AuthScreen } from "@/shared/components/app/auth/components/auth-screen";
 
 const page = createPageModel({
@@ -16,7 +17,7 @@ const page = createPageModel({
       if (!isConnected()) return;
 
       if (ctx.get(authLoginVariantAtom) === "qr") {
-        login.qr.generate(ctx);
+        qrLogin.generate(ctx);
       }
 
       const devModulesInfo = getDevModulesInfo(ctx);
@@ -36,7 +37,7 @@ const page = createPageModel({
     onDisconnect: (ctx) => {
       auth.resetAuthState(ctx)
       register.resetRegisterState(ctx)
-      login.qr.close(ctx)
+      qrLogin.close(ctx)
     },
   }
 })

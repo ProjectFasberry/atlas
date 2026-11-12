@@ -7,7 +7,7 @@ import { Icon } from "@/shared/ui/icon"
 import { scan, scanReaderModel, scanState } from "../models/settings-devices.model"
 import { dialogVariant } from "@/shared/ui/dialog"
 import { Scanner } from "@yudiel/react-qr-scanner"
-import { authLoginQRIsErrorAtom, login, loginState } from "../../auth/models/login.model"
+import { authLoginQRIsErrorAtom, qrLogin, qrState } from "../../auth/models/qr.model"
 import type { ReactNode } from "react"
 import { spawn } from "@reatom/framework"
 import { createPortal } from "react-dom"
@@ -55,11 +55,11 @@ const ConnectNewVerifyDeclined = () => {
 }
 
 const ConnectNewVerifyIdle = reatomComponent(({ ctx }) => {
-  const data = ctx.spy(login.qr.verify.validateToken.dataAtom)?.result
+  const data = ctx.spy(qrLogin.verify.validateToken.dataAtom)?.result
   if (!data || typeof data === 'boolean') return null;
 
-  const isPending = ctx.spy(login.qr.verify.decline.statusesAtom).isPending
-    || ctx.spy(login.qr.verify.confirm.statusesAtom).isPending
+  const isPending = ctx.spy(qrLogin.verify.decline.statusesAtom).isPending
+    || ctx.spy(qrLogin.verify.confirm.statusesAtom).isPending
 
   const { browser, geo } = data
 
@@ -77,7 +77,7 @@ const ConnectNewVerifyIdle = reatomComponent(({ ctx }) => {
         <Button
           background="white"
           className="w-full"
-          onClick={() => spawn(ctx, (spawnCtx) => login.qr.verify.confirm(spawnCtx))}
+          onClick={() => spawn(ctx, (spawnCtx) => qrLogin.verify.confirm(spawnCtx))}
           disabled={isPending}
         >
           <Typography>{translate["settings.devices.sections.add-device.it-is-me"]()}</Typography>
@@ -85,7 +85,7 @@ const ConnectNewVerifyIdle = reatomComponent(({ ctx }) => {
         <Button
           variant="danger"
           className="w-full"
-          onClick={() => spawn(ctx, (spawnCtx) => login.qr.verify.decline(spawnCtx))}
+          onClick={() => spawn(ctx, (spawnCtx) => qrLogin.verify.decline(spawnCtx))}
           disabled={isPending}
         >
           <Typography>{translate["settings.devices.sections.add-device.it-is-not-me"]()}</Typography>
@@ -102,7 +102,7 @@ const VERIFY_COMPONENTS: Record<"idle" | "confirmed" | "declined", ReactNode> = 
 }
 
 const ConnectNewVerifyContent = reatomComponent(({ ctx }) =>
-  VERIFY_COMPONENTS[ctx.spy(loginState.qr.verify.status)], "ConnectNewVerifyContent"
+  VERIFY_COMPONENTS[ctx.spy(qrState.verify.status)], "ConnectNewVerifyContent"
 )
 
 const ConnectNewVerifyError = () => {
@@ -115,9 +115,9 @@ const ConnectNewVerifyError = () => {
 }
 
 const ConnectNewVerifyLogin = reatomComponent(({ ctx }) => {
-  if (ctx.spy(login.qr.verify.validateToken.statusesAtom).isPending) return <IconLoader />
+  if (ctx.spy(qrLogin.verify.validateToken.statusesAtom).isPending) return <IconLoader />
 
-  const data = ctx.spy(login.qr.verify.validateToken.dataAtom)
+  const data = ctx.spy(qrLogin.verify.validateToken.dataAtom)
   if (!data) return <ConnectNewVerifyExpiredOrNotfound />
 
   const isError = ctx.spy(authLoginQRIsErrorAtom)

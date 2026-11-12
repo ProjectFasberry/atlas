@@ -189,20 +189,11 @@
     },
     "register": {
       "success": "Вы успешно зарегистрировались на проекте Fasberry!",
-      "error": "Что-то пошло не так",
       "toLogin": "Перейти к входу",
       "placeholders": {
         "findoutOther": "Например: Telegram-канал",
-        "findout": "Выберите вариант",
         "password-repeat": "Повторите пароль"
       },
-      "findout": {
-        "referrer": "От другого игрока",
-        "custom": "Другое"
-      },
-      "in-progress": "Регистрируем",
-      "in-progress-subtitle": "это займет немного времени...",
-      "to-back": "Вернуться",
       "acceptRulesTitle": "Я согласен(-на) с",
       "acceptRulesPrivacy": "политикой конфиденциальности",
       "acceptRulesProcessing": "пользовательским соглашением",
@@ -215,7 +206,8 @@
         "password-repeat": "Повторите пароль",
         "findout": "Откуда узнали? (необязательно)"
       },
-      "acceptRulesAnd": "и"
+      "acceptRulesAnd": "и",
+      "submit": "Создать аккаунт"
     },
     "shared": {
       "placeholders": {

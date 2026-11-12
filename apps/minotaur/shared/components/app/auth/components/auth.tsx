@@ -142,7 +142,7 @@ export const Auth = reatomComponent(({ ctx }) => {
           </Tabs.Trigger >
         ))}
       </Tabs.List>
-      {(ctx.spy(authState.type) === "login" || ctx.spy(registerState.type) !== "confirm") && <AuthError />}
+      {(ctx.spy(authState.type) === "login" || !ctx.spy(registerState.success)) && <AuthError />}
       <div className="flex flex-col gap-6 min-w-0 w-full h-full">
         <Tabs.Content value="register">
           <RegisterForm />

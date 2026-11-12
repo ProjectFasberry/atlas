@@ -1,4 +1,4 @@
-import { AUTH_REGISTER_TYPE, registerNavigationModel, registerState } from "../models/register.model";
+import { register } from "../models/register.model";
 import { authState } from "../models/auth.model";
 import { action, atom, withAssign } from "@reatom/framework";
 import { login } from "../models/login.model";
@@ -18,10 +18,10 @@ const events = atom(null).pipe(
       authState.type(ctx, "register")
       authState.fields.nickname(ctx, nickname)
       authState.fields.password(ctx, nickname)
+      authState.fields.passwordRepeat(ctx, nickname)
       authState.fields.findout(ctx, "distribate")
-      authState.fields.findoutType(ctx, "referrer")
       authState.fields.acceptRules(ctx, true)
-      await registerNavigationModel.next(ctx)
+      await register.submit(ctx)
     })
   }))
 )
@@ -49,13 +49,6 @@ export const startAuthWidget = action(async (ctx) => {
       parse: (state: unknown) => nicknameAtom(ctx, String(state)),
       value
     });
-
-    // todo: change the buttons to select component
-    AUTH_REGISTER_TYPE.forEach((type) => {
-      authFolder
-        .addButton({ title: `Register as ${type}`, })
-        .on("click", () => registerState.type(ctx, type))
-    })
 
     const un = ctx.subscribe(nicknameAtom, (state) => {
       value = state
