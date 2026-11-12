@@ -49,7 +49,6 @@ export const ForgotPassword = reatomComponent(({ ctx }) => {
           {translate["auth.forgot.description"]()}
         </Typography>
       </div>
-
       <ForgotMethod icon="sprite:device-desktop" title={translate["auth.forgot.game.title"]()}>
         <Typography className="text-sm text-neutral-300">
           {translate["auth.forgot.game.description"]()}
@@ -63,7 +62,6 @@ export const ForgotPassword = reatomComponent(({ ctx }) => {
           {translate["auth.forgot.game.note"]()}
         </Typography>
       </ForgotMethod>
-
       <ForgotMethod icon="sprite:question-mark" title={translate["auth.forgot.support.title"]()}>
         <Typography className="text-sm text-neutral-300">
           {translate["auth.forgot.support.description"]({ email: supportEmail })}

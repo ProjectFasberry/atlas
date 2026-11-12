@@ -7,6 +7,8 @@ import { Typography } from "@/shared/ui/typography"
 import { Icon } from "@/shared/ui/icon"
 import { createPageModel } from "@/shared/lib/events"
 import { ErrorBlock } from "@/shared/ui/error-block"
+import { Button } from "@/shared/ui/button"
+import { getRatingTypeLabel, getServerLabel } from "@/shared/components/app/ratings/labels"
 
 const RatingItem = ({
   title, parentValue, childs
@@ -15,7 +17,7 @@ const RatingItem = ({
     <section className="flex flex-col gap-4">
       <div className="flex items-center border-t rounded-lg border-neutral-800 pt-2 px-2">
         <Typography className="font-bold text-2xl tracking-tight">
-          {title}
+          {getServerLabel(parentValue, title)}
         </Typography>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
@@ -34,10 +36,7 @@ const RatingItem = ({
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-medium text-neutral-200 truncate">
-                  {child.title}
-                </span>
-                <span className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">
-                  {translate["ratings.goTo"]()}
+                  {getRatingTypeLabel(child.value, child.title)}
                 </span>
               </div>
             </div>
@@ -56,10 +55,28 @@ const RatingsList = reatomComponent(({ ctx }) => {
   if (ctx.spy(rating.fetch.statusesAtom).isPending) return <PageLoader />
 
   const error = ctx.spy(rating.fetch.errorAtom)
-  if (error) return <ErrorBlock title={error.message} />
+  if (error) {
+    const isPending = ctx.spy(rating.fetch.statusesAtom).isPending
+
+    return (
+      <div className="flex flex-col gap-3">
+        <ErrorBlock title={error.message || translate["ratings.error"]()} />
+        <Button
+          background="default"
+          className="w-fit"
+          disabled={isPending}
+          withSpinner
+          isLoading={isPending}
+          onClick={() => rating.fetch(ctx)}
+        >
+          {translate["ratings.retry"]()}
+        </Button>
+      </div>
+    )
+  }
 
   const data = ctx.spy(rating.fetch.dataAtom)
-  if (!data) return null;
+  if (!data) return <PageLoader />;
 
   return (
     <div className="grid grid-cols-1 auto-rows-auto gap-10 min-w-0 w-full h-full">

@@ -6,7 +6,9 @@ import { Checkbox } from "@ark-ui/react/checkbox"
 import { spawn } from "@reatom/framework"
 import { auth, authState } from "../models/auth.model"
 import { register, registerState } from "../models/register.model"
-import { AuthField, NicknameInput, PasswordInput, PasswordVisibility } from "./auth"
+import {
+  AuthField, NicknameInput, PasswordInput, PasswordVisibility
+} from "./auth"
 import { focusFirstAuthError } from "./focus"
 import { translate } from "@/shared/locales/helpers"
 import { getLocale } from "@/paraglide/runtime"
@@ -64,7 +66,9 @@ const PasswordRepeatInput = reatomComponent(({ ctx }) => {
 }, "PasswordRepeatInput")
 
 const PasswordPolicyHint = () => (
-  <span className="text-xs text-neutral-400">{translate["auth.register.password-hint"]()}</span>
+  <span className="text-xs text-neutral-400">
+    {translate["auth.register.password-hint"]()}
+  </span>
 )
 
 const PasswordMismatchHint = reatomComponent(({ ctx }) => {
@@ -73,7 +77,9 @@ const PasswordMismatchHint = reatomComponent(({ ctx }) => {
   if (!repeat.length || password === repeat) return null
 
   return (
-    <span className="text-xs text-red">{translate["auth.register.password-mismatch"]()}</span>
+    <span className="text-xs text-red">
+      {translate["auth.register.password-mismatch"]()}
+    </span>
   )
 }, "PasswordHint")
 
@@ -85,7 +91,8 @@ const PrivacyTerms = reatomComponent(({ ctx }) => {
       <Checkbox.Root
         id="rules"
         checked={ctx.spy(authState.fields.acceptRules)}
-        onCheckedChange={(e) => typeof e.checked === 'boolean' && authState.fields.acceptRules(ctx, e.checked)}
+        onCheckedChange={(e) => typeof e.checked === 'boolean' &&
+          authState.fields.acceptRules(ctx, e.checked)}
         className={checkboxVariant.root()}
       >
         <Checkbox.Control
@@ -96,7 +103,8 @@ const PrivacyTerms = reatomComponent(({ ctx }) => {
       </Checkbox.Root>
       <label
         lang={getLocale()}
-        className="select-none relative -top-1 text-sm [&_a]:text-green-500 [&_a]:inline [hyphens:auto]"
+        className="select-none relative -top-1 text-sm
+          [&_a]:text-green-500 [&_a]:inline [hyphens:auto]"
         htmlFor="checkbox:rules:input"
       >
         {translate["auth.register.acceptRulesTitle"]()}
@@ -154,9 +162,10 @@ const RegisterSuccess = reatomComponent(({ ctx }) => (
 export const RegisterForm = reatomComponent(({ ctx }) => {
   if (ctx.spy(registerState.success)) return <RegisterSuccess />
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    void spawn(ctx, (spawnCtx) => register.submit(spawnCtx))
+
+    spawn(ctx, (spawnCtx) => register.submit(spawnCtx))
       .then(() => focusFirstAuthError(ctx))
   }
 
@@ -166,7 +175,11 @@ export const RegisterForm = reatomComponent(({ ctx }) => {
         <AuthField
           id="register-nickname"
           label={translate["auth.shared.labels.nickname"]()}
-          hint={<span className="text-xs text-neutral-400">{translate["auth.register.nickname-hint"]()}</span>}
+          hint={
+            <span className="text-xs text-neutral-400">
+              {translate["auth.register.nickname-hint"]()}
+            </span>
+          }
         >
           <NicknameInput id="register-nickname" />
         </AuthField>

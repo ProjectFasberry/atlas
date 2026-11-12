@@ -33,7 +33,7 @@ export const AuthBrand = reatomComponent(({ ctx }) => {
     <aside
       className="
         relative hidden lg:flex flex-col justify-between overflow-hidden rounded-2xl
-        border border-neutral-800 h-[600px] p-8 bg-neutral-900
+        border border-neutral-800 h-150 p-8 bg-neutral-900
       "
     >
       <img
@@ -42,14 +42,13 @@ export const AuthBrand = reatomComponent(({ ctx }) => {
         draggable={false}
         className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/20" />
-
+      <div className="absolute inset-0 bg-linear-to-t from-black via-black/70 to-black/20" />
       <div className="relative z-10">
         <Logotype />
       </div>
-
       <div className="relative z-10 flex flex-col gap-4 max-w-md">
-        <span className="w-fit rounded-lg bg-green-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-green-400">
+        <span className="w-fit rounded-lg bg-green-500/15 px-2 py-0.5
+          text-[11px] font-semibold uppercase tracking-wide text-green-400">
           {translate["index.intro.subtitle"]()}
         </span>
         <h2 className="font-[PIXY] text-4xl leading-[1.1]">
@@ -64,7 +63,6 @@ export const AuthBrand = reatomComponent(({ ctx }) => {
           <span className="text-neutral-400">{translate["auth.page.online"]()}</span>
         </div>
       </div>
-
       <div className="relative z-10 flex flex-wrap items-center gap-2">
         <Link
           href="/report"

@@ -45,7 +45,7 @@ export default defineConfig(({ mode }) => {
 
   const previewAndServerOpts: PreviewOptions = {
     host,
-    port: 3004,
+    port,
     allowedHosts: true
   }
 

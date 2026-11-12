@@ -4,16 +4,15 @@ import { getStaticImage } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { useConfig } from "vike-react/useConfig";
 import type { PageContextServer } from "vike/types";
+import { getRatingTypeLabel, getServerLabel } from "@/shared/components/app/ratings/labels";
 
-const image = getStaticImage("arts/adventure-in-blossom.jpg")
+const image = getStaticImage("arts/sand-camel.jpg")
 
 function metadata(
   pageCtx: PageContextServer
 ) {
-  const { server, type } = {
-    server: pageCtx.routeParams.server,
-    type: pageCtx.routeParams.id,
-  }
+  const server = getServerLabel(pageCtx.routeParams.server)
+  const type = getRatingTypeLabel(pageCtx.routeParams.type)
 
   const title = wrapTitle(translate["rating.page.title"]({ type, server }))
   const description = translate["ratings.page.description"]()
