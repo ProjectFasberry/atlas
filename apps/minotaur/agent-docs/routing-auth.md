@@ -42,7 +42,9 @@ Rules:
 - Guards are server-side; they run before the page renders.
 - Read the user from the SSR snapshot, not from a client store.
 - Redirect to `/` when unauthenticated, to `/private/` when authenticated but
-  lacking the permission.
+  lacking the permission. Public pages that need a session use
+  `buildAuthRedirect(pathname, searchOriginal)` so `/auth?next=` returns the
+  player to the requested page after sign-in.
 - Export a `*_PERMISSION` constant from the feature model and reuse it in the
   guard and the sidebar.
 - Permission names are lowercase (`config.panel.read`, `servers.read`,

@@ -4,7 +4,9 @@ import { withAssign } from "@reatom/framework";
 import { withCookie } from "@reatom/persist-web-storage";
 import { type IconName } from "@/shared/ui/icon"
 import { type ReactNode } from "react";
-import { navigate } from "vike/client/router";
+import { pageState } from "@/shared/models/page-context.model";
+import { buildAuthRedirect } from "@/shared/lib/auth-redirect";
+import { translate } from "@/shared/locales/helpers";
 
 type WidgetBase = {
   icon?: IconName,
@@ -29,17 +31,22 @@ const WIDGET_IDS = {
 const WIDGETS_SOURCES: Map<string, WidgetItem> = new Map([
   [WIDGET_IDS.AUTH_REQUIRED, {
     cd: atom((ctx) => {
+      if (ctx.spy(pageState.urlPathname).startsWith("/auth")) return true;
+
       const isHiddenByUser = ctx.spy(widgetsState.data)[WIDGET_IDS.AUTH_REQUIRED]
       if (isHiddenByUser === false) return true;
 
       const user = ctx.spy(currentUserState);
       return !!user;
     }),
-    title: "Вы не авторизованы",
+    title: translate["auth.widget.title"](),
     icon: "sprite:lock",
-    description: 'Авторизируйтесь, чтобы получить доступ к полному функционалу сайта.',
+    description: translate["auth.widget.description"](),
     onAction: (ctx) => {
-      ctx.schedule(() => navigate("/auth"))
+      ctx.schedule(() => {
+        const pathname = ctx.get(pageState.urlPathname)
+        window.location.assign(buildAuthRedirect(pathname, window.location.search || null))
+      })
     },
     onHide: (ctx) => {
       widget.hide(ctx, "auth.required")

@@ -1,4 +1,4 @@
-import { NicknameInput, PasswordInput } from "./auth"
+import { AuthField, NicknameInput, PasswordInput, PasswordVisibility } from "./auth"
 import { reatomComponent } from "@reatom/npm-react"
 import { auth, type AuthFindoutType, authState } from "../models/auth.model"
 import { Input } from "@/shared/ui/input"
@@ -10,6 +10,7 @@ import {
   registerNavigationModel, register, registerState, findoutSelectedTypeAtom,
   createFindoutOptions
 } from "../models/register.model"
+import { focusFirstAuthError } from "./focus"
 import { IconLoader } from "@/shared/ui/icon-loader"
 import { spawn } from "@reatom/framework"
 import { translate } from "@/shared/locales/helpers"
@@ -26,9 +27,13 @@ const FindoutReferrerInput = reatomComponent(({ ctx }) => (
     autoCorrect="off"
     autoCapitalize="off"
     spellCheck="false"
-    autoComplete="new-referrer"
+    autoComplete="off"
+    data-auth-field="findout"
+    aria-label={translate["auth.register.labels.findout"]()}
     placeholder={translate["auth.shared.placeholders.nickname"]()}
     variant={ctx.spy(authState.errorsType).includes("findout") ? "danger" : "default"}
+    aria-invalid={ctx.spy(authState.errorsType).includes("findout")}
+    aria-describedby={ctx.spy(authState.globalError) ? "auth-error" : undefined}
     className="w-full"
     value={ctx.spy(authState.fields.findout) ?? ""}
     onClick={() => auth.resetError(ctx)}
@@ -41,10 +46,14 @@ const FindoutOtherInput = reatomComponent(({ ctx }) => (
     autoCorrect="off"
     autoCapitalize="off"
     spellCheck="false"
-    autoComplete="new-other"
+    autoComplete="off"
+    data-auth-field="findout"
+    aria-label={translate["auth.register.labels.findout"]()}
     placeholder={translate["auth.register.placeholders.findoutOther"]()}
     className="w-full"
     variant={ctx.spy(authState.errorsType).includes("findout") ? "danger" : "default"}
+    aria-invalid={ctx.spy(authState.errorsType).includes("findout")}
+    aria-describedby={ctx.spy(authState.globalError) ? "auth-error" : undefined}
     value={ctx.spy(authState.fields.findout) ?? ""}
     onClick={() => auth.resetError(ctx)}
     onChange={e => authState.fields.findout(ctx, e.target.value)}
@@ -57,22 +66,34 @@ const FINDOUT_COMPONENTS: Record<AuthFindoutType, ReactNode> = {
   "custom": <FindoutOtherInput />
 }
 
-const FINDOUT_COLLECTION = createListCollection({
-  items: createFindoutOptions()
-})
-
 const FindoutOptions = reatomComponent(({ ctx }) => {
   const currentItem = ctx.spy(findoutSelectedTypeAtom)
+  const collection = createListCollection({
+    items: createFindoutOptions()
+  })
 
   return (
     <Select.Root
-      collection={FINDOUT_COLLECTION}
+      collection={collection}
       value={currentItem ? [currentItem.value] : []}
-      onValueChange={({ value }) => authState.fields.findoutType(ctx, value[0] as AuthFindoutType)}
+      onValueChange={({ value }) => {
+        const next = value[0] as AuthFindoutType | undefined
+        if (!next) {
+          authState.fields.findoutType(ctx, null)
+          return
+        }
+        if (next !== currentItem?.value) authState.fields.findout.reset(ctx)
+        authState.fields.findoutType(ctx, next)
+      }}
       className="flex flex-col gap-1 w-full"
     >
       <Select.Control className={selectVariant.control()}>
-        <Select.Trigger className={selectVariant.trigger()}>
+        <Select.Trigger
+          id="register-findout"
+          data-auth-field="findout"
+          aria-labelledby="findout-label"
+          className={selectVariant.trigger()}
+        >
           <Select.ValueText>
             {currentItem?.title ?? translate["auth.register.placeholders.findout"]()}
           </Select.ValueText>
@@ -115,35 +136,51 @@ const FindoutComponent = reatomComponent(({ ctx }) => {
   return FINDOUT_COMPONENTS?.[data] ?? null;
 }, "FindoutComponent")
 
-const PasswordRepeatInput = reatomComponent(({ ctx }) => (
-  <Input
-    type="password"
-    autoComplete="new-password"
-    aria-label={translate["auth.register.placeholders.password-repeat"]()}
-    placeholder={translate["auth.register.placeholders.password-repeat"]()}
-    value={ctx.spy(authState.fields.passwordRepeat)}
-    onClick={() => auth.resetError(ctx)}
-    onChange={e => authState.fields.passwordRepeat(ctx, e.target.value)}
-    maxLength={72}
-  />
-), "PasswordRepeatInput")
-
-const PasswordHint = reatomComponent(({ ctx }) => {
-  const password = ctx.spy(authState.fields.password)
-  const repeat = ctx.spy(authState.fields.passwordRepeat)
-  const mismatch = repeat.length > 0 && password !== repeat
+const PasswordRepeatInput = reatomComponent(({ ctx }) => {
+  const errors = ctx.spy(authState.errorsType)
+  const invalid = errors.includes("passwordRepeat") || errors.includes("password")
+  const hasError = !!ctx.spy(authState.globalError)
 
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs text-neutral-400">{translate["auth.register.password-hint"]()}</span>
-      {mismatch && (
-        <span className="text-xs text-red">{translate["auth.register.password-mismatch"]()}</span>
-      )}
+    <div className="flex relative items-center justify-between w-full">
+      <Input
+        id="register-passwordRepeat"
+        data-auth-field="passwordRepeat"
+        className="w-full pr-12"
+        variant={invalid ? "danger" : "default"}
+        type={ctx.spy(authState.settings.showPasswordRepeat) ? "text" : "password"}
+        autoComplete="new-password"
+        aria-label={translate["auth.register.labels.password-repeat"]()}
+        aria-invalid={invalid}
+        aria-describedby={hasError ? "auth-error" : undefined}
+        placeholder={translate["auth.register.placeholders.password-repeat"]()}
+        value={ctx.spy(authState.fields.passwordRepeat)}
+        onClick={() => auth.resetError(ctx)}
+        onChange={e => authState.fields.passwordRepeat(ctx, e.target.value)}
+        maxLength={72}
+      />
+      <PasswordVisibility visibility={authState.settings.showPasswordRepeat} />
     </div>
+  )
+}, "PasswordRepeatInput")
+
+const PasswordPolicyHint = () => (
+  <span className="text-xs text-neutral-400">{translate["auth.register.password-hint"]()}</span>
+)
+
+const PasswordMismatchHint = reatomComponent(({ ctx }) => {
+  const password = ctx.spy(authState.fields.password)
+  const repeat = ctx.spy(authState.fields.passwordRepeat)
+  if (!repeat.length || password === repeat) return null
+
+  return (
+    <span className="text-xs text-red">{translate["auth.register.password-mismatch"]()}</span>
   )
 }, "PasswordHint")
 
 const PrivacyTerms = reatomComponent(({ ctx }) => {
+  const invalid = ctx.spy(authState.errorsType).includes("acceptRules")
+
   return (
     <div className="inline-flex gap-2 items-start">
       <Checkbox.Root
@@ -152,7 +189,10 @@ const PrivacyTerms = reatomComponent(({ ctx }) => {
         onCheckedChange={(e) => typeof e.checked === 'boolean' && authState.fields.acceptRules(ctx, e.checked)}
         className={checkboxVariant.root()}
       >
-        <Checkbox.Control className={checkboxVariant.control({ variant: "filled" })} />
+        <Checkbox.Control
+          aria-invalid={invalid}
+          className={checkboxVariant.control({ variant: "filled" })}
+        />
         <Checkbox.HiddenInput />
       </Checkbox.Root>
       <label
@@ -161,14 +201,14 @@ const PrivacyTerms = reatomComponent(({ ctx }) => {
         htmlFor="checkbox:rules:input"
       >
         {translate["auth.register.acceptRulesTitle"]()}
-        <a href="/privacy" target="_blank">
+        <a href="/privacy" target="_blank" rel="noreferrer">
           &nbsp;{translate["auth.register.acceptRulesPrivacy"]()}
         </a>,
-        <a href="/terms" target="_blank">
+        <a href="/terms" target="_blank" rel="noreferrer">
           &nbsp;{translate["auth.register.acceptRulesProcessing"]()}&nbsp;
         </a>
-        и
-        <a href="/rules" target="_blank">
+        {translate["auth.register.acceptRulesAnd"]()}
+        <a href="/rules" target="_blank" rel="noreferrer">
           &nbsp;{translate["auth.register.acceptRulesProject"]()}
         </a>.
       </label>
@@ -178,15 +218,32 @@ const PrivacyTerms = reatomComponent(({ ctx }) => {
 
 const RegisterStartInput = () => (
   <>
-    <div className="flex flex-col gap-2 w-full">
-      <div className="flex flex-col gap-1 w-full">
-        <NicknameInput />
-        <span className="text-xs text-neutral-400">{translate["auth.register.nickname-hint"]()}</span>
-      </div>
-      <PasswordInput />
-      <PasswordRepeatInput />
-      <PasswordHint />
-      <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-3 w-full">
+      <AuthField
+        id="register-nickname"
+        label={translate["auth.shared.labels.nickname"]()}
+        hint={<span className="text-xs text-neutral-400">{translate["auth.register.nickname-hint"]()}</span>}
+      >
+        <NicknameInput id="register-nickname" />
+      </AuthField>
+      <AuthField
+        id="register-password"
+        label={translate["auth.shared.labels.password"]()}
+        hint={<PasswordPolicyHint />}
+      >
+        <PasswordInput id="register-password" />
+      </AuthField>
+      <AuthField
+        id="register-passwordRepeat"
+        label={translate["auth.register.labels.password-repeat"]()}
+        hint={<PasswordMismatchHint />}
+      >
+        <PasswordRepeatInput />
+      </AuthField>
+      <div className="flex flex-col gap-1.5 w-full">
+        <span id="findout-label" className="text-sm font-medium text-neutral-300">
+          {translate["auth.register.labels.findout"]()}
+        </span>
         <FindoutOptions />
         <FindoutComponent />
       </div>
@@ -248,7 +305,7 @@ const RegisterConfirmSuccess = reatomComponent(({ ctx }) => {
       </div>
       <Button
         className="w-2/3 font-semibold"
-        background="white"
+        background="positive"
         onClick={() => register.toLogin(ctx)}
       >
         {translate["auth.register.toLogin"]()}
@@ -286,22 +343,27 @@ const RegisterBack = reatomComponent(({ ctx }) => {
       disabled={!canGoBack || ctx.spy(registerNavigationModel.back.statusesAtom).isPending}
       onClick={() => spawn(ctx, (spawnCtx) => registerNavigationModel.back(spawnCtx))}
       background="default"
-      className="transition-none capitalize"
+      className="capitalize"
     >
       {translate["shared.back"]()}
     </Button>
   )
 }, "RegisterBack")
 const RegisterContinue = reatomComponent(({ ctx }) => {
-  const canGoNext = ctx.spy(registerNavigationModel.canGoNextAtom)
+  const isPending = ctx.spy(registerNavigationModel.next.statusesAtom).isPending
 
   return (
     <Button
       type="button"
       background="positive"
-      className="w-full capitalize font-semibold transition-none"
-      disabled={!canGoNext || ctx.spy(registerNavigationModel.next.statusesAtom).isPending}
-      onClick={() => register.next(ctx)}
+      className="w-full font-semibold capitalize"
+      disabled={isPending}
+      withSpinner
+      isLoading={isPending}
+      onClick={() => {
+        register.next(ctx)
+        focusFirstAuthError(ctx)
+      }}
     >
       {translate["shared.next"]()}
     </Button>
@@ -332,6 +394,7 @@ export const RegisterForm = reatomComponent(({ ctx }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     register.next(ctx);
+    focusFirstAuthError(ctx)
   }
 
   return (

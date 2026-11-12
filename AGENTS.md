@@ -72,7 +72,7 @@ scripts.
 - `pkgs/*` - shared packages (configs, UI, shared libs). Consume them through
   workspace dependencies, never through relative paths into another workspace.
   App-local aliases are declared in that app's tsconfig/vite config.
-- `standards/` - repo-wide conventions: maintaining and Linear.
+- `standards/` - repo-wide conventions: maintaining and Plane.
 
 ## Commands
 
@@ -116,8 +116,8 @@ Container apps (`minotaur`, `wiki`) deploy by push: `main` goes to `prod`,
 
 ## Issue tracking
 
-Work is tracked in Linear (project Fasberry); the label and priority convention
-is in `standards/LINEAR.md`. Agent-created issues get `AI` plus the app label;
+Work is tracked in Plane (project Fasberry); the label and priority convention
+is in `standards/PLANE.md`. Agent-created issues get `AI` plus the app label;
 audit batches include mid severity and above unless asked otherwise.
 
 ## Commits

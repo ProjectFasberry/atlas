@@ -4,11 +4,13 @@ import { atom, action } from "@reatom/framework";
 import { type AsyncCtx, reatomAsync, spawn, withAssign, withDataAtom, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { onEvent } from "@reatom/web";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { auth, type AuthErrorType, authState, defineError, isPofActiveAtom } from "./auth.model";
+import { auth, applyZodError, authState, defineError, isPofActiveAtom } from "./auth.model";
 import { createWsUrl } from "@/shared/lib/helpers";
 import { getApiHost } from "@/shared/lib/helpers";
 import { env } from "@/shared/env";
 import { logError } from "@/shared/lib/log";
+import { pageState } from "@/shared/models/page-context.model";
+import { getNextPath, goAfterAuth } from "@/shared/lib/auth-redirect";
 import * as z from "zod";
 import { authSchema as loginSchema } from "@/shared/schemas/auth";
 import { maybeSpyOptionAtom } from "@/shared/models/app/utils";
@@ -24,7 +26,7 @@ export type QREventsPayload = {
 };
 
 export type AuthLoginVariant = "qr" | "game" | "password";
-export type AuthLoginQRStatus = QREventsEvent | "idle"
+export type AuthLoginQRStatus = QREventsEvent | "idle" | "error"
 
 const LOGIN_VARIANTS_EVENTS: Partial<Record<AuthLoginVariant, (ctx: AsyncCtx) => void>> = {
   qr: (ctx) => login.qr.generate(ctx),
@@ -73,6 +75,16 @@ export const login = atom(null, "login").pipe(
     basic: atom(null, `${name}.basic`).pipe(
       withAssign((_, name) => ({
         submit: reatomAsync(async (ctx) => {
+          auth.resetErrors(ctx);
+
+          const { success, error, data: json } = loginSchema.safeParse({
+            nickname: ctx.get(authState.fields.nickname),
+            password: ctx.get(authState.fields.password),
+          });
+
+          // Do not ask for a CAPTCHA until the fields themselves are valid.
+          if (!success) return error;
+
           const pofIsActive = maybeSpyOptionAtom(ctx, "flags", "isPof", true)
           const token = ctx.get(authState.token);
 
@@ -89,13 +101,6 @@ export const login = atom(null, "login").pipe(
 
           authState.isProcessing(ctx, true);
 
-          const { success, error, data: json } = loginSchema.safeParse({
-            nickname: ctx.get(authState.fields.nickname),
-            password: ctx.get(authState.fields.password),
-          });
-
-          if (!success) return error;
-
           return await client.raw
             .post<ExtractApiData<"postAuthLoginBasic">["data"]>(`/auth/login/basic`, {
               params: { query: { token: token ?? "" } },
@@ -108,17 +113,13 @@ export const login = atom(null, "login").pipe(
             if (!res) return;
 
             if (res instanceof z.ZodError) {
-              const issue = res.issues.map((d) => d)[0];
-              const property = issue.path[0].toString() as AuthErrorType;
-
-              authState.globalError(ctx, issue.message);
-              authState.errorsType(ctx, (state) => [...state, property]);
+              applyZodError(ctx, res);
               authState.isProcessing(ctx, false);
 
               return;
             }
 
-            window.location.reload()
+            goAfterAuth(getNextPath(ctx.get(pageState.urlParsed)?.search))
           },
           onReject: (ctx, e) => {
             logError(e);
@@ -136,10 +137,11 @@ export const login = atom(null, "login").pipe(
       withAssign((_, name) => ({
         generate: reatomAsync(async (ctx) => {
           const generation = ctx.get(loginState.qr.generation);
+          loginState.qr.status(ctx, "idle");
           const visitorId = await login.getVisitorId();
 
           const res = await client
-            .post("/auth/login/qr/generate", { json: { visitorId } })
+            .post("/auth/login/qr/generate", { json: { visitorId }, timeout: 10000 })
 
           // The request may finish after the QR view was closed.
           if (ctx.get(loginState.qr.generation) !== generation) return;
@@ -163,10 +165,11 @@ export const login = atom(null, "login").pipe(
             .post("/auth/login/qr/create", { params: { query: { token } } })
         }, {
           name: `${name}.createSession`,
-          onFulfill: () => {
-            window.location.reload()
+          onFulfill: (ctx) => {
+            goAfterAuth(getNextPath(ctx.get(pageState.urlParsed)?.search))
           },
-          onReject: (_, e) => {
+          onReject: (ctx, e) => {
+            loginState.qr.status(ctx, "error")
             logError(e, { type: 'combined' })
           }
         }),
@@ -196,14 +199,11 @@ export const login = atom(null, "login").pipe(
             const data = JSON.parse(raw) as QREventsPayload
             loginState.qr.status(ctx, data.event)
           })
-          onEvent(ctx, socket, 'open', () => {
-            loginState.qr.status(ctx, "connected")
-          })
           onEvent(ctx, socket, 'close', () => {
             ctx.controller.abort()
           })
           onEvent(ctx, socket, 'error', () => {
-            loginState.qr.status.reset(ctx)
+            loginState.qr.status(ctx, "error")
             ctx.controller.abort()
           })
         }, `${name}.events`),
@@ -318,27 +318,13 @@ export const authLoginQRIsErrorAtom = atom((ctx) =>
   ctx.spy(login.qr.verify.confirm.errorAtom) || ctx.spy(login.qr.verify.decline.errorAtom),
 );
 
-const authIsValidAtom = atom<boolean>((ctx) => {
-  const type = ctx.spy(authState.type);
-
-  const { nickname, password, findout, acceptRules } = {
-    nickname: ctx.spy(authState.fields.nickname),
-    password: ctx.spy(authState.fields.password),
-    findout: ctx.spy(authState.fields.findout),
-    acceptRules: ctx.spy(authState.fields.acceptRules)
-  }
-
-  const isBaseValid = nickname.length >= 2 && password.length >= 6;
-  if (!isBaseValid) return false;
-
-  if (type !== "register") return true;
-
-  return !!findout && !!acceptRules;
-}, "authIsValid");
-
+/**
+ * The form stays enabled on purpose: validation runs on submit and shows the
+ * reason. Only a request in flight, the CAP dialog or a CAP check may block it.
+ */
 export const authSubmitIsDisabledAtom = atom((ctx) => {
   const isPending = ctx.spy(login.basic.submit.statusesAtom).isPending;
-  const isInvalid = !ctx.spy(authIsValidAtom);
+  const isProcessing = ctx.spy(authState.isProcessing);
   const isPofActive = ctx.spy(isPofActiveAtom)
-  return isPofActive || isPending || isInvalid;
+  return isPofActive || isPending || isProcessing;
 }, "authSubmitIsDisabled");

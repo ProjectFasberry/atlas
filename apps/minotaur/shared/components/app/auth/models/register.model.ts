@@ -4,7 +4,7 @@ import {
 } from "@reatom/framework";
 import { registerSchema } from "@/shared/schemas/auth";
 import { client } from "@/shared/lib/client-wrapper";
-import { auth, type AuthFindoutType, authState, defineError } from "./auth.model";
+import { auth, applyZodError, type AuthFindoutType, authState, defineError } from "./auth.model";
 import { logError } from "@/shared/lib/log";
 import { createNavigationModel } from "./navigation.model";
 import { getExistNickname } from "@/shared/models/shared.model";
@@ -62,10 +62,17 @@ export const register = atom(null, "register").pipe(
     cb: {
       submitRegistration: reatomAsync(async (ctx): Promise<boolean> => {
         const nickname = ctx.get(authState.fields.nickname);
-        const isExist = await getExistNickname(nickname)
 
-        if (isExist) {
-          authState.globalError(ctx, translate["auth.register.existing-player"]())
+        try {
+          const isExist = await getExistNickname(nickname)
+
+          if (isExist) {
+            authState.globalError(ctx, translate["auth.register.existing-player"]())
+            return false;
+          }
+        } catch (e) {
+          logError(e);
+          authState.globalError(ctx, translate["auth.shared.errors.unknown"]())
           return false;
         }
 
@@ -121,6 +128,11 @@ export const register = atom(null, "register").pipe(
       onReject: (ctx, e) => {
         logError(e);
 
+        if (e instanceof z.ZodError) {
+          applyZodError(ctx, e)
+          return
+        }
+
         defineError(ctx, e)
       },
       onSettle: (ctx) => {
@@ -140,6 +152,34 @@ export const register = atom(null, "register").pipe(
       authState.token.reset(ctx);
     }),
     next: action((ctx) => {
+      auth.resetErrors(ctx)
+
+      if (ctx.get(registerState.type) === "start-input") {
+        if (ctx.get(authState.fields.password) !== ctx.get(authState.fields.passwordRepeat)) {
+          authState.globalError(ctx, translate["auth.register.password-mismatch"]())
+          authState.errorsType(ctx, (state) => [...state, "passwordRepeat"])
+          return
+        }
+
+        const { findout, findoutType } = normalizeFindout(
+          ctx.get(authState.fields.findout),
+          ctx.get(authState.fields.findoutType),
+        )
+
+        const parsed = fieldsOnlyRegisterSchema.safeParse({
+          nickname: ctx.get(authState.fields.nickname),
+          password: ctx.get(authState.fields.password),
+          findout,
+          findoutType,
+          acceptRules: ctx.get(authState.fields.acceptRules)
+        })
+
+        if (!parsed.success) {
+          applyZodError(ctx, parsed.error)
+          return
+        }
+      }
+
       spawn(ctx, (spawnCtx) => {
         registerNavigationModel.next(spawnCtx)
       })

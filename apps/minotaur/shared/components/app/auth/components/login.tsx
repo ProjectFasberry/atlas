@@ -5,15 +5,19 @@ import {
 } from "../models/login.model"
 import { type ReactNode } from "react"
 import { Icon } from "@/shared/ui/icon"
-// import { Copy } from "@/shared/ui/copy"
 import { Button } from "@/shared/ui/button"
 import { atom, spawn } from "@reatom/framework"
 import { Separator } from "@/shared/ui/separator"
-import { NicknameInput, PasswordInput } from "./auth"
+import { AuthField, NicknameInput, PasswordInput } from "./auth"
+import { authState } from "../models/auth.model"
+import { focusFirstAuthError } from "./focus"
 import { IconLoader } from "@/shared/ui/icon-loader"
 import { translate } from "@/shared/locales/helpers"
 import { QrCode } from "@ark-ui/react/qr-code"
 import { qrCodeVariant } from "@/shared/ui/qr-code"
+import { Link } from "@/shared/components/config/link/link"
+import { pageState } from "@/shared/models/page-context.model"
+import { getNextPath } from "@/shared/lib/auth-redirect"
 
 const qrIconAtom = atom<HTMLDivElement | null>(null, "loginQrIcon")
 const qrSpinTimerAtom = atom<ReturnType<typeof setTimeout> | null>(null, "loginQrSpinTimer")
@@ -25,6 +29,7 @@ const LoginVariants = reatomComponent(({ ctx }) => (
         key={variant.value}
         type="button"
         background="default"
+        className={variant.value === "qr" ? "max-sm:hidden" : undefined}
         onClick={() => spawn(ctx, (spawnCtx) => authLoginVariantAtom.select(spawnCtx, variant.value))}
       >
         {variant.title}
@@ -33,39 +38,61 @@ const LoginVariants = reatomComponent(({ ctx }) => (
   </div>
 ), "LoginVariants")
 
-const LoginPasswordSubmit = reatomComponent(({ ctx }) => (
-  <Button
-    className="w-full bg-green-600 h-10 font-semibold"
-    disabled={ctx.spy(authSubmitIsDisabledAtom)}
-    type="submit"
-  >
-    {translate["auth.login.submit"]()}
-  </Button>
-), "LoginPasswordSubmit")
+const LoginPasswordSubmit = reatomComponent(({ ctx }) => {
+  const isPending = ctx.spy(login.basic.submit.statusesAtom).isPending
+    || ctx.spy(authState.isProcessing)
+
+  return (
+    <Button
+      className="w-full h-10 font-semibold"
+      background="positive"
+      disabled={ctx.spy(authSubmitIsDisabledAtom)}
+      withSpinner
+      isLoading={isPending}
+      type="submit"
+    >
+      {translate["auth.login.submit"]()}
+    </Button>
+  )
+}, "LoginPasswordSubmit")
 
 const LoginPassword = reatomComponent(({ ctx }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    spawn(ctx, (spawnCtx) => login.basic.submit(spawnCtx))
+    void spawn(ctx, (spawnCtx) => login.basic.submit(spawnCtx))
+      .then(() => focusFirstAuthError(ctx))
   }
+
+  const next = getNextPath(ctx.get(pageState.urlParsed)?.search)
+  const forgotHref = next ? `/auth/forgot?next=${encodeURIComponent(next)}` : "/auth/forgot"
 
   return (
     <form
       className="flex flex-col gap-4 w-full h-full"
       onSubmit={handleSubmit}
-      autoComplete="off"
     >
-      <div className="flex flex-col gap-2 w-full">
-        <NicknameInput />
-        <PasswordInput />
+      <div className="flex flex-col gap-3 w-full">
+        <AuthField id="login-nickname" label={translate["auth.shared.labels.nickname"]()}>
+          <NicknameInput id="login-nickname" />
+        </AuthField>
+        <AuthField id="login-password" label={translate["auth.shared.labels.password"]()}>
+          <PasswordInput id="login-password" />
+        </AuthField>
+        <Link
+          href={forgotHref}
+          className="self-end text-sm text-neutral-400 duration-150 hover:text-neutral-50"
+        >
+          {translate["auth.login.forgot"]()}
+        </Link>
       </div>
       <LoginPasswordSubmit />
     </form>
   )
 }, 'LoginPassword')
 
-const LoginQRRetry = reatomComponent(({ ctx }) => {
+const LoginQRRetry = reatomComponent<{ reason: "expired" | "error" }>(({ ctx, reason }) => {
   const handleClick = () => {
+    login.qr.generate.errorAtom.reset(ctx);
     const el = ctx.get(qrIconAtom);
     if (!el) return;
 
@@ -87,8 +114,15 @@ const LoginQRRetry = reatomComponent(({ ctx }) => {
   return (
     <div className="flex flex-col w-full items-center justify-center gap-3">
       <p className="text-sm text-neutral-400 text-center">
-        {translate["auth.login.qr.expired"]()}
+        {reason === "error"
+          ? translate["auth.login.qr.error"]()
+          : translate["auth.login.qr.expired"]()}
       </p>
+      {reason === "error" && (
+        <p className="text-xs text-neutral-500 text-center">
+          {translate["auth.login.qr.error-description"]()}
+        </p>
+      )}
       <button
         type="button"
         disabled={ctx.spy(login.qr.generate.statusesAtom).isPending}
@@ -159,15 +193,19 @@ const LoginVerified = () => (
 
 const LOGIN_QR_COMPONENTS: Partial<Record<AuthLoginQRStatus, ReactNode>> = {
   "idle": <LoginQRConnected />,
-  "expired": <LoginQRRetry />,
+  "expired": <LoginQRRetry reason="expired" />,
   "connected": <LoginQRScanned />,
   "declined": <LoginQRDeclined />,
-  "verified": <LoginVerified />
+  "verified": <LoginVerified />,
+  "error": <LoginQRRetry reason="error" />
 }
 
-const LoginQRContent = reatomComponent(({ ctx }) =>
-  LOGIN_QR_COMPONENTS[ctx.spy(loginState.qr.status)], "LoginQRContent"
-)
+const LoginQRContent = reatomComponent(({ ctx }) => {
+  const error = ctx.spy(login.qr.generate.errorAtom)
+  if (error) return <LoginQRRetry reason="error" />
+
+  return LOGIN_QR_COMPONENTS[ctx.spy(loginState.qr.status)]
+}, "LoginQRContent")
 
 const LoginQR = () => {
   return (
@@ -184,24 +222,6 @@ const LoginQR = () => {
   )
 }
 
-// const LoginGame = reatomComponent(({ ctx }) => {
-//   const code = ctx.spy(loginState.game.code)
-//   const isPending = ctx.spy(login.game.generate.statusesAtom).isPending
-//   const isLoading = isPending || !code
-
-//   return (
-//     <div className="flex flex-col items-center gap-4 w-full">
-//       <div className="w-full text-base">
-//         <p>
-//           Введи код в <span className="font-semibold">игре</span> с помощью команды ниже!&nbsp;
-//         </p>
-//         <p className="font-semibold">Никому не сообщай его!</p>
-//       </div>
-//       {isLoading ? <IconLoader /> : <Copy code={`/verify ${code}`} />}
-//     </div>
-//   )
-// }, "LoginGame")
-
 const createLoginVariants = (): { title: string, value: AuthLoginVariant, component: ReactNode }[] => ([
   { title: translate["auth.login.variants.basic"](), value: "password", component: <LoginPassword /> },
   // { title: "Через игру", value: "game", component: <LoginGame /> },
@@ -209,14 +229,15 @@ const createLoginVariants = (): { title: string, value: AuthLoginVariant, compon
 ])
 
 const LoginFormComponent = reatomComponent(({ ctx }) =>
-  createLoginVariants().find(d => d.value === ctx.spy(authLoginVariantAtom))?.component, "LoginFormComponent"
-)
+  createLoginVariants().find(d => d.value === ctx.spy(authLoginVariantAtom))?.component, "LoginFormComponent")
 
-export const LoginForm = () => {
+export const LoginForm = reatomComponent(({ ctx }) => {
+  const active = ctx.spy(authLoginVariantAtom)
+
   return (
     <div className="flex flex-col gap-6 w-full h-full">
       <LoginFormComponent />
-      <div className="flex flex-col w-full gap-2 items-center justify-center">
+      <div className={`flex flex-col w-full gap-2 items-center justify-center ${active === "password" ? "max-sm:hidden" : ""}`}>
         <div className="flex items-center w-full gap-4">
           <Separator className="flex-1" />
           <span className="shrink-0 text-sm text-neutral-50">
@@ -228,4 +249,4 @@ export const LoginForm = () => {
       </div>
     </div>
   )
-}
+}, "LoginForm")

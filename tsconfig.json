@@ -3,5 +3,6 @@
 	"references": [
 		{ "path": "./apps/minotaur" },
 		{ "path": "./apps/taurus" },
+		{ "path": "./apps/wiki" },
 	]
 }
