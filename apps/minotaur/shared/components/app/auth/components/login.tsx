@@ -54,9 +54,10 @@ const LoginPasswordSubmit = reatomComponent(({ ctx }) => {
 }, "LoginPasswordSubmit")
 
 const LoginPassword = reatomComponent(({ ctx }) => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    void spawn(ctx, (spawnCtx) => login.basic.submit(spawnCtx))
+
+    spawn(ctx, (spawnCtx) => login.basic.submit(spawnCtx))
       .then(() => focusFirstAuthError(ctx))
   }
 
@@ -114,7 +115,10 @@ const LoginQRRetry = reatomComponent<{ reason: "expired" | "error" }>(({ ctx, re
         aria-label={translate["auth.login.qr.refresh"]()}
         className="group cursor-pointer active:scale-[0.98] duration-150 flex items-center gap-2"
       >
-        <Icon name='sprite:refresh' className={`size-[32px] text-neutral-200 ${isPending ? "animate-spin" : ""}`} />
+        <Icon
+          name='sprite:refresh'
+          className={`size-8 text-neutral-200 ${isPending ? "animate-spin" : ""}`}
+        />
         <span className="text-sm font-semibold">{translate["auth.login.qr.refresh"]()}</span>
       </button>
     </div>
@@ -144,7 +148,7 @@ const LoginQRConnected = reatomComponent(({ ctx }) => {
 
 const LoginQRDeclined = reatomComponent(({ ctx }) => (
   <div className="flex flex-col w-full items-center justify-center gap-3">
-    <Icon name="sprite:hand-stop" className="size-[32px] text-red-600" />
+    <Icon name="sprite:hand-stop" className="size-8 text-red-600" />
     <p className="text-sm text-neutral-400 text-center">
       {translate["auth.login.qr.declined"]()}
     </p>
@@ -169,7 +173,7 @@ const LoginQRScanned = () => (
 
 const LoginVerified = () => (
   <div className="flex flex-col w-full items-center justify-center gap-4">
-    <Icon name="sprite:check" className="size-[32px] text-green-600" />
+    <Icon name="sprite:check" className="size-8 text-green-600" />
   </div>
 )
 
@@ -204,13 +208,27 @@ const LoginQR = () => {
   )
 }
 
-const createLoginVariants = (): { title: string, value: AuthLoginVariant, component: ReactNode }[] => ([
-  { title: translate["auth.login.variants.basic"](), value: "password", component: <LoginPassword /> },
-  { title: translate["auth.login.variants.qr"](), value: "qr", component: <LoginQR /> }
+const createLoginVariants = (): {
+  title: string,
+  value: AuthLoginVariant,
+  component: ReactNode
+}[] => ([
+  {
+    title: translate["auth.login.variants.basic"](),
+    value: "password",
+    component: <LoginPassword />
+  },
+  {
+    title: translate["auth.login.variants.qr"](),
+    value: "qr",
+    component: <LoginQR />
+  }
 ])
 
 const LoginFormComponent = reatomComponent(({ ctx }) =>
-  createLoginVariants().find(d => d.value === ctx.spy(authLoginVariantAtom))?.component, "LoginFormComponent")
+  createLoginVariants().find(d => d.value === ctx.spy(authLoginVariantAtom))?.component,
+  "LoginFormComponent"
+)
 
 export const LoginForm = reatomComponent(({ ctx }) => {
   const active = ctx.spy(authLoginVariantAtom)
@@ -218,7 +236,8 @@ export const LoginForm = reatomComponent(({ ctx }) => {
   return (
     <div className="flex flex-col gap-6 w-full h-full">
       <LoginFormComponent />
-      <div className={`flex flex-col w-full gap-2 items-center justify-center ${active === "password" ? "max-sm:hidden" : ""}`}>
+      <div className={`flex flex-col w-full gap-2 items-center justify-center
+        ${active === "password" ? "max-sm:hidden" : ""}`}>
         <div className="flex items-center w-full gap-4">
           <Separator className="flex-1" />
           <span className="shrink-0 text-sm text-neutral-50">

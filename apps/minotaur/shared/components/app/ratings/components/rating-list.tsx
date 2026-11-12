@@ -1,341 +1,463 @@
-import {
-  type RatingBelkoin,
-  type RatingCharism,
-  type RatingLands,
-  type RatingParkour,
-  type RatingPlaytime,
-  type RatingReputation
-} from "@/shared/schemas/rating"
 import { reatomComponent } from "@reatom/npm-react";
-import { Skeleton } from "@/shared/ui/skeleton";
 import { type ReactNode } from "react";
-import { type AtomState } from "@reatom/framework";
-import { ratingsState, ratings, RatingsViewer } from "../models/ratings.model";
-import { Icon } from "@/shared/ui/icon"
+import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
-import { Avatar } from "../../../../ui/avatar";
-import { Link } from "@/shared/components/config/link/link";
-import { dayjs } from "@/shared/lib/dayjs"
-import { PageLoader } from "@/shared/ui/page-loader";
-import { Typography } from "@/shared/ui/typography";
 import { ErrorBlock } from "@/shared/ui/error-block";
+import { Icon } from "@/shared/ui/icon";
+import { Link } from "@/shared/components/config/link/link";
 import { createLink } from "@/shared/components/config/link/link.model";
+import { Skeleton } from "@/shared/ui/skeleton";
+import {
+  Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow
+} from "@/shared/ui/table";
+import { Typography } from "@/shared/ui/typography";
+import { currentUserState } from "@/shared/models/current-user/index.model";
+import { rating, ratings, ratingsState, RatingsViewer } from "../models/ratings.model";
+import { getRatingTypeLabel, getServerLabel, type RatingType } from "../labels";
+import { formatDuration, formatNumber } from "../format";
 import { translate } from "@/shared/locales/helpers";
 
-const RatingListParkourHeaderU = () => {
+const MEDAL_COLORS = ["text-yellow-400", "text-neutral-300", "text-amber-600"];
+
+const RankCell = ({ idx }: { idx: number }) => (
+  <span className="inline-flex items-center gap-1.5 font-semibold tabular-nums">
+    {idx < 3 && <Icon name="sprite:trophy" className={`size-4 ${MEDAL_COLORS[idx]}`} />}
+    <span className={idx < 3 ? "text-neutral-200" : "text-neutral-400"}>{idx + 1}</span>
+  </span>
+);
+
+const UserHead = reatomComponent<{ nickname?: string | null, avatar?: string }>(({ ctx, nickname, avatar }) => {
+  const current = ctx.spy(currentUserState)?.nickname;
+  const name = nickname || "—";
+  const isSelf = !!nickname && current === nickname;
+
+  const content = (
+    <>
+      <Avatar nickname={name} url={avatar ?? ""} className="w-7 h-7" />
+      <span className="font-medium text-sm truncate">{name}</span>
+      {isSelf && (
+        <span className="rounded bg-green-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-green-400">
+          {translate["ratings.you"]()}
+        </span>
+      )}
+    </>
+  );
+
+  if (!nickname) return <span className="flex items-center gap-2 min-w-0">{content}</span>;
+
   return (
-    <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-10">#</TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.player"]()}
-      </TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.map"]()}
-      </TableHead>
-      <TableHead className="text-right capitalize">
-        {translate["parkour.score"]()}
-      </TableHead>
-    </TableRow>
-  )
+    <Link href={createLink("player", nickname)} className="flex items-center gap-2 min-w-0">
+      {content}
+    </Link>
+  );
+}, "UserHead");
+
+const NumberCell = ({ value }: { value: number | null | undefined }) => (
+  <span className="tabular-nums whitespace-nowrap">{formatNumber(value)}</span>
+);
+
+const DurationCell = ({ value }: { value: number | null | undefined }) => (
+  <span className="tabular-nums whitespace-nowrap text-neutral-300">{formatDuration(value)}</span>
+);
+
+const LandName = ({ name, ulid }: { name?: string | null, ulid?: string }) => {
+  if (!ulid) return <span>{name || "—"}</span>;
+
+  return <Link href={createLink("land", ulid)}>{name || "—"}</Link>;
+};
+
+type Column = {
+  key: string,
+  label: () => string,
+  align?: "left" | "right",
+  className?: string,
+  render: (row: any, idx: number) => ReactNode
 }
 
-const RatingListCharismHeaderU = () => {
-  return (
-    <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-10">#</TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.player"]()}
-      </TableHead>
-      <TableHead className="text-right capitalize">
-        {translate["parkour.charism"]()}
-      </TableHead>
-    </TableRow>
-  )
+type TableConfig = {
+  columns: Column[],
+  rowKey: (row: any, idx: number) => string,
+  nickname?: (row: any) => string | undefined
 }
 
-const RatingListBelkoinHeaderU = () => {
-  return (
-    <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-10">#</TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.player"]()}
-      </TableHead>
-      <TableHead className="text-right capitalize">
-        {translate["parkour.belkoin"]()}
-      </TableHead>
-    </TableRow>
-  )
+const rankColumn: Column = {
+  key: "rank",
+  label: () => translate["ratings.columns.rank"](),
+  className: "w-14",
+  render: (_, idx) => <RankCell idx={idx} />
 }
 
-const TableRowsSkeleton = () => {
-  return (
-    <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-10">
-        <Skeleton className="h-8 w-8" />
-      </TableHead>
-      <TableHead>
-        <Skeleton className="h-10 w-24" />
-      </TableHead>
-      <TableHead>
-        <Skeleton className="h-10 w-full" />
-      </TableHead>
-    </TableRow>
-  )
+const playerColumn: Column = {
+  key: "player",
+  label: () => translate["ratings.columns.player"](),
+  render: (row) => <UserHead nickname={row.nickname} avatar={row.avatar} />
 }
 
-const RatingListReputationHeaderU = () => {
-  return (
-    <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-10">#</TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.player"]()}
-      </TableHead>
-      <TableHead className="text-right capitalize">
-        {translate["parkour.reputation"]()}
-      </TableHead>
-    </TableRow>
-  )
-}
-
-const RatingListPlaytimeHeaderU = () => {
-  return (
-    <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-10">#</TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.player"]()}
-      </TableHead>
-      <TableHead className="text-right capitalize">
-        {translate["parkour.playtime"]()}
-      </TableHead>
-    </TableRow>
-  )
-}
-
-const RatingListLandsHeaderU = () => {
-  return (
-    <TableRow className="*:font-semibold *:text-base">
-      <TableHead className="w-10">#</TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.lands"]()}
-      </TableHead>
-      <TableHead className="capitalize">
-        {translate["parkour.chunks"]()}
-      </TableHead>
-      <TableHead className="text-right capitalize">
-        {translate["parkour.type"]()}
-      </TableHead>
-    </TableRow>
-  )
-}
-
-const RatingTableBodyParkour = reatomComponent(({ ctx }) => {
-  const data = ctx.spy(ratingsState.data) as RatingParkour[]
-  if (!data) return null
-
-  return (
-    data.map((user, idx) => (
-      <TableRow key={user.nickname}>
-        <TableCell className="font-medium">{idx + 1}</TableCell>
-        <TableCell>
-          <UserHead nickname={user.nickname!} avatar={user.avatar} />
-        </TableCell>
-        <TableCell>{user.area}</TableCell>
-        <TableHead className="text-right">{user.score}</TableHead>
-      </TableRow>
-    ))
-  )
-})
-
-const RatingTableBodyBelkoin = reatomComponent(({ ctx }) => {
-  const data = ctx.spy(ratingsState.data) as RatingBelkoin[]
-  if (!data) return null
-
-  return (
-    data.map((user, idx) => (
-      <TableRow key={user.nickname}>
-        <TableCell className="font-medium">{idx + 1}</TableCell>
-        <TableCell>
-          <UserHead nickname={user.nickname} avatar={user.avatar} />
-        </TableCell>
-        <TableHead className="text-right">{formatNumber(user.balance)}</TableHead>
-      </TableRow>
-    ))
-  )
-})
-
-const RatingTableBodyReputation = reatomComponent(({ ctx }) => {
-  const data = ctx.spy(ratingsState.data) as RatingReputation[]
-  if (!data) return null
-
-  return (
-    data.map((user, idx) => (
-      <TableRow key={user.nickname}>
-        <TableCell className="font-medium">{idx + 1}</TableCell>
-        <TableCell>
-          <UserHead nickname={user.nickname} avatar={user.avatar} />
-        </TableCell>
-        <TableHead className="text-right">{user.reputation}</TableHead>
-      </TableRow>
-    ))
-  )
-})
-
-function formatNumber(n: number): number | string | null {
-  try {
-    return Number.isInteger(n) ? n : n.toFixed(2);
-  } catch (e) {
-    console.error('formatNumber error:', e);
-    return null;
+const RATING_TABLE: Record<RatingType, TableConfig> = {
+  playtime: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "total",
+        label: () => translate["ratings.columns.totalTime"](),
+        align: "right",
+        render: (row) => <DurationCell value={row.total} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  lands: {
+    columns: [
+      rankColumn,
+      {
+        key: "land",
+        label: () => translate["ratings.columns.land"](),
+        render: (row) => <LandName name={row.name} ulid={row.ulid} />
+      },
+      {
+        key: "chunks",
+        label: () => translate["ratings.columns.chunks"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.chunks_amount} />
+      },
+      {
+        key: "type",
+        label: () => translate["ratings.columns.type"](),
+        align: "right",
+        render: (row) => <span className="text-neutral-300">{row.type || "—"}</span>
+      }
+    ],
+    rowKey: (row, idx) => `${row.ulid ?? row.land ?? "land"}-${idx}`
+  },
+  reputation: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "reputation",
+        label: () => translate["ratings.columns.reputation"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.reputation} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.uuid ?? row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  charism: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "charism",
+        label: () => translate["ratings.columns.charism"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.balance} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  belkoin: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "belkoin",
+        label: () => translate["ratings.columns.belkoin"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.balance} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  parkour: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "map",
+        label: () => translate["ratings.columns.map"](),
+        render: (row) => <span className="text-neutral-300">{row.area || "—"}</span>
+      },
+      {
+        key: "score",
+        label: () => translate["ratings.columns.score"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.score} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? row.player ?? "row"}-${row.area ?? "area"}-${idx}`,
+    nickname: (row) => row.nickname
   }
 }
 
-const RatingTableBodyCharism = reatomComponent(({ ctx }) => {
-  const data = ctx.spy(ratingsState.data) as RatingCharism[]
-  if (!data) return null
+const currentTable = (type: RatingType) => RATING_TABLE[type] ?? RATING_TABLE.playtime;
+
+const RatingTableHeader = ({ config }: { config: TableConfig }) => (
+  <TableRow>
+    {config.columns.map((column) => (
+      <TableHead
+        key={column.key}
+        className={`${column.align === "right" ? "text-right" : ""} ${column.className ?? ""}`}
+      >
+        {column.label()}
+      </TableHead>
+    ))}
+  </TableRow>
+)
+
+const RatingTable = reatomComponent(({ ctx }) => {
+  const type = ctx.spy(ratingsState.filters.by);
+  const config = currentTable(type);
+  const data = (ctx.spy(ratingsState.data) ?? []) as any[];
+  const current = ctx.spy(currentUserState)?.nickname;
 
   return (
-    data.map((user, idx) => (
-      <TableRow key={user.nickname}>
-        <TableCell className="font-medium">{idx + 1}</TableCell>
-        <TableCell>
-          <UserHead nickname={user.nickname} avatar={user.avatar} />
-        </TableCell>
-        <TableHead className="text-right">{formatNumber(user.balance)}</TableHead>
-      </TableRow>
-    ))
+    <Table>
+      <TableCaption>{translate["ratings.caption"]()}</TableCaption>
+      <TableHeader>
+        <RatingTableHeader config={config} />
+      </TableHeader>
+      <TableBody>
+        {data.map((row, idx) => {
+          const isSelf = !!current && config.nickname?.(row) === current;
+
+          return (
+            <TableRow
+              key={config.rowKey(row, idx)}
+              className={isSelf ? "bg-green-900/10 hover:bg-green-900/20" : undefined}
+            >
+              {config.columns.map((column) => (
+                <TableCell
+                  key={column.key}
+                  className={column.align === "right" ? "text-right" : ""}
+                >
+                  {column.render(row, idx)}
+                </TableCell>
+              ))}
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
   )
-}, "RatingTableBodyCharism")
+}, "RatingTable")
 
-const RatingTableBodyLands = reatomComponent(({ ctx }) => {
-  const data = ctx.spy(ratingsState.data) as RatingLands[]
-  if (!data) return null
+const RatingTableSkeleton = reatomComponent(({ ctx }) => {
+  const config = currentTable(ctx.spy(ratingsState.filters.by));
 
   return (
-    data.map((land, idx) => (
-      <TableRow key={idx}>
-        <TableCell className="font-medium">{idx + 1}</TableCell>
-        <TableCell>
-          <Link href={createLink("land", land.ulid)}>
-            {land.name}
-          </Link>
-        </TableCell>
-        <TableCell>{land.chunks_amount}</TableCell>
-        <TableHead className="text-right">{land.type}</TableHead>
-      </TableRow>
-    ))
+    <Table>
+      <TableHeader>
+        <RatingTableHeader config={config} />
+      </TableHeader>
+      <TableBody>
+        {Array.from({ length: 8 }).map((_, idx) => (
+          <TableRow key={idx}>
+            {config.columns.map((column) => (
+              <TableCell key={column.key}>
+                <Skeleton className={`h-5 ${column.key === "rank" ? "w-8" : "w-full"}`} />
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   )
-}, "RatingTableBodyLands")
+}, "RatingTableSkeleton")
 
-const RatingsFilter = reatomComponent(({ ctx }) => {
-  const current = ctx.spy(ratingsState.filters.asc);
+const pillClass = (active: boolean) => `shrink-0 rounded-xl px-3 py-2 text-sm font-semibold duration-150 ${
+  active
+    ? "bg-neutral-50 text-neutral-950"
+    : "bg-neutral-900 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
+}`
+
+const RatingPills = reatomComponent(({ ctx }) => {
+  const groups = ctx.spy(rating.fetch.dataAtom) ?? [];
+  const currentServer = ctx.spy(ratingsState.filters.server);
+  const currentType = ctx.spy(ratingsState.filters.by);
+
+  if (!groups.length) return null;
+
+  const group = groups.find((item) => item.key === currentServer);
+  const typeFor = (item: (typeof groups)[number]) =>
+    item.childs.some((child) => child.value === currentType)
+      ? currentType
+      : item.childs[0]?.value;
 
   return (
-    <Button
-      aria-label={translate["ratings.sort"]()}
-      className='bg-neutral-800 hover:bg-neutral-700 aspect-square text-neutral-400 h-11 w-11 p-1'
-      onClick={() => ratingsState.filters.asc(ctx, (state) => !state)}
-    >
-      {current ? <Icon name="sprite:arrow-down" /> : <Icon name="sprite:arrow-up" />}
-    </Button>
-  )
-}, "RatingsFilter")
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-1 overflow-x-auto pb-1">
+        {groups.map((item) => {
+          const nextType = typeFor(item);
+          if (!nextType) return null;
 
-const RatingsHeader = () => {
-  return (
-    <div className="flex items-center justify-between w-full">
-      <RatingsFilter />
+          return (
+            <Link
+              key={item.key}
+              href={`/ratings/${item.key}/${nextType}`}
+              aria-current={item.key === currentServer ? "page" : undefined}
+              className={pillClass(item.key === currentServer)}
+            >
+              {getServerLabel(item.key, item.title)}
+            </Link>
+          )
+        })}
+      </div>
+      {group && (
+        <div className="flex gap-1 overflow-x-auto pb-1">
+          {group.childs.map((child) => (
+            <Link
+              key={child.value}
+              href={`/ratings/${group.key}/${child.value}`}
+              aria-current={child.value === currentType ? "page" : undefined}
+              className={pillClass(child.value === currentType)}
+            >
+              {getRatingTypeLabel(child.value, child.title)}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
-}
+}, "RatingPills")
 
-const UserHead = ({ nickname, avatar }: { nickname: string, avatar: string }) => {
+const SortControl = reatomComponent(({ ctx }) => {
+  const asc = ctx.spy(ratingsState.filters.asc);
+
+  const set = (value: boolean) => ratingsState.filters.asc(ctx, value);
+
   return (
-    <Link href={createLink("player", nickname)} className="flex items-center gap-2">
-      <Avatar
-        nickname={nickname}
-        className="w-6 h-6"
-        url={avatar}
-      />
-      <span className="font-semibold text-base truncate min-w-0">
-        {nickname}
+    <div className="flex items-center gap-2">
+      <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        {translate["ratings.sort.label"]()}
       </span>
-    </Link>
+      <div className="flex rounded-xl bg-neutral-900 p-1">
+        <button
+          type="button"
+          aria-pressed={!asc}
+          onClick={() => set(false)}
+          className={`rounded-lg px-3 py-1.5 text-xs font-semibold duration-150 ${
+            !asc ? "bg-neutral-50 text-neutral-950" : "text-neutral-400 hover:text-neutral-100"
+          }`}
+        >
+          {translate["ratings.sort.best"]()}
+        </button>
+        <button
+          type="button"
+          aria-pressed={asc}
+          onClick={() => set(true)}
+          className={`rounded-lg px-3 py-1.5 text-xs font-semibold duration-150 ${
+            asc ? "bg-neutral-50 text-neutral-950" : "text-neutral-400 hover:text-neutral-100"
+          }`}
+        >
+          {translate["ratings.sort.worst"]()}
+        </button>
+      </div>
+    </div>
   )
-}
+}, "SortControl")
 
-const RatingTableBodyPlaytime = reatomComponent(({ ctx }) => {
-  const data = ctx.spy(ratingsState.data) as RatingPlaytime[]
-  if (!data) return null
+const RatingsToolbar = reatomComponent(({ ctx }) => (
+  <div className="flex flex-col gap-3">
+    <RatingPills />
+    <div className="flex items-center justify-between gap-3">
+      <SortControl />
+    </div>
+  </div>
+), "RatingsToolbar")
+
+const RatingsEmpty = () => (
+  <div className="flex flex-col items-center gap-2 py-16 text-center">
+    <Icon name="sprite:trophy" className="size-8 text-neutral-600" />
+    <Typography className="text-lg font-semibold">
+      {translate["ratings.empty.title"]()}
+    </Typography>
+    <Typography color="gray" className="text-sm">
+      {translate["ratings.empty.description"]()}
+    </Typography>
+    <Link
+      href="/"
+      className="mt-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold duration-150 hover:bg-green-500"
+    >
+      {translate["ratings.empty.action"]()}
+    </Link>
+  </div>
+)
+
+const RatingsError = reatomComponent(({ ctx }) => {
+  const isPending = ctx.spy(ratings.fetch.statusesAtom).isPending
 
   return (
-    data.map((user, idx) => (
-      <TableRow key={user.nickname}>
-        <TableCell className="font-medium">{idx + 1}</TableCell>
-        <TableCell>
-          <UserHead nickname={user.nickname} avatar={user.avatar} />
-        </TableCell>
-        <TableHead className="text-right">
-          {Math.floor(dayjs.duration(user.total ?? 0).asHours())} часа(-ов)
-        </TableHead>
-      </TableRow>
-    ))
+    <div className="flex flex-col gap-3">
+      <ErrorBlock title={ctx.spy(ratings.fetch.errorAtom)?.message || translate["ratings.error"]()} />
+      <Button
+        background="default"
+        className="w-fit"
+        disabled={isPending}
+        withSpinner
+        isLoading={isPending}
+        onClick={() => ratings.fetch(ctx)}
+      >
+        {translate["ratings.retry"]()}
+      </Button>
+    </div>
   )
-}, "RatingTableBodyPlaytime")
+}, "RatingsError")
 
-const HEADERS: Record<AtomState<typeof ratingsState.filters.by>, ReactNode> = {
-  "lands": <RatingListLandsHeaderU />,
-  "parkour": <RatingListParkourHeaderU />,
-  "playtime": <RatingListPlaytimeHeaderU />,
-  "belkoin": <RatingListBelkoinHeaderU />,
-  "reputation": <RatingListReputationHeaderU />,
-  "charism": <RatingListCharismHeaderU />
-}
+const LoadMore = reatomComponent(({ ctx }) => {
+  const meta = ctx.spy(ratingsState.meta);
+  const isPending = ctx.spy(ratings.update.statusesAtom).isPending;
+  const error = ctx.spy(ratings.update.errorAtom);
+  const hasMore = !!meta?.hasNextPage && !!meta.endCursor;
 
-export const COMPONENTS: Record<AtomState<typeof ratingsState.filters.by>, ReactNode> = {
-  "playtime": <RatingTableBodyPlaytime />,
-  "lands": <RatingTableBodyLands />,
-  "reputation": <RatingTableBodyReputation />,
-  "charism": <RatingTableBodyCharism />,
-  "belkoin": <RatingTableBodyBelkoin />,
-  "parkour": <RatingTableBodyParkour />
-}
+  if (!hasMore && !error) return null;
 
-const RatingTableHeader = reatomComponent(({ ctx }) => HEADERS[ctx.spy(ratingsState.filters.by)], "RatingTableHeader")
-const RatingTableBody = reatomComponent(({ ctx }) => {
-  if (!ctx.spy(ratingsState.data) && ctx.spy(ratings.update.statusesAtom).isPending) {
-    return Array.from({ length: 32 }).map((_, idx) => <TableRowsSkeleton key={idx} />)
-  }
-
-  return COMPONENTS[ctx.spy(ratingsState.filters.by)]
-}, "RatingTableBody")
+  return (
+    <div className="flex flex-col items-center gap-2 py-4">
+      {error && <ErrorBlock title={error.message} />}
+      <Button
+        background="default"
+        onClick={() => ratings.loadMore(ctx)}
+        disabled={isPending}
+        withSpinner
+        isLoading={isPending}
+      >
+        {isPending
+          ? translate["ratings.loadingMore"]()
+          : hasMore
+            ? translate["ratings.loadMore"]()
+            : translate["ratings.retry"]()}
+      </Button>
+    </div>
+  )
+}, "LoadMore")
 
 export const Ratings = reatomComponent(({ ctx }) => {
-  if (ctx.spy(ratings.fetch.statusesAtom).isPending) return <PageLoader />
-
+  const data = ctx.spy(ratingsState.data);
   const error = ctx.spy(ratings.fetch.errorAtom);
-  if (error) return <ErrorBlock title={error.message} />
-
-  if (!ctx.spy(ratingsState.data)) {
-    return (
-      <Typography color="gray" className="text-lg">
-        {translate["ratings.empty"]()}
-      </Typography>
-    )
-  }
+  const isPending = ctx.spy(ratings.fetch.statusesAtom).isPending;
+  const isLoaded = ctx.spy(ratingsState.loaded);
 
   return (
-    <>
-      <Table>
-        <TableCaption>Рейтинг</TableCaption>
-        <TableHeader>
-          <RatingTableHeader />
-        </TableHeader>
-        <TableBody>
-          <RatingTableBody />
-        </TableBody>
-      </Table>
-      <RatingsViewer />
-    </>
+    <div className="flex flex-col gap-4 w-full">
+      <RatingsToolbar />
+      {!data && error
+        ? <RatingsError />
+        : !data && (!isLoaded || isPending)
+          ? <RatingTableSkeleton />
+          : !data
+            ? <RatingsEmpty />
+            : (
+              <>
+                <RatingTable />
+                <RatingsViewer />
+                <LoadMore />
+              </>
+            )}
+    </div>
   )
 }, "Ratings")

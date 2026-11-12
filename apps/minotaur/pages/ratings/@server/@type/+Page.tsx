@@ -1,5 +1,6 @@
 import { Ratings } from "@/shared/components/app/ratings/components/rating-list";
-import { ratings, ratingsState } from "@/shared/components/app/ratings/models/ratings.model";
+import { isRatingType } from "@/shared/components/app/ratings/labels";
+import { rating, ratings, ratingsState } from "@/shared/components/app/ratings/models/ratings.model";
 import { createPageModel } from "@/shared/lib/events";
 import { pageState } from "@/shared/models/page-context.model";
 import { useAtom } from "@reatom/npm-react";
@@ -10,28 +11,35 @@ const page = createPageModel({
     onConnect: (ctx) => {
       const routeParams = ctx.get(pageState.routeParams)
 
-      ratingsState.filters.by(ctx, routeParams.id);
+      if (!isRatingType(routeParams.type) || !routeParams.server) return;
+
+      ratingsState.filters.by(ctx, routeParams.type);
       ratingsState.filters.server(ctx, routeParams.server);
 
+      rating.fetch(ctx);
       ratings.fetch(ctx)
     },
     onSpy: (ctx, _, routeParams) => {
-      if (!routeParams.id || !routeParams.server) return;
+      if (!isRatingType(routeParams.type) || !routeParams.server) return;
 
       const by = ctx.get(ratingsState.filters.by);
       const server = ctx.get(ratingsState.filters.server);
 
       // The page component stays mounted when only the route params change,
       // so the filter atoms have to be compared instead of relying on onConnect.
-      if (by === routeParams.id && server === routeParams.server) return;
+      if (by === routeParams.type && server === routeParams.server) return;
 
-      ratingsState.filters.by(ctx, routeParams.id);
+      ratingsState.filters.by(ctx, routeParams.type);
       ratingsState.filters.server(ctx, routeParams.server);
       ratingsState.filters.endCursor.reset(ctx);
       ratings.update.abort(ctx);
 
       ratings.fetch(ctx)
     },
+    onDisconnect: (ctx) => {
+      ratings.fetch.abort(ctx);
+      ratings.update.abort(ctx);
+    }
   },
   spyedAtom: pageState.routeParams
 })

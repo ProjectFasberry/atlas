@@ -279,13 +279,52 @@
   },
   "ratings": {
     "page": {
-      "title": "Player rankings",
+      "title": "Server rankings",
       "description": "Current player rankings across different categories"
     },
     "title": "Server rankings",
-    "goTo": "View leaderboard",
-    "sort": "Sort",
-    "empty": "The rating is empty for now"
+    "caption": "Leaderboard",
+    "columns": {
+      "rank": "#",
+      "player": "Player",
+      "totalTime": "Total time",
+      "land": "Land",
+      "chunks": "Chunks",
+      "type": "Type",
+      "reputation": "Reputation",
+      "charism": "Charisma",
+      "belkoin": "Belkoin",
+      "map": "Map",
+      "score": "Score"
+    },
+    "types": {
+      "playtime": "Playtime",
+      "lands": "Lands",
+      "reputation": "Reputation",
+      "charism": "Charisma",
+      "belkoin": "Belkoin",
+      "parkour": "Parkour"
+    },
+    "servers": {
+      "global": "Global",
+      "bisquite": "Bisquite",
+      "muffin": "Muffin"
+    },
+    "sort": {
+      "label": "Sort",
+      "best": "Best first",
+      "worst": "Worst first"
+    },
+    "loadMore": "Load more",
+    "loadingMore": "Loading...",
+    "retry": "Retry",
+    "empty": {
+      "title": "No rankings yet",
+      "description": "Play on the server and be the first on the list.",
+      "action": "Play"
+    },
+    "error": "Could not load the ranking",
+    "you": "You"
   },
   "rating": {
     "page": {
@@ -528,19 +567,6 @@
     },
     "loading": "Preparing your order",
     "title": "Storage"
-  },
-  "parkour": {
-    "player": "player",
-    "map": "map",
-    "score": "score",
-    "time": "time",
-    "charism": "charisma",
-    "belkoin": "belkoin",
-    "chunks": "chunks",
-    "lands": "territories",
-    "type": "type",
-    "playtime": "total time",
-    "reputation": "reputation"
   },
   "map": {
     "page": {

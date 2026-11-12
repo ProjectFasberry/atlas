@@ -5,7 +5,7 @@ import { type PageContextServer } from 'vike/types'
 import { logRouting } from '@/shared/lib/log'
 import { translate } from '@/shared/locales/helpers'
 
-const image = getStaticImage("arts/adventure-in-blossom.jpg")
+const image = getStaticImage("arts/sand-camel.jpg")
 
 function metadata() {
   const title = wrapTitle(translate["ratings.page.title"]())
