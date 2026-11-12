@@ -751,7 +751,7 @@
   "team": {
     "join": {
       "title": "Join the project team",
-      "description": "We are looking for builders, developers, designers, moderators and content people. Tell us about yourself and we will reply on Telegram.",
+      "description": "We are looking for builders, developers, designers, moderators and content people. Tell us about yourself and we will reply to the contact you choose.",
       "roles": "Roles",
       "about": "About you",
       "about-placeholder": "Experience, skills and how much time you can give the project",
@@ -762,7 +762,7 @@
       "cap-note": "We will ask you to pass a bot check before sending.",
       "error": "Could not send",
       "success-title": "Application sent",
-      "success-text": "Thanks! We will review it and message you on Telegram.",
+      "success-text": "Thanks! We will review it and message the contact you chose.",
       "cta": "Join the team",
       "badge": "Hiring",
       "contact": "How to reach you",
@@ -786,7 +786,24 @@
       "role-content": "Content and translations",
       "role-content-desc": "Texts, guides, news and localization",
       "role-other": "Other",
-      "role-other-desc": "Tell us how you can help"
+      "role-other-desc": "Tell us how you can help",
+      "back-home": "Back to home",
+      "about-hint": "At least 40 characters",
+      "contact-telegram-placeholder": "@nickname",
+      "contact-email-placeholder": "name@example.com",
+      "errors": {
+        "roles-required": "Choose at least one role",
+        "about-too-short": "Tell us a bit more - at least 40 characters",
+        "about-too-long": "The about section is too long",
+        "telegram-required": "Enter your Telegram nickname",
+        "telegram-too-long": "The Telegram nickname is too long",
+        "email-invalid": "Enter a valid email",
+        "email-too-long": "The email is too long",
+        "portfolio-too-long": "The portfolio is too long",
+        "cap-failed": "Verification failed. Try again",
+        "rate-limited": "Too many applications. Try again later",
+        "generic": "Could not send the application. Try again"
+      }
     }
   },
   "report": {
@@ -799,6 +816,13 @@
     "contact-title": "Where to write",
     "discord": "Open Discord",
     "telegram": "Message on Telegram",
-    "rules": "Project rules"
+    "rules": "Project rules",
+    "badge": "Support",
+    "include-title": "What to include",
+    "include-1": "Nickname and server",
+    "include-2": "Date and time",
+    "include-3": "Screenshots or video",
+    "include-4": "Payment receipt if the issue is about a purchase",
+    "tip": "The more details, the faster we can look into it."
   }
 }

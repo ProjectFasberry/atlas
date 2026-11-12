@@ -12,13 +12,31 @@ export const joinState = atom(null, "joinState").pipe(
     contact: atom("", `${name}.contact`).pipe(withReset()),
     portfolio: atom("", `${name}.portfolio`).pipe(withReset()),
     token: atom<string | null>(null, `${name}.token`).pipe(withReset()),
-    error: atom<string | null>(null, `${name}.error`),
-    submitted: atom(false, `${name}.submitted`),
-    isProcessing: atom(false, `${name}.isProcessing`),
+    error: atom<string | null>(null, `${name}.error`).pipe(withReset()),
+    submitted: atom(false, `${name}.submitted`).pipe(withReset()),
+    isProcessing: atom(false, `${name}.isProcessing`).pipe(withReset()),
   }))
 )
 
+export const resetJoin = action((ctx) => {
+  joinState.roles.reset(ctx)
+  joinState.about.reset(ctx)
+  joinState.contactType.reset(ctx)
+  joinState.contact.reset(ctx)
+  joinState.portfolio.reset(ctx)
+  joinState.token.reset(ctx)
+  joinState.error.reset(ctx)
+  joinState.submitted.reset(ctx)
+  joinState.isProcessing.reset(ctx)
+  pof.resetAll(ctx)
+}, "resetJoin")
+
+export const clearJoinError = action((ctx) => {
+  joinState.error.reset(ctx)
+}, "clearJoinError")
+
 export const toggleJoinRole = action((ctx, role: TeamRole) => {
+  clearJoinError(ctx)
   joinState.roles(ctx, (roles) =>
     roles.includes(role) ? roles.filter((item) => item !== role) : [...roles, role]
   )
@@ -88,7 +106,11 @@ export const submitJoin = action((ctx) => {
     joinState.contact.reset(ctx)
     joinState.portfolio.reset(ctx)
   }).catch((error: unknown) => {
-    joinState.error(ctx, error instanceof Error ? error.message : String(error))
+    const code = error instanceof Error && error.message === "RATE_LIMITED"
+      ? "RATE_LIMITED"
+      : "GENERIC"
+
+    joinState.error(ctx, code)
   }).finally(() => {
     joinState.isProcessing(ctx, false)
   })

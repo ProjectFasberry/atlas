@@ -32,7 +32,7 @@ const WIDGETS_SOURCES: Map<string, WidgetItem> = new Map([
   [WIDGET_IDS.AUTH_REQUIRED, {
     cd: atom((ctx) => {
       const pathname = ctx.spy(pageState.urlPathname)
-      if (pathname.startsWith("/auth") || pathname.startsWith("/ratings")) return true;
+      if (pathname.startsWith("/auth") || pathname.startsWith("/ratings") || pathname.startsWith("/report")) return true;
 
       const isHiddenByUser = ctx.spy(widgetsState.data)[WIDGET_IDS.AUTH_REQUIRED]
       if (isHiddenByUser === false) return true;
