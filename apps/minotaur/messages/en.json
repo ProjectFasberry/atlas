@@ -326,11 +326,6 @@
     "error": "Could not load the ranking",
     "you": "You"
   },
-  "rating": {
-    "page": {
-      "title": "{type} ranking, server {server}"
-    }
-  },
   "land": {
     "not-found": "It seems this region no longer exists",
     "editing": {

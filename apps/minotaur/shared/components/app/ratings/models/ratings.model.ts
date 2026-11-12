@@ -17,6 +17,12 @@ import {
 import { client } from "@/shared/lib/client-wrapper";
 import { createViewerModel } from "@/shared/models/shared.model";
 import { type RatingType } from "../labels";
+import {
+  DEFAULT_RATINGS_PREFERENCES, isSamePreferences, syncPreferencesUrl, writePreferencesCookie
+} from "../preferences";
+import { type RatingItem, type RatingsPreferences } from "../types";
+
+export type { RatingItem } from "../types";
 
 type RatingMap = {
   playtime: RatingPlaytime[];
@@ -25,11 +31,6 @@ type RatingMap = {
   charism: RatingCharism[];
   belkoin: RatingBelkoin[];
   parkour: RatingParkour[];
-};
-
-export type RatingItem = Pick<{ title: string; childs: string[] }, "title"> & {
-  childs: { title: string, value: string }[],
-  key: string
 };
 
 export const { Component: RatingsViewer, inViewAtom: ratingIsViewAtom } = createViewerModel({
@@ -179,19 +180,40 @@ export const ratings = atom(null, "ratings").pipe(
 
       ratingsState.filters.endCursor(ctx, meta.endCursor);
       ratings.update(ctx);
-    }, `${name}.loadMore`)
+    }, `${name}.loadMore`),
+    applyFilters: action((ctx, next: Partial<RatingsPreferences>, options: { persist?: boolean, force?: boolean } = {}) => {
+      const current: RatingsPreferences = {
+        server: ctx.get(ratingsState.filters.server) ?? DEFAULT_RATINGS_PREFERENCES.server,
+        type: ctx.get(ratingsState.filters.by),
+        asc: ctx.get(ratingsState.filters.asc),
+      };
+      const merged = { ...current, ...next };
+
+      if (!options.force && isSamePreferences(current, merged)) return;
+
+      ratings.update.abort(ctx);
+      ratingsState.filters.server(ctx, merged.server);
+      ratingsState.filters.by(ctx, merged.type);
+      ratingsState.filters.asc(ctx, merged.asc);
+      ratingsState.filters.endCursor.reset(ctx);
+
+      if (options.persist !== false) {
+        try {
+          writePreferencesCookie(merged);
+          syncPreferencesUrl(merged);
+        } catch (error) {
+          logError(error);
+        }
+      }
+
+      ratings.fetch(ctx);
+    }, `${name}.applyFilters`)
   }))
 )
 
 ratingIsViewAtom.onChange((ctx, state) => {
   if (!state) return;
   ratings.loadMore(ctx);
-});
-
-ratingsState.filters.asc.onChange((ctx) => {
-  ratings.update.abort(ctx);
-  ratingsState.filters.endCursor.reset(ctx);
-  ratings.fetch(ctx);
 });
 
 export const rating = atom(null, "rating").pipe(

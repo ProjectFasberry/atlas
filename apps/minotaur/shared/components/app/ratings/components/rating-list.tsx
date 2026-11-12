@@ -283,10 +283,10 @@ const RatingPills = reatomComponent(({ ctx }) => {
   if (!groups.length) return null;
 
   const group = groups.find((item) => item.key === currentServer);
-  const typeFor = (item: (typeof groups)[number]) =>
+  const typeFor = (item: (typeof groups)[number]): RatingType | undefined =>
     item.childs.some((child) => child.value === currentType)
       ? currentType
-      : item.childs[0]?.value;
+      : item.childs[0]?.value as RatingType | undefined;
 
   return (
     <div className="flex flex-col gap-2">
@@ -296,28 +296,30 @@ const RatingPills = reatomComponent(({ ctx }) => {
           if (!nextType) return null;
 
           return (
-            <Link
+            <button
               key={item.key}
-              href={`/ratings/${item.key}/${nextType}`}
-              aria-current={item.key === currentServer ? "page" : undefined}
+              type="button"
+              aria-pressed={item.key === currentServer}
+              onClick={() => ratings.applyFilters(ctx, { server: item.key, type: nextType })}
               className={pillClass(item.key === currentServer)}
             >
               {getServerLabel(item.key, item.title)}
-            </Link>
+            </button>
           )
         })}
       </div>
       {group && (
         <div className="flex gap-1 overflow-x-auto pb-1">
           {group.childs.map((child) => (
-            <Link
+            <button
               key={child.value}
-              href={`/ratings/${group.key}/${child.value}`}
-              aria-current={child.value === currentType ? "page" : undefined}
+              type="button"
+              aria-pressed={child.value === currentType}
+              onClick={() => ratings.applyFilters(ctx, { server: group.key, type: child.value as RatingType })}
               className={pillClass(child.value === currentType)}
             >
               {getRatingTypeLabel(child.value, child.title)}
-            </Link>
+            </button>
           ))}
         </div>
       )}
@@ -328,7 +330,7 @@ const RatingPills = reatomComponent(({ ctx }) => {
 const SortControl = reatomComponent(({ ctx }) => {
   const asc = ctx.spy(ratingsState.filters.asc);
 
-  const set = (value: boolean) => ratingsState.filters.asc(ctx, value);
+  const set = (value: boolean) => ratings.applyFilters(ctx, { asc: value });
 
   return (
     <div className="flex items-center gap-2">
