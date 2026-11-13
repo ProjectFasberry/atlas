@@ -133,11 +133,12 @@ const skins = atom(null, "skins").pipe(
 
           const id = selectedSkin.identifier
 
-          return await ctx.schedule(() => client
-            .get("/server/skin/set", {
-              params: { query: { id } },
-              retry: 1
-            })
+          // TODO: switch to the typed `client.put` after the OpenAPI contract
+          // with `PUT /server/skin/current` is synced to atlas.
+          return await ctx.schedule(() => client.raw.put<"OK">("/server/skin/current", {
+            json: { skinName: id },
+            retry: 1
+          })
           )
         }, {
           name: `${name}.set`,
