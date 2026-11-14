@@ -6,6 +6,7 @@ import { dayjs } from "@/shared/lib/dayjs"
 import { createPageModel } from "@/shared/lib/events"
 import { users, type PrivatedUser } from "@/shared/components/app/private/models/users.model"
 import { Button } from "@/shared/ui/button"
+import { currentUserState } from "@/shared/models/current-user/index.model"
 import { PageLoader } from "@/shared/ui/page-loader"
 import { BackButton } from "@/shared/ui/back-button"
 import { ClientOnly } from "vike-react/ClientOnly"
@@ -53,7 +54,9 @@ const UserInfo = reatomComponent(({ ctx }) => {
         )}
       </div>
       </div>
-      {data.skin?.length ? <SkinsModeration nickname={data.nickname} skins={data.skin} /> : null}
+      {ctx.spy(currentUserState.perms).includes("skins.moderate") && data.skin?.length ? (
+        <SkinsModeration nickname={data.nickname} skins={data.skin} />
+      ) : null}
     </div>
   )
 }, "UserInfo")
