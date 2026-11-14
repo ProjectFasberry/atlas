@@ -14,6 +14,8 @@ import { modpackSection } from "./modpack"
 import { landsSection } from "./lands"
 import { apiKeysSection } from "./api"
 import { Typography } from "@/shared/ui/typography"
+import { currentUserState } from "@/shared/models/current-user/index.model"
+import { LANDS_READ_PERMISSION } from "@/shared/consts/permissions"
 
 type ComponentType = Nullable<() => ReactNode>;
 
@@ -98,7 +100,7 @@ const ConfigSection = ({ id, title, parent, action, children }: ConfigSectionPro
   )
 }
 
-type SectionBase = { id: string, title: string }
+type SectionBase = { id: string, title: string, permission?: string }
 
 const SECTIONS: SectionBase[] = [
   { id: "config-general", title: "Основное" },
@@ -109,10 +111,13 @@ const SECTIONS: SectionBase[] = [
   { id: "config-news", title: "Новости" },
   { id: "config-dictionaries", title: "Справочник" },
   { id: "config-api", title: "API Ключи" },
-  { id: "config-lands", title: "Регионы" },
+  { id: "config-lands", title: "Регионы", permission: LANDS_READ_PERMISSION },
 ]
 
-const ConfigNav = () => {
+const ConfigNav = reatomComponent(({ ctx }) => {
+  const permissions = ctx.spy(currentUserState.perms);
+  const sections = SECTIONS.filter((section) => !section.permission || permissions.includes(section.permission));
+
   const jump = (id: SectionBase["id"]) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
@@ -124,7 +129,7 @@ const ConfigNav = () => {
         rounded-xl border border-neutral-800 bg-neutral-900 p-2 scrollbar-h-1
       "
     >
-      {SECTIONS.map(({ id, title }) => (
+      {sections.map(({ id, title }) => (
         <button
           key={id}
           type="button"
@@ -139,9 +144,11 @@ const ConfigNav = () => {
       ))}
     </nav>
   )
-}
+}, "ConfigNav")
 
-export const Config = () => {
+export const Config = reatomComponent(({ ctx }) => {
+  const permissions = ctx.spy(currentUserState.perms);
+
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <ConfigNav />
@@ -208,14 +215,16 @@ export const Config = () => {
       >
         <apiKeysSection.Wrapper />
       </ConfigSection>
-      <ConfigSection
-        id="config-lands"
-        parent="lands"
-        title="Регионы"
-        action={<ActionsHeaderSlot parent="lands" />}
-      >
-        <landsSection.Wrapper />
-      </ConfigSection>
+      {permissions.includes(LANDS_READ_PERMISSION) && (
+        <ConfigSection
+          id="config-lands"
+          parent="lands"
+          title="Регионы"
+          action={<ActionsHeaderSlot parent="lands" />}
+        >
+          <landsSection.Wrapper />
+        </ConfigSection>
+      )}
     </div>
   )
-}
+}, "Config")

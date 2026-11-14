@@ -5,6 +5,7 @@ import { PlayerInfo } from "@/shared/components/app/player/components/info";
 import { PurchasesHistory } from "@/shared/components/app/player/components/details";
 import { reatomComponent, useAtom } from "@reatom/npm-react";
 import { PlayerActivity } from "@/shared/components/app/player/components/activity";
+import { PlayerActivityChart } from "@/shared/components/app/player/components/activity-chart";
 import { isIdentityAtom, playerState } from "@/shared/components/app/player/models/player.model";
 import { PlayerSeemsLikePlayers } from "@/shared/components/app/player/components/seems-like-players";
 import { PlayerSocials } from "@/shared/components/app/player/components/socials";
@@ -28,6 +29,7 @@ const PlayerPublic = () => {
     <>
       <PlayerInfo />
       <PlayerActivity />
+      <PlayerActivityChart />
       <PlayerLands />
       <PlayerSeemsLikePlayers />
     </>

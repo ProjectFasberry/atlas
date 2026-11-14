@@ -14,6 +14,8 @@ import { dayjs } from "@/shared/lib/dayjs";
 import { ReactSkinview3d } from "react-skinview3d"
 import { ClientOnly } from "vike-react/ClientOnly"
 import { appState } from "@/shared/models/app/index.model";
+import { isIdentityAtom } from "../models/player.model";
+import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 import { Dialog, DialogTitle } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { dialogVariant } from "@/shared/ui/dialog";
@@ -109,12 +111,25 @@ const SkinsHistoryItem = reatomComponent<SkinsHistory & { variant: "mobile" | "d
   if (!skin_head_url) return null;
 
   const selectedSkin = ctx.spy(skinsState.selected);
+  const isIdentity = ctx.spy(isIdentityAtom);
+  const canRemove = isIdentity && identifier.toLowerCase().startsWith("sr-");
+  const isRemoving = ctx.spy(skins.remove.statusesAtom).isPending;
 
   const handleClick = () => {
     skinsState.selected(ctx, {
       identifier,
       skin_url: skin_url ?? null,
       skin_head_url: skin_head_url ?? null
+    })
+  }
+
+  const handleRemove = () => {
+    alertDialog.open(ctx, {
+      title: translate["player.skin.delete.title"](),
+      description: translate["player.skin.delete.description"](),
+      confirmLabel: translate["player.skin.delete.confirm"](),
+      onConfirm: () => skins.remove(ctx, identifier),
+      errorAtom: skins.remove.errorAtom,
     })
   }
 
@@ -125,19 +140,38 @@ const SkinsHistoryItem = reatomComponent<SkinsHistory & { variant: "mobile" | "d
   const changedAt = dayjs(timestamp * 1000).format("DD.MM.YYYY HH:mm")
 
   return (
-    <button
-      type="button"
-      className={`${skinHeadVariant({ status, size: "small" })} bg-transparent`}
-      onClick={handleClick}
-      title={changedAt}
-      aria-label={`${identifier}, ${changedAt}`}
-    >
-      <Avatar
-        src={skin_head_url}
-        width={variant === 'mobile' ? SKINS_HISTORY_AVATAR_SIZES[0] : SKINS_HISTORY_AVATAR_SIZES[1]}
-        height={variant === 'mobile' ? SKINS_HISTORY_AVATAR_SIZES[0] : SKINS_HISTORY_AVATAR_SIZES[1]}
-      />
-    </button>
+    <div className="relative group">
+      <button
+        type="button"
+        className={`${skinHeadVariant({ status, size: "small" })} bg-transparent`}
+        onClick={handleClick}
+        title={changedAt}
+        aria-label={`${identifier}, ${changedAt}`}
+      >
+        <Avatar
+          src={skin_head_url}
+          width={variant === 'mobile' ? SKINS_HISTORY_AVATAR_SIZES[0] : SKINS_HISTORY_AVATAR_SIZES[1]}
+          height={variant === 'mobile' ? SKINS_HISTORY_AVATAR_SIZES[0] : SKINS_HISTORY_AVATAR_SIZES[1]}
+        />
+      </button>
+      {canRemove && (
+        <button
+          type="button"
+          className="absolute -top-1 -right-1 z-10 flex size-5 items-center justify-center rounded-full
+            border border-neutral-700 bg-neutral-900 text-neutral-400 opacity-100 lg:opacity-0
+            transition-opacity lg:group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-50"
+          onClick={(event) => {
+            event.stopPropagation()
+            handleRemove()
+          }}
+          disabled={isRemoving}
+          title={translate["player.skin.delete.title"]()}
+          aria-label={translate["player.skin.delete.title"]()}
+        >
+          <Icon name="sprite:trash" className="size-3" />
+        </button>
+      )}
+    </div>
   )
 }, "SkinsHistoryItem")
 
@@ -165,7 +199,15 @@ const SkinsHistoryList = reatomComponent<{ variant: "mobile" | "desktop" }>(({ c
   const data = ctx.spy(skins.fetch.dataAtom)
   if (!data) return null;
 
-  return data.map(item => (
+  // The API dedupes case-insensitively; this guards older cached payloads.
+  const unique = new Map<string, SkinsHistory>()
+
+  for (const item of data) {
+    const key = item.skin_identifier.toLowerCase()
+    if (!unique.has(key)) unique.set(key, item)
+  }
+
+  return Array.from(unique.values()).map(item => (
     <SkinsHistoryItem
       key={item.skin_identifier}
       variant={variant}
