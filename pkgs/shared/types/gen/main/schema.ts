@@ -2526,9 +2526,29 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Set skin */
+        /**
+         * Set skin (deprecated)
+         * @deprecated
+         */
         get: operations["getServerSkinSet"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/server/skin/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set current skin */
+        put: operations["putServerSkinCurrent"];
         post?: never;
         delete?: never;
         options?: never;
@@ -8838,12 +8858,87 @@ export interface operations {
                     /** @enum {string} */
                     variant: "classic" | "slim";
                     name?: string;
-                    /** Format: uuid */
-                    capeUuid?: string;
                 };
             };
         };
-        responses: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            job: {
+                                id: string;
+                                status: string;
+                            };
+                            url: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default RATE_LIMITED
+                         * @enum {string}
+                         */
+                        error: "RATE_LIMITED";
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 502 */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 504 */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
     };
     getServerSkinDownloadByNickname: {
         parameters: {
@@ -8855,7 +8950,23 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: never;
+        responses: {
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "NOT_FOUND";
+                    };
+                };
+            };
+        };
     };
     getServerSkinSet: {
         parameters: {
@@ -8880,14 +8991,33 @@ export interface operations {
                     };
                 };
             };
-            /** @description Response for status 400 */
-            400: {
+            /** @description Response for status 403 */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error: string;
+                        /**
+                         * @default SKIN_FORBIDDEN
+                         * @enum {string}
+                         */
+                        error: "SKIN_FORBIDDEN";
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SKIN_NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "SKIN_NOT_FOUND" | "PLAYER_NOT_FOUND";
                     };
                 };
             };
@@ -8899,10 +9029,120 @@ export interface operations {
                 content: {
                     "application/json": {
                         /**
-                         * @default THIRDPARTY_ERROR
+                         * @default INTERNAL_SERVER_ERROR
                          * @enum {string}
                          */
-                        error: "THIRDPARTY_ERROR" | "INTERNAL_SERVER_ERROR";
+                        error: "INTERNAL_SERVER_ERROR";
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SERVER_OFFLINE
+                         * @enum {string}
+                         */
+                        error: "SERVER_OFFLINE";
+                    };
+                };
+            };
+        };
+    };
+    putServerSkinCurrent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    skinName: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    skinName: string;
+                };
+                "multipart/form-data": {
+                    skinName: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SKIN_FORBIDDEN
+                         * @enum {string}
+                         */
+                        error: "SKIN_FORBIDDEN";
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SKIN_NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "SKIN_NOT_FOUND" | "PLAYER_NOT_FOUND";
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default INTERNAL_SERVER_ERROR
+                         * @enum {string}
+                         */
+                        error: "INTERNAL_SERVER_ERROR";
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SERVER_OFFLINE
+                         * @enum {string}
+                         */
+                        error: "SERVER_OFFLINE";
                     };
                 };
             };
@@ -10261,25 +10501,46 @@ export interface operations {
                 "application/json": {
                     roles: ("builder" | "developer" | "designer" | "moderator" | "content" | "other")[];
                     about: string;
-                    telegram: string;
-                    /** Format: email */
-                    email?: string;
+                    contact: {
+                        /** @constant */
+                        type: "telegram";
+                        value: string;
+                    } | {
+                        /** @constant */
+                        type: "email";
+                        /** Format: email */
+                        value: string;
+                    };
                     portfolio?: string;
                 };
                 "application/x-www-form-urlencoded": {
                     roles: ("builder" | "developer" | "designer" | "moderator" | "content" | "other")[];
                     about: string;
-                    telegram: string;
-                    /** Format: email */
-                    email?: string;
+                    contact: {
+                        /** @constant */
+                        type: "telegram";
+                        value: string;
+                    } | {
+                        /** @constant */
+                        type: "email";
+                        /** Format: email */
+                        value: string;
+                    };
                     portfolio?: string;
                 };
                 "multipart/form-data": {
                     roles: ("builder" | "developer" | "designer" | "moderator" | "content" | "other")[];
                     about: string;
-                    telegram: string;
-                    /** Format: email */
-                    email?: string;
+                    contact: {
+                        /** @constant */
+                        type: "telegram";
+                        value: string;
+                    } | {
+                        /** @constant */
+                        type: "email";
+                        /** Format: email */
+                        value: string;
+                    };
                     portfolio?: string;
                 };
             };
