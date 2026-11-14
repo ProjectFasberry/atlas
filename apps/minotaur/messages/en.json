@@ -359,7 +359,16 @@
     },
     "activity": {
       "online": "Online",
-      "offline": "Offline"
+      "offline": "Offline",
+      "chart": {
+        "title": "Activity",
+        "total": "Total: {hours} h",
+        "active-days": "Active days: {days}",
+        "empty": "No activity data yet",
+        "less": "Less",
+        "more": "More",
+        "tooltip": "{date}: {hours} h"
+      }
     },
     "balance": {
       "title": "Balance",
@@ -400,8 +409,14 @@
       },
       "toast": {
         "updated": "Skin updated",
+        "removed": "Skin removed",
         "rejoin": "Rejoin if you are in game",
         "processing": "The skin is being processed, refresh in a minute"
+      },
+      "delete": {
+        "title": "Remove skin",
+        "description": "Remove this skin from the history? If it is active, the fallback skin will be used.",
+        "confirm": "Remove"
       },
       "select": "Select skin",
       "hardware-off": "Hardware acceleration is disabled",

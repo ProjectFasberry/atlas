@@ -1,4 +1,4 @@
-import { reatomAsync, spawn, withDataAtom, withStatusesAtom } from "@reatom/framework";
+import { reatomAsync, spawn, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { action, atom } from "@reatom/framework";
 import { sleep, withAssign, withReset } from "@reatom/framework";
 import { logError } from "@/shared/lib/log";
@@ -245,6 +245,25 @@ const skins = atom(null, "skins").pipe(
           withStatusesAtom()
         )
       }))
+    ),
+    remove: reatomAsync(async (ctx, identifier: string) => {
+      return await client.raw.delete<{ removed: number }>(
+        `/server/skin/${encodeURIComponent(identifier)}`,
+        { retry: 0 },
+      )
+    }, {
+      name: `${name}.remove`,
+      onFulfill: (ctx) => {
+        toast.success(translate["player.skin.toast.removed"]())
+        skins.updateSkinAndHead(ctx)
+      },
+      onReject: (_, e) => {
+        logError(e, { type: "combined" })
+        toast.error(getSkinErrorMessage(e))
+      }
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
     ),
     fetch: reatomAsync(async (ctx, nickname: string) => {
       skins.fetch.dataAtom.reset(ctx);
