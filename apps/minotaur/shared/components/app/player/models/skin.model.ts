@@ -3,6 +3,7 @@ import { action, atom } from "@reatom/framework";
 import { sleep, withAssign, withReset } from "@reatom/framework";
 import { logError } from "@/shared/lib/log";
 import { client } from "@/shared/lib/client-wrapper";
+import { translate } from "@/shared/locales/helpers";
 import { isIdentityAtom, playerState } from "./player.model";
 import { toast } from "sonner";
 import { DEFAULT_SOFT_DELAY, DIALOG_DELAY, ENVIRONMENT } from "@/shared/consts";
@@ -19,6 +20,39 @@ type SkinSelected = {
 const SKIN_VARIANTS = ["classic", "slim"] as const
 const SKIN_DEFAULT_VARIANT = SKIN_VARIANTS[0]
 
+const MAX_SKIN_BYTES = 1024 * 1024
+const SKIN_SIZES = new Set(["64x64", "64x32"])
+
+const SKIN_ERROR_MESSAGES: Record<string, () => string> = {
+  SKIN_FORBIDDEN: () => translate["player.skin.errors.forbidden"](),
+  SKIN_NOT_FOUND: () => translate["player.skin.errors.not-found"](),
+  SERVER_OFFLINE: () => translate["player.skin.errors.server-offline"](),
+  INVALID_SKIN_FILE: () => translate["player.skin.errors.invalid-file"](),
+  RATE_LIMITED: () => translate["player.skin.errors.rate-limited"](),
+}
+
+const getSkinErrorMessage = (error: unknown) => {
+  const code = error instanceof Error ? error.message : ""
+
+  return SKIN_ERROR_MESSAGES[code]?.() ?? translate["player.skin.errors.generic"]()
+}
+
+/** The server validates again; this only avoids a pointless upload. */
+const validateSkinFile = async (file: File): Promise<boolean> => {
+  if (file.size > MAX_SKIN_BYTES) return false
+  if (file.type && file.type !== "image/png") return false
+
+  try {
+    const bitmap = await createImageBitmap(file)
+    const valid = SKIN_SIZES.has(`${bitmap.width}x${bitmap.height}`)
+    bitmap.close()
+
+    return valid
+  } catch {
+    return false
+  }
+}
+
 export type SkinVariant = typeof SKIN_VARIANTS[number]
 type SkinFileData = { name: string, size: number, url: string }
 export type SkinsHistory = NonNullable<ExtractApiData<"getServerSkinHistoryByNickname">["data"]>[number]
@@ -27,6 +61,7 @@ const getIsUploadAvailableAtom = atom<boolean>((ctx) => ctx.spy(isIdentityAtom))
 
 const skinSubmitIsDisabledAtom = atom<boolean>((ctx) => {
   if (ctx.spy(skins.control.change.statusesAtom).isPending) return true;
+  if (ctx.spy(skinsState.control.fileError)) return true;
   return !ctx.spy(skinsState.control.file);
 })
 
@@ -38,7 +73,10 @@ const getIsSelectSkinAtom = atom<boolean>((ctx) => {
   const state = ctx.spy(skins.fetch.dataAtom)
   if (!state) return false;
 
-  return state[0].skin_identifier !== ctx.spy(skinsState.selected)?.identifier
+  const current = state[0].skin_identifier.toLowerCase()
+  const selected = ctx.spy(skinsState.selected)?.identifier.toLowerCase()
+
+  return current !== selected
 })
 
 const skinsState = atom(null, "skinsState").pipe(
@@ -51,16 +89,17 @@ const skinsState = atom(null, "skinsState").pipe(
           withAssign((target) => ({
             reset: action((ctx) => {
               const url = ctx.get(skinsState.control.fileData)?.url
-              if (!url) return;
+              if (url) URL.revokeObjectURL(url);
 
-              URL.revokeObjectURL(url);
               target(ctx, null);
 
               skinsState.control.fileData.reset(ctx)
+              skinsState.control.fileError.reset(ctx)
             })
           }))
         ),
         fileData: atom<Nullable<SkinFileData>>(null, `${name}.fileData`).pipe(withReset()),
+        fileError: atom<Nullable<string>>(null, `${name}.fileError`).pipe(withReset()),
         variant: atom<SkinVariant>(SKIN_DEFAULT_VARIANT, `${name}.variant`).pipe(withReset()),
       }))
     )
@@ -112,11 +151,19 @@ const skins = atom(null, "skins").pipe(
           const target = ctx.get(skinsState.control.file)
           if (!target) return null;
 
+          skinsState.control.fileError.reset(ctx)
+          skinsState.control.fileData.reset(ctx)
+
+          if (!await validateSkinFile(target)) {
+            skinsState.control.fileError(ctx, "invalid-file")
+            return null
+          }
+
           const url = URL.createObjectURL(target)
 
           const info = {
             name: target.name,
-            size: target.size * 1024,
+            size: target.size,
             url
           }
 
@@ -133,27 +180,32 @@ const skins = atom(null, "skins").pipe(
 
           const id = selectedSkin.identifier
 
-          // TODO: switch to the typed `client.put` after the OpenAPI contract
-          // with `PUT /server/skin/current` is synced to atlas.
-          return await ctx.schedule(() => client.raw.put<"OK">("/server/skin/current", {
+          return await ctx.schedule(() => client.put("/server/skin/current", {
             json: { skinName: id },
             retry: 1
-          })
-          )
+          }))
         }, {
           name: `${name}.set`,
           onFulfill: (ctx) => {
-            toast.success("Скин обновлен", { description: "Если вы в игре - перезайдите" })
+            toast.success(translate["player.skin.toast.updated"](), {
+              description: translate["player.skin.toast.rejoin"](),
+            })
             skins.updateSkinAndHead(ctx)
           },
-          onReject: (_, e) => logError(e, { type: "combined" })
+          onReject: (_, e) => {
+            logError(e, { type: "combined" })
+            toast.error(getSkinErrorMessage(e))
+          }
         }).pipe(
           withStatusesAtom()
         ),
         change: reatomAsync(async (ctx) => {
+          const file = ctx.get(skinsState.control.file)
+          if (!file || ctx.get(skinsState.control.fileError)) return null
+
           const payloadFormData = new FormData()
 
-          payloadFormData.append("file", ctx.get(skinsState.control.file)!)
+          payloadFormData.append("file", file)
           payloadFormData.append("variant", ctx.get(skinsState.control.variant))
 
           const result = await client
@@ -168,7 +220,14 @@ const skins = atom(null, "skins").pipe(
         }, {
           name: `${name}.change`,
           onFulfill: async (ctx, res) => {
-            toast.success("Скин обновлен", { description: "Если вы в игре - перезайдите" })
+            if (res?.result?.url) {
+              toast.success(translate["player.skin.toast.updated"](), {
+                description: translate["player.skin.toast.rejoin"](),
+              })
+            } else {
+              toast.info(translate["player.skin.toast.processing"]())
+              await sleep(5000)
+            }
 
             skins.updateSkinAndHead(ctx)
             skinsState.control.isOpen.reset(ctx)
@@ -178,7 +237,10 @@ const skins = atom(null, "skins").pipe(
             skinsState.control.file.reset(ctx)
             skinsState.control.variant.reset(ctx)
           },
-          onReject: (_, e) => logError(e, { type: "combined" })
+          onReject: (_, e) => {
+            logError(e, { type: "combined" })
+            toast.error(getSkinErrorMessage(e))
+          }
         }).pipe(
           withStatusesAtom()
         )

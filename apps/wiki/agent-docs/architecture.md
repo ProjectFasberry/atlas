@@ -13,11 +13,15 @@
 
 ## Routes
 
+Every page belongs to a server. The default server (`bisquite`) keeps short URLs, the others
+live under a prefix.
+
 | Path | What |
 | --- | --- |
-| `/` | overview page (slug `''`) |
-| `/<slug>` | article, the slug may contain `/` - `app/[[...slug]]/page.tsx` |
-| `PUT /api/wiki/pages/<slug>` | save an article, requires an editor |
+| `/` | overview of the default server (slug `''`) |
+| `/<slug>` | article on the default server, the slug may contain `/` - `app/[[...slug]]/page.tsx` |
+| `/<server>` / `/<server>/<slug>` | the same for another server, for example `/muffin/armor` |
+| `PUT /api/wiki/pages/<slug>?server=` | save an article, requires an editor |
 | `POST /api/wiki/upload` | upload an image (png/jpeg/webp/gif, up to 8 MB) |
 | `GET /api/images/<id>` | image from the database, `immutable` cache |
 | `GET /api/search?query=` | search in the current locale, returns the Fumadocs shape (`{id,url,type,content}`) |
@@ -29,15 +33,20 @@
 `/edit/*` -> the root.
 
 `proxy.ts` (middleware):
+- `/bisquite/...` -> the same path without the prefix (308);
 - `/foo.md` -> rewrite to `/llms.mdx/docs/foo/content.md`;
 - a request with `Accept: text/plain` (`isMarkdownPreferred`) -> the same markdown version + `Vary: Accept`;
+- passes the pathname to server components as `x-wiki-path` (root layouts get no route params);
 - leaves the service prefixes `/_next`, `/api`, `/llms`, `/og` alone.
 
 ## How a page is rendered
 
 `app/[[...slug]]/page.tsx`:
-1. `getPage(slug)` from PostgreSQL, otherwise `notFound()`; `getLocalizedPage(slug, locale)` swaps
-   in the translation when it is still fresh, otherwise the Russian original is used.
+1. `resolveRoute(segments, servers)` -> the server and the slug (`/muffin/armor` is armor on
+   muffin, `/armor` is armor on the default server); `getPage(server, slug)` reads PostgreSQL,
+   otherwise a root of a server without pages renders the empty state and anything else is
+   `notFound()`; `getLocalizedPage(server, slug, locale)` swaps in the translation when it is
+   still fresh, otherwise the Russian original is used.
 2. `renderPageHtml(page)` -> `withHeadingIds` puts `id` on h2/h3 headings and builds the TOC.
 3. `getViewer()` - the signed-in user (session cookie, forwarded to the backend) becomes the
    skin-head badge in the header; its menu carries the "Editor" chip when editing is allowed,
@@ -52,13 +61,29 @@
   no flash and no script before paint; the same value seeds `$theme` in the Reatom context
   (`ReatomProvider initialTheme`), so the first client render matches the SSR markup;
 - `RootProvider theme={{ enabled: false }}` - a custom theme instead of the Fumadocs one;
-- `DocsLayout tree={await getPageTree()}` with `nav.mode: 'top'` and a custom `Separator`.
+- `getServers()` (`lib/content/servers.ts`) reads the public `/servers-with-map` endpoint and
+  caches it for five minutes; a failed call falls back to `bisquite`, so the wiki does not
+  depend on the api being up;
+- the pathname from `x-wiki-path` selects the server, `getPageTree(server)` builds its sidebar;
+- `DocsLayout tree={...}` with `nav.mode: 'top'` and a custom `Separator`; `slots.sidebar.root`
+  is `shared/ui/wiki-sidebar.tsx`, which keeps the fumadocs sidebar on desktop and renders a
+  shared bottom sheet on mobile. The server switcher lives in the header controls, mobile
+  controls are repeated in the sheet footer.
+
+## Servers
+
+`wiki_pages.server` is part of the primary key, so the same slug can exist on several servers.
+`shared/ui/server-switcher.tsx` is a client component, but the current server and slug are
+computed on the server and passed as props: switching is a plain navigation to
+`pageUrl(server, slug)`, the article is kept when the target server has the same slug. The
+switcher marks servers without pages (`пусто`) and their root shows the empty state.
 
 ## Sidebar tree
 
-`lib/content/source.ts` builds a fumadocs `dynamicLoader` source over the database: every
-`wiki_pages` row becomes a virtual page (`armor.mdx`, the root page is `index.mdx`) and a single
-root `meta.json` carries the group separators (`---Аспекты игры---`). `loader.pageTree` replaces
+`lib/content/source.ts` builds a fumadocs `dynamicLoader` source over the database, one loader
+per server (cached in a module map): every `wiki_pages` row of that server becomes a virtual page
+(`armor.mdx`, the root page is `index.mdx`) and a single root `meta.json` carries the group
+separators (`---Аспекты игры---`). Non-default servers get the `/<server>` prefix on tree URLs. `loader.pageTree` replaces
 the hand-built tree; icons are resolved by a string key - the slug for pages, `section:<name>`
 for separators (`lib/content/source.ts` `icon`). The tree is cached for a second, so `sync:wiki` and
 editor saves show up without a restart.
@@ -69,9 +94,9 @@ editor saves show up without a restart.
 ## Data flow
 
 ```
-Fasberry backend --pnpm sync:wiki--> PostgreSQL --> getPageTree --> sidebar
-content/seed.json --pnpm db:import--> PostgreSQL --> getPage --> page
-editor --PUT /api/wiki/pages--> wiki_pages + wiki_revisions (one transaction) --> page
+Fasberry backend --pnpm sync:wiki [--server]--> PostgreSQL --> getPageTree(server) --> sidebar
+content/seed.json --pnpm db:import--> PostgreSQL --> getPage(server, slug) --> page
+editor --PUT /api/wiki/pages/<slug>?server=--> wiki_pages + wiki_revisions (one transaction) --> page
 ```
 
 `content/` is local only and ignored by git; `seed.json` is an exported snapshot of the pages

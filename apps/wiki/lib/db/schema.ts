@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import {
   bigint,
   customType,
+  foreignKey,
   index,
   integer,
   pgTable,
@@ -18,14 +19,21 @@ const bytea = customType<{ data: Buffer; driverData: Buffer }>({
 });
 
 /**
- * Wiki content. Tables are prefixed with `wiki_` so the database can be shared
- * with other Fasberry services. Migrations live in `drizzle/` and are applied by
- * `lib/db.ts` on start, so this file is the single source of truth.
+ * Wiki content, one page per server. Tables are prefixed with `wiki_` so the
+ * database can be shared with other Fasberry services. Migrations live in
+ * `drizzle/` and are applied by `lib/db/index.ts` on start, so this file is the
+ * single source of truth.
+ *
+ * The default server is repeated as a literal here and in the scripts: this file
+ * is loaded by Node directly (type stripping), which does not resolve extensionless
+ * relative imports. `lib/content/default-server.ts` is the app-side source and must
+ * keep the same value (`bisquite`).
  */
 export const wikiPages = pgTable(
   'wiki_pages',
   {
-    slug: text('slug').primaryKey(),
+    server: text('server').notNull().default('bisquite'),
+    slug: text('slug').notNull(),
     title: text('title').notNull(),
     description: text('description').notNull().default(''),
     html: text('html').notNull().default(''),
@@ -37,8 +45,9 @@ export const wikiPages = pgTable(
     updatedBy: text('updated_by'),
   },
   (table) => [
-    index('wiki_pages_order_idx').on(table.position, table.slug),
-    index('wiki_pages_section_idx').on(table.section, table.position),
+    primaryKey({ columns: [table.server, table.slug] }),
+    index('wiki_pages_order_idx').on(table.server, table.position, table.slug),
+    index('wiki_pages_section_idx').on(table.server, table.section, table.position),
   ],
 );
 
@@ -46,16 +55,21 @@ export const wikiRevisions = pgTable(
   'wiki_revisions',
   {
     id: bigint('id', { mode: 'number' }).generatedAlwaysAsIdentity().primaryKey(),
-    slug: text('slug')
-      .notNull()
-      .references(() => wikiPages.slug, { onDelete: 'cascade' }),
+    server: text('server').notNull().default('bisquite'),
+    slug: text('slug').notNull(),
     title: text('title').notNull(),
     description: text('description').notNull().default(''),
     html: text('html').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
     author: text('author'),
   },
-  (table) => [index('wiki_revisions_slug_idx').on(table.slug, table.createdAt)],
+  (table) => [
+    index('wiki_revisions_slug_idx').on(table.server, table.slug, table.createdAt),
+    foreignKey({
+      columns: [table.server, table.slug],
+      foreignColumns: [wikiPages.server, wikiPages.slug],
+    }).onDelete('cascade'),
+  ],
 );
 
 export const wikiImages = pgTable('wiki_images', {
@@ -77,9 +91,8 @@ export type WikiImage = typeof wikiImages.$inferSelect;
 export const wikiPageTranslations = pgTable(
   'wiki_page_translations',
   {
-    slug: text('slug')
-      .notNull()
-      .references(() => wikiPages.slug, { onDelete: 'cascade' }),
+    server: text('server').notNull().default('bisquite'),
+    slug: text('slug').notNull(),
     locale: text('locale').notNull(),
     title: text('title').notNull(),
     description: text('description').notNull().default(''),
@@ -89,7 +102,13 @@ export const wikiPageTranslations = pgTable(
     engine: text('engine').notNull().default('deepl'),
     translatedAt: timestamp('translated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [primaryKey({ columns: [table.slug, table.locale] })],
+  (table) => [
+    primaryKey({ columns: [table.server, table.slug, table.locale] }),
+    foreignKey({
+      columns: [table.server, table.slug],
+      foreignColumns: [wikiPages.server, wikiPages.slug],
+    }).onDelete('cascade'),
+  ],
 );
 
 export type WikiPageTranslation = typeof wikiPageTranslations.$inferSelect;

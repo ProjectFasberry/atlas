@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { getEditor } from '@/lib/auth';
 import { getPage, pageUrl, savePage } from '@/lib/content/pages';
+import { DEFAULT_SERVER } from '@/lib/content/servers';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +14,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
 
   const { slug } = await params;
   const key = (slug ?? []).join('/');
-  const page = await getPage(key);
+  const requested = new URL(request.url).searchParams.get('server') ?? DEFAULT_SERVER;
+  const server = /^[a-z0-9-]+$/.test(requested) ? requested : DEFAULT_SERVER;
+
+  const page = await getPage(server, key);
   if (!page) {
     return NextResponse.json({ error: 'not found' }, { status: 404 });
   }
@@ -37,6 +41,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
   }
 
   const saved = await savePage(
+    server,
     key,
     {
       title,
@@ -50,7 +55,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
     return NextResponse.json({ error: 'not found' }, { status: 404 });
   }
 
-  revalidatePath(pageUrl(key));
+  revalidatePath(pageUrl(server, key));
 
   return NextResponse.json({ ok: true, updatedAt: saved.updatedAt.toISOString() });
 }

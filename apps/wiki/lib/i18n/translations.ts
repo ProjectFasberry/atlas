@@ -19,12 +19,22 @@ export function sourceHash(page: Pick<WikiPage, 'title' | 'description' | 'html'
     .slice(0, 32);
 }
 
-export async function getTranslation(slug: string, locale: TranslationLocale) {
+export async function getTranslation(
+  server: string,
+  slug: string,
+  locale: TranslationLocale,
+) {
   const db = await database();
   const [row] = await db
     .select()
     .from(wikiPageTranslations)
-    .where(and(eq(wikiPageTranslations.slug, slug), eq(wikiPageTranslations.locale, locale)))
+    .where(
+      and(
+        eq(wikiPageTranslations.server, server),
+        eq(wikiPageTranslations.slug, slug),
+        eq(wikiPageTranslations.locale, locale),
+      ),
+    )
     .limit(1);
 
   return row ?? null;

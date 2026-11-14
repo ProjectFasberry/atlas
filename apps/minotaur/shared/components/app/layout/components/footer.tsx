@@ -1,12 +1,11 @@
-import { Icon } from "@/shared/ui/icon"
 import { Link } from "../../../config/link/link"
-import { Typography } from "@/shared/ui/typography"
 import { env } from "@/shared/env"
 import { Logotype } from "./logotype"
 import { translate } from "@/shared/locales/helpers"
 import { type AtomState } from "@reatom/framework"
 import { reatomComponent } from "@reatom/npm-react"
 import { socialsAtom } from "@/shared/models/shared.model"
+import { SiteFooter, type SiteFooterColumn, type SiteFooterSocial } from "@repo/ui"
 
 const getHrefs = (data: AtomState<typeof socialsAtom>) => {
   let telegramHref: string | undefined;
@@ -32,93 +31,52 @@ const createLandingUrl = (path: string) => `${env.VITE_LANDING_URL}${path}`
 export const Footer = reatomComponent(({ ctx }) => {
   const data = getHrefs(ctx.spy(socialsAtom));
 
+  const columns: SiteFooterColumn[] = [
+    {
+      title: translate["shared.footer.about.title"](),
+      links: [
+        { label: translate["shared.footer.about.news"](), href: "/news" },
+        { label: translate["shared.footer.about.team"](), href: "/join" },
+        { label: translate["shared.footer.about.report"](), href: "/report" },
+        { label: translate["shared.footer.about.status"](), href: "https://status.fasberry.fun" },
+      ],
+    },
+    {
+      title: translate["shared.footer.info.title"](),
+      links: [
+        { label: translate["shared.footer.info.contacts"](), href: "/contacts" },
+        { label: translate["shared.footer.info.privacy"](), href: "/privacy" },
+      ],
+    },
+    {
+      title: translate["shared.footer.resources.title"](),
+      links: [
+        { label: translate["shared.footer.resources.status"](), href: createLandingUrl("/status") },
+        { label: translate["shared.footer.resources.faq"](), href: createLandingUrl("/wiki") },
+      ],
+    },
+  ]
+
+  const socials: SiteFooterSocial[] = []
+  if (data.discordHref) {
+    socials.push({ label: translate["support.discord"](), href: data.discordHref, icon: "discord" })
+  }
+  if (data.telegramHref) {
+    socials.push({ label: translate["support.telegram"](), href: data.telegramHref, icon: "telegram" })
+  }
+
   return (
-    <div
-      className="
-        flex items-center justify-center w-full pb-[calc(6rem+env(safe-area-inset-bottom))] h-full lg:min-h-40 p-3 lg:p-4
-        bg-gradient-to-br from-green-800/40 via-green-800/50 to-green-800/40 border-t border-green-700/20
-        lg:backdrop-blur-md
-      "
-    >
-      <div className="flex flex-col items-center justify-center responsive h-full gap-4">
-        <div className="flex flex-col lg:flex-row justify-between gap-4 lg:items-start w-full h-full">
-          <div className="flex flex-col gap-4 items-start h-full w-full lg:w-1/3">
-            <div className="h-14 w-full">
-              <Logotype />
-            </div>
-            {data && (data.telegramHref || data.discordHref) && (
-              <div
-                className="
-                flex items-center gap-2
-                *:bg-neutral-600/40 *:hover:bg-neutral-600/60 *:duration-150
-                *:flex *:items-center *:justify-center *:p-2 *:rounded-full
-              "
-              >
-                {data.discordHref && (
-                  <a href={data.discordHref} aria-label="Дискорд">
-                    <Icon name="sprite:brand-discord" className="size-[18px]" />
-                  </a>
-                )}
-                {data.telegramHref && (
-                  <a href={data.telegramHref} aria-label="Телеграм">
-                    <Icon name="sprite:brand-telegram" className="size-[18px]" />
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="grid auto-rows-auto grid-cols-1 lg:grid-rows-none lg:grid-cols-3 gap-4 w-full lg:w-2/3">
-            <div className="flex flex-col min-w-0 gap-1 *:w-fit">
-              <Typography className="font-semibold truncate">
-                {translate["shared.footer.about.title"]()}
-              </Typography>
-              <div className="flex flex-col gap-1 min-w-0 *:truncate">
-                <Link href="/news">
-                  {translate["shared.footer.about.news"]()}
-                </Link>
-                <Link href="/join">
-                  {translate["shared.footer.about.team"]()}
-                </Link>
-                <Link href="/report">
-                  {translate["shared.footer.about.report"]()}
-                </Link>
-                <a href="https://status.fasberry.fun">
-                  {translate["shared.footer.about.status"]()}
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col min-w-0 gap-1 *:w-fit">
-              <Typography className="font-semibold truncate">
-                {translate["shared.footer.info.title"]()}
-              </Typography>
-              <div className="flex flex-col gap-1 min-w-0 *:truncate">
-                <a href="/contacts" target="_blank">
-                  {translate["shared.footer.info.contacts"]()}
-                </a>
-                <a href="/privacy" target="_blank">
-                  {translate["shared.footer.info.privacy"]()}
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col min-w-0 gap-1 *:w-fit">
-              <Typography className="font-semibold truncate">
-                {translate["shared.footer.resources.title"]()}
-              </Typography>
-              <div className="flex flex-col gap-1 min-w-0 *:truncate">
-                <a href={createLandingUrl("/status")}>
-                  {translate["shared.footer.resources.status"]()}
-                </a>
-                <a href={createLandingUrl("/wiki")}>
-                  {translate["shared.footer.resources.faq"]()}
-                </a>
-              </div>
-            </div>
-          </div>
+    <SiteFooter
+      className="pb-[calc(6rem+env(safe-area-inset-bottom))]"
+      linkComponent={Link}
+      logo={
+        <div className="h-14 w-full">
+          <Logotype />
         </div>
-        <Typography className="text-neutral-400 text-sm truncate text-wrap">
-          {translate["shared.footer.warning"]()}
-        </Typography>
-      </div>
-    </div>
+      }
+      columns={columns}
+      socials={socials}
+      warning={translate["shared.footer.warning"]()}
+    />
   )
 }, "Footer")

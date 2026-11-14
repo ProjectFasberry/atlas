@@ -1,10 +1,19 @@
 import { i18nProvider } from 'fumadocs-ui/i18n';
 import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
+import {
+  SidebarCollapseTrigger,
+  SidebarProvider,
+  SidebarTrigger,
+  useSidebar,
+} from 'fumadocs-ui/layouts/notebook/slots/sidebar';
 import { RootProvider } from 'fumadocs-ui/provider/next';
-import { Inter } from 'next/font/google';
+import { Golos_Text } from 'next/font/google';
+import { headers } from 'next/headers';
 import Script from 'next/script';
 import { getViewer } from '@/lib/auth';
-import { getPageTree } from '@/lib/content/pages';
+import { getPageTree, listServerSlugs } from '@/lib/content/pages';
+import { resolveRoute } from '@/lib/content/default-server';
+import { getServers } from '@/lib/content/servers';
 import { getLocale } from '@/lib/i18n/locale';
 import { buildRootMetadata } from '@/lib/seo/metadata';
 import { getServerTheme } from '@/lib/theme';
@@ -17,10 +26,14 @@ import { LocaleSync } from '@/shared/components/app/locale-sync';
 import { ReatomProvider } from '@/shared/components/app/reatom-provider';
 import { SidebarLinks } from '@/shared/ui/sidebar-links';
 import { SidebarSection } from '@/shared/ui/sidebar-section';
+import { WikiSidebar } from '@/shared/ui/wiki-sidebar';
 import './global.css';
 
-const inter = Inter({
+/** Same family as minotaur: Golos Text, self-hosted by next/font. */
+const golos = Golos_Text({
   subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-golos',
 });
 
 export async function generateMetadata() {
@@ -32,13 +45,24 @@ export const dynamic = 'force-dynamic';
 export default async function Layout({ children }: LayoutProps<'/'>) {
   const locale = await getLocale();
   const theme = await getServerTheme();
-  const options = baseOptions();
   const viewer = await getViewer();
+  const servers = await getServers();
+  const slugs = await listServerSlugs();
+
+  // root layouts get no route params, the proxy passes the pathname along
+  const pathname = (await headers()).get('x-wiki-path') ?? '/';
+  const segments = pathname
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => decodeURIComponent(segment));
+  const { server } = resolveRoute(segments, servers);
+
+  const options = baseOptions();
 
   return (
     <html
       lang={locale}
-      className={cn(inter.className, theme)}
+      className={cn(golos.variable, theme)}
       style={{ colorScheme: theme }}
       suppressHydrationWarning
     >
@@ -53,13 +77,23 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
           i18n={i18nProvider(locale === 'ru' ? translations : defaultTranslations)}
           theme={{ enabled: false }}
         >
-          <ReatomProvider initialTheme={theme}>
+          <ReatomProvider initialTheme={theme} servers={servers} slugs={slugs}>
             <LocaleSync locale={locale} />
             <ViewerSync viewer={viewer} />
             <DocsLayout
-              tree={await getPageTree(locale)}
+              tree={await getPageTree(server, locale)}
               {...options}
               nav={{ ...options.nav, mode: 'top' }}
+              slots={{
+                ...options.slots,
+                sidebar: {
+                  provider: SidebarProvider,
+                  root: WikiSidebar,
+                  trigger: SidebarTrigger,
+                  collapseTrigger: SidebarCollapseTrigger,
+                  useSidebar,
+                },
+              }}
               sidebar={{
                 collapsible: false,
                 components: { Separator: SidebarSection },

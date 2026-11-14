@@ -33,6 +33,18 @@ http
       return;
     }
 
+    if (url.pathname === '/servers-with-map') {
+      response.end(
+        JSON.stringify({
+          data: [
+            { name: 'Bisquite', value: 'bisquite', href: '', img: '' },
+            { name: 'Muffin', value: 'muffin', href: '', img: '' },
+          ],
+        }),
+      );
+      return;
+    }
+
     response.statusCode = 404;
     response.end('{}');
   })

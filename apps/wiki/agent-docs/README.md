@@ -1,8 +1,9 @@
 # Project map for agents
 
 Fasberry wiki: Next.js 16 (App Router) + Fumadocs UI, content in PostgreSQL, editor built on TipTap,
-state on Reatom v3. It lives at `https://wiki.fasberry.fun`; the wiki sits at the domain root
-(`/` is the overview, `/<slug>` is an article, a slug may have several segments).
+state on Reatom v3. It lives at `https://wiki.fasberry.fun`; the wiki sits at the domain root and
+is split by server: `/` and `/<slug>` are the default server (`bisquite`), `/<server>/<slug>` is
+another one, for example `/muffin/armor`.
 
 This directory is the entry point. Read in order:
 
@@ -19,6 +20,8 @@ This directory is the entry point. Read in order:
 
 - Content is not MDX: articles live in PostgreSQL and are rendered on every request, so an edit
   shows up immediately and `dynamic = 'force-dynamic'` is deliberate.
+- Pages, translations and revisions are keyed by `(server, slug)`; the switcher list comes from
+  the public `/servers-with-map` api and is cached for five minutes.
 - `lib/` is server code grouped by domain (content, db, env, i18n, seo, ui config, utils);
   `shared/` is what reaches the browser - Reatom models plus components. A file that imports
   `lib/` from a client component is a mistake.

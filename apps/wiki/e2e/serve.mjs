@@ -16,6 +16,7 @@ const env = {
   ...process.env,
   DATABASE_URL: databaseUrl,
   WIKI_AUTH_CHECK_URL: `http://127.0.0.1:${mockPort}/wiki/access`,
+  WIKI_API_URL: `http://127.0.0.1:${mockPort}`,
   NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${port}`,
   PORT: port,
 };

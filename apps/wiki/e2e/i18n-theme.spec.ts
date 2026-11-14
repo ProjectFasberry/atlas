@@ -20,9 +20,10 @@ test.describe('locale', () => {
     await expect(page.getByText('Game aspects').first()).toBeVisible();
   });
 
-  test('switches the language from the header', async ({ page }) => {
+  test('switches the language from the header flag', async ({ page }) => {
     await page.goto('/armor');
-    await page.getByTestId('language-switch').getByRole('button', { name: 'EN' }).click();
+    await page.getByTestId('language-menu').click();
+    await page.getByRole('menuitem', { name: 'English' }).click();
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.locator('h1')).toContainText('E2E Armour');
@@ -39,9 +40,9 @@ test.describe('theme', () => {
     await expect(page.locator('html')).toHaveClass(/light/);
   });
 
-  test('stores the choice when switched from the header', async ({ page, context }) => {
+  test('stores the choice when switched from the header icon', async ({ page, context }) => {
     await page.goto('/armor');
-    await page.getByTestId('theme-switch').getByRole('button').first().click();
+    await page.getByTestId('theme-toggle').click();
 
     await expect(page.locator('html')).toHaveClass(/light/);
     const cookies = await context.cookies();

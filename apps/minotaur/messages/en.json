@@ -374,6 +374,43 @@
       "title": "Purchases",
       "subtitle": "Your purchase history is displayed here",
       "goTo": "Go to"
+    },
+    "skin": {
+      "title": "Skin",
+      "nothing": "Nothing here",
+      "upload": {
+        "title": "Upload a skin",
+        "drop": "Drop or choose a file",
+        "step-file": "Upload a skin file (.png)",
+        "step-file-desc": "PNG 64x64 or 64x32, up to 1 MB",
+        "step-variant": "Choose the skin type",
+        "submit": "Upload"
+      },
+      "variants": {
+        "classic": "Classic",
+        "slim": "Slim"
+      },
+      "errors": {
+        "forbidden": "This skin belongs to another player",
+        "not-found": "Skin not found",
+        "server-offline": "Could not apply the skin on the server, try again later",
+        "invalid-file": "The file must be a 64x64 or 64x32 PNG",
+        "rate-limited": "Too many uploads. Limit: 5 per day",
+        "generic": "Could not update the skin"
+      },
+      "toast": {
+        "updated": "Skin updated",
+        "rejoin": "Rejoin if you are in game",
+        "processing": "The skin is being processed, refresh in a minute"
+      },
+      "select": "Select skin",
+      "hardware-off": "Hardware acceleration is disabled",
+      "controls": {
+        "rotate": "Rotate",
+        "idle": "Idle",
+        "run": "Run",
+        "flying": "Flying"
+      }
     }
   },
   "lands": {

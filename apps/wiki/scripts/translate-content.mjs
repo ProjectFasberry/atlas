@@ -2,7 +2,7 @@
 /**
  * Fills `wiki_page_translations` with machine translations of the Russian pages.
  *
- *   DATABASE_URL=... node scripts/translate-content.mjs [--slug armor] [--force]
+ *   DATABASE_URL=... node scripts/translate-content.mjs [--server bisquite] [--slug armor] [--force]
  *
  * The provider is MyMemory: free, no key, but it caps a request at 500 bytes, so
  * every text node of the article HTML is translated separately and the markup is
@@ -13,6 +13,7 @@ import crypto from 'node:crypto';
 import pg from 'pg';
 import Turndown from 'turndown';
 import { sanitizeContent } from '../lib/content/html.ts';
+import { DEFAULT_SERVER } from './lib/db.mjs';
 
 const API = 'https://api.mymemory.translated.net/get';
 const LIMIT = 480;
@@ -21,6 +22,7 @@ const LOCALE = 'en';
 const args = process.argv.slice(2);
 const force = args.includes('--force');
 const slugArg = args.includes('--slug') ? args[args.indexOf('--slug') + 1] : null;
+const server = args.includes('--server') ? args[args.indexOf('--server') + 1] : DEFAULT_SERVER;
 
 const turndown = new Turndown({
   headingStyle: 'atx',
@@ -109,12 +111,16 @@ async function main() {
   await client.connect();
 
   const { rows: pages } = await client.query(
-    'select slug, title, description, html from wiki_pages order by position, slug',
+    'select slug, title, description, html from wiki_pages where server = $1 order by position, slug',
+    [server],
   );
   const { rows: existing } = await client.query(
-    'select slug, locale, source_hash from wiki_page_translations',
+    'select server, slug, locale, source_hash from wiki_page_translations where server = $1',
+    [server],
   );
-  const known = new Map(existing.map((row) => [`${row.slug}|${row.locale}`, row.source_hash]));
+  const known = new Map(
+    existing.map((row) => [`${row.server}|${row.slug}|${row.locale}`, row.source_hash]),
+  );
 
   let done = 0;
   let skipped = 0;
@@ -123,12 +129,12 @@ async function main() {
     if (slugArg && page.slug !== slugArg) continue;
 
     const hash = hashOf(page);
-    if (!force && known.get(`${page.slug}|${LOCALE}`) === hash) {
+    if (!force && known.get(`${server}|${page.slug}|${LOCALE}`) === hash) {
       skipped += 1;
       continue;
     }
 
-    process.stdout.write(`· ${page.slug || '/'} ... `);
+    process.stdout.write(`· ${server}/${page.slug || '/'} ... `);
 
     const title = await request(page.title);
     const description = page.description ? await request(page.description) : '';
@@ -137,9 +143,9 @@ async function main() {
 
     await client.query(
       `insert into wiki_page_translations
-         (slug, locale, title, description, html, markdown, source_hash, engine, translated_at)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, now())
-       on conflict (slug, locale) do update set
+         (server, slug, locale, title, description, html, markdown, source_hash, engine, translated_at)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, now())
+       on conflict (server, slug, locale) do update set
          title = excluded.title,
          description = excluded.description,
          html = excluded.html,
@@ -147,7 +153,7 @@ async function main() {
          source_hash = excluded.source_hash,
          engine = excluded.engine,
          translated_at = now()`,
-      [page.slug, LOCALE, title, description, html, markdown, hash, 'mymemory'],
+      [server, page.slug, LOCALE, title, description, html, markdown, hash, 'mymemory'],
     );
 
     done += 1;

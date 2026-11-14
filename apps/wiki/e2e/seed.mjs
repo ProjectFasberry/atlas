@@ -17,6 +17,7 @@ const sourceHash = (title, description, html) =>
 
 const PAGES = [
   {
+    server: 'bisquite',
     slug: '',
     title: 'E2E Обзор',
     description: 'Обзор вики для e2e',
@@ -26,6 +27,7 @@ const PAGES = [
     markdown: '## E2E Обзор\n\nСтартовая страница для e2e.',
   },
   {
+    server: 'bisquite',
     slug: 'armor',
     title: 'E2E Броня',
     description: 'Про броню',
@@ -35,6 +37,7 @@ const PAGES = [
     markdown: '## E2E Броня\n\nЕсть пять новых видов брони.',
   },
   {
+    server: 'bisquite',
     slug: 'mobs',
     title: 'E2E Мобы',
     description: 'Про мобов',
@@ -42,6 +45,26 @@ const PAGES = [
     position: 2,
     html: '<h2>E2E Мобы</h2><p>Мобы встречаются в разных биомах.</p>',
     markdown: '## E2E Мобы\n\nМобы встречаются в разных биомах.',
+  },
+  {
+    server: 'muffin',
+    slug: '',
+    title: 'E2E Маффин',
+    description: 'Обзор вики Маффина',
+    section: null,
+    position: 0,
+    html: '<h2>E2E Маффин</h2><p>Стартовая страница Маффина.</p>',
+    markdown: '## E2E Маффин\n\nСтартовая страница Маффина.',
+  },
+  {
+    server: 'muffin',
+    slug: 'armor',
+    title: 'E2E Броня Маффина',
+    description: 'Про броню на Маффине',
+    section: 'Аспекты игры',
+    position: 1,
+    html: '<h2>E2E Броня Маффина</h2><p>Своя броня.</p>',
+    markdown: '## E2E Броня Маффина\n\nСвоя броня.',
   },
 ];
 
@@ -51,9 +74,9 @@ await client.connect();
 try {
   for (const page of PAGES) {
     await client.query(
-      `insert into wiki_pages (slug, title, description, html, markdown, section, position, source, updated_at, updated_by)
-       values ($1, $2, $3, $4, $5, $6, $7, 'seed', now(), 'e2e')
-       on conflict (slug) do update set
+      `insert into wiki_pages (server, slug, title, description, html, markdown, section, position, source, updated_at, updated_by)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, 'seed', now(), 'e2e')
+       on conflict (server, slug) do update set
          title = excluded.title,
          description = excluded.description,
          html = excluded.html,
@@ -63,16 +86,16 @@ try {
          source = excluded.source,
          updated_at = now(),
          updated_by = excluded.updated_by`,
-      [page.slug, page.title, page.description, page.html, page.markdown, page.section, page.position],
+      [page.server, page.slug, page.title, page.description, page.html, page.markdown, page.section, page.position],
     );
   }
 
   // the armor page has a fresh English translation, the rest stays Russian
   const armor = PAGES.find((page) => page.slug === 'armor');
   await client.query(
-    `insert into wiki_page_translations (slug, locale, title, description, html, markdown, source_hash, engine, translated_at)
-     values ('armor', 'en', $1, $2, $3, '', $4, 'e2e', now())
-     on conflict (slug, locale) do update set
+    `insert into wiki_page_translations (server, slug, locale, title, description, html, markdown, source_hash, engine, translated_at)
+     values ('bisquite', 'armor', 'en', $1, $2, $3, '', $4, 'e2e', now())
+     on conflict (server, slug, locale) do update set
        title = excluded.title,
        description = excluded.description,
        html = excluded.html,

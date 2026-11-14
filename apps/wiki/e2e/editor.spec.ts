@@ -64,4 +64,52 @@ test.describe('editor access', () => {
     ]);
     await expect(page.locator('h1')).toContainText('E2E Броня');
   });
+
+  test('writes to the server of the page', async ({ context, page }) => {
+    await actAs(context, 'editor');
+    await page.goto('/muffin/armor');
+
+    await page.getByTestId('edit-page').click();
+    await page.getByTestId('page-title').fill('E2E Броня Маффина (правка)');
+    await Promise.all([page.waitForLoadState('networkidle'), page.getByTestId('save-page').click()]);
+    await expect(page.locator('h1')).toContainText('E2E Броня Маффина (правка)');
+
+    const databaseUrl = process.env.E2E_DATABASE_URL;
+    if (databaseUrl) {
+      const client = new pg.Client({ connectionString: databaseUrl });
+      await client.connect();
+      try {
+        const revisions = await client.query(
+          'select server, title from wiki_revisions where slug = $1 order by id',
+          ['armor'],
+        );
+        expect(
+          revisions.rows.some(
+            (row) => row.server === 'muffin' && row.title === 'E2E Броня Маффина (правка)',
+          ),
+        ).toBe(true);
+        const pages = await client.query(
+          'select server, title from wiki_pages where slug = $1 order by server',
+          ['armor'],
+        );
+        expect(pages.rows).toEqual([
+          { server: 'bisquite', title: 'E2E Броня' },
+          { server: 'muffin', title: 'E2E Броня Маффина (правка)' },
+        ]);
+      } finally {
+        await client.end();
+      }
+    }
+
+    // the default server keeps its own article
+    await page.goto('/armor');
+    await expect(page.locator('h1')).toContainText('E2E Броня');
+
+    // restore the fixture title for the next run
+    await page.goto('/muffin/armor');
+    await page.getByTestId('edit-page').click();
+    await page.getByTestId('page-title').fill('E2E Броня Маффина');
+    await Promise.all([page.waitForLoadState('networkidle'), page.getByTestId('save-page').click()]);
+    await expect(page.locator('h1')).toContainText('E2E Броня Маффина');
+  });
 });

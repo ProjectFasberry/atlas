@@ -2,7 +2,8 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "sidebar": {
     "back": "На главный сайт",
-    "account": "К аккаунту"
+    "account": "К аккаунту",
+    "close": "Закрыть"
   },
   "layout": {
     "editor-badge": "Редактор",
@@ -57,7 +58,9 @@
     "about": {
       "title": "О проекте",
       "news": "Новости",
-      "status": "Статус"
+      "status": "Статус",
+      "team": "Команда",
+      "report": "Репорт"
     },
     "info": {
       "title": "Информация",
@@ -69,6 +72,16 @@
       "status": "Статус серверов",
       "faq": "FAQ"
     },
-    "warning": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С MOJANG ИЛИ MICROSOFT."
+    "warning": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С MOJANG ИЛИ MICROSOFT.",
+    "social": {
+      "telegram": "Telegram"
+    }
+  },
+  "server": {
+    "switch": "Сменить сервер",
+    "empty": {
+      "badge": "пусто",
+      "description": "Для сервера {name} статьи пока не добавлены."
+    }
   }
 }

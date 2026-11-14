@@ -13,7 +13,7 @@ import path from 'node:path';
 import { marked } from 'marked';
 import { wikiPages } from '../lib/db/schema.ts';
 import { htmlToMarkdown, jsxToHtml } from './lib/content.mjs';
-import { openDb, upsertPage } from './lib/db.mjs';
+import { DEFAULT_SERVER, openDb, upsertPage } from './lib/db.mjs';
 
 const CONTENT = path.join(process.cwd(), 'content/docs');
 const SEED = path.join(process.cwd(), 'content/seed.json');
@@ -57,8 +57,9 @@ async function importSeed(db, existing) {
   let imported = 0;
 
   for (const page of seed.pages ?? []) {
-    if (!force && existing.get(page.slug) === 'editor') {
-      console.log(`· ${page.slug || '/'} - есть правки из редактора, пропускаю`);
+    const server = page.server || DEFAULT_SERVER;
+    if (!force && existing.get(`${server}|${page.slug}`) === 'editor') {
+      console.log(`· ${server}/${page.slug || '/'} - есть правки из редактора, пропускаю`);
       continue;
     }
 
@@ -72,9 +73,11 @@ async function importSeed(db, existing) {
 async function main() {
   const { client, db } = await openDb();
   const existing = new Map(
-    (await db.select({ slug: wikiPages.slug, source: wikiPages.source }).from(wikiPages)).map(
-      (row) => [row.slug, row.source],
-    ),
+    (
+      await db
+        .select({ server: wikiPages.server, slug: wikiPages.slug, source: wikiPages.source })
+        .from(wikiPages)
+    ).map((row) => [`${row.server}|${row.slug}`, row.source]),
   );
 
   const files = (await fs.readdir(CONTENT).catch(() => [])).filter((file) => file.endsWith('.mdx'));
@@ -122,7 +125,7 @@ async function main() {
 
     const slug = item.slug === 'index' ? '' : item.slug;
 
-    if (!force && existing.get(slug) === 'editor') {
+    if (!force && existing.get(`${DEFAULT_SERVER}|${slug}`) === 'editor') {
       console.log(`· ${slug || '/'} - есть правки из редактора, пропускаю`);
       skipped += 1;
       continue;
@@ -132,6 +135,7 @@ async function main() {
     const html = jsxToHtml(String(await marked.parse(body)));
 
     await upsertPage(db, {
+      server: DEFAULT_SERVER,
       slug,
       title: data.title || slug || 'Fasberry Wiki',
       description: data.description || '',
