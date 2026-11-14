@@ -2,6 +2,9 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 import * as schema from '../../lib/db/schema.ts';
 
+/** Must match `lib/content/default-server.ts` and the schema default. */
+export const DEFAULT_SERVER = 'bisquite';
+
 export const ROOT = process.cwd();
 
 /** DATABASE_URL, or the standard PG* variables when the password needs no URI escaping. */
@@ -32,6 +35,7 @@ export async function openDb() {
 
 export async function upsertPage(db, page) {
   const values = {
+    server: page.server ?? DEFAULT_SERVER,
     slug: page.slug,
     title: page.title,
     description: page.description ?? '',
@@ -48,7 +52,7 @@ export async function upsertPage(db, page) {
     .insert(schema.wikiPages)
     .values(values)
     .onConflictDoUpdate({
-      target: schema.wikiPages.slug,
+      target: [schema.wikiPages.server, schema.wikiPages.slug],
       set: {
         title: values.title,
         description: values.description,

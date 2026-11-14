@@ -25,7 +25,7 @@ export const UserMenu = reatomComponent(({ ctx }) => {
         data-testid="user-menu"
         aria-label={m['user.menu']({}, { locale })}
         className="
-          relative block size-8 rounded-sm transition hover:opacity-90
+          relative block size-8 rounded-md transition hover:opacity-90
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fd-ring
         "
       >
@@ -40,7 +40,7 @@ export const UserMenu = reatomComponent(({ ctx }) => {
         <Menu.Positioner>
           <Menu.Content
             className="
-              z-50 min-w-56 rounded-xl border border-fd-border bg-fd-popover p-1.5
+              z-50 min-w-56 rounded-lg border border-fd-border bg-fd-popover p-1.5
               text-fd-popover-foreground shadow-lg outline-none
               data-[state=open]:animate-in data-[state=open]:fade-in
               data-[state=closed]:animate-out data-[state=closed]:fade-out

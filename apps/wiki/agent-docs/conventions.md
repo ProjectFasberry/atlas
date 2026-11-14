@@ -6,6 +6,8 @@
 - Imports use the `@/` alias (see `tsconfig.json`).
 - Styling is Tailwind v4 + Fumadocs tokens (`bg-fd-card`, `text-fd-muted-foreground`,
   `border-fd-border`, `ring-fd-ring`); classes are joined with `cn` from `lib/utils/cn.ts`.
+- Radius scale: `rounded-lg` for mid surfaces, `rounded-md` for small controls, `rounded-sm` for
+  tiny ones; no `rounded-full`, `rounded-xl`, `2xl` or `3xl`.
 - Comments explain "why", not "what", and follow the style of the surrounding code.
 - Keep changes minimal, do not refactor neighbouring code.
 
@@ -38,6 +40,8 @@ refs for DOM only. Below are the wiki naming and model conventions.
 - Drizzle ORM, never raw SQL in application code: `const db = await database()` from `lib/db/index.ts`,
   tables from `lib/db/schema.ts`. Types come from `typeof wikiPages.$inferSelect`.
 - The pool and the drizzle instance are cached on `globalThis`, one per process.
+- Pages are always read and written together with their server: `getPage(server, slug)`,
+  `savePage(server, slug, ...)`. Never query `wiki_pages` by `slug` alone.
 - Writes that touch more than one row go through `db.transaction` (see `savePage`).
 - `lib/db/schema.ts` is the source of truth. After changing it run `pnpm db:generate`, commit the new
   file in `drizzle/`; migrations are applied by the app on start (`public.wiki_migrations`).

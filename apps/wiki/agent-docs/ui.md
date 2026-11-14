@@ -9,7 +9,9 @@
 (`.dark #nd-sidebar`).
 
 The project name font is `PIXY` (`@font-face` from `/fonts/PIXY.ttf`), all other text is
-`Inter` via `next/font/google` in `app/layout.tsx`.
+`Golos Text` via `next/font/google` in `app/layout.tsx` - the same family minotaur uses. The
+variable is `--font-golos`, `@theme` maps it to `--font-sans`, so Fumadocs and Tailwind text use it
+too.
 
 ## Header
 
@@ -18,15 +20,51 @@ The goal is to match `app.fasberry.fun`: 80px tall.
 ```css
 #nd-notebook-layout:has(#nd-subnav) { --fd-header-height: 5rem; }
 #nd-subnav [data-header-body] { height: 5rem; }
+#nd-subnav { z-index: 30; } /* above the article and its sticky blocks */
 ```
 
-The right side of the header is `shared/ui/header-controls.tsx`: the language switch, the theme
-switch and, for a signed-in user, the skin-head badge (`shared/components/app/user-menu.tsx`) whose
-dropdown holds the "Editor" chip. The badge is filled from the server through `$viewer`.
+The header is `z-index: 30`: the sidebar is `20`, fumadocs drawers are `40`, popovers and the
+shared bottom sheet are `50`. The editor
+toolbar sticks at `top-20` (80px), exactly below the header, never under it.
+
+The right side of the header is `shared/ui/header-controls.tsx`: the server switcher
+(`shared/ui/server-switcher.tsx`), the language flag menu (`shared/ui/language-menu.tsx`), the
+morphing theme icon (`shared/components/theme/theme-toggle.tsx`) and, for a signed-in user, the
+skin-head badge (`shared/components/app/user-menu.tsx`) whose dropdown holds the "Editor" chip.
+
+The theme icon is `Classic` from `@theme-toggles/react`: the sun collapses into a crescent and
+back, the click still starts the circle reveal from its coordinates. The language is just a flag;
+the menu lists the languages natively and writes the same `locale` cookie. The server switcher
+reads `$servers` / `$serverSlugs` from Reatom, seeded by the layout through `ReatomProvider`, and
+derives the current server from `usePathname`, so no props cross the fumadocs client boundary.
 
 `lib/ui/layout.tsx` defines `nav.title`: the `/favicon.svg` image at 40x40, the name
 `Fasberry` in PIXY and a small `wiki` under it (`subscript`), like on the main site. The same
 file holds the Fumadocs translations (`i18nProvider(translations)`).
+
+## Drawer
+
+Mobile navigation is the shared bottom sheet from `@repo/ui/src/drawer.tsx`, not the fumadocs
+right-side drawer (`#nd-sidebar-mobile` is hidden in `global.css`). `shared/ui/wiki-sidebar.tsx`
+keeps the fumadocs sidebar for desktop and renders its page tree into `DrawerContent`; the header
+trigger and the sheet share the fumadocs `useSidebar` context. The sheet is bottom-up
+(`max-h-[80dvh]`, `rounded-t-lg`) with a grabber, a close button and `HeaderControls` in the
+footer. Minotaur wraps the same primitives in `shared/ui/vaul.tsx` with its neutral palette.
+
+## Footer
+
+`shared/components/app/footer.tsx` renders `SiteFooter` from `@repo/ui` - the same component and
+columns as minotaur, with the `wiki` suffix in the logo. The shared component is presentational:
+the app passes the logo node, the columns, the socials and the warning; minotaur additionally
+passes its Vike `Link` as `linkComponent`. The footer is a dark green band, so it looks the same
+on the light and on the dark theme.
+
+## Radius scale
+
+One scale for the whole app: mid-sized surfaces (`cards`, `search`, `menus`, `drawer`, `footer
+icons`) use `rounded-lg` (8px), small controls (`buttons`, `chips`, `flags`) use `rounded-md`
+(6px), nothing is a pill. Fumadocs ships `rounded-xl` on the header search trigger, dialogs and code
+blocks and a `rounded-full` in one header button - `app/global.css` overrides those to `lg`.
 
 ## Favicons
 
@@ -99,4 +137,5 @@ layers are removed at the end. `stopCover`/`revealId` cancel the previous animat
 
 `.wiki-editor-content` reproduces the article look inside TipTap: spacing, h2/h3, lists, quote,
 code, links, images with a border and rounding. The same rules for `article img`, `article table`
-apply in read mode, because an article is plain HTML rather than a component.
+apply in read mode, because an article is plain HTML rather than a component. Code and images use
+the same radius scale (code `md`, images and code blocks `lg`).

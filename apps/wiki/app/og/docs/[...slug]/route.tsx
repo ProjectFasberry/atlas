@@ -3,6 +3,7 @@ import path from 'node:path';
 import { notFound } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 import { getPage, pageDescription } from '@/lib/content/pages';
+import { getServers, resolveRoute } from '@/lib/content/servers';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,8 +48,9 @@ async function loadHero() {
 
 export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...slug]'>) {
   const { slug } = await params;
-  const pageSlug = (slug ?? []).slice(0, -1).join('/');
-  const page = await getPage(pageSlug);
+  const segments = (slug ?? []).slice(0, -1);
+  const { server, slug: pageSlug } = resolveRoute(segments, await getServers());
+  const page = await getPage(server, pageSlug);
   if (!page) notFound();
 
   const headers = {
@@ -56,8 +58,8 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
     'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
   };
 
-  const key = cardCacheKey(page);
-  const cached = cards.get(pageSlug);
+  const key = `${server}:${cardCacheKey(page)}`;
+  const cached = cards.get(key);
   if (cached?.key === key) {
     return new Response(new Uint8Array(cached.png), { headers });
   }
@@ -115,7 +117,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
               display: 'flex',
               alignSelf: 'flex-start',
               padding: '6px 18px',
-              borderRadius: 999,
+              borderRadius: 8,
               border: `2px solid ${BRAND}`,
               color: BRAND,
               fontSize: 24,
@@ -172,7 +174,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
   );
 
   const png = Buffer.from(await image.arrayBuffer());
-  cards.set(pageSlug, { key, png });
+  cards.set(key, { key, png });
   if (cards.size > CARD_CACHE_LIMIT) {
     const oldest = cards.keys().next().value;
     if (oldest !== undefined) cards.delete(oldest);

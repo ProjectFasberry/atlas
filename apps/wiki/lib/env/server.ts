@@ -23,6 +23,8 @@ const schema = z
       .transform((value) => value === '1'),
     /** Backend endpoint that answers whether the current cookie may edit. */
     WIKI_AUTH_CHECK_URL: z.url().optional(),
+    /** Public Fasberry api, read for the server switcher. */
+    WIKI_API_URL: z.url().default('https://api.fasberry.fun'),
   })
   .superRefine((value, ctx) => {
     if (value.DATABASE_URL || value.WIKI_DATABASE_URL) return;
@@ -58,6 +60,7 @@ export type ServerEnv = {
   migrationsDir: string | null;
   editorOpen: boolean;
   authCheckUrl: string | null;
+  apiUrl: string;
 };
 
 function resolve(parsed: ParsedEnv): ServerEnv {
@@ -79,6 +82,7 @@ function resolve(parsed: ParsedEnv): ServerEnv {
     migrationsDir: parsed.WIKI_MIGRATIONS_DIR ?? null,
     editorOpen: parsed.WIKI_EDITOR_OPEN,
     authCheckUrl: parsed.WIKI_AUTH_CHECK_URL ?? null,
+    apiUrl: parsed.WIKI_API_URL.replace(/\/$/, ''),
   };
 }
 

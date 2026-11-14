@@ -3,6 +3,7 @@ import { withAssign } from '@reatom/primitives';
 import { http } from '@/lib/utils/http';
 
 export type PageDraft = {
+  server: string;
   slug: string;
   title: string;
   description: string;
@@ -55,6 +56,7 @@ export const $draft = atom<PageDraft | null>(null, 'wikiPage.draft').pipe(
 
         const response = await http
           .put(`/api/wiki/pages${draft.slug ? `/${draft.slug}` : ''}`, {
+            searchParams: { server: draft.server },
             json: { title: draft.title, description: draft.description, html },
             throwHttpErrors: false,
           })

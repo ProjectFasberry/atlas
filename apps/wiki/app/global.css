@@ -1,8 +1,18 @@
 @import "tailwindcss";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+@import "@theme-toggles/react/styles/classic.css";
 
 @source "../../../pkgs/ui/src/**/*.{ts,tsx}";
+
+/*
+ * One font for the whole app: Golos Text, the same family minotaur uses.
+ * The font is self-hosted by next/font, `--font-golos` is set on <html>.
+ */
+@theme {
+  --font-sans: var(--font-golos), "Golos Text", sans-serif;
+  --default-font-family: var(--font-golos), "Golos Text", sans-serif;
+}
 
 @font-face {
   font-family: "PIXY";
@@ -54,26 +64,6 @@
   --color-fd-ring: #4ade80;
 }
 
-/*
- * Apple-like segmented control (theme and language switches): a soft grey track,
- * a white thumb with a small shadow, muted labels outside the thumb.
- */
-:root {
-  --seg-track: rgb(118 118 128 / 0.12);
-  --seg-thumb: #ffffff;
-  --seg-thumb-foreground: #1c1c1e;
-  --seg-muted: rgb(60 60 67 / 0.6);
-  --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.12), 0 3px 1px rgb(0 0 0 / 0.04);
-}
-
-.dark {
-  --seg-track: rgb(118 118 128 / 0.32);
-  --seg-thumb: #636366;
-  --seg-thumb-foreground: #ffffff;
-  --seg-muted: rgb(235 235 245 / 0.6);
-  --seg-shadow: 0 3px 8px rgb(0 0 0 / 0.4), 0 3px 1px rgb(0 0 0 / 0.16);
-}
-
 /* Fumadocs overrides the sidebar separately in the dark theme */
 .dark #nd-sidebar {
   --color-fd-muted: #171b1a;
@@ -86,6 +76,7 @@
 html {
   scrollbar-gutter: stable;
   background-color: var(--color-fd-background);
+  font-family: var(--font-golos), "Golos Text", sans-serif;
 }
 
 html > body[data-scroll-locked] {
@@ -102,6 +93,11 @@ html > body[data-scroll-locked] {
   height: 5rem;
 }
 
+/* The header is a layer above the article and every sticky block inside it. */
+#nd-subnav {
+  z-index: 30;
+}
+
 /* Sidebar: soft rounding and a visible active item */
 #nd-sidebar a {
   border-radius: 0.5rem;
@@ -109,6 +105,25 @@ html > body[data-scroll-locked] {
 
 #nd-sidebar a[data-active="true"] {
   font-weight: 500;
+}
+
+/* Mobile navigation is the shared bottom sheet, not the fumadocs side drawer. */
+#nd-sidebar-mobile {
+  display: none !important;
+}
+
+/*
+ * Radius scale: mid-sized surfaces use lg (8px), small controls md (6px),
+ * nothing is a pill or a bubble. Fumadocs ships rounded-xl/full in a few places.
+ */
+#nd-subnav [data-search-full],
+[role="dialog"],
+.shiki {
+  border-radius: var(--radius-lg);
+}
+
+#nd-subnav button.rounded-full {
+  border-radius: var(--radius-lg);
 }
 
 /* Theme switch: the new colour unfolds as a circle from the click point.
@@ -293,7 +308,7 @@ body::after {
 }
 
 .wiki-editor-content code {
-  border-radius: 0.3rem;
+  border-radius: 0.375rem;
   background: var(--color-fd-muted);
   padding: 0.1rem 0.3rem;
   font-size: 0.9em;

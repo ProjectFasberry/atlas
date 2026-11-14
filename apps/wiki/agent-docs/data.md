@@ -16,8 +16,12 @@ type comes from `typeof wikiPages.$inferSelect` rather than a hand-written inter
 
 ### `wiki_pages`
 
+The primary key is `(server, slug)`: the same slug can exist on several servers, and the default
+server (`bisquite`) is the one with short URLs.
+
 | Field | Meaning |
 | --- | --- |
+| `server` (PK) | server the page belongs to, `bisquite` by default |
 | `slug` (PK) | page key, `''` is the overview; a `/`-separated path |
 | `title`, `description` | heading and a short description |
 | `html` | sanitized HTML (source of truth for rendering) |
@@ -29,9 +33,14 @@ type comes from `typeof wikiPages.$inferSelect` rather than a hand-written inter
 
 ### `wiki_revisions`
 
-Edit history written by the editor: `id` (identity), `slug` (FK to `wiki_pages`, `ON DELETE
-CASCADE`), `title`, `description`, `html`, `created_at`, `author`. Written in the same transaction
-as the page update (`savePage` in `lib/content/pages.ts`). There is no rollback UI yet - the data is there.
+Edit history written by the editor: `id` (identity), `server` + `slug` (composite FK to
+`wiki_pages`, `ON DELETE CASCADE`), `title`, `description`, `html`, `created_at`, `author`.
+Written in the same transaction as the page update (`savePage` in `lib/content/pages.ts`).
+There is no rollback UI yet - the data is there.
+
+`wiki_page_translations` has the same `(server, slug)` pair in its primary key, so a translation
+never leaks to another server. `wiki_section_translations` stays global: the sidebar group names
+are shared by all servers.
 
 ### `wiki_images`
 
@@ -44,8 +53,9 @@ the shared `general` database.
 ## Scripts
 
 ```bash
-pnpm sync:wiki                    # Fasberry backend -> PostgreSQL
+pnpm sync:wiki                    # Fasberry backend -> PostgreSQL (bisquite)
 pnpm sync:wiki --force            # also overwrite pages edited in the editor
+pnpm sync:wiki --server muffin    # write the same backend content into another server
 pnpm db:import                    # content/seed.json -> PostgreSQL
 pnpm db:import --force            # also overwrite pages edited in the editor
 pnpm db:export                    # PostgreSQL -> content/seed.json
@@ -53,7 +63,9 @@ pnpm db:export                    # PostgreSQL -> content/seed.json
 
 - `sync-wiki.mjs` calls `WIKI_API_URL` (default `https://api.fasberry.fun`) for
   `/wiki/categories` and `/wiki/category/{slug}`, converts TipTap JSON into HTML/markdown and
-  writes pages into PostgreSQL. Without `--force` it skips pages with `source = 'editor'`, like
+  writes pages into PostgreSQL for `--server` (`bisquite` by default). The backend routes are not
+  server-scoped yet, so only the default server is synced in practice; other servers are filled
+  through the editor. Without `--force` it skips pages with `source = 'editor'`, like
   `db-import.mjs`. Images stay in the public bucket: the script only normalises
   legacy addresses (`volume.fasberry.su`, local MinIO) to `volume.fasberry.fun` and reports the
   skipped nodes in `content/wiki-sync-report.json` (not tracked by git).
@@ -79,6 +91,7 @@ because `process.env.NEXT_PUBLIC_*` has to be read literally to be inlined.
 | `WIKI_DB_POOL_MAX` | server | pool size, `8` by default |
 | `WIKI_EDITOR_OPEN` | server | `1` opens the editor to everyone (locally, preview) |
 | `WIKI_AUTH_CHECK_URL` | server | endpoint that answers from the cookie whether editing is allowed |
+| `WIKI_API_URL` | server | public api for the server switcher, `https://api.fasberry.fun` by default |
 | `NEXT_PUBLIC_SITE_URL` | build | base URL for metadata, defaults to `https://wiki.fasberry.fun` |
 | `WIKI_API_URL` | `sync:wiki` | content source |
 | `PORT` | standalone | server port |

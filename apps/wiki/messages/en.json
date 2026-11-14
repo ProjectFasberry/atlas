@@ -2,7 +2,8 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "sidebar": {
     "back": "Back to the website",
-    "account": "Go to account"
+    "account": "Go to account",
+    "close": "Close"
   },
   "layout": {
     "editor-badge": "Editor",
@@ -57,7 +58,9 @@
     "about": {
       "title": "About the project",
       "news": "News",
-      "status": "Status"
+      "status": "Status",
+      "team": "Team",
+      "report": "Report"
     },
     "info": {
       "title": "Information",
@@ -69,6 +72,16 @@
       "status": "Server status",
       "faq": "FAQ"
     },
-    "warning": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
+    "warning": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
+    "social": {
+      "telegram": "Telegram"
+    }
+  },
+  "server": {
+    "switch": "Switch server",
+    "empty": {
+      "badge": "empty",
+      "description": "No articles for {name} yet."
+    }
   }
 }

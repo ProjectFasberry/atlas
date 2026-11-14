@@ -40,6 +40,7 @@ import { $locale } from '@/shared/models/locale.model';
 import { $draft, $saveState, uploadImage } from '@/shared/models/wiki-page.model';
 
 type Props = {
+  server: string;
   slug: string;
   title: string;
   description: string;
@@ -75,11 +76,11 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
     'save-error': t(m['editor.save-error']),
     'upload-error': t(m['editor.upload-error']),
   } as const;
-  const { slug, title, description, html, markdownUrl, canEdit, icon, editSource } = props;
+  const { server, slug, title, description, html, markdownUrl, canEdit, icon, editSource } = props;
 
   const stored = ctx.spy($draft);
   // the draft atom outlives navigation: ignore a draft that belongs to another page
-  const draft = stored?.slug === slug ? stored : null;
+  const draft = stored?.server === server && stored.slug === slug ? stored : null;
   const saveState = ctx.spy($saveState);
   const editing = draft !== null;
   const fileInput = useRef<HTMLInputElement>(null);
@@ -97,7 +98,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
 
   function startEdit() {
     editor?.commands.setContent(editSource.html);
-    $draft.start(ctx, { slug, ...editSource });
+    $draft.start(ctx, { server, slug, ...editSource });
   }
 
   function cancelEdit() {
@@ -181,7 +182,7 @@ export const WikiPage = reatomComponent<Props>(({ ctx, ...props }) => {
               {t(m['editor.source-locale'])}
             </p>
           ) : null}
-          <div className="sticky top-16 z-10 flex flex-wrap items-center gap-1 rounded-lg border bg-fd-card/95 p-1.5 backdrop-blur">
+          <div className="sticky top-20 z-10 flex flex-wrap items-center gap-1 rounded-lg border bg-fd-card/95 p-1.5 backdrop-blur">
             <ToolButton
               label={t(m['editor.undo'])}
               disabled={!editor?.can().chain().focus().undo().run()}

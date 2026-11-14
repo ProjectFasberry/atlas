@@ -29,6 +29,7 @@
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tabler/icons-react": "3.50.0",
+    "@theme-toggles/react": "5.0.5",
     "@tiptap/extension-image": "3.10.5",
     "@tiptap/extension-table": "3.10.5",
     "@tiptap/pm": "3.10.5",

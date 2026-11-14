@@ -2,13 +2,15 @@
 
 import { ThemeToggle } from '@/shared/components/theme/theme-toggle';
 import { UserMenu } from '@/shared/components/app/user-menu';
-import { LanguageToggle } from '@/shared/ui/language-toggle';
+import { LanguageMenu } from '@/shared/ui/language-menu';
+import { ServerSwitcher } from '@/shared/ui/server-switcher';
 
-/** Header controls: language and theme switches, then the signed-in user badge. */
+/** Header and drawer controls: server, language, theme, then the signed-in user. */
 export function HeaderControls() {
   return (
     <div className="flex shrink-0 items-center gap-1.5">
-      <LanguageToggle />
+      <ServerSwitcher />
+      <LanguageMenu />
       <ThemeToggle />
       <UserMenu />
     </div>

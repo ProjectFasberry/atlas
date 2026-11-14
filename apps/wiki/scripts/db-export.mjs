@@ -19,7 +19,7 @@ async function main() {
   const pages = await db
     .select()
     .from(wikiPages)
-    .orderBy(asc(wikiPages.position), asc(wikiPages.slug));
+    .orderBy(asc(wikiPages.server), asc(wikiPages.position), asc(wikiPages.slug));
   await client.end();
 
   const target = path.join(process.cwd(), 'content/seed.json');
