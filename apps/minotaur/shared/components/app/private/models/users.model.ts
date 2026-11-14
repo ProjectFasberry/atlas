@@ -125,7 +125,40 @@ export const users = atom(null, "users").pipe(
       withCache({ swr: false }),
       withStatusesAtom(),
       withAbort()
-    )
+    ),
+    rejectSkin: reatomAsync(async (ctx, args: { nickname: string, skinName: string }) => {
+      const result = await client.raw.delete<{ removed: number }>(
+        `/privated/user/${args.nickname}/skin`,
+        { json: { skinName: args.skinName } },
+      )
+
+      const data = await client.get("/privated/user/{nickname}", {
+        params: { path: { nickname: args.nickname } },
+      })
+      users.fetchSingle.dataAtom(ctx, data)
+
+      return result
+    }, {
+      name: `${name}.rejectSkin`,
+      onFulfill: () => toast.success("Скин отклонён"),
+      onReject: (_, e) => logError(e, { type: "combined" }),
+    }).pipe(withStatusesAtom()),
+    rejectAllSkins: reatomAsync(async (ctx, nickname: string) => {
+      const result = await client.raw.delete<{ removed: number }>(
+        `/privated/user/${nickname}/skins`,
+      )
+
+      const data = await client.get("/privated/user/{nickname}", {
+        params: { path: { nickname } },
+      })
+      users.fetchSingle.dataAtom(ctx, data)
+
+      return result
+    }, {
+      name: `${name}.rejectAllSkins`,
+      onFulfill: () => toast.success("Скины отклонены"),
+      onReject: (_, e) => logError(e, { type: "combined" }),
+    }).pipe(withStatusesAtom())
   }))
 )
 

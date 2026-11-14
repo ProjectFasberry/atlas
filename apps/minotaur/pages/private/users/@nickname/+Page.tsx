@@ -4,7 +4,8 @@ import { reatomComponent, useAtom } from "@reatom/npm-react"
 import { Typography } from "@/shared/ui/typography"
 import { dayjs } from "@/shared/lib/dayjs"
 import { createPageModel } from "@/shared/lib/events"
-import { users } from "@/shared/components/app/private/models/users.model"
+import { users, type PrivatedUser } from "@/shared/components/app/private/models/users.model"
+import { Button } from "@/shared/ui/button"
 import { PageLoader } from "@/shared/ui/page-loader"
 import { BackButton } from "@/shared/ui/back-button"
 import { ClientOnly } from "vike-react/ClientOnly"
@@ -19,7 +20,8 @@ const UserInfo = reatomComponent(({ ctx }) => {
   if (!data) return null;
 
   return (
-    <div className="flex sm:flex-row flex-col w-full gap-4 items-start">
+    <div className="flex flex-col gap-6 w-full">
+      <div className="flex sm:flex-row flex-col w-full gap-4 items-start">
       <div className="flex flex-col items-start w-full sm:w-[100%-300px] h-full">
         <Avatar url={data.avatar} nickname={data.nickname} className="h-20 w-20 mb-4" />
         <Typography>
@@ -50,9 +52,48 @@ const UserInfo = reatomComponent(({ ctx }) => {
           <span className="m-auto text-neutral-400">Скина нет</span>
         )}
       </div>
+      </div>
+      {data.skin?.length ? <SkinsModeration nickname={data.nickname} skins={data.skin} /> : null}
     </div>
   )
 }, "UserInfo")
+
+const SkinsModeration = reatomComponent<{ nickname: string, skins: NonNullable<PrivatedUser["skin"]> }>(({
+  ctx, nickname, skins
+}) => (
+  <div className="flex flex-col gap-2 w-full max-w-2xl">
+    <Typography className="font-semibold">Скины</Typography>
+    {skins.map((skin) => (
+      <div
+        key={skin.skin_identifier}
+        className="flex items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/40 px-3 py-2"
+      >
+        <div className="flex flex-col min-w-0">
+          <Typography className="text-sm truncate">{skin.skin_identifier}</Typography>
+          <Typography className="text-xs text-neutral-500">
+            {dayjs(skin.timestamp * 1000).format("DD.MM.YYYY HH:mm")}
+          </Typography>
+        </div>
+        <Button
+          background="default"
+          className="h-8 px-3 text-xs"
+          disabled={ctx.spy(users.rejectSkin.statusesAtom).isPending}
+          onClick={() => users.rejectSkin(ctx, { nickname, skinName: skin.skin_identifier })}
+        >
+          Отклонить
+        </Button>
+      </div>
+    ))}
+    <Button
+      background="default"
+      className="h-9 px-3 text-sm w-fit"
+      disabled={ctx.spy(users.rejectAllSkins.statusesAtom).isPending}
+      onClick={() => users.rejectAllSkins(ctx, nickname)}
+    >
+      Отклонить все
+    </Button>
+  </div>
+), "SkinsModeration")
 
 const page = createPageModel({
   name: "users",
