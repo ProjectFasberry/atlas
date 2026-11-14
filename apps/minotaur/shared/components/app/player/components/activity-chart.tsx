@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { playerActivity, type PlayerActivityDailyPayload } from "../models/activity.model";
 import { playerState } from "../models/player.model";
@@ -79,6 +80,11 @@ const ActivityChartSkeleton = () => (
 const ActivityChart = ({ payload }: { payload: PlayerActivityDailyPayload }) => {
   const weeks = buildWeeks(payload);
   const cells = weeks.flat();
+  const [hovered, setHovered] = useState<Nullable<{
+    x: number;
+    y: number;
+    label: string;
+  }>>(null);
 
   return (
     <div className="flex flex-col gap-3 w-full bg-neutral-900 rounded-xl p-4">
@@ -96,18 +102,30 @@ const ActivityChart = ({ payload }: { payload: PlayerActivityDailyPayload }) => 
           role="img"
           aria-label={translate["player.activity.chart.title"]()}
         >
-          {cells.map((cell) => (
-            <div
-              key={cell.key}
-              className={`${CELL_CLASS} ${cell.isFuture ? "bg-transparent" : levelClass(cell.minutes)}`}
-              title={cell.isFuture
-                ? undefined
-                : translate["player.activity.chart.tooltip"]({
-                  date: cell.date.format("DD.MM.YYYY"),
-                  hours: formatHours(cell.minutes),
-                })}
-            />
-          ))}
+          {cells.map((cell) => {
+            const label = cell.isFuture
+              ? null
+              : translate["player.activity.chart.tooltip"]({
+                date: cell.date.format("DD.MM.YYYY"),
+                hours: formatHours(cell.minutes),
+              });
+
+            return (
+              <div
+                key={cell.key}
+                className={`${CELL_CLASS} ${cell.isFuture ? "bg-transparent" : levelClass(cell.minutes)}`}
+                aria-label={label ?? undefined}
+                onMouseEnter={label
+                  ? (event) => setHovered({
+                    x: event.clientX,
+                    y: event.clientY,
+                    label,
+                  })
+                  : undefined}
+                onMouseLeave={label ? () => setHovered(null) : undefined}
+              />
+            );
+          })}
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-400">
@@ -124,6 +142,15 @@ const ActivityChart = ({ payload }: { payload: PlayerActivityDailyPayload }) => 
           <span>{translate["player.activity.chart.more"]()}</span>
         </div>
       </div>
+      {hovered && (
+        <div
+          className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-lg
+            border border-neutral-700 bg-neutral-950 px-2.5 py-1.5 text-sm text-neutral-100 shadow-lg"
+          style={{ left: hovered.x, top: hovered.y - 8 }}
+        >
+          {hovered.label}
+        </div>
+      )}
     </div>
   );
 };

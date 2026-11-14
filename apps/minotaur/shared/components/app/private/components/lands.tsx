@@ -163,8 +163,8 @@ const CreateLandForm = reatomComponent(({ ctx }) => {
 			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
 				<Field
 					label={mode === "random" ? "Название (необязательно)" : "Название"}
-					value={ctx.spy(landsState.create.name)}
-					onChange={(value) => landsState.create.name(ctx, value)}
+					value={ctx.spy(landsState.create.landName)}
+					onChange={(value) => landsState.create.landName(ctx, value)}
 				/>
 				<Field
 					label="Описание"

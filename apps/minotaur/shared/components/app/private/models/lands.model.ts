@@ -61,7 +61,7 @@ export const landsState = atom(null, "landsState").pipe(
 		create: atom(null, `${name}.create`).pipe(
 			withAssign((_, name) => ({
 				mode: atom<CreateMode>("random", `${name}.mode`).pipe(withReset()),
-				name: atom("", `${name}.name`).pipe(withReset()),
+				landName: atom("", `${name}.landName`).pipe(withReset()),
 				title: atom("", `${name}.title`).pipe(withReset()),
 				type: atom("player", `${name}.type`).pipe(withReset()),
 				level: atom(1, `${name}.level`).pipe(withReset()),
@@ -74,7 +74,7 @@ export const landsState = atom(null, "landsState").pipe(
 
 const resetCreate = action((ctx) => {
 	landsState.create.mode.reset(ctx);
-	landsState.create.name.reset(ctx);
+	landsState.create.landName.reset(ctx);
 	landsState.create.title.reset(ctx);
 	landsState.create.type.reset(ctx);
 	landsState.create.level.reset(ctx);
@@ -168,7 +168,7 @@ export const createRandomLand = reatomAsync(async (ctx) => {
 		json: {
 			players: selected.map((player) => player.uuid),
 			chunks: ctx.get(landsState.create.chunks),
-			name: ctx.get(landsState.create.name).trim() || undefined,
+			name: ctx.get(landsState.create.landName).trim() || undefined,
 			title: ctx.get(landsState.create.title).trim() || undefined,
 		},
 	});
@@ -195,7 +195,7 @@ export const createManualLand = reatomAsync(async (ctx) => {
 	return await client.raw.post<AdminLand>("/privated/lands/manual", {
 		json: {
 			players: selected.map((player) => player.uuid),
-			name: ctx.get(landsState.create.name).trim(),
+			name: ctx.get(landsState.create.landName).trim(),
 			title: ctx.get(landsState.create.title).trim() || undefined,
 			type: ctx.get(landsState.create.type).trim(),
 			level: ctx.get(landsState.create.level),
@@ -263,7 +263,7 @@ export const lands = atom(null, "lands").pipe(
 
 export const createIsValidAtom = atom((ctx) => {
 	const mode = ctx.spy(landsState.create.mode);
-	const name = ctx.spy(landsState.create.name).trim();
+	const name = ctx.spy(landsState.create.landName).trim();
 	const type = ctx.spy(landsState.create.type).trim();
 	const players = ctx.spy(landsState.selectedPlayers);
 
