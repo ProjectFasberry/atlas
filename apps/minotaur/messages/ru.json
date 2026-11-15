@@ -350,7 +350,7 @@
     },
     "gallery": {
       "title": "Галерея",
-      "hint": "До 12 изображений, PNG/JPEG/WebP до 2 МБ"
+      "hint": "До 3 изображений, PNG/JPEG/WebP до 2 МБ"
     }
   },
   "default": {

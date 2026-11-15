@@ -350,7 +350,7 @@
     },
     "gallery": {
       "title": "Gallery",
-      "hint": "Up to 12 images, PNG/JPEG/WebP under 2 MB"
+      "hint": "Up to 3 images, PNG/JPEG/WebP under 2 MB"
     }
   },
   "default": {

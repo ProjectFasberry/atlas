@@ -31,6 +31,7 @@ const LandGallery = reatomComponent(({ ctx }) => {
 
   if (editing) {
     const existing = landGallery.filter((url) => !removed.includes(url))
+    const canAdd = existing.length + pending.length < 3
 
     return (
       <div className="flex flex-col gap-2">
@@ -64,19 +65,21 @@ const LandGallery = reatomComponent(({ ctx }) => {
               </button>
             </div>
           ))}
-          <label className="flex aspect-video items-center justify-center rounded-lg border border-dashed border-neutral-700 text-neutral-500 cursor-pointer hover:border-neutral-500">
-            <input
+          {canAdd && (
+            <label className="flex aspect-video items-center justify-center rounded-lg border border-dashed border-neutral-700 text-neutral-500 cursor-pointer hover:border-neutral-500">
+              <input
               type="file"
               accept="image/png,image/jpeg,image/webp"
               multiple
               className="hidden"
-              onChange={(e) => {
-                landEditing.gallery.add(ctx, e.target.files)
-                e.currentTarget.value = ""
-              }}
-            />
-            <Icon name="sprite:plus" className="size-5" />
-          </label>
+                onChange={(e) => {
+                  landEditing.gallery.add(ctx, e.target.files)
+                  e.currentTarget.value = ""
+                }}
+              />
+              <Icon name="sprite:plus" className="size-5" />
+            </label>
+          )}
         </div>
         <span className="text-[11px] text-neutral-500">
           {translate["land.gallery.hint"]()}
