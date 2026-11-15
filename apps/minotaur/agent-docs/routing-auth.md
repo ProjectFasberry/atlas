@@ -96,3 +96,23 @@ cannot open.
   `actions.open`/`actions.goBack` (`private/models/actions.model.ts`); never
   mirror the query into a second atom or call `history.pushState` by hand.
 - Preserve filters/pagination in the query string when the page supports it.
+
+## Panel pages and tabs
+
+The private panel is grouped into pages with `?tab=` deep links:
+
+| Page | Tabs |
+| --- | --- |
+| `/private` | `general`, `roles`, `dictionaries`, `servers` |
+| `/private/content` | `news`, `banner`, `event`, `modpack`, `lands` |
+| `/private/moderation` | `team`, `audit` |
+| `/private/analytics` | `players`, `builds` |
+| `/private/api-keys` | single section |
+
+- Tabs and sidebar entries stay visible without a permission: the control is
+  disabled, the click is ignored and the direct URL is normalized to the first
+  allowed tab by the page.
+- Page guards still reject a direct visit when no tab permission matches.
+- Old URLs redirect: `?parent=` to the new page, `/private/servers` to
+  `?tab=servers`, `/private/metrics` to the analytics page, `/private/team`,
+  `/private/audit` and `/private/history` to the moderation page.

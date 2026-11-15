@@ -259,7 +259,7 @@ const SidebarBody = reatomComponent(({ ctx }) => {
         return (
           <Link
             key={link.title}
-            href={allowed ? link.value : "#"}
+            href={link.value}
             aria-disabled={!allowed}
             tabIndex={allowed ? undefined : -1}
             title={collapsed ? link.title : undefined}
