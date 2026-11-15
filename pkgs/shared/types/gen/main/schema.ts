@@ -5719,12 +5719,12 @@ export interface operations {
                      * @default RUB
                      * @enum {string}
                      */
-                    from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    from: "RUB" | "BELKOIN" | "CHARISM";
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    to: "RUB" | "BELKOIN" | "CHARISM";
                     rate: number;
                     spread?: number;
                     effectiveFrom?: string;
@@ -5734,12 +5734,12 @@ export interface operations {
                      * @default RUB
                      * @enum {string}
                      */
-                    from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    from: "RUB" | "BELKOIN" | "CHARISM";
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    to: "RUB" | "BELKOIN" | "CHARISM";
                     rate: number;
                     spread?: number;
                     effectiveFrom?: string;
@@ -5749,12 +5749,12 @@ export interface operations {
                      * @default RUB
                      * @enum {string}
                      */
-                    from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    from: "RUB" | "BELKOIN" | "CHARISM";
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    to: "RUB" | "BELKOIN" | "CHARISM";
                     rate: number;
                     spread?: number;
                     effectiveFrom?: string;
@@ -5767,8 +5767,8 @@ export interface operations {
         parameters: {
             query: {
                 amount: string;
-                from: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
-                to: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                from: "RUB" | "BELKOIN" | "CHARISM";
+                to: "RUB" | "BELKOIN" | "CHARISM";
             };
             header?: never;
             path?: never;
@@ -5805,12 +5805,12 @@ export interface operations {
                      * @default RUB
                      * @enum {string}
                      */
-                    from?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    from?: "RUB" | "BELKOIN" | "CHARISM";
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    to?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    to?: "RUB" | "BELKOIN" | "CHARISM";
                     rate?: number;
                     spread?: number;
                     effectiveFrom?: string;
@@ -5820,12 +5820,12 @@ export interface operations {
                      * @default RUB
                      * @enum {string}
                      */
-                    from?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    from?: "RUB" | "BELKOIN" | "CHARISM";
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    to?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    to?: "RUB" | "BELKOIN" | "CHARISM";
                     rate?: number;
                     spread?: number;
                     effectiveFrom?: string;
@@ -5835,12 +5835,12 @@ export interface operations {
                      * @default RUB
                      * @enum {string}
                      */
-                    from?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    from?: "RUB" | "BELKOIN" | "CHARISM";
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    to?: "RUB" | "USDT" | "USDC" | "BELKOIN" | "CHARISM";
+                    to?: "RUB" | "BELKOIN" | "CHARISM";
                     rate?: number;
                     spread?: number;
                     effectiveFrom?: string;
@@ -11071,39 +11071,39 @@ export interface operations {
                      * @default fake
                      * @enum {string}
                      */
-                    provider: "fake" | "sbp" | "heleket";
+                    provider: "fake" | "sbp";
                     amountMinor: string | number;
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    currency: "RUB" | "USDT" | "USDC";
+                    currency: "RUB";
                 };
                 "application/x-www-form-urlencoded": {
                     /**
                      * @default fake
                      * @enum {string}
                      */
-                    provider: "fake" | "sbp" | "heleket";
+                    provider: "fake" | "sbp";
                     amountMinor: string | number;
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    currency: "RUB" | "USDT" | "USDC";
+                    currency: "RUB";
                 };
                 "multipart/form-data": {
                     /**
                      * @default fake
                      * @enum {string}
                      */
-                    provider: "fake" | "sbp" | "heleket";
+                    provider: "fake" | "sbp";
                     amountMinor: string | number;
                     /**
                      * @default RUB
                      * @enum {string}
                      */
-                    currency: "RUB" | "USDT" | "USDC";
+                    currency: "RUB";
                 };
             };
         };

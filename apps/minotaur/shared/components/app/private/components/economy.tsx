@@ -560,7 +560,7 @@ const MigrationPanel = reatomComponent(({ ctx }) => {
 }, "EconomyMigration");
 
 
-const RATE_CURRENCIES = ["RUB", "USDT", "USDC", "BELKOIN", "CHARISM"] as const;
+const RATE_CURRENCIES = ["RUB", "BELKOIN", "CHARISM"] as const;
 
 const RatesSection = reatomComponent(({ ctx }) => {
   const canWrite = ctx.spy(currentUserState.perms).includes(ECONOMY_WRITE_PERMISSION);
@@ -747,7 +747,7 @@ const FakePaymentSection = reatomComponent(({ ctx }) => {
 }, "EconomyFakePayment");
 
 
-const MINOR_EXPONENT: Record<string, number> = { RUB: 2, USDT: 6, USDC: 6 };
+const MINOR_EXPONENT: Record<string, number> = { RUB: 2 };
 
 function formatMinor(amount: number, currency: string) {
   const exponent = MINOR_EXPONENT[currency] ?? 2;
@@ -922,7 +922,6 @@ const ORDER_PROVIDERS = [
   { label: "Все провайдеры", value: "" },
   { label: "Fake", value: "fake" },
   { label: "SBP", value: "sbp" },
-  { label: "Heleket", value: "heleket" },
 ];
 
 const FILTER_CONTROL_CLASS = "h-8 rounded-lg border border-neutral-800 bg-neutral-900 px-2 text-xs text-neutral-200 outline-none focus:ring-1 focus:ring-green-500";
