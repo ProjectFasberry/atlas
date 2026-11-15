@@ -1,4 +1,4 @@
-import { reatomComponent } from "@reatom/npm-react";
+import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { createStorageModel } from "../models/storage.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { dayjs } from "@/shared/lib/dayjs";
@@ -11,6 +11,8 @@ import { atom, type Ctx, type CtxSpy } from "@reatom/framework";
 import { BackButton } from "@/shared/ui/back-button";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { Noop } from "@/shared/ui/noop";
+import { Icon } from "@/shared/ui/icon";
+import type { StorageObject } from "@repo/storage";
 
 type StorageModel = {
   name: string,
@@ -49,10 +51,14 @@ export const storageModel = ({
   })
   storageState.section.onChange((ctx) => storage.load(ctx))
 
-  const TITLES = (ctx: CtxSpy) => ({
-    "buckets-list": "Список бакетов",
-    "bucket-list": `Список объектов в ${ctx.spy(storageState.bucket)}`,
-  })
+  const TITLES = (ctx: CtxSpy) => {
+    const folder = ctx.spy(storageState.folder)
+
+    return {
+      "buckets-list": "Список бакетов",
+      "bucket-list": `Список объектов в ${ctx.spy(storageState.bucket)}${folder ? `/${folder}` : ""}`,
+    }
+  }
 
   const storageTitleAtom = atom((ctx) => TITLES(ctx)[ctx.spy(storageState.section)])
 
@@ -62,36 +68,90 @@ export const storageModel = ({
     </div>
   )
 
+  const IMAGE_RE = /\.(png|jpe?g|webp|gif)$/i
+
+  const StorageObjectRow = reatomComponent<{
+    bucket: string,
+    object: StorageObject,
+    onSelect: () => void,
+  }>(({ ctx, bucket, object, onSelect }) => {
+    const key = `${bucket}/${object.key}`
+    const preview = ctx.spy(storage.previews)[key]
+    const isImage = IMAGE_RE.test(object.key)
+
+    useUpdate((ctx) => {
+      if (isImage && !preview) storage.loadPreview(ctx, { bucket, key: object.key })
+    }, [preview, isImage])
+
+    return (
+      <div
+        className="flex items-center gap-2 w-full px-2 py-1 bg-neutral-800 hover:bg-neutral-700 rounded-lg min-h-10"
+        onClick={onSelect}
+      >
+        {isImage && preview ? (
+          <img src={preview} alt="" className="size-8 shrink-0 rounded object-cover" />
+        ) : (
+          <div className="flex size-8 shrink-0 items-center justify-center rounded bg-neutral-900 text-neutral-500">
+            <Icon name="sprite:book" className="size-4" />
+          </div>
+        )}
+        <div className="flex flex-col min-w-0">
+          <Typography className="text-sm font-medium truncate">
+            {object.key}
+          </Typography>
+          <span className="text-neutral-400 text-[10px]">
+            {formatBytes(object.size)}
+            {object.lastModified ? ` · ${dayjs(object.lastModified).format("DD.MM.YYYY HH:mm")}` : ""}
+          </span>
+        </div>
+      </div>
+    )
+  }, `${name}.StorageObjectRow`)
+
   const StorageBucketList = reatomComponent(({ ctx }) => {
     if (ctx.spy(storage.listObjects.statusesAtom).isPending) return <StorageListSkeleton />
 
     const error = ctx.spy(storage.listObjects.errorAtom)
     if (error) return <ErrorBlock title={error.message} />
 
-    const data = ctx.spy(storage.listObjects.dataAtom);
+    const data = ctx.spy(storage.listObjects.dataAtom)
+    const folders = data?.commonPrefixes ?? []
     const objects = data?.contents ?? []
+    const bucket = ctx.get(storageState.bucket)
+    const folder = ctx.spy(storageState.folder)
 
-    if (objects.length === 0) return <Noop title="Бакет пуст" />
+    if (!bucket) return null
+
+    if (folders.length === 0 && objects.length === 0) {
+      return <Noop title={folder ? "Папка пуста" : "Бакет пуст"} />
+    }
 
     return (
       <div className="flex flex-col gap-1 w-full max-h-[40vh] overflow-y-auto">
-        {objects.map((object, idx) => (
+        {folders.map(({ prefix }) => (
           <div
-            key={`${object.key}-${idx}`}
-            className="flex flex-col gap-1 w-full px-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg h-10"
-            onClick={() => {
-              const bucket = ctx.get(storageState.bucket)
-              if (bucket) onSelectFile?.(ctx, `${bucket}/${object.key}`)
+            key={prefix}
+            className="flex items-center gap-2 w-full px-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg h-10 cursor-pointer"
+            onClick={() => storage.openFolder(ctx, prefix)}
+          >
+            <div className="flex size-8 shrink-0 items-center justify-center rounded bg-neutral-900 text-neutral-400">
+              <Icon name="sprite:category" className="size-4" />
+            </div>
+            <Typography className="text-sm font-medium truncate">
+              {prefix.slice(folder.length)}
+            </Typography>
+          </div>
+        ))}
+        {objects.map((object) => (
+          <StorageObjectRow
+            key={object.key}
+            bucket={bucket}
+            object={object}
+            onSelect={() => {
+              onSelectFile?.(ctx, `${bucket}/${object.key}`)
               storageState.isOpen(ctx, false)
             }}
-          >
-            <Typography className="text-sm font-medium">
-              {object.key}
-            </Typography>
-            <span className="text-neutral-400 text-[10px]">
-              {formatBytes(object.size)}
-            </span>
-          </div>
+          />
         ))}
       </div>
     )
@@ -108,23 +168,29 @@ export const storageModel = ({
 
     return (
       <div className="flex flex-col gap-1 w-full">
-        {data.map((bucket) => (
-          <div
-            key={bucket.name}
-            className="
-              flex bg-neutral-800 hover:bg-neutral-700
-              cursor-pointer rounded-lg items-center px-2 h-8 justify-between w-full gap-2
-            "
-            onClick={() => storage.selectBucket(ctx, bucket.name)}
-          >
-            <Typography className="text-sm leading-5 truncate">
-              {bucket.name}
-            </Typography>
-            <span className="text-[12px] leading-4">
-              {dayjs(bucket.creationDate).format("DD MMM YYYY")}
-            </span>
-          </div>
-        ))}
+        {data.map((bucket) => {
+          const available = bucket.available !== false
+
+          return (
+            <div
+              key={bucket.name}
+              aria-disabled={!available}
+              title={available ? undefined : "Бакет недоступен"}
+              className={`
+                flex bg-neutral-800 rounded-lg items-center px-2 h-8 justify-between w-full gap-2
+                ${available ? "hover:bg-neutral-700 cursor-pointer" : "opacity-40 pointer-events-none"}
+              `}
+              onClick={() => available && storage.selectBucket(ctx, bucket.name)}
+            >
+              <Typography className="text-sm leading-5 truncate">
+                {bucket.name}
+              </Typography>
+              <span className="text-[12px] leading-4">
+                {dayjs(bucket.creationDate).format("DD MMM YYYY")}
+              </span>
+            </div>
+          )
+        })}
       </div>
     )
   }, `${name}.StorageBucketsList`)
@@ -136,6 +202,7 @@ export const storageModel = ({
 
   const StorageContent = reatomComponent(({ ctx }) => {
     const section = ctx.spy(storageState.section)
+    const folder = ctx.spy(storageState.folder)
     const inBucket = section === "bucket-list"
 
     return (
@@ -144,7 +211,7 @@ export const storageModel = ({
           <BackButton
             event="custom"
             onClick={() => storage.goBack(ctx)}
-            icon={inBucket ? "sprite:arrow-left" : "sprite:x"}
+            icon={inBucket || folder ? "sprite:arrow-left" : "sprite:x"}
           />
           <span className="text-sm text-center leading-4">
             {ctx.spy(storageTitleAtom)}

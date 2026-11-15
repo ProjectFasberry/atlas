@@ -18,13 +18,24 @@ export const minotaurStorageApi: StorageApi = {
 		})
 	},
 	async listObjects(bucket, options) {
-		const data = await client.get("/privated/volume/buckets/{bucket}/list", {
-			params: {
-				path: { bucket },
-				query: { folder: options?.folder },
+		const data = await client.raw.get<StorageObjectPage>(
+			"/privated/volume/buckets/{bucket}/list",
+			{
+				params: {
+					path: { bucket },
+					query: { folder: options?.folder, delimiter: options?.delimiter },
+				},
 			},
-		})
+		)
 
-		return (data ?? { contents: [] }) as StorageObjectPage
+		return data ?? { contents: [] }
+	},
+	async presign(bucket, key) {
+		const data = await client.raw.get<{ url: string }>(
+			"/privated/volume/buckets/{bucket}/presign",
+			{ params: { path: { bucket }, query: { key } } },
+		)
+
+		return data.url
 	},
 }
