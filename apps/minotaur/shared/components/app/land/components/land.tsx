@@ -13,7 +13,6 @@ import { getDataFromSnapshot } from "@/shared/models/app/utils"
 import { isEmptyArray } from "@/shared/lib/utils"
 import { tv } from "tailwind-variants"
 import { carouselVariant } from "@/shared/ui/carousel"
-import { appState } from "@/shared/models/app/index.model"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { pageState } from "@/shared/models/page-context.model"
@@ -21,12 +20,71 @@ import { Noop } from "@/shared/ui/noop"
 import { SummaryNumber } from "@/shared/ui/summary-number"
 import { translate } from "@/shared/locales/helpers"
 import type { LandSimilar } from "../../lands/models/lands.model"
-import { ENVIRONMENT } from "@/shared/consts"
 import { LandAccess } from "./land-access"
 import { ClientOnly } from "vike-react/ClientOnly"
 
 const LandGallery = reatomComponent(({ ctx }) => {
   const landGallery = ctx.spy(landGalleryAtom)
+  const editing = ctx.spy(landEditingState.mode) === 1
+  const removed = ctx.spy(landEditingState.galleryRemoved)
+  const pending = ctx.spy(landEditingState.galleryFiles)
+
+  if (editing) {
+    const existing = landGallery.filter((url) => !removed.includes(url))
+
+    return (
+      <div className="flex flex-col gap-2">
+        <Typography className="text-base sm:text-2xl font-semibold">
+          {translate["land.gallery.title"]()}
+        </Typography>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {existing.map((url) => (
+            <div key={url} className="relative aspect-video overflow-hidden rounded-lg bg-neutral-800">
+              <img src={url} className="h-full w-full object-cover" alt="" />
+              <button
+                type="button"
+                title="Удалить"
+                className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
+                onClick={() => landEditing.gallery.removeExisting(ctx, url)}
+              >
+                <Icon name="sprite:x" className="size-4" />
+              </button>
+            </div>
+          ))}
+          {pending.map((item, idx) => (
+            <div key={item.preview} className="relative aspect-video overflow-hidden rounded-lg bg-neutral-800">
+              <img src={item.preview} className="h-full w-full object-cover" alt="" />
+              <button
+                type="button"
+                title="Убрать"
+                className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
+                onClick={() => landEditing.gallery.removePending(ctx, idx)}
+              >
+                <Icon name="sprite:x" className="size-4" />
+              </button>
+            </div>
+          ))}
+          <label className="flex aspect-video items-center justify-center rounded-lg border border-dashed border-neutral-700 text-neutral-500 cursor-pointer hover:border-neutral-500">
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                landEditing.gallery.add(ctx, e.target.files)
+                e.currentTarget.value = ""
+              }}
+            />
+            <Icon name="sprite:plus" className="size-5" />
+          </label>
+        </div>
+        <span className="text-[11px] text-neutral-500">
+          {translate["land.gallery.hint"]()}
+        </span>
+      </div>
+    )
+  }
+
   if (!landGallery || isEmptyArray(landGallery)) return null;
 
   return (
@@ -68,9 +126,6 @@ const LandGallery = reatomComponent(({ ctx }) => {
 }, "LandGallery")
 
 const LandToggleMode = reatomComponent(({ ctx }) => {
-  const stage = ctx.spy(appState.options)?.state.stage
-  if (stage === 'prod') return null;
-
   const changesIsExist = ctx.spy(changesIsExistsAtom)
 
   return (
@@ -84,7 +139,10 @@ const LandToggleMode = reatomComponent(({ ctx }) => {
           <Icon name="sprite:x" className="size-4" />
         </Button>
       ) : (
-        <Button background="white" onClick={() => landEditingState.mode(ctx, (state) => state === 0 ? 1 : 0)}>
+        <Button background="white" onClick={() => {
+          if (ctx.get(landEditingState.mode) === 0) landEditing.start(ctx)
+          else landEditing.resetFull(ctx)
+        }}>
           <Typography className='text-nowrap truncate'>
             {ctx.spy(landActionTitleAtom)}
           </Typography>
@@ -194,7 +252,6 @@ const LandDetails = reatomComponent(({ ctx }) => {
 
   const currentUser = getDataFromSnapshot("currentUser")
   const isAccessible = currentUser?.meta.role.id === 3
-  console.log(ENVIRONMENT, isAccessible); // server, true
 
   const isOwner = ctx.spy(landIsOwnerAtom);
 
@@ -231,14 +288,35 @@ const LandHead = reatomComponent(({ ctx }) => {
   const land = ctx.spy(landState.data)
   if (!land) return null;
 
+  const editing = ctx.spy(landEditingState.mode) === 1
+  const title = ctx.spy(landEditingState.title)
+
   return (
     <>
       <Typography className="text-2xl xl:text-3xl font-semibold">
         {land.name}
       </Typography>
-      {land.title && (
+      {editing ? (
+        <div className="flex flex-col gap-1 w-full">
+          <textarea
+            value={title}
+            onChange={(e) => landEditingState.title(ctx, e.target.value)}
+            maxLength={300}
+            placeholder="Описание региона"
+            className="
+              px-4 py-2 min-h-20 text-sm rounded-xl placeholder:text-neutral-400
+              bg-neutral-800 border outline-none border-transparent resize-y
+              focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500
+            "
+          />
+          <span className="text-[11px] text-neutral-500">
+            Цветовые коды: &amp;0-&amp;f, &amp;l, &amp;o, &amp;n, &amp;m
+          </span>
+          {title && <FormattedText as="span" text={title} />}
+        </div>
+      ) : land.title ? (
         <FormattedText as="span" text={land.title} />
-      )}
+      ) : null}
     </>
   )
 }, "LandHead")

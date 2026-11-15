@@ -2465,7 +2465,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update a land description as its owner */
+        patch: operations["patchServerLandsByUlid"];
         trace?: never;
     };
     "/server/lands/similar": {
@@ -2480,6 +2481,42 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/server/lands/{ulid}/banner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a land banner as its owner */
+        post: operations["postServerLandsByUlidBanner"];
+        /** Remove a land banner as its owner */
+        delete: operations["deleteServerLandsByUlidBanner"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/server/lands/{ulid}/gallery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a land gallery image as its owner */
+        post: operations["postServerLandsByUlidGallery"];
+        /** Remove a land gallery image as its owner */
+        delete: operations["deleteServerLandsByUlidGallery"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9004,7 +9041,61 @@ export interface operations {
                                     [key: string]: string | number;
                                 } | null) | null;
                             } | null) | null;
+                            isOwner: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    patchServerLandsByUlid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ulid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string | null;
+                };
+                "application/x-www-form-urlencoded": {
+                    title: string | null;
+                };
+                "multipart/form-data": {
+                    title: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            title: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_LAND_OWNER
+                         * @enum {string}
+                         */
+                        error: "NOT_LAND_OWNER";
                     };
                 };
             };
@@ -9069,6 +9160,222 @@ export interface operations {
                          * @enum {string}
                          */
                         error: "INVALID_VARIANT" | "INVALID_TARGET";
+                    };
+                };
+            };
+        };
+    };
+    postServerLandsByUlidBanner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ulid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            key: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_LAND_OWNER
+                         * @enum {string}
+                         */
+                        error: "NOT_LAND_OWNER";
+                    };
+                };
+            };
+        };
+    };
+    deleteServerLandsByUlidBanner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ulid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_LAND_OWNER
+                         * @enum {string}
+                         */
+                        error: "NOT_LAND_OWNER";
+                    };
+                };
+            };
+        };
+    };
+    postServerLandsByUlidGallery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ulid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            key: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default GALLERY_LIMIT_REACHED
+                         * @enum {string}
+                         */
+                        error: "GALLERY_LIMIT_REACHED";
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_LAND_OWNER
+                         * @enum {string}
+                         */
+                        error: "NOT_LAND_OWNER";
+                    };
+                };
+            };
+        };
+    };
+    deleteServerLandsByUlidGallery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ulid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    url: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    url: string;
+                };
+                "multipart/form-data": {
+                    url: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default NOT_LAND_OWNER
+                         * @enum {string}
+                         */
+                        error: "NOT_LAND_OWNER";
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default GALLERY_IMAGE_NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "GALLERY_IMAGE_NOT_FOUND";
                     };
                 };
             };

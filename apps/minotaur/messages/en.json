@@ -334,7 +334,9 @@
     "not-found": "It seems this region no longer exists",
     "editing": {
       "save-changes": "Save changes",
-      "delete": "Delete"
+      "delete": "Delete",
+      "saved": "Land updated",
+      "save-error": "Could not save the land"
     },
     "edit": "Editing",
     "view": "View",
@@ -345,6 +347,10 @@
     "test": {
       "test-item": "This region may be a test region",
       "not-impl": "Not added yet... coming soon"
+    },
+    "gallery": {
+      "title": "Gallery",
+      "hint": "Up to 12 images, PNG/JPEG/WebP under 2 MB"
     }
   },
   "default": {

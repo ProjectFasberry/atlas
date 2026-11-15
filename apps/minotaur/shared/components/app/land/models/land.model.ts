@@ -39,15 +39,8 @@ export const landIsMemberAtom = atom<boolean>((ctx) => {
   return members.some((exist) => exist.nickname === currentUser.nickname);
 }, "landIsMemberAtom")
 
-export const landIsOwnerAtom = atom<boolean>((ctx) => {
-  const currentUser = ctx.spy(currentUserState);
-  if (!currentUser) return false;
-
-  const owner = ctx.spy(landOwnerAtom)
-  if (!owner) return false;
-
-  return currentUser.nickname === owner;
-}, "landIsOwnerAtom")
+export const landIsOwnerAtom = atom<boolean>((ctx) =>
+  ctx.spy(landState.data)?.isOwner ?? false, "landIsOwnerAtom")
 
 export const landBannerAtom = atom<string | null>((ctx) => ctx.spy(landState.data)?.details.banner ?? null, "landBanner")
 export const landGalleryAtom = atom<string[]>((ctx) => ctx.spy(landState.data)?.details.gallery ?? [], "landGalleryAtom")
