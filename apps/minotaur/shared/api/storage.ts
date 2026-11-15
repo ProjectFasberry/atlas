@@ -21,7 +21,11 @@ export const minotaurStorageApi: StorageApi = {
 		const data = await client.get("/privated/volume/buckets/{bucket}/list", {
 			params: {
 				path: { bucket },
-				query: { folder: options?.folder, delimiter: options?.delimiter },
+				query: {
+					// Elysia rejects empty strings for these optional query fields.
+					folder: options?.folder || undefined,
+					delimiter: options?.delimiter || undefined,
+				},
 			},
 		})
 
