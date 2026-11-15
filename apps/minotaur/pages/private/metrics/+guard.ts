@@ -3,9 +3,12 @@ import { redirect } from "vike/abort";
 import { METRICS_READ_PERMISSION } from "@/shared/consts/permissions";
 import { getDataFromSnapshot } from "@/shared/models/app/utils";
 
+/** Metrics became the players tab of the analytics page. */
 export function guard(pageCtx: PageContextServer) {
   const user = getDataFromSnapshot("currentUser", pageCtx.snapshot)
   if (!user) throw redirect("/")
 
   if (!user.meta.permissions.includes(METRICS_READ_PERMISSION)) throw redirect("/private/")
+
+  throw redirect("/private/analytics?tab=players")
 }

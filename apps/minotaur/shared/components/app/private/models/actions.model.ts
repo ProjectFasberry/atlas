@@ -13,6 +13,16 @@ export type ActionType = typeof TYPES[number]
 /** Config panel route. Sections and modes only exist as query params on it. */
 export const PANEL_PATH = "/private"
 
+const CONTENT_PARENTS = ["news", "banner", "event", "modpack", "lands"] as const
+
+/** Each section lives on the page that owns its tabs. */
+const pathForParent = (parent: ActionParent): string => {
+  if (parent === "api") return "/private/api-keys"
+  if (CONTENT_PARENTS.includes(parent as (typeof CONTENT_PARENTS)[number])) return "/private/content"
+
+  return PANEL_PATH
+}
+
 const isParent = (value: unknown): value is ActionParent =>
   PARENTS.includes(value as ActionParent)
 
@@ -27,7 +37,10 @@ const isType = (value: unknown): value is ActionType =>
 export const actionsState = atom(null, "actionsState").pipe(
   withAssign((_, name) => ({
     parent: atom((ctx): ActionParent | null => {
-      const value = ctx.spy(pageState.urlParsed)?.search?.parent
+      const search = ctx.spy(pageState.urlParsed)?.search
+      // `tab` is the current form; `parent` is kept for old links.
+      const value = search?.tab ?? search?.parent
+
       return isParent(value) ? value : null
     }, `${name}.parent`),
     type: atom((ctx): ActionType => {
@@ -49,14 +62,14 @@ export type ConfigLinkParams = {
 
 /** Pure panel URL for a section mode; the only place that encodes the params. */
 export const configLink = ({ parent, type, target }: ConfigLinkParams): string => {
-  const search = new URLSearchParams({ parent, type })
+  const search = new URLSearchParams({ tab: parent, type })
   const targetValue = target === null || target === undefined ? "" : String(target).trim()
 
   if (type === "edit" && targetValue.length > 0) {
     search.set("target", targetValue)
   }
 
-  return `${PANEL_PATH}?${search.toString()}`
+  return `${pathForParent(parent)}?${search.toString()}`
 }
 
 /** A mode switch is a navigation on the same page, so keep the section in view. */

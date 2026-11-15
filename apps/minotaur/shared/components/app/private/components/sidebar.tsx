@@ -247,26 +247,34 @@ const SidebarHeader = reatomComponent(({ ctx }) => {
 }, "SidebarHeader")
 
 const SidebarBody = reatomComponent(({ ctx }) => {
-  const permissions = ctx.spy(currentUserState.perms)
+  const permissions = ctx.spy(currentUserState.perms) ?? []
   const collapsed = ctx.spy(sidebar.isCollapsed)
-  const visible = sidebarLinks.filter((link) => permissions.includes(link.permission))
 
   return (
     <div className="flex flex-row items-center lg:items-stretch lg:flex-col gap-1 w-full">
       <span className={clsx("hidden lg:inline", collapsed && "lg:hidden")}>Навигация</span>
-      {visible.map((link) => (
-        <Link
-          key={link.title}
-          href={link.value}
-          title={collapsed ? link.title : undefined}
-          className={linkVariant({ collapsed }).base()}
-        >
-          <Icon name={link.icon} className={linkVariant({ collapsed }).icon()} />
-          <Typography className={clsx(linkVariant({ collapsed }).text(), collapsed && "lg:hidden")}>
-            {link.title}
-          </Typography>
-        </Link>
-      ))}
+      {sidebarLinks.map((link) => {
+        const allowed = link.permissions.some((permission) => permissions.includes(permission))
+
+        return (
+          <Link
+            key={link.title}
+            href={allowed ? link.value : "#"}
+            aria-disabled={!allowed}
+            tabIndex={allowed ? undefined : -1}
+            title={collapsed ? link.title : undefined}
+            className={clsx(
+              linkVariant({ collapsed }).base(),
+              !allowed && "opacity-40 pointer-events-none",
+            )}
+          >
+            <Icon name={link.icon} className={linkVariant({ collapsed }).icon()} />
+            <Typography className={clsx(linkVariant({ collapsed }).text(), collapsed && "lg:hidden")}>
+              {link.title}
+            </Typography>
+          </Link>
+        )
+      })}
     </div>
   )
 }, "SidebarBody")

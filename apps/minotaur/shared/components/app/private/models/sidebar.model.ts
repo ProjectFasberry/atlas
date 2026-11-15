@@ -12,6 +12,8 @@ import {
   SERVERS_READ_PERMISSION,
   TEAM_APPLICATIONS_READ_PERMISSION,
   STORE_ITEM_READ_PERMISSION,
+  API_KEYS_LIST_PERMISSION,
+  LANDS_READ_PERMISSION,
 } from "@/shared/consts/permissions";
 
 export const sidebar = atom(null).pipe(
@@ -199,16 +201,16 @@ export function formatAccountDate(value: unknown) {
   return date.isValid() ? date.format("DD.MM.YYYY") : "—";
 }
 
-export type SidebarLink = { title: string, value: string, permission: string, icon: IconName }
+export type SidebarLink = { title: string, value: string, permissions: string[], icon: IconName }
 
 export const sidebarLinks: SidebarLink[] = [
-  { title: "Конфигурация", value: "/private/", permission: CONFIG_PANEL_READ_PERMISSION, icon: "sprite:settings" },
-  { title: "Магазин", value: "/private/store", permission: STORE_ITEM_READ_PERMISSION, icon: "sprite:building-store" },
-  { title: "Игрок", value: "/private/users", permission: PLAYERS_READ_PERMISSION, icon: "sprite:user-circle" },
-  { title: "Аудит", value: "/private/audit", permission: HISTORY_READ_PERMISSION, icon: "sprite:shield-half" },
-  { title: "Релизы", value: "/private/releases", permission: RELEASES_READ_PERMISSION, icon: "sprite:download" },
-  { title: "Серверы", value: "/private/servers", permission: SERVERS_READ_PERMISSION, icon: "sprite:device-desktop" },
-  { title: "Метрики", value: "/private/metrics", permission: METRICS_READ_PERMISSION, icon: "sprite:aspect-ratio" },
-  { title: "Экономика", value: "/private/economy", permission: ECONOMY_READ_PERMISSION, icon: "sprite:credit-card-pay" },
-  { title: "Команда", value: "/private/team", permission: TEAM_APPLICATIONS_READ_PERMISSION, icon: "sprite:stars" },
+  { title: "Конфигурация", value: "/private/", permissions: [CONFIG_PANEL_READ_PERMISSION], icon: "sprite:settings" },
+  { title: "Контент", value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "modpacks.create", "modpacks.delete", LANDS_READ_PERMISSION], icon: "sprite:category" },
+  { title: "Магазин", value: "/private/store", permissions: [STORE_ITEM_READ_PERMISSION], icon: "sprite:building-store" },
+  { title: "Игрок", value: "/private/users", permissions: [PLAYERS_READ_PERMISSION], icon: "sprite:user-circle" },
+  { title: "Модерация", value: "/private/moderation", permissions: [TEAM_APPLICATIONS_READ_PERMISSION, HISTORY_READ_PERMISSION], icon: "sprite:shield-half" },
+  { title: "Релизы", value: "/private/releases", permissions: [RELEASES_READ_PERMISSION], icon: "sprite:download" },
+  { title: "Аналитика", value: "/private/analytics", permissions: [METRICS_READ_PERMISSION], icon: "sprite:aspect-ratio" },
+  { title: "Экономика", value: "/private/economy", permissions: [ECONOMY_READ_PERMISSION], icon: "sprite:credit-card-pay" },
+  { title: "API-ключи", value: "/private/api-keys", permissions: [API_KEYS_LIST_PERMISSION], icon: "sprite:lock" },
 ]

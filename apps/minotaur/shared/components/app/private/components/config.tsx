@@ -1,229 +1,83 @@
-import { newsSection } from "./news"
-import { actionsState, type ActionParent, type ActionType } from "../models/actions.model"
-import { type ReactNode } from "react"
-import { bannersSection } from "./banners"
-import { dictionariesSection } from "./dictionaries"
-import { eventsSection } from "./events"
+import { useEffect } from "react"
 import { reatomComponent } from "@reatom/npm-react"
-import { WithHeader, SectionWrapper } from "./ui"
-import { Roles } from "./roles"
-import { Methods } from "./methods"
-import { Options } from "./options"
-import { atom } from "@reatom/framework"
-import { modpackSection } from "./modpack"
-import { landsSection } from "./lands"
-import { apiKeysSection } from "./api"
-import { Typography } from "@/shared/ui/typography"
 import { currentUserState } from "@/shared/models/current-user/index.model"
-import { LANDS_READ_PERMISSION } from "@/shared/consts/permissions"
+import { WithHeader } from "./ui"
+import { PanelTabs } from "./panel-tabs"
+import { PanelSection } from "./panel-section"
+import { ActionsHeaderSlot } from "./actions-header"
+import { Options } from "./options"
+import { Methods } from "./methods"
+import { Roles } from "./roles"
+import { dictionariesSection } from "./dictionaries"
+import { Servers } from "./servers"
+import { createTabAtom, hasTabAccess, type PanelTab } from "../models/tabs.model"
 
-type ComponentType = Nullable<() => ReactNode>;
+type ConfigTab = "general" | "roles" | "dictionaries" | "servers"
 
-const COMPONENTS: Record<string, Partial<Record<ActionType, ComponentType>>> = {
-  "news": {
-    "create": newsSection.Header.Create,
-    "edit": newsSection.Header.Edit,
-    "view": newsSection.Header.View
-  },
-  "modpack": {
-    "create": modpackSection.Header.Create,
-    "edit": modpackSection.Header.Edit,
-    "view": modpackSection.Header.View
-  },
-  "event": {
-    "create": eventsSection.Header.Create,
-    "edit": eventsSection.Header.Edit,
-    "view": eventsSection.Header.View,
-  },
-  "banner": {
-    "create": bannersSection.Header.Create,
-    "edit": bannersSection.Header.Edit,
-    "view": bannersSection.Header.View,
-  },
-  "dictionaries": {
-    "create": dictionariesSection.Header.Create,
-    "edit": dictionariesSection.Header.Edit,
-    "view": dictionariesSection.Header.View,
-  },
-  "lands": {
-    "create": landsSection.Header.Create,
-    "edit": landsSection.Header.Edit,
-    "view": landsSection.Header.View,
-  },
-  "api": {
-    "create": apiKeysSection.Header.Create,
-    "edit": apiKeysSection.Header.Edit,
-    "view": apiKeysSection.Header.View
-  }
-}
-
-const actionsHeaderComponentAtom = (parent: ActionParent) => atom((ctx): ComponentType => {
-  const targetParent = ctx.spy(actionsState.parent)
-  if (!targetParent) return COMPONENTS[parent]?.view ?? null
-
-  if (parent !== targetParent) return null;
-
-  const targetType = ctx.spy(actionsState.type);
-  return COMPONENTS[parent][targetType] ?? null
-})
-
-const ActionsHeaderSlot = reatomComponent<{ parent: ActionParent }>(({ ctx, parent }) => {
-  const Component = ctx.spy(actionsHeaderComponentAtom(parent));
-  if (!Component) return null;
-  return <Component />
-}, "ActionsHeaderSlot")
-
-type ConfigSectionProps = {
-  id: string
-  title: string
-  /** Section key of the actions model, so a mode switch can scroll back here. */
-  parent?: ActionParent
-  action?: ReactNode
-  children: ReactNode
-}
-
-const ConfigSection = ({ id, title, parent, action, children }: ConfigSectionProps) => {
-  return (
-    <SectionWrapper
-      id={id}
-      data-config-section={parent}
-      className="flex flex-col gap-2 w-full scroll-mt-24"
-    >
-      <div className="flex items-center justify-between gap-2 w-full">
-        <Typography className="text-base font-semibold">{title}</Typography>
-        {action}
-      </div>
-      <div className="flex flex-col gap-2 w-full">
-        {children}
-      </div>
-    </SectionWrapper>
-  )
-}
-
-type SectionBase = { id: string, title: string, permission?: string }
-
-const SECTIONS: SectionBase[] = [
-  { id: "config-general", title: "Основное" },
-  { id: "config-roles", title: "Роли" },
-  { id: "config-events", title: "Ивенты" },
-  { id: "config-modpacks", title: "Модпаки" },
-  { id: "config-banners", title: "Баннеры" },
-  { id: "config-news", title: "Новости" },
-  { id: "config-dictionaries", title: "Справочник" },
-  { id: "config-api", title: "API Ключи" },
-  { id: "config-lands", title: "Регионы", permission: LANDS_READ_PERMISSION },
+const CONFIG_TABS: PanelTab<ConfigTab>[] = [
+  { value: "general", title: "Основное" },
+  { value: "roles", title: "Роли", permissions: ["roles.read"] },
+  { value: "dictionaries", title: "Справочник", permissions: ["dictionaries.read"] },
+  { value: "servers", title: "Серверы", permissions: ["servers.read"] },
 ]
 
-const ConfigNav = reatomComponent(({ ctx }) => {
-  const permissions = ctx.spy(currentUserState.perms);
-  const sections = SECTIONS.filter((section) => !section.permission || permissions.includes(section.permission));
-
-  const jump = (id: SectionBase["id"]) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
-
-  return (
-    <nav
-      className="
-        sticky top-14 lg:top-2 z-20 flex items-center gap-1 overflow-x-auto
-        rounded-xl border border-neutral-800 bg-neutral-900 p-2 scrollbar-h-1
-      "
-    >
-      {sections.map(({ id, title }) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => jump(id)}
-          className="
-            shrink-0 rounded-lg px-3 py-1 duration-150 hover:bg-neutral-800
-            text-sm font-semibold text-neutral-300 hover:text-neutral-50
-          "
-        >
-          {title}
-        </button>
-      ))}
-    </nav>
-  )
-}, "ConfigNav")
+const configTab = createTabAtom("configTab", CONFIG_TABS, "general")
 
 export const Config = reatomComponent(({ ctx }) => {
-  const permissions = ctx.spy(currentUserState.perms);
+  const tab = ctx.spy(configTab)
+  const permissions = ctx.spy(currentUserState.perms) ?? []
+  const allowed = CONFIG_TABS.filter((item) => hasTabAccess(item, permissions))
+  const active = allowed.some((item) => item.value === tab) ? tab : allowed[0]?.value
+
+  useEffect(() => {
+    if (active && active !== tab) configTab(ctx, active)
+  }, [active, tab, ctx])
+
+  if (!active) return null
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
-      <ConfigNav />
-      <ConfigSection id="config-general" title="Основное">
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-stretch w-full">
-          <div className="flex flex-col gap-1 w-full">
-            <WithHeader title="Глобальные параметры" />
-            <Options />
+      <PanelTabs
+        tabs={CONFIG_TABS}
+        value={active}
+        onChange={(value) => configTab(ctx, value)}
+      />
+
+      {active === "general" && (
+        <PanelSection title="Основное">
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-stretch w-full">
+            <div className="flex flex-col gap-1 w-full">
+              <WithHeader title="Глобальные параметры" />
+              <Options />
+            </div>
+            <div className="flex flex-col gap-1 w-full">
+              <WithHeader title="Платежные методы" />
+              <Methods />
+            </div>
           </div>
-          <div className="flex flex-col gap-1 w-full">
-            <WithHeader title="Платежные методы" />
-            <Methods />
-          </div>
-        </div>
-      </ConfigSection>
-      <ConfigSection id="config-roles" title="Роли">
-        <Roles />
-      </ConfigSection>
-      <ConfigSection
-        id="config-events"
-        parent="event"
-        title="Ивенты"
-        action={<ActionsHeaderSlot parent="event" />}
-      >
-        <eventsSection.Wrapper />
-      </ConfigSection>
-      <ConfigSection
-        id="config-modpacks"
-        parent="modpack"
-        title="Модпаки"
-        action={<ActionsHeaderSlot parent="modpack" />}
-      >
-        <modpackSection.Wrapper />
-      </ConfigSection>
-      <ConfigSection
-        id="config-banners"
-        parent="banner"
-        title="Баннеры"
-        action={<ActionsHeaderSlot parent="banner" />}
-      >
-        <bannersSection.Wrapper />
-      </ConfigSection>
-      <ConfigSection
-        id="config-news"
-        parent="news"
-        title="Новости"
-        action={<ActionsHeaderSlot parent="news" />}
-      >
-        <newsSection.Wrapper />
-      </ConfigSection>
-      <ConfigSection
-        id="config-dictionaries"
-        parent="dictionaries"
-        title="Справочник"
-        action={<ActionsHeaderSlot parent="dictionaries" />}
-      >
-        <dictionariesSection.Wrapper />
-      </ConfigSection>
-      <ConfigSection
-        id="config-api"
-        parent="api"
-        title="API Ключи"
-        action={<ActionsHeaderSlot parent="api" />}
-      >
-        <apiKeysSection.Wrapper />
-      </ConfigSection>
-      {permissions.includes(LANDS_READ_PERMISSION) && (
-        <ConfigSection
-          id="config-lands"
-          parent="lands"
-          title="Регионы"
-          action={<ActionsHeaderSlot parent="lands" />}
+        </PanelSection>
+      )}
+
+      {active === "roles" && (
+        <PanelSection title="Роли">
+          <Roles />
+        </PanelSection>
+      )}
+
+      {active === "dictionaries" && (
+        <PanelSection
+          title="Справочник"
+          parent="dictionaries"
+          action={<ActionsHeaderSlot parent="dictionaries" />}
         >
-          <landsSection.Wrapper />
-        </ConfigSection>
+          <dictionariesSection.Wrapper />
+        </PanelSection>
+      )}
+
+      {active === "servers" && (
+        <PanelSection title="Серверы">
+          <Servers />
+        </PanelSection>
       )}
     </div>
   )

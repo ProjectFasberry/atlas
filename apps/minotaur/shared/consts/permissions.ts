@@ -3,6 +3,10 @@
  * for guards, sidebar entries and mutation checks. Keep them lowercase.
  */
 export const CONFIG_PANEL_READ_PERMISSION = "config.panel.read"
+export const API_KEYS_LIST_PERMISSION = "api.keys.list"
+export const API_KEYS_CONTROL_PERMISSION = "api.keys.control"
+export const ROLES_READ_PERMISSION = "roles.read"
+export const DICTIONARIES_READ_PERMISSION = "dictionaries.read"
 export const RELEASES_READ_PERMISSION = "releases.read"
 export const ECONOMY_READ_PERMISSION = "economy.read"
 export const HISTORY_READ_PERMISSION = "history.read"

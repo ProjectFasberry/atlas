@@ -1,11 +1,4 @@
-import { SectionWrapper, WithHeader } from "@/shared/components/app/private/components/ui"
-import { TeamApplications } from "@/shared/components/app/private/components/team"
-
+/** The route only redirects; the guard never lets this component render. */
 export default function Page() {
-  return (
-    <SectionWrapper className="flex flex-col gap-3 w-full h-full">
-      <WithHeader title="Заявки в команду" />
-      <TeamApplications />
-    </SectionWrapper>
-  )
+  return null
 }
