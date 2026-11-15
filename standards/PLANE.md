@@ -31,20 +31,6 @@ to. The apps in this monorepo are:
 | `Feature` | `7e88d224-74ce-495f-b739-3e94e87da585` | new capability |
 | `Improvement` | `43262067-1396-4a84-b07f-bd34537d2815` | quality, UX, performance |
 
-An issue that needs changes on both sides of an app/API boundary gets both app
-labels (for example `minotaur` + `thunderbird`). Backend labels belong to the
-aether/mods repos but live in the same project; use them only for issues that
-touch those repos:
-
-| Label | ID | Repo |
-|---|---|---|
-| `aether` | `9e1c490d-297d-452b-a007-c8db8100fe95` | API backend |
-| `thunderbird` | `bb736367-dfab-417d-b917-521d5d973ec0` | API service |
-| `janus` | `595e8750-d55d-4d86-9375-0f1a55243235` | launcher |
-| `api` | `763d194a-dfb0-4e60-929e-b69b4b673dd1` | public API surface |
-| `config` | `c0bab626-ea99-4c78-ad93-7833587d4052` | plugin/server configuration |
-| `bisquite` | `b89bcf98-ff44-419c-a502-e3d06ca21f27` | the Bisquite server |
-
 Labels are project-scoped. Create or rename one with `label create` /
 `label update`; attach ids through the `labels` array on a work item.
 

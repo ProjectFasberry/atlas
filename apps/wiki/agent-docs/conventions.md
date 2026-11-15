@@ -62,7 +62,7 @@ refs for DOM only. Below are the wiki naming and model conventions.
 
 ## Build and deploy
 
-Production code: `/home/rusik/work/fasberry/atlas/apps/wiki` (monorepo `atlas`). The app runs
+Production code: `apps/wiki` (repo `atlas`). The app runs
 in standalone mode and stores content in PostgreSQL on the deploy host (`prod-db-general`,
 database `general`).
 
