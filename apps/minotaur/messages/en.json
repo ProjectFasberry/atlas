@@ -324,7 +324,11 @@
       "action": "Play"
     },
     "error": "Could not load the ranking",
-    "you": "You"
+    "you": "You",
+    "filters": {
+      "server": "Server",
+      "type": "Type"
+    }
   },
   "land": {
     "not-found": "It seems this region no longer exists",

@@ -78,12 +78,10 @@ export const land = atom(null, "lands").pipe(
       const exclude = ctx.get(landParamAtom);
       if (!exclude) return;
 
-      return await ctx.schedule(() => client.raw
-        .get<ExtractApiData<"getServerLandsList">["data"]>(`/server/lands/similar`, {
-          signal: ctx.controller.signal,
-          params: { query: { exclude } }
-        }),
-      );
+      return await ctx.schedule(() => client.get("/server/lands/similar", {
+        signal: ctx.controller.signal,
+        params: { query: { variant: "random", exclude } }
+      }));
     }, {
       name: `${name}.fetchSimilar`,
       onReject: (_, e) => {

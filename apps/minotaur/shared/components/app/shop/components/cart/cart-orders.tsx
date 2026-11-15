@@ -1,6 +1,6 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
 import { Typography } from "@/shared/ui/typography"
-import { type OrdersFilterOption, type OrdersSort, cartOrders, cartOrdersState } from "../../models/store-orders.model"
+import { type OrdersFilterOption, type OrdersSort, type OrdersStatus, cartOrders, cartOrdersState } from "../../models/store-orders.model"
 import { Link } from "@/shared/components/config/link/link"
 import { Button } from "@/shared/ui/button"
 import { PageLoader } from "@/shared/ui/page-loader"
@@ -97,7 +97,7 @@ export const CartOrdersFilters = reatomComponent(({ ctx }) => {
         label={translate["store.orders.filters.status"]()}
         options={cartOrdersState.STATUS_OPTIONS}
         currentValue={cartOrdersState.status}
-        onSelect={(innerCtx, val) => cartOrdersState.status(innerCtx, val)}
+        onSelect={(innerCtx, val) => cartOrdersState.status(innerCtx, val as OrdersStatus)}
       />
       <OrdersFilterDropdown
         label={translate["store.orders.sort.label"]()}

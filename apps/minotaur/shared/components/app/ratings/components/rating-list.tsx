@@ -16,6 +16,9 @@ import { rating, ratings, ratingsState, RatingsViewer } from "../models/ratings.
 import { getRatingTypeLabel, getServerLabel, type RatingType } from "../labels";
 import { formatDuration, formatNumber } from "../format";
 import { translate } from "@/shared/locales/helpers";
+import { Portal } from "@ark-ui/react/portal";
+import { createListCollection, Select } from "@ark-ui/react/select";
+import { selectVariant } from "@/shared/ui/select";
 
 const MEDAL_COLORS = ["text-yellow-400", "text-neutral-300", "text-amber-600"];
 
@@ -269,108 +272,182 @@ const RatingTableSkeleton = reatomComponent(({ ctx }) => {
   )
 }, "RatingTableSkeleton")
 
-const pillClass = (active: boolean) => `shrink-0 rounded-xl px-3 py-2 text-sm font-semibold duration-150 ${
-  active
-    ? "bg-neutral-50 text-neutral-950"
-    : "bg-neutral-900 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
-}`
+const toolbarSelect = "w-auto min-w-[170px] bg-neutral-900 text-sm"
 
-const RatingPills = reatomComponent(({ ctx }) => {
+const OptionText = ({ label }: { label: string }) => (
+  <Select.ItemText className={selectVariant.itemText()}>{label}</Select.ItemText>
+)
+
+const RatingsToolbar = reatomComponent(({ ctx }) => {
   const groups = ctx.spy(rating.fetch.dataAtom) ?? [];
   const currentServer = ctx.spy(ratingsState.filters.server);
   const currentType = ctx.spy(ratingsState.filters.by);
+  const asc = ctx.spy(ratingsState.filters.asc);
 
   if (!groups.length) return null;
 
-  const group = groups.find((item) => item.key === currentServer);
-  const typeFor = (item: (typeof groups)[number]): RatingType | undefined =>
-    item.childs.some((child) => child.value === currentType)
+  const group = groups.find((item) => item.key === currentServer) ?? groups[0];
+  const activeType = group?.childs.some((child) => child.value === currentType)
+    ? currentType
+    : group?.childs[0]?.value as RatingType | undefined;
+
+  const serverItems = groups.map((item) => ({
+    label: getServerLabel(item.key, item.title),
+    value: item.key
+  }));
+  const typeItems = (group?.childs ?? []).map((child) => ({
+    label: getRatingTypeLabel(child.value, child.title),
+    value: child.value
+  }));
+  const sortItems = [
+    { label: translate["ratings.sort.best"](), value: "best" },
+    { label: translate["ratings.sort.worst"](), value: "worst" }
+  ];
+
+  const pickServer = (key: string) => {
+    const next = groups.find((item) => item.key === key);
+    if (!next) return;
+
+    const nextType = next.childs.some((child) => child.value === currentType)
       ? currentType
-      : item.childs[0]?.value as RatingType | undefined;
+      : next.childs[0]?.value as RatingType | undefined;
+    if (!nextType) return;
+
+    ratings.applyFilters(ctx, { server: next.key, type: nextType });
+  };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-1 overflow-x-auto pb-1">
-        {groups.map((item) => {
-          const nextType = typeFor(item);
-          if (!nextType) return null;
+    <div className="flex flex-wrap items-center gap-2">
+      <Select.Root
+        collection={createListCollection({ items: serverItems })}
+        value={[group?.key ?? ""]}
+        onValueChange={({ value }) => value[0] && pickServer(value[0])}
+      >
+        <Select.Control className={selectVariant.control("w-auto")}>
+          <Select.Trigger
+            aria-label={translate["ratings.filters.server"]()}
+            className={selectVariant.trigger(toolbarSelect)}
+          >
+            <Select.ValueText>{getServerLabel(group?.key, group?.title)}</Select.ValueText>
+          </Select.Trigger>
+          <div className={selectVariant.indicators()}>
+            <Select.Indicator className={selectVariant.indicator()}>
+              <Icon name="sprite:chevron-down" className="size-4" />
+            </Select.Indicator>
+          </div>
+        </Select.Control>
+        <Portal>
+          <Select.Positioner>
+            <Select.Content className={selectVariant.content("min-w-[200px]")}>
+              <Select.ItemGroup className={selectVariant.itemGroup()}>
+                {serverItems.map((item) => (
+                  <Select.Item key={item.value} item={item} className={selectVariant.item()}>
+                    <OptionText label={item.label} />
+                    <Select.ItemIndicator className={selectVariant.itemIndicator()}>
+                      <Icon name="sprite:check" className="size-4" />
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                ))}
+              </Select.ItemGroup>
+            </Select.Content>
+          </Select.Positioner>
+        </Portal>
+        <Select.HiddenSelect />
+      </Select.Root>
 
-          return (
-            <button
-              key={item.key}
-              type="button"
-              aria-pressed={item.key === currentServer}
-              onClick={() => ratings.applyFilters(ctx, { server: item.key, type: nextType })}
-              className={pillClass(item.key === currentServer)}
-            >
-              {getServerLabel(item.key, item.title)}
-            </button>
-          )
-        })}
-      </div>
-      {group && (
-        <div className="flex gap-1 overflow-x-auto pb-1">
-          {group.childs.map((child) => (
-            <button
-              key={child.value}
-              type="button"
-              aria-pressed={child.value === currentType}
-              onClick={() => ratings.applyFilters(ctx, { server: group.key, type: child.value as RatingType })}
-              className={pillClass(child.value === currentType)}
-            >
-              {getRatingTypeLabel(child.value, child.title)}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}, "RatingPills")
+      <Select.Root
+        collection={createListCollection({ items: typeItems })}
+        value={activeType ? [activeType] : []}
+        onValueChange={({ value }) => {
+          if (!group || !value[0]) return;
+          ratings.applyFilters(ctx, { server: group.key, type: value[0] as RatingType });
+        }}
+      >
+        <Select.Control className={selectVariant.control("w-auto")}>
+          <Select.Trigger
+            aria-label={translate["ratings.filters.type"]()}
+            className={selectVariant.trigger(toolbarSelect)}
+          >
+            <Select.ValueText>{getRatingTypeLabel(activeType)}</Select.ValueText>
+          </Select.Trigger>
+          <div className={selectVariant.indicators()}>
+            <Select.Indicator className={selectVariant.indicator()}>
+              <Icon name="sprite:chevron-down" className="size-4" />
+            </Select.Indicator>
+          </div>
+        </Select.Control>
+        <Portal>
+          <Select.Positioner>
+            <Select.Content className={selectVariant.content("min-w-[200px]")}>
+              <Select.ItemGroup className={selectVariant.itemGroup()}>
+                {typeItems.map((item) => (
+                  <Select.Item key={item.value} item={item} className={selectVariant.item()}>
+                    <OptionText label={item.label} />
+                    <Select.ItemIndicator className={selectVariant.itemIndicator()}>
+                      <Icon name="sprite:check" className="size-4" />
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                ))}
+              </Select.ItemGroup>
+            </Select.Content>
+          </Select.Positioner>
+        </Portal>
+        <Select.HiddenSelect />
+      </Select.Root>
 
-const SortControl = reatomComponent(({ ctx }) => {
-  const asc = ctx.spy(ratingsState.filters.asc);
-
-  const set = (value: boolean) => ratings.applyFilters(ctx, { asc: value });
-
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-        {translate["ratings.sort.label"]()}
-      </span>
-      <div className="flex rounded-xl bg-neutral-900 p-1">
+      <div className="ml-auto flex items-center gap-2">
         <button
           type="button"
-          aria-pressed={!asc}
-          onClick={() => set(false)}
-          className={`rounded-lg px-3 py-1.5 text-xs font-semibold duration-150 ${
-            !asc ? "bg-neutral-50 text-neutral-950" : "text-neutral-400 hover:text-neutral-100"
-          }`}
+          aria-label={asc ? translate["ratings.sort.best"]() : translate["ratings.sort.worst"]()}
+          title={translate["ratings.sort.label"]()}
+          onClick={() => ratings.applyFilters(ctx, { asc: !asc })}
+          className="flex items-center justify-center size-10 rounded-xl bg-neutral-900 text-neutral-400 duration-150 hover:text-neutral-100"
         >
-          {translate["ratings.sort.best"]()}
+          <Icon name={asc ? "sprite:arrow-down" : "sprite:arrow-up"} className="size-4" />
         </button>
-        <button
-          type="button"
-          aria-pressed={asc}
-          onClick={() => set(true)}
-          className={`rounded-lg px-3 py-1.5 text-xs font-semibold duration-150 ${
-            asc ? "bg-neutral-50 text-neutral-950" : "text-neutral-400 hover:text-neutral-100"
-          }`}
+
+        <Select.Root
+          collection={createListCollection({ items: sortItems })}
+          value={[asc ? "worst" : "best"]}
+          onValueChange={({ value }) => ratings.applyFilters(ctx, { asc: value[0] === "worst" })}
         >
-          {translate["ratings.sort.worst"]()}
-        </button>
+          <Select.Control className={selectVariant.control("w-auto")}>
+            <Select.Trigger
+              aria-label={translate["ratings.sort.label"]()}
+              className={selectVariant.trigger(toolbarSelect)}
+            >
+              <Select.ValueText>
+                {asc ? translate["ratings.sort.worst"]() : translate["ratings.sort.best"]()}
+              </Select.ValueText>
+            </Select.Trigger>
+            <div className={selectVariant.indicators()}>
+              <Select.Indicator className={selectVariant.indicator()}>
+                <Icon name="sprite:chevron-down" className="size-4" />
+              </Select.Indicator>
+            </div>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content className={selectVariant.content("min-w-[200px]")}>
+                <Select.ItemGroup className={selectVariant.itemGroup()}>
+                  {sortItems.map((item) => (
+                    <Select.Item key={item.value} item={item} className={selectVariant.item()}>
+                      <OptionText label={item.label} />
+                      <Select.ItemIndicator className={selectVariant.itemIndicator()}>
+                        <Icon name="sprite:check" className="size-4" />
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                  ))}
+                </Select.ItemGroup>
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+          <Select.HiddenSelect />
+        </Select.Root>
       </div>
     </div>
   )
-}, "SortControl")
-
-const RatingsToolbar = reatomComponent(({ ctx }) => (
-  <div className="flex flex-col gap-3">
-    <RatingPills />
-    <div className="flex items-center justify-between gap-3">
-      <SortControl />
-    </div>
-  </div>
-), "RatingsToolbar")
+}, "RatingsToolbar")
 
 const RatingsEmpty = () => (
   <div className="flex flex-col items-center gap-2 py-16 text-center">

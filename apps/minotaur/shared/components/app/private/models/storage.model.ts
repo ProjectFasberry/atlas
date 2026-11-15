@@ -29,8 +29,9 @@ export const createStorageModel = (name: string) => {
         withErrorAtom()
       ),
       getBucket: reatomAsync(async (_, bucketId: string) => {
-        return await client.raw
-          .get<ExtractApiData<"getPrivatedVolumeBucketsByBucket">["data"]>(`/privated/volume/bucket/${bucketId}`)
+        return await client.get("/privated/volume/buckets/{bucket}/", {
+          params: { path: { bucket: bucketId } }
+        })
       }, `${name}.getBucket`).pipe(
         withDataAtom(null),
         withCache({ swr: false }),
@@ -38,8 +39,9 @@ export const createStorageModel = (name: string) => {
         withErrorAtom()
       ),
       getListByBucket: reatomAsync(async (_, bucketId: string) => {
-        return await client.raw
-          .get<ExtractApiData<"getPrivatedVolumeBucketsByBucketList">["data"]>(`/privated/volume/buckets/${bucketId}/list`)
+        return await client.get("/privated/volume/buckets/{bucket}/list", {
+          params: { path: { bucket: bucketId } }
+        })
       }, `${name}.getListByBucket`).pipe(
         withDataAtom(null),
         withCache({ swr: false }),

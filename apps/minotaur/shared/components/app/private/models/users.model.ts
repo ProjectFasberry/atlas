@@ -17,7 +17,7 @@ import { createViewerModel } from "@/shared/models/shared.model"
 export type PrivatedUser = PrivatedUsersPayload["data"][number]
 export type PrivatedUsersPayload = ExtractApiData<"getPrivatedUserList">["data"]
 
-type UsersQuery = Partial<ExtractApiParams<"getPrivatedUserList">["query"]>;
+type UsersQuery = ExtractApiParams<"getPrivatedUserList">["query"];
 type UsersSort = NonNullable<UsersQuery["sort"]>
 
 export const { Component: UsersViewer, inViewAtom: usersListInView } = createViewerModel({
@@ -46,10 +46,11 @@ usersState.filters.asc.onChange((ctx) => users.refetchAll(ctx))
 export const usersDataArrAtom = atom<PrivatedUsersPayload["data"]>((ctx) => Array.from(ctx.spy(usersState.data).values()))
 
 async function getUsers(query: UsersQuery) {
-  return client.raw.get<PrivatedUsersPayload>("/privated/user/list", { params: { query } })
+  return client.get("/privated/user/list", { params: { query } })
 }
 
 const getParams = action((ctx): UsersQuery => ({
+  limit: 32,
   searchQuery: ctx.get(usersState.filters.searchQuery) ?? undefined,
   asc: ctx.get(usersState.filters.asc),
   sort: ctx.get(usersState.filters.sortBy),
@@ -127,10 +128,10 @@ export const users = atom(null, "users").pipe(
       withAbort()
     ),
     rejectSkin: reatomAsync(async (ctx, args: { nickname: string, skinName: string }) => {
-      const result = await client.raw.delete<{ removed: number }>(
-        `/privated/user/${args.nickname}/skin`,
-        { json: { skinName: args.skinName } },
-      )
+      const result = await client.delete("/privated/user/{nickname}/skin", {
+        params: { path: { nickname: args.nickname } },
+        json: { skinName: args.skinName },
+      })
 
       const data = await client.get("/privated/user/{nickname}", {
         params: { path: { nickname: args.nickname } },
@@ -144,9 +145,9 @@ export const users = atom(null, "users").pipe(
       onReject: (_, e) => logError(e, { type: "combined" }),
     }).pipe(withStatusesAtom()),
     rejectAllSkins: reatomAsync(async (ctx, nickname: string) => {
-      const result = await client.raw.delete<{ removed: number }>(
-        `/privated/user/${nickname}/skins`,
-      )
+      const result = await client.delete("/privated/user/{nickname}/skins", {
+        params: { path: { nickname } },
+      })
 
       const data = await client.get("/privated/user/{nickname}", {
         params: { path: { nickname } },

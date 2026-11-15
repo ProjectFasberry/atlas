@@ -5,6 +5,7 @@ import { withSearchParamsPersist } from "@reatom/url";
 import { translate } from "@/shared/locales/helpers";
 
 export type OrdersFilterOption = { title: string; value: string };
+export type OrdersStatus = "all" | "pending" | "succeeded" | "refunded";
 export type OrdersSort = "date" | "amount";
 export type OrdersDirection = "asc" | "desc";
 
@@ -27,7 +28,7 @@ const PAGE_SIZE = 20;
 
 export const cartOrdersState = atom(null, "cartOrdersState").pipe(
   withAssign((_, name) => ({
-    status: atom<string>("all", `${name}.status`).pipe(
+    status: atom<OrdersStatus>("all", `${name}.status`).pipe(
       withSearchParamsPersist("status", (d = "all") => d),
     ),
     sort: atom<OrdersSort>("date", `${name}.sort`).pipe(
@@ -67,7 +68,7 @@ function queryParams(ctx: Parameters<typeof cartOrdersState.status>[0]) {
   return {
     sort: ctx.get(cartOrdersState.sort),
     order: ctx.get(cartOrdersState.order),
-    limit: PAGE_SIZE,
+    limit: String(PAGE_SIZE),
     ...(status === "all" ? {} : { status }),
   };
 }
@@ -80,16 +81,14 @@ export const cartOrders = atom(null, "cartOrders").pipe(
       cartOrders.fetch(ctx);
     }),
     fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client.raw
-        .get<GameOrdersPage>("/store/order/internal/list", {
-          params: { query: queryParams(ctx) }
-        })
-      );
+      return await ctx.schedule(() => client.get("/store/order/internal/list", {
+        params: { query: queryParams(ctx) }
+      }));
     }, {
       name: `${name}.fetch`,
       onFulfill: (ctx, page) => {
-        cartOrdersState.data(ctx, page.data);
-        cartOrdersState.meta(ctx, page.meta);
+        cartOrdersState.data(ctx, page.data as GameOrder[]);
+        cartOrdersState.meta(ctx, page.meta as GameOrdersPage["meta"]);
       },
       onReject: (_, e) => logError(e),
     }).pipe(withStatusesAtom()),
@@ -97,18 +96,16 @@ export const cartOrders = atom(null, "cartOrders").pipe(
       const meta = ctx.get(cartOrdersState.meta);
       if (!meta?.endCursor) return null;
 
-      return await ctx.schedule(() => client.raw
-        .get<GameOrdersPage>("/store/order/internal/list", {
-          params: { query: { ...queryParams(ctx), endCursor: meta.endCursor } }
-        })
-      );
+      return await ctx.schedule(() => client.get("/store/order/internal/list", {
+        params: { query: { ...queryParams(ctx), endCursor: meta.endCursor } }
+      }));
     }, {
       name: `${name}.loadMore`,
       onFulfill: (ctx, page) => {
         if (!page) return;
 
-        cartOrdersState.data(ctx, (current) => [...current, ...page.data]);
-        cartOrdersState.meta(ctx, page.meta);
+        cartOrdersState.data(ctx, (current) => [...current, ...page.data as GameOrder[]]);
+        cartOrdersState.meta(ctx, page.meta as GameOrdersPage["meta"]);
       },
       onReject: (_, e) => logError(e),
     }).pipe(withStatusesAtom()),

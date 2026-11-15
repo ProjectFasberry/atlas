@@ -113,6 +113,7 @@ const ActivityChart = ({ payload }: { payload: PlayerActivityDailyPayload }) => 
             return (
               <div
                 key={cell.key}
+                role="img"
                 className={`${CELL_CLASS} ${cell.isFuture ? "bg-transparent" : levelClass(cell.minutes)}`}
                 aria-label={label ?? undefined}
                 onMouseEnter={label

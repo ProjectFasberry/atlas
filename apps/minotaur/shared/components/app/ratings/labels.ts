@@ -19,11 +19,11 @@ export type RatingType = keyof typeof TYPE_KEYS;
 export type RatingServer = keyof typeof SERVER_KEYS;
 
 export function isRatingType(value: string | undefined | null): value is RatingType {
-	return !!value && Object.prototype.hasOwnProperty.call(TYPE_KEYS, value);
+	return !!value && Object.hasOwn(TYPE_KEYS, value);
 }
 
 export function isRatingServer(value: string | undefined | null): value is RatingServer {
-	return !!value && Object.prototype.hasOwnProperty.call(SERVER_KEYS, value);
+	return !!value && Object.hasOwn(SERVER_KEYS, value);
 }
 
 export function getRatingTypeLabel(value: string | undefined | null, fallback?: string): string {

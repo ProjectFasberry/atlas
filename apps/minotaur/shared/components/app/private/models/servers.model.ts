@@ -128,7 +128,10 @@ export const servers = atom(null, "servers").pipe(
     ),
     save: reatomAsync(async (ctx, input: { id: number; patch: ServerPatch }) => {
       return await ctx.schedule(() =>
-        client.raw.patch<ServerPayload>("/privated/servers/{id}", { json: input.patch, params: { path: { id: input.id } } })
+        client.patch("/privated/servers/{id}", {
+          json: input.patch as ExtractApiBody<"patchPrivatedServersById">["content"]["application/json"],
+          params: { path: { id: input.id } },
+        })
       )
     }, {
       name: `${name}.save`,

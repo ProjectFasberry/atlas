@@ -95,7 +95,7 @@ export const submitJoin = action((ctx) => {
     ? { telegram: parsed.data.contact.value }
     : { email: parsed.data.contact.value }
 
-  void client.raw.post<{ id: number }>("/team/apply", {
+  void client.post("/team/apply", {
     json: { ...parsed.data, ...legacy },
     headers: { "x-cap-token": token ?? "" },
   }).then(() => {

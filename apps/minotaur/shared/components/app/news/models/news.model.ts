@@ -8,8 +8,7 @@ export type PublicNewsParams = ExtractApiParams<"getNewsList">["query"]
 export type PublicNewsSingle = PublicNewsPayload["data"][number]
 
 export const getNews = async (params: Partial<PublicNewsParams>, init?: RequestInit) => {
-  return client.raw
-    .get<PublicNewsPayload>("/news/list", { ...init, params: { query: params } })
+  return client.get("/news/list", { ...init, params: { query: { ...params, limit: params.limit ?? 32 } } })
 }
 
 export const newsState = atom(null, "newsState").pipe(

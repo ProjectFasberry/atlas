@@ -35,11 +35,10 @@ export const order = atom(null, "order").pipe(
     create: reatomAsync(async () => {
       // The same key is reused by the client's automatic retry, so a lost
       // response cannot charge the player twice.
-      return await client.raw
-        .post<CreateOrderRoutePayload>("/store/order/internal/create", {
-          retry: 1,
-          json: { idempotencyKey: crypto.randomUUID() }
-        })
+      return await client.raw.post<CreateOrderRoutePayload>("/store/order/internal/create", {
+        retry: 1,
+        json: { idempotencyKey: crypto.randomUUID() }
+      })
     }, {
       name: `${name}.create`,
       onFulfill: (ctx, res) => {
@@ -67,8 +66,7 @@ export const order = atom(null, "order").pipe(
 )
 
 export async function getOrder(id: string, init: RequestInit): Promise<OrderSingleGamePayload> {
-  return client.raw
-    .get<OrderSingleGamePayload>(`/store/order/internal/${id}`, init)
+  return client.raw.get<OrderSingleGamePayload>(`/store/order/internal/${id}`, init)
 }
 
 export const getOrderUrl = (uniqueId: string) => `/store/order/${uniqueId}`;

@@ -9,7 +9,7 @@ export type EventsSingle = EventsList[number]
 type EventsParams = ExtractApiParams<"getServerEventsList">["query"]
 
 export async function getEvents(params: Partial<EventsParams>, init?: RequestInit) {
-  return client.raw.get<EventsList>("/server/events/list", { ...init, params: { query: params } })
+  return client.get("/server/events/list", { ...init, params: { query: { ...params, limit: params.limit ?? 32 } } })
 }
 
 export const eventsState = atom(null, "eventsState").pipe(

@@ -35,12 +35,10 @@ export const tasks = atom(null, "tasks").pipe(
         searchQuery: ctx.get(tasksState.filters.searchQuery)
       }
 
-      return await ctx.schedule(() => client.raw
-        .get<TasksPayload>("/server/task/list", {
-          signal: ctx.controller.signal,
-          params: { query: params }
-        })
-      )
+      return await ctx.schedule(() => client.get("/server/task/list", {
+        signal: ctx.controller.signal,
+        params: { query: { ...params, endCursor: params.endCursor ?? undefined } }
+      }))
     }, `${name}.fetch`).pipe(
       withDataAtom(null, (_, data) => isEmptyArray(data.data) ? null : data),
       withStatusesAtom(),

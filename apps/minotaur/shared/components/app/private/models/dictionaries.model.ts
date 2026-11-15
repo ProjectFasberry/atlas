@@ -98,11 +98,10 @@ export const dict = atom(null, "dict").pipe(
         value: ctx.get(dictState.editValue)
       }
 
-      return await client.raw
-        .post<ExtractApiData<"postPrivatedDictionariesByIdEdit">["data"]>(`/privated/dictionaries/${id}/edit`, {
-          json,
-          params: { path: { id } }
-        })
+      return await client.post("/privated/dictionaries/{id}/edit", {
+        json: json as ExtractApiBody<"postPrivatedDictionariesByIdEdit">["content"]["application/json"],
+        params: { path: { id } }
+      })
     }, {
       name: `${name}.edit`,
       onFulfill: (ctx, res) => {
@@ -122,8 +121,9 @@ export const dict = atom(null, "dict").pipe(
       });
     }, `${name}.deleteBefore`),
     delete: reatomAsync(async (ctx, id: number) => {
-      const result = await client.raw
-        .delete<ExtractApiData<"deletePrivatedDictionariesByIdRemove">["data"]>(`/privated/dictionaries/${id}/remove`)
+      const result = await client.delete("/privated/dictionaries/{id}/remove", {
+        params: { path: { id } }
+      })
 
       return { result, id };
     }, {

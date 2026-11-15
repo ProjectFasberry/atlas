@@ -53,10 +53,9 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
         type: ctx.get(createStoreItemState.type)
       }
 
-      return await client.raw
-        .post<StoreItem>("/privated/store/item/create", {
-          json: body
-        })
+      return await client.raw.post<StoreItem>("/privated/store/item/create", {
+        json: body
+      })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -155,7 +154,7 @@ export const editStoreItem = atom(null, "editStoreItem").pipe(
       ]
 
       return await client.raw
-        .post(`/privated/store/item/edit/{id}`, { json: body, params: { path: { id } } })
+        .post(`/privated/store/item/${id}/edit`, { json: body })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx) => {

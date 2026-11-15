@@ -87,7 +87,7 @@ const resetCreate = action((ctx) => {
 export const fetchLands = reatomAsync(async (ctx, params?: { cursor?: string; append?: boolean }) => {
 	const search = ctx.get(landsState.search);
 
-	const result = await ctx.schedule(() => client.raw.get<AdminLandListPayload>(
+	const result = await ctx.schedule(() => client.get(
 		"/privated/lands/list",
 		{
 			signal: ctx.controller.signal,
@@ -132,7 +132,7 @@ export const fetchMoreLands = action((ctx) => {
 export const fetchEligiblePlayers = reatomAsync(async (ctx) => {
 	const search = ctx.get(landsState.playerSearch);
 
-	return await ctx.schedule(() => client.raw.get<EligiblePlayer[]>(
+	return await ctx.schedule(() => client.get(
 		"/privated/lands/eligible-players",
 		{
 			signal: ctx.controller.signal,
@@ -164,7 +164,7 @@ export const createRandomLand = reatomAsync(async (ctx) => {
 	const selected = ctx.get(landsState.selectedPlayers);
 	if (selected.length === 0) throw new Error("PLAYERS_REQUIRED");
 
-	return await client.raw.post<AdminLand>("/privated/lands/random", {
+	return await client.post("/privated/lands/random", {
 		json: {
 			players: selected.map((player) => player.uuid),
 			chunks: ctx.get(landsState.create.chunks),
@@ -192,7 +192,7 @@ export const createManualLand = reatomAsync(async (ctx) => {
 	const selected = ctx.get(landsState.selectedPlayers);
 	if (selected.length === 0) throw new Error("PLAYERS_REQUIRED");
 
-	return await client.raw.post<AdminLand>("/privated/lands/manual", {
+	return await client.post("/privated/lands/manual", {
 		json: {
 			players: selected.map((player) => player.uuid),
 			name: ctx.get(landsState.create.landName).trim(),
@@ -220,7 +220,7 @@ export const createManualLand = reatomAsync(async (ctx) => {
 );
 
 export const deleteLand = reatomAsync(async (_, ulid: string) => {
-	await client.raw.delete<"OK">(`/privated/lands/${ulid}`);
+	await client.delete("/privated/lands/{ulid}", { params: { path: { ulid } } });
 
 	return ulid;
 }, {

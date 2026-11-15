@@ -128,8 +128,7 @@ export const createNews = atom(null, "createNews").pipe(
         content: ctx.get(createNewsState.content)
       }
 
-      return await client.raw
-        .post<NewsSingle>("/privated/news/create", { json })
+      return await client.raw.post<NewsSingle>("/privated/news/create", { json })
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
@@ -325,8 +324,9 @@ export const deleteNews = atom(null, "deleteNews").pipe(
       });
     }),
     submit: reatomAsync(async (_, id: number) => {
-      const result = await client.raw
-        .delete<ExtractApiData<"deletePrivatedNewsById">["data"]>(`/privated/news/${id}`)
+      const result = await client.delete("/privated/news/{id}", {
+        params: { path: { id } },
+      })
 
       return { result, id }
     }, {

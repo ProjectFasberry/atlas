@@ -83,12 +83,11 @@ export async function getRatings(
 ) {
   const opts = { limit, endCursor, asc, server };
 
-  return client.raw
-    .get<RatingsPayload>(`/server/rating/${by}`, {
-      ...init,
-      retry: 1,
-      params: { query: opts }
-    })
+  return client.get("/server/rating/{by}", {
+    ...init,
+    retry: 1,
+    params: { path: { by }, query: opts }
+  })
 }
 
 export const ratingsState = atom(null, "ratingsState").pipe(
@@ -125,7 +124,8 @@ export const ratings = atom(null, "ratings").pipe(
       name: `${name}.fetch`,
       onFulfill: (ctx, res) => {
         batch(ctx, () => {
-          ratingsState.data(ctx, res.data.length === 0 ? null : res.data);
+          const data = res.data as RatingData;
+          ratingsState.data(ctx, data.length === 0 ? null : data);
           ratingsState.meta(ctx, res.meta);
           ratingsState.loaded(ctx, true);
         });

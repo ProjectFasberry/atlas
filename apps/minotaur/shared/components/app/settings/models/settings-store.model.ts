@@ -69,10 +69,12 @@ export const changeLocalRecipient = atom(null, "changeLocalRecipient").pipe(
       const existNickname = await getExistNickname(validatedRecipient)
       if (!existNickname) throw new Error("NOT_FOUND")
 
-      const json = { key: "recipient", value: validatedRecipient };
+      const json = { key: "recipient" as const, value: validatedRecipient };
 
-      const result = await client.raw
-        .post<string>(`/store/cart/edit/${id}`, { json })
+      const result = await client.post("/store/cart/edit/{id}", {
+        params: { path: { id } },
+        json,
+      })
 
       return { id, result, cb }
     }, {

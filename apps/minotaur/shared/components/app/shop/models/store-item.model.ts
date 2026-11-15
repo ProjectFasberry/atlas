@@ -15,8 +15,10 @@ export type StoreItem = ExtractApiData<"getStoreItems">["data"]["data"][number] 
 }
 
 export async function getStoreItem(id: string, init: RequestInit) {
-  return client.raw
-    .get<StoreItem>(`/store/item/${id}`, init)
+  return client.get("/store/item/{id}", {
+    ...init,
+    params: { path: { id: Number(id) } },
+  })
 }
 
 type UpdateItemStatusOptions =

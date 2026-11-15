@@ -736,7 +736,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/privated/lands/create": {
+    "/privated/lands/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List lands for the admin panel */
+        get: operations["getPrivatedLandsList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/lands/eligible-players": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List players without a land */
+        get: operations["getPrivatedLandsEligible-players"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/lands/random": {
         parameters: {
             query?: never;
             header?: never;
@@ -745,8 +779,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a land */
-        post: operations["postPrivatedLandsCreate"];
+        /** Create a random land */
+        post: operations["postPrivatedLandsRandom"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/lands/manual": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a manually configured land */
+        post: operations["postPrivatedLandsManual"];
         delete?: never;
         options?: never;
         head?: never;
@@ -763,7 +814,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Delete a land */
+        /** Delete a land as an admin */
         delete: operations["deletePrivatedLandsByUlid"];
         options?: never;
         head?: never;
@@ -1026,6 +1077,40 @@ export interface paths {
         head?: never;
         /** Update a server: availability, runtime and presentation */
         patch: operations["patchPrivatedServersById"];
+        trace?: never;
+    };
+    "/privated/user/{nickname}/skin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Reject a player skin */
+        delete: operations["deletePrivatedUserByNicknameSkin"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/user/{nickname}/skins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Reject all player skins */
+        delete: operations["deletePrivatedUserByNicknameSkins"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/privated/api/keys/create": {
@@ -2556,6 +2641,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/server/skin/{skinName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove own skin from history
+         * @description Deleting the current skin clears the selection and refreshes the live player.
+         */
+        delete: operations["deleteServerSkinBySkinName"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/server/skin/history/{nickname}": {
         parameters: {
             query?: never;
@@ -2563,7 +2668,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get skin history */
+        /**
+         * Get skin history
+         * @description Paginated with ?cursor=<offset>&limit=<1..100>; the next offset is returned in x-next-cursor.
+         */
         get: operations["getServerSkinHistoryByNickname"];
         put?: never;
         post?: never;
@@ -2665,6 +2773,26 @@ export interface paths {
         };
         /** Get activity summary */
         get: operations["getServerActivitySummaryByNickname"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/server/activity/daily/{nickname}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get daily player activity
+         * @description Returns one UTC day per entry for the last ?days=7..365 (default 365).
+         */
+        get: operations["getServerActivityDailyByNickname"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4872,7 +5000,93 @@ export interface operations {
             };
         };
     };
-    postPrivatedLandsCreate: {
+    getPrivatedLandsList: {
+        parameters: {
+            query: {
+                asc?: boolean | string;
+                endCursor?: string;
+                limit: number;
+                searchQuery?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            data: {
+                                ulid: string;
+                                name: string;
+                                title: (string | null) | null;
+                                type: string;
+                                level: number;
+                                /** Format: date-time */
+                                created_at: string;
+                                world: string;
+                                server: string;
+                                owner: ({
+                                    uuid: string;
+                                    nickname: string;
+                                    chunks: number;
+                                    avatar: string;
+                                } | null) | null;
+                                members: {
+                                    uuid: string;
+                                    nickname: string;
+                                    chunks: number;
+                                    avatar: string;
+                                }[];
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                hasPrevPage: boolean;
+                                startCursor?: string;
+                                endCursor?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getPrivatedLandsEligible-players": {
+        parameters: {
+            query: {
+                limit: number;
+                searchQuery?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            uuid: string;
+                            nickname: string;
+                            avatar: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedLandsRandom: {
         parameters: {
             query?: never;
             header?: never;
@@ -4882,18 +5096,21 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    name: string;
-                    initialChunksSize: number;
+                    players: string[];
+                    chunks?: string | number;
+                    name?: string;
                     title?: string;
                 };
                 "application/x-www-form-urlencoded": {
-                    name: string;
-                    initialChunksSize: number;
+                    players: string[];
+                    chunks?: string | number;
+                    name?: string;
                     title?: string;
                 };
                 "multipart/form-data": {
-                    name: string;
-                    initialChunksSize: number;
+                    players: string[];
+                    chunks?: string | number;
+                    name?: string;
                     title?: string;
                 };
             };
@@ -4907,31 +5124,61 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            owner: {
-                                nickname: string;
-                                avatar: string;
-                            };
+                            ulid: string;
+                            name: string;
+                            title: (string | null) | null;
+                            type: string;
+                            level: number;
+                            /** Format: date-time */
+                            created_at: string;
                             world: string;
                             server: string;
-                            area: ({
-                                ulid: string;
-                                holder: {
-                                    roles: unknown[];
-                                    trusted: string[];
-                                };
-                                settings: string[];
-                                invites: unknown[];
-                                tax: {
-                                    current: number;
-                                    time: number;
-                                    before: number;
-                                };
-                                banned: unknown[];
+                            owner: ({
+                                uuid: string;
+                                nickname: string;
+                                chunks: number;
+                                avatar: string;
                             } | null) | null;
-                            ulid: string;
-                            title: (string | null) | null;
-                            name: string;
+                            members: {
+                                uuid: string;
+                                nickname: string;
+                                chunks: number;
+                                avatar: string;
+                            }[];
                         };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
@@ -4942,11 +5189,143 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /**
-                         * @default INTERNAL_UNKNOWN
-                         * @enum {string}
-                         */
-                        error: "INTERNAL_UNKNOWN" | "NO_DEFAULTS";
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedLandsManual: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    players: string[];
+                    name: string;
+                    title?: string;
+                    type: string;
+                    level?: string | number;
+                    chunks?: string | number;
+                    stats?: {
+                        kills: string | number;
+                        deaths: string | number;
+                        wins: string | number;
+                        defeats: string | number;
+                        captures: string | number;
+                    };
+                };
+                "application/x-www-form-urlencoded": {
+                    players: string[];
+                    name: string;
+                    title?: string;
+                    type: string;
+                    level?: string | number;
+                    chunks?: string | number;
+                    stats?: {
+                        kills: string | number;
+                        deaths: string | number;
+                        wins: string | number;
+                        defeats: string | number;
+                        captures: string | number;
+                    };
+                };
+                "multipart/form-data": {
+                    players: string[];
+                    name: string;
+                    title?: string;
+                    type: string;
+                    level?: string | number;
+                    chunks?: string | number;
+                    stats?: {
+                        kills: string | number;
+                        deaths: string | number;
+                        wins: string | number;
+                        defeats: string | number;
+                        captures: string | number;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            ulid: string;
+                            name: string;
+                            title: (string | null) | null;
+                            type: string;
+                            level: number;
+                            /** Format: date-time */
+                            created_at: string;
+                            world: string;
+                            server: string;
+                            owner: ({
+                                uuid: string;
+                                nickname: string;
+                                chunks: number;
+                                avatar: string;
+                            } | null) | null;
+                            members: {
+                                uuid: string;
+                                nickname: string;
+                                chunks: number;
+                                avatar: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
@@ -4975,21 +5354,6 @@ export interface operations {
                     };
                 };
             };
-            /** @description Response for status 403 */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default PERMISSION_DENIED
-                         * @enum {string}
-                         */
-                        error: "PERMISSION_DENIED";
-                    };
-                };
-            };
             /** @description Response for status 404 */
             404: {
                 headers: {
@@ -4998,25 +5362,10 @@ export interface operations {
                 content: {
                     "application/json": {
                         /**
-                         * @default NOT_FOUND
+                         * @default LAND_NOT_FOUND
                          * @enum {string}
                          */
-                        error: "NOT_FOUND";
-                    };
-                };
-            };
-            /** @description Response for status 500 */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default INTERNAL_UNKNOWN
-                         * @enum {string}
-                         */
-                        error: "INTERNAL_UNKNOWN";
+                        error: "LAND_NOT_FOUND";
                     };
                 };
             };
@@ -5633,6 +5982,85 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    deletePrivatedUserByNicknameSkin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                nickname: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    skinName: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    skinName: string;
+                };
+                "multipart/form-data": {
+                    skinName: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            removed: number;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SKIN_NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "SKIN_NOT_FOUND";
+                    };
+                };
+            };
+        };
+    };
+    deletePrivatedUserByNicknameSkins: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                nickname: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            removed: number;
+                        };
                     };
                 };
             };
@@ -9148,6 +9576,62 @@ export interface operations {
             };
         };
     };
+    deleteServerSkinBySkinName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                skinName: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            removed: number;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SKIN_NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "SKIN_NOT_FOUND";
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default INTERNAL_SERVER_ERROR
+                         * @enum {string}
+                         */
+                        error: "INTERNAL_SERVER_ERROR";
+                    };
+                };
+            };
+        };
+    };
     getServerSkinHistoryByNickname: {
         parameters: {
             query?: never;
@@ -9317,6 +9801,39 @@ export interface operations {
                                 [key: string]: number;
                             };
                         } | null) | null;
+                    };
+                };
+            };
+        };
+    };
+    getServerActivityDailyByNickname: {
+        parameters: {
+            query?: {
+                days?: string;
+            };
+            header?: never;
+            path: {
+                nickname: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            days: {
+                                date: string;
+                                minutes: number;
+                            }[];
+                            totalMinutes: number;
+                            activeDays: number;
+                        };
                     };
                 };
             };

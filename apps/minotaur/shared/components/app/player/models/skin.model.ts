@@ -247,10 +247,10 @@ const skins = atom(null, "skins").pipe(
       }))
     ),
     remove: reatomAsync(async (ctx, identifier: string) => {
-      return await client.raw.delete<{ removed: number }>(
-        `/server/skin/${encodeURIComponent(identifier)}`,
-        { retry: 0 },
-      )
+      return await client.delete("/server/skin/{skinName}", {
+        params: { path: { skinName: identifier } },
+        retry: 0,
+      })
     }, {
       name: `${name}.remove`,
       onFulfill: (ctx) => {

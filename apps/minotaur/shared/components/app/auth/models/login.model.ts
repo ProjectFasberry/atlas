@@ -47,12 +47,11 @@ export const login = atom(null, "login").pipe(
 
           authState.isProcessing(ctx, true);
 
-          return await client.raw
-            .post<ExtractApiData<"postAuthLoginBasic">["data"]>(`/auth/login/basic`, {
-              params: { query: { token: token ?? "" } },
-              json,
-              timeout: 10000,
-            })
+          return await client.post("/auth/login/basic", {
+            headers: token ? { "x-cap-token": token } : undefined,
+            json,
+            timeout: 10000,
+          })
         }, {
           name: `${name}.submit`,
           onFulfill: (ctx, res) => {

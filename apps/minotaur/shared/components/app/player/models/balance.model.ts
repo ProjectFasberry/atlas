@@ -32,10 +32,9 @@ export const balance = atom(null, "balance").pipe(
     fetch: reatomAsync(async (ctx) => {
       const server = ctx.get(balanceState.targetServer);
 
-      return await client.raw
-        .get<BalancePayload>("/server/balance", {
-          params: { query: { server } }
-        })
+      return await client.get("/server/balance", {
+        params: { query: { server: server as "muffin" | "bisquite" } }
+      })
     }, {
       name: `${name}.fetch`,
       onFulfill: async (ctx, res) => {

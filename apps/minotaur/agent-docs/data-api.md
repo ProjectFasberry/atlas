@@ -36,15 +36,19 @@ const created = await client.post("/privated/things/create", { json: body });
 - Cookies are included (`credentials: "include"`); never add auth headers
   manually.
 
-**Undocumented endpoints.** Some routes are missing from the OpenAPI contract
-(economy, payments, parts of the store and history). Use the `raw` escape hatch
-and keep the type explicit:
+**Undocumented endpoints.** `client.raw` is only for operations the contract
+does not describe: `responses: never` or a missing request body. That currently
+covers the economy and payments routes, the private history list, the public
+rating list (`/server/rating/list`), store item create/edit/get, order
+create/single and private news create/edit. Keep the type explicit:
 
 ```ts
 const wallet = await client.raw.get<EconomyWallet>("/privated/economy/wallet", {
   params: { query: { nickname } },
 });
 ```
+
+Everything else uses the typed methods, including path params with `{placeholders}`.
 
 ## Types
 
