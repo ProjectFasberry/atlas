@@ -2,9 +2,6 @@ import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { createStorageModel } from "../models/storage.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { dayjs } from "@/shared/lib/dayjs";
-import { Portal } from "@ark-ui/react/portal";
-import { Menu } from "@ark-ui/react/menu";
-import { menuVariant } from "@/shared/ui/menu";
 import { Typography } from "@/shared/ui/typography";
 import type { ReactNode } from "react";
 import { atom, type Ctx, type CtxSpy } from "@reatom/framework";
@@ -13,12 +10,13 @@ import { ErrorBlock } from "@/shared/ui/error-block";
 import { Noop } from "@/shared/ui/noop";
 import { Icon } from "@/shared/ui/icon";
 import type { StorageObject } from "@repo/storage";
+import { Vaul, VaulContent, VaulHeader, VaulTrigger } from "@/shared/ui/vaul";
 
 type StorageModel = {
   name: string,
   onSelectFile?: (ctx: Ctx, fileName: string) => void,
 } & ({
-  as: "menu", Slot: React.ReactNode
+  as: "drawer", Slot: React.ReactNode
 } | {
   as: "headless", Slot?: never
 })
@@ -123,12 +121,11 @@ export const storageModel = ({
     if (!bucket) return null
 
     if (folders.length === 0 && objects.length === 0) {
-      const debug = JSON.stringify(data)?.slice(0, 180) ?? "null"
-      return <Noop title={`${folder ? "Папка пуста" : "Бакет пуст"} :: ${debug}`} />
+      return <Noop title={folder ? "Папка пуста" : "Бакет пуст"} />
     }
 
     return (
-      <div className="flex flex-col gap-1 w-full max-h-[40vh] overflow-y-auto">
+      <div className="flex flex-col gap-1 w-full max-h-[60vh] overflow-y-auto">
         {folders.map(({ prefix }) => (
           <div
             key={prefix}
@@ -225,23 +222,17 @@ export const storageModel = ({
   }, `${name}.StorageContent`)
 
   const StorageWrapper = reatomComponent(({ ctx }) => {
-    if (as === "menu" && Slot) {
+    if (as === "drawer" && Slot) {
       return (
-        <Menu.Root
-          open={ctx.spy(storageState.isOpen)}
-          onOpenChange={({ open }) => storageState.isOpen(ctx, open)}
-        >
-          <Menu.Trigger asChild>
-            {Slot}
-          </Menu.Trigger>
-          <Portal>
-            <Menu.Positioner>
-              <Menu.Content className={menuVariant.content("min-w-[340px]")}>
-                <StorageContent />
-              </Menu.Content>
-            </Menu.Positioner>
-          </Portal>
-        </Menu.Root>
+        <Vaul openAtom={storageState.isOpen}>
+          <VaulTrigger asChild>{Slot}</VaulTrigger>
+          <VaulContent side="right" className="w-full! max-w-md">
+            <VaulHeader title="Хранилище" />
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+              <StorageContent />
+            </div>
+          </VaulContent>
+        </Vaul>
       )
     }
 

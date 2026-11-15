@@ -51,10 +51,12 @@ export function DrawerTrigger({ children, asChild, className }: DrawerTriggerPro
 type DrawerContentProps = PropsWithChildren<
 	Omit<ComponentProps<typeof ArkDrawer.Content>, "children"> & {
 		side?: DrawerSide;
+		/** The grabber is a bottom-sheet affordance; side drawers hide it. */
+		grabber?: boolean;
 	}
 >;
 
-export function DrawerContent({ side = "bottom", className, children, ...props }: DrawerContentProps) {
+export function DrawerContent({ side = "bottom", className, children, grabber = true, ...props }: DrawerContentProps) {
 	return (
 		<Portal>
 			<ArkDrawer.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
@@ -68,9 +70,11 @@ export function DrawerContent({ side = "bottom", className, children, ...props }
 					)}
 					{...props}
 				>
-					<ArkDrawer.Grabber className="mx-auto -my-2 flex h-10 w-full shrink-0 cursor-grab items-center justify-center active:cursor-grabbing">
-						<ArkDrawer.GrabberIndicator className="h-1 w-9 rounded-sm bg-neutral-600" />
-					</ArkDrawer.Grabber>
+					{grabber ? (
+						<ArkDrawer.Grabber className="mx-auto -my-2 flex h-10 w-full shrink-0 cursor-grab items-center justify-center active:cursor-grabbing">
+							<ArkDrawer.GrabberIndicator className="h-1 w-9 rounded-sm bg-neutral-600" />
+						</ArkDrawer.Grabber>
+					) : null}
 					{children}
 				</ArkDrawer.Content>
 			</ArkDrawer.Positioner>

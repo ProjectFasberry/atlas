@@ -185,7 +185,7 @@ const CreateNewsField = reatomComponent<typeof fields[number]>(({ ctx, label, at
 
 const { Storage } = storageModel({
   name: "create-news",
-  as: "menu",
+  as: "drawer",
   Slot: (
     <Button background="white" className="text-sm h-8 font-semibold">
       Открыть хранилище

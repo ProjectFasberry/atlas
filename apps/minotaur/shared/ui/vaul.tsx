@@ -19,6 +19,7 @@ export const VaulContent = ({
 	return (
 		<DrawerContent
 			side={side}
+			grabber={side === "bottom"}
 			className={[
 				`bg-neutral-900 border-neutral-700/60 text-neutral-50
 				after:absolute after:inset-x-0 after:top-full after:h-[200%]
