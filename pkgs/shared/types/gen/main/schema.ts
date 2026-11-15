@@ -9636,9 +9636,7 @@ export interface operations {
     };
     postServerSkinUpload: {
         parameters: {
-            query: {
-                waitMs: number;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -9650,7 +9648,6 @@ export interface operations {
                     file: string;
                     /** @enum {string} */
                     variant: "classic" | "slim";
-                    name?: string;
                 };
             };
         };
@@ -9663,11 +9660,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            job: {
-                                id: string;
-                                status: string;
-                            };
-                            url: (string | null) | null;
+                            url: string;
                         };
                     };
                 };
@@ -9700,28 +9693,6 @@ export interface operations {
             };
             /** @description Response for status 500 */
             500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error: string;
-                    };
-                };
-            };
-            /** @description Response for status 502 */
-            502: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error: string;
-                    };
-                };
-            };
-            /** @description Response for status 504 */
-            504: {
                 headers: {
                     [name: string]: unknown;
                 };
