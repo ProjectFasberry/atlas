@@ -14,9 +14,11 @@ import { scrollableVariant } from "@/shared/consts/style-variants";
 import { Avatar } from "@/shared/ui/avatar";
 import { Noop } from "@/shared/ui/noop";
 import {
-  formatAccountDate, groupsAtom, sidebar, sidebarLinks, toggleSidebar,
-  transformPermsByNamespace
+  copyPermissions, formatAccountDate, permissionCopied, permissionCountAtom,
+  permissionFilteredCountAtom, permissionGroupsAtom, permissionSearch, sidebar,
+  sidebarLinks, toggleSidebar
 } from "../models/sidebar.model";
+import { Input } from "@/shared/ui/input";
 
 const InfoCell = ({ label, value }: { label: string, value: string }) => (
   <div className="flex flex-col gap-0.5 rounded-lg border border-neutral-800 bg-neutral-800/40 px-3 py-1">
@@ -29,16 +31,17 @@ const UserInfo = reatomComponent(({ ctx }) => {
   const open = ctx.spy(sidebar.infoIsOpened)
   const collapsed = ctx.spy(sidebar.isCollapsed)
 
-  useUpdate(transformPermsByNamespace, []);
-
   const currentUser = ctx.spy(currentUserState);
   if (!currentUser) return null;
 
   const role = ctx.spy(currentUserState.role)
   if (!role) return null;
 
-  const groups = ctx.spy(groupsAtom)
-  const permissions = ctx.spy(currentUserState.perms)
+  const groups = ctx.spy(permissionGroupsAtom)
+  const permissionsCount = ctx.spy(permissionCountAtom)
+  const filteredCount = ctx.spy(permissionFilteredCountAtom)
+  const search = ctx.spy(permissionSearch)
+  const copied = ctx.spy(permissionCopied)
   const roleTitle = getFromDictionary(ctx, role.name)
   const registeredAt = formatAccountDate(currentUser.meta.reg_date)
 
@@ -81,7 +84,7 @@ const UserInfo = reatomComponent(({ ctx }) => {
             className="hidden rounded-lg bg-neutral-900
               px-1.5 py-0.5 text-[10px] font-semibold sm:inline-flex"
           >
-            {permissions.length}
+            {permissionsCount}
           </span>
           <Icon name="sprite:arrows-diagonal" className="size-3.5 sm:size-4" />
         </div>
@@ -125,53 +128,83 @@ const UserInfo = reatomComponent(({ ctx }) => {
               </div>
             </div>
             <div className="grid w-full gap-2 sm:grid-cols-3">
-              <InfoCell label="Права" value={permissions.length.toString()} />
-              <InfoCell label="Группы" value={groups.length.toString()} />
+              <InfoCell label="Права" value={permissionsCount.toString()} />
+              <InfoCell label="Разделы" value={groups.length.toString()} />
               <InfoCell label="Регистрация" value={registeredAt} />
+            </div>
+            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+              <Input
+                value={search}
+                onChange={(event) => permissionSearch(ctx, event.target.value)}
+                placeholder="Поиск по правам"
+                className="h-8 flex-1"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-neutral-500">
+                  {filteredCount === permissionsCount
+                    ? `${permissionsCount} прав`
+                    : `${filteredCount} из ${permissionsCount}`}
+                </span>
+                <Button
+                  background="default"
+                  className="h-8 px-3 text-xs"
+                  disabled={filteredCount === 0}
+                  onClick={() => copyPermissions(ctx)}
+                >
+                  {copied ? "Скопировано" : "Скопировать"}
+                </Button>
+              </div>
             </div>
             <div
               className={scrollableVariant({
                 className: "flex min-h-0 w-full flex-1 flex-col gap-2 overflow-y-auto pr-1"
               })}
             >
-              {groups.length === 0
+              {permissionsCount === 0
                 ? <Noop title="Права не назначены" />
-                : (
-                  <div className="grid w-full gap-2 sm:grid-cols-2">
-                    {groups.map((group) => (
-                      <div
-                        key={group.title}
-                        className="flex flex-col gap-1.5 rounded-xl border border-neutral-800 p-2"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <Typography className="text-sm font-semibold">
-                            {group.title}
-                          </Typography>
-                          <span className="rounded-lg bg-neutral-800 px-1.5 py-0.5
-                            text-[11px] font-medium text-neutral-400">
-                            {group.data.length}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          {group.data.map((item) => (
-                            <div
-                              key={item}
-                              className="flex items-center gap-1.5 rounded-lg bg-neutral-800/60 px-2 py-1"
-                            >
-                              <Icon name="sprite:check" className="size-3 shrink-0 text-green-500" />
-                              <span
-                                className="truncate font-mono text-[11px] text-neutral-300"
-                                title={item}
+                : groups.length === 0
+                  ? <Noop title="Ничего не найдено" />
+                  : (
+                    <div className="grid w-full gap-2 sm:grid-cols-2">
+                      {groups.map((group) => (
+                        <div
+                          key={group.key}
+                          className="flex flex-col gap-1.5 rounded-xl border border-neutral-800 p-2"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <Typography className="text-sm font-semibold">
+                              {group.title}
+                            </Typography>
+                            <span className="rounded-lg bg-neutral-800 px-1.5 py-0.5
+                              text-[11px] font-medium text-neutral-400">
+                              {group.items.length}
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            {group.items.map((item) => (
+                              <div
+                                key={item.name}
+                                className="flex items-start gap-1.5 rounded-lg bg-neutral-800/60 px-2 py-1"
                               >
-                                {item}
-                              </span>
-                            </div>
-                          ))}
+                                <Icon
+                                  name={item.danger ? "sprite:shield-half" : "sprite:check"}
+                                  className={`size-3 shrink-0 mt-0.5 ${item.danger ? "text-red" : "text-green-500"}`}
+                                />
+                                <div className="flex min-w-0 flex-col">
+                                  <span className="truncate text-[12px] text-neutral-200" title={item.name}>
+                                    {item.title}
+                                  </span>
+                                  <span className="truncate font-mono text-[10px] text-neutral-500" title={item.name}>
+                                    {item.name}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
             </div>
             <DialogClose />
           </Dialog.Content>

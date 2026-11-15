@@ -6,7 +6,6 @@ import { Input } from "@/shared/ui/input";
 import { Noop } from "@/shared/ui/noop";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { Typography } from "@/shared/ui/typography";
-import { SectionWrapper } from "./ui";
 import { atom, spawn } from "@reatom/framework";
 import { dayjs } from "@/shared/lib/dayjs";
 import { getFromDictionary } from "@/shared/models/app/utils";
@@ -167,7 +166,7 @@ export const HistoryList = reatomComponent(({ ctx }) => {
   const loadMoreError = ctx.spy(history.loadMore.errorAtom);
 
   return (
-    <SectionWrapper className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Typography className="text-sm text-neutral-400">
           Загружено: {data.length}
@@ -221,6 +220,6 @@ export const HistoryList = reatomComponent(({ ctx }) => {
 
       <HistoryViewer />
       <HistoryAutoLoad />
-    </SectionWrapper>
+    </div>
   )
 }, "HistoryList")

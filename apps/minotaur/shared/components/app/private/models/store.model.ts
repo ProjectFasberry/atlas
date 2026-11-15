@@ -17,21 +17,55 @@ type CreateItemStoreSchema = z.infer<typeof storeItemCreateSchema>
 export const createStoreItemState = atom(null, "createStoreItemState").pipe(
   withAssign((_, name) => ({
     title: atom<CreateItemStoreSchema["title"]>("", `${name}.title`).pipe(withReset()),
+    description: atom<Nullable<CreateItemStoreSchema["description"]>>(null, `${name}.description`).pipe(withReset()),
     imgUrl: atom<Nullable<CreateItemStoreSchema["imageUrl"]>>(null, `${name}.imgUrl`).pipe(withReset()),
+    imageUploading: atom(false, `${name}.imageUploading`),
+    imageError: atom<Nullable<string>>(null, `${name}.imageError`),
     currency: atom<CreateItemStoreSchema["currency"]>("CHARISM", `${name}.currency`).pipe(withReset()),
     value: atom<Nullable<CreateItemStoreSchema["value"]>>(null, `${name}.value`).pipe(withReset()),
     content: atom<JSONContent>({}, `${name}.content`).pipe(withReset()),
     price: atom<CreateItemStoreSchema["price"]>("0", `${name}.price`).pipe(withReset()),
     command: atom<CreateItemStoreSchema["command"]>("", `${name}.command`).pipe(withReset()),
     refundCmd: atom<Nullable<CreateItemStoreSchema["refund_cmd"]>>(null, `${name}.refundCmd`).pipe(withReset()),
-    type: atom<Nullable<CreateItemStoreSchema["type"]>>(null, `${name}.type`).pipe(withReset())
+    type: atom<CreateItemStoreSchema["type"]>("donate", `${name}.type`).pipe(withReset())
   }))
 )
+export const createStoreItemBodyAtom = atom((ctx) => ({
+  title: ctx.spy(createStoreItemState.title),
+  description: ctx.spy(createStoreItemState.description),
+  imageUrl: ctx.spy(createStoreItemState.imgUrl),
+  value: ctx.spy(createStoreItemState.value) ?? "",
+  currency: ctx.spy(createStoreItemState.currency),
+  content: ctx.spy(createStoreItemState.content),
+  price: ctx.spy(createStoreItemState.price),
+  command: ctx.spy(createStoreItemState.command),
+  refund_cmd: ctx.spy(createStoreItemState.refundCmd),
+  type: ctx.spy(createStoreItemState.type),
+}), "createStoreItemBody")
+
+/** Field-level errors for the create form; the API validates again. */
+export const createStoreItemValidationAtom = atom((ctx) => {
+  const result = storeItemCreateSchema.safeParse(ctx.spy(createStoreItemBodyAtom))
+  const errors: Record<string, string> = {}
+
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const key = String(issue.path[0] ?? "")
+      if (key && !errors[key]) errors[key] = issue.message
+    }
+  }
+
+  return { valid: result.success, errors }
+}, "createStoreItemValidation")
+
 export const createStoreItem = atom(null, "createStoreItem").pipe(
   withAssign((_, name) => ({
     resetFull: action((ctx) => {
       createStoreItemState.title.reset(ctx)
+      createStoreItemState.description.reset(ctx)
       createStoreItemState.imgUrl.reset(ctx)
+      createStoreItemState.imageUploading(ctx, false)
+      createStoreItemState.imageError(ctx, null)
       createStoreItemState.currency.reset(ctx)
       createStoreItemState.value.reset(ctx)
       createStoreItemState.content.reset(ctx)
@@ -40,21 +74,29 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
       createStoreItemState.refundCmd.reset(ctx)
       createStoreItemState.type.reset(ctx)
     }),
-    submit: reatomAsync(async (ctx) => {
-      const body = {
-        title: ctx.get(createStoreItemState.title),
-        imageUrl: ctx.get(createStoreItemState.imgUrl),
-        value: ctx.get(createStoreItemState.value),
-        currency: ctx.get(createStoreItemState.currency),
-        content: ctx.get(createStoreItemState.content),
-        price: ctx.get(createStoreItemState.price),
-        command: ctx.get(createStoreItemState.command),
-        refund_cmd: ctx.get(createStoreItemState.refundCmd),
-        type: ctx.get(createStoreItemState.type)
-      }
+    uploadImage: reatomAsync(async (ctx, file: File) => {
+      const form = new FormData()
+      form.append("file", file)
 
+      return await client.post("/privated/store/item/image", {
+        body: form
+      })
+    }, {
+      name: `${name}.uploadImage`,
+      onFulfill: (ctx, result) => {
+        createStoreItemState.imgUrl(ctx, result.key)
+        createStoreItemState.imageError(ctx, null)
+      },
+      onReject: (ctx, error) => {
+        createStoreItemState.imageError(ctx, error instanceof Error ? error.message : "Не удалось загрузить картинку")
+        logError(error, { type: "combined" })
+      }
+    }).pipe(
+      withStatusesAtom()
+    ),
+    submit: reatomAsync(async (ctx) => {
       return await client.raw.post<StoreItem>("/privated/store/item/create", {
-        json: body
+        json: ctx.get(createStoreItemBodyAtom)
       })
     }, {
       name: `${name}.submit`,
@@ -78,6 +120,36 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
       withStatusesAtom()
     )
   }))
+)
+
+export const duplicateStoreItem = reatomAsync(async (_, id: number) => {
+  return await client.raw.get<StoreItem>("/privated/store/item/{id}", {
+    params: { path: { id } }
+  })
+}, {
+  name: "duplicateStoreItem",
+  onFulfill: (ctx, item) => {
+    if (!item) return
+
+    createStoreItemState.title(ctx, `${item.title} (копия)`)
+    createStoreItemState.description(ctx, item.description ?? null)
+    createStoreItemState.imgUrl(ctx, item.imageUrl ?? null)
+    createStoreItemState.currency(ctx, item.currency as AtomState<typeof createStoreItemState.currency>)
+    createStoreItemState.value(ctx, item.value)
+    createStoreItemState.content(ctx, (item.content ?? {}) as JSONContent)
+    createStoreItemState.price(ctx, String(item.price))
+    createStoreItemState.command(ctx, item.command ?? "")
+    createStoreItemState.refundCmd(ctx, item.refund_cmd ?? null)
+    createStoreItemState.type(ctx, item.type)
+
+    ctx.schedule(() => navigate("/private/store?target=create"))
+  },
+  onReject: (_, e) => {
+    logError(e, { type: "combined" })
+    toast.error("Не удалось открыть товар")
+  }
+}).pipe(
+  withStatusesAtom()
 )
 
 export const deleteStoreItem = atom(null, "deleteStoreItem").pipe(
