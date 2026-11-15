@@ -1300,6 +1300,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/volume/buckets/{bucket}/presign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Presign a bucket object */
+        get: operations["getPrivatedVolumeBucketsByBucketPresign"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/metrics/players": {
         parameters: {
             query?: never;
@@ -6446,6 +6463,7 @@ export interface operations {
                         data: {
                             name: string;
                             creationDate: string;
+                            available: boolean;
                         }[];
                     };
                 };
@@ -6486,6 +6504,7 @@ export interface operations {
         parameters: {
             query?: {
                 folder?: string;
+                delimiter?: string;
             };
             header?: never;
             path: {
@@ -6520,6 +6539,9 @@ export interface operations {
                                 size?: number;
                                 storageClass?: "STANDARD" | "REDUCED_REDUNDANCY" | "GLACIER" | "STANDARD_IA" | "ONEZONE_IA" | "INTELLIGENT_TIERING" | "DEEP_ARCHIVE" | "OUTPOSTS" | "GLACIER_IR" | "SNOW" | "EXPRESS_ONEZONE";
                             }[];
+                            commonPrefixes?: {
+                                prefix: string;
+                            }[];
                             continuationToken?: string;
                             delimiter?: string;
                             /** @constant */
@@ -6532,6 +6554,34 @@ export interface operations {
                             prefix?: string;
                             startAfter?: string;
                         } | null) | null;
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedVolumeBucketsByBucketPresign: {
+        parameters: {
+            query: {
+                key: string;
+            };
+            header?: never;
+            path: {
+                bucket: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            url: string;
+                        };
                     };
                 };
             };
