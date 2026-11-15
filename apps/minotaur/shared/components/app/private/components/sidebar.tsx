@@ -2,7 +2,7 @@ import { Link } from "@/shared/components/config/link/link"
 import { tv } from "tailwind-variants"
 import { getFromDictionary } from "@/shared/models/app/utils";
 import { currentUserState } from "@/shared/models/current-user/index.model";
-import { reatomComponent, useUpdate } from "@reatom/npm-react";
+import { reatomComponent } from "@reatom/npm-react";
 import { clsx } from "cnfast";
 import { Typography } from "@/shared/ui/typography"
 import { Icon } from "@/shared/ui/icon"

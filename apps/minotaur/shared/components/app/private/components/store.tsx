@@ -52,7 +52,7 @@ const Field = ({ label, required, hint, error, children }: PropsWithChildren<{
   hint?: string
   error?: string
 }>) => (
-  <label className="flex flex-col gap-1 w-full">
+  <div className="flex flex-col gap-1 w-full">
     <span className="text-xs font-medium text-neutral-400">
       {label}
       {required && <span className="text-red"> *</span>}
@@ -63,7 +63,7 @@ const Field = ({ label, required, hint, error, children }: PropsWithChildren<{
       : hint
         ? <span className="text-[11px] text-neutral-500">{hint}</span>
         : null}
-  </label>
+  </div>
 )
 
 const fieldError = (ctx: CtxSpy, field: string, errors: Record<string, string>) => {
