@@ -110,7 +110,7 @@ const SkinsHistoryItem = reatomComponent<SkinsHistory & { variant: "mobile" | "d
 }) => {
   if (!skin_head_url) return null;
 
-  const selectedSkin = ctx.spy(skinsState.selected);
+  const currentSkin = ctx.spy(skins.fetch.dataAtom)?.[0]?.skin_identifier;
   const isIdentity = ctx.spy(isIdentityAtom);
   const canRemove = isIdentity && identifier.toLowerCase().startsWith("sr-");
   const isRemoving = ctx.spy(skins.remove.statusesAtom).isPending;
@@ -133,7 +133,7 @@ const SkinsHistoryItem = reatomComponent<SkinsHistory & { variant: "mobile" | "d
     })
   }
 
-  const status = selectedSkin?.identifier.toLowerCase() === identifier.toLowerCase()
+  const status = currentSkin?.toLowerCase() === identifier.toLowerCase()
     ? "active"
     : "inactive"
 

@@ -192,9 +192,21 @@ const skins = atom(null, "skins").pipe(
             })
             skins.updateSkinAndHead(ctx)
           },
-          onReject: (_, e) => {
+          onReject: (ctx, e) => {
             logError(e, { type: "combined" })
             toast.error(getSkinErrorMessage(e))
+
+            // The click selected the skin for preview only; a failed request
+            // must put the canonical current skin back into the UI.
+            const current = ctx.get(skins.fetch.dataAtom)?.[0]
+            if (current) {
+              skinsState.selected(ctx, {
+                identifier: current.skin_identifier,
+                skin_url: current.skin_url ?? null,
+                skin_head_url: current.skin_head_url ?? null,
+              })
+            }
+            skins.updateSkinAndHead(ctx)
           }
         }).pipe(
           withStatusesAtom()
@@ -210,8 +222,7 @@ const skins = atom(null, "skins").pipe(
 
           const result = await client
             .post("/server/skin/upload", {
-              body: payloadFormData,
-              timeout: 10000
+              body: payloadFormData
             })
 
           await ctx.schedule(() => sleep(DEFAULT_SOFT_DELAY));
@@ -220,14 +231,18 @@ const skins = atom(null, "skins").pipe(
         }, {
           name: `${name}.change`,
           onFulfill: async (ctx, res) => {
-            if (res?.result?.url) {
-              toast.success(translate["player.skin.toast.updated"](), {
-                description: translate["player.skin.toast.rejoin"](),
-              })
-            } else {
+            // No URL means the job is still processing; the skin is not
+            // applied yet, so keep the dialog open and just refresh the list.
+            if (!res?.result?.url) {
               toast.info(translate["player.skin.toast.processing"]())
               await sleep(5000)
+              skins.updateSkinAndHead(ctx)
+              return
             }
+
+            toast.success(translate["player.skin.toast.updated"](), {
+              description: translate["player.skin.toast.rejoin"](),
+            })
 
             skins.updateSkinAndHead(ctx)
             skinsState.control.isOpen.reset(ctx)
@@ -237,9 +252,13 @@ const skins = atom(null, "skins").pipe(
             skinsState.control.file.reset(ctx)
             skinsState.control.variant.reset(ctx)
           },
-          onReject: (_, e) => {
+          onReject: (ctx, e) => {
             logError(e, { type: "combined" })
             toast.error(getSkinErrorMessage(e))
+
+            // A dropped response does not mean the upload failed: the server
+            // commits before it rebuilds the cache. Reconcile with the API.
+            skins.updateSkinAndHead(ctx)
           }
         }).pipe(
           withStatusesAtom()
