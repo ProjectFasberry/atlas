@@ -44,11 +44,6 @@ export const storageModel = ({
 }: StorageModel) => {
   const { storage, storageState } = createStorageModel(name)
 
-  storageState.isOpen.onChange((ctx, state) => {
-    if (state) storage.load(ctx)
-  })
-  storageState.section.onChange((ctx) => storage.load(ctx))
-
   const TITLES = (ctx: CtxSpy) => {
     const folder = ctx.spy(storageState.folder)
 
@@ -201,7 +196,12 @@ export const storageModel = ({
   const StorageContent = reatomComponent(({ ctx }) => {
     const section = ctx.spy(storageState.section)
     const folder = ctx.spy(storageState.folder)
+    const bucket = ctx.spy(storageState.bucket)
     const inBucket = section === "bucket-list"
+
+    useUpdate((loadCtx) => {
+      storage.load(loadCtx)
+    }, [section, folder, bucket])
 
     return (
       <div className="flex flex-col gap-1 w-full">

@@ -112,7 +112,6 @@ export const createStorageModel = ({ name, api }: { name: string, api: StorageAp
 			}, `${name}.selectBucket`),
 			openFolder: action((ctx, prefix: string) => {
 				storageState.folder(ctx, prefix)
-				storage.load(ctx)
 			}, `${name}.openFolder`),
 			/** Folder up, then buckets, then close the panel. */
 			goBack: action((ctx) => {
@@ -121,7 +120,6 @@ export const createStorageModel = ({ name, api }: { name: string, api: StorageAp
 				if (folder) {
 					const parent = folder.replace(/\/$/, "").split("/").slice(0, -1).join("/")
 					storageState.folder(ctx, parent ? `${parent}/` : "")
-					storage.load(ctx)
 					return
 				}
 
@@ -132,7 +130,12 @@ export const createStorageModel = ({ name, api }: { name: string, api: StorageAp
 
 				storageState.isOpen(ctx, false)
 			}, `${name}.goBack`),
-			/** Loads the data for the current section; called on open and tab change. */
+			/**
+			 * Loads the data for the current section. The view calls it from an
+			 * effect on its own provider context: an action started from a
+			 * component context is aborted when that component unmounts, which
+			 * happens exactly when a bucket replaces the bucket list.
+			 */
 			load: action((ctx) => {
 				if (ctx.get(storageState.section) === "buckets-list") {
 					storage.listBuckets(ctx)
