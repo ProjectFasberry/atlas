@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 import { atom, type Ctx, type CtxSpy } from "@reatom/framework";
 import { BackButton } from "@/shared/ui/back-button";
 import { ErrorBlock } from "@/shared/ui/error-block";
+import { Noop } from "@/shared/ui/noop";
 
 type StorageModel = {
   name: string,
@@ -20,6 +21,21 @@ type StorageModel = {
   as: "headless", Slot?: never
 })
 
+const formatBytes = (value?: number) => {
+  if (value === undefined || value === null) return "—"
+
+  const units = ["B", "KB", "MB", "GB", "TB"]
+  let size = value
+  let unit = 0
+
+  while (size >= 1024 && unit < units.length - 1) {
+    size /= 1024
+    unit++
+  }
+
+  return `${size.toFixed(size >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`
+}
+
 export const storageModel = ({
   name,
   as = "headless",
@@ -29,10 +45,9 @@ export const storageModel = ({
   const { storage, storageState } = createStorageModel(name)
 
   storageState.isOpen.onChange((ctx, state) => {
-    if (!state) return;
-    storage.execEvent(ctx, ctx.get(storageState.section))
+    if (state) storage.load(ctx)
   })
-  storageState.section.onChange((ctx, section) => storage.execEvent(ctx, section))
+  storageState.section.onChange((ctx) => storage.load(ctx))
 
   const TITLES = (ctx: CtxSpy) => ({
     "buckets-list": "Список бакетов",
@@ -48,30 +63,33 @@ export const storageModel = ({
   )
 
   const StorageBucketList = reatomComponent(({ ctx }) => {
-    if (ctx.spy(storage.getListByBucket.statusesAtom).isPending) return <StorageListSkeleton />
+    if (ctx.spy(storage.listObjects.statusesAtom).isPending) return <StorageListSkeleton />
 
-    const error = ctx.spy(storage.getBucketsList.errorAtom)
+    const error = ctx.spy(storage.listObjects.errorAtom)
     if (error) return <ErrorBlock title={error.message} />
 
-    const data = ctx.spy(storage.getListByBucket.dataAtom);
-    if (!data) return null;
+    const data = ctx.spy(storage.listObjects.dataAtom);
+    const objects = data?.contents ?? []
+
+    if (objects.length === 0) return <Noop title="Бакет пуст" />
 
     return (
       <div className="flex flex-col gap-1 w-full max-h-[40vh] overflow-y-auto">
-        {data.contents?.map((bucket, idx) => (
+        {objects.map((object, idx) => (
           <div
-            key={idx}
+            key={`${object.key}-${idx}`}
             className="flex flex-col gap-1 w-full px-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg h-10"
             onClick={() => {
-              onSelectFile?.(ctx, `${storage.getSelectedBucket(ctx)}/${bucket.key}`)
+              const bucket = ctx.get(storageState.bucket)
+              if (bucket) onSelectFile?.(ctx, `${bucket}/${object.key}`)
               storageState.isOpen(ctx, false)
             }}
           >
             <Typography className="text-sm font-medium">
-              {bucket.key}
+              {object.key}
             </Typography>
             <span className="text-neutral-400 text-[10px]">
-              {bucket.size}
+              {formatBytes(object.size)}
             </span>
           </div>
         ))}
@@ -80,13 +98,13 @@ export const storageModel = ({
   }, `${name}.StorageBucketList`)
 
   const StorageBucketsList = reatomComponent(({ ctx }) => {
-    if (ctx.spy(storage.getBucketsList.statusesAtom).isPending) return <StorageListSkeleton />
+    if (ctx.spy(storage.listBuckets.statusesAtom).isPending) return <StorageListSkeleton />
 
-    const error = ctx.spy(storage.getBucketsList.errorAtom)
+    const error = ctx.spy(storage.listBuckets.errorAtom)
     if (error) return <ErrorBlock title={error.message} />
 
-    const data = ctx.spy(storage.getBucketsList.dataAtom)
-    if (!data) return null;
+    const data = ctx.spy(storage.listBuckets.dataAtom)
+    if (!data || data.length === 0) return <Noop title="Бакетов нет" />
 
     return (
       <div className="flex flex-col gap-1 w-full">
@@ -118,14 +136,15 @@ export const storageModel = ({
 
   const StorageContent = reatomComponent(({ ctx }) => {
     const section = ctx.spy(storageState.section)
+    const inBucket = section === "bucket-list"
 
     return (
       <div className="flex flex-col gap-1 w-full">
         <div className="flex items-center justify-between gap-1 w-full">
           <BackButton
             event="custom"
-            onClick={() => storage.navigation.goBack(ctx)}
-            icon={ctx.spy(storageState.section.isUndoAtom) ? "sprite:arrow-left" : "sprite:x"}
+            onClick={() => storage.goBack(ctx)}
+            icon={inBucket ? "sprite:arrow-left" : "sprite:x"}
           />
           <span className="text-sm text-center leading-4">
             {ctx.spy(storageTitleAtom)}

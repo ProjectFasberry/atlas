@@ -198,6 +198,9 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../pkgs/shared
+      '@repo/storage':
+        specifier: workspace:*
+        version: link:../../pkgs/storage
       '@repo/ui':
         specifier: workspace:*
         version: link:../../pkgs/ui
@@ -522,6 +525,12 @@ importers:
       openapi-typescript:
         specifier: 7.13.0
         version: 7.13.0(typescript@5.8.3)
+
+  pkgs/storage:
+    devDependencies:
+      '@reatom/framework':
+        specifier: 3.4.68
+        version: 3.4.68
 
   pkgs/ui:
     dependencies:

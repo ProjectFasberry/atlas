@@ -1,0 +1,14 @@
+{
+	"name": "@repo/storage",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"peerDependencies": {
+		"@reatom/framework": ">=3.4"
+	},
+	"devDependencies": {
+		"@reatom/framework": "3.4.68"
+	}
+}
