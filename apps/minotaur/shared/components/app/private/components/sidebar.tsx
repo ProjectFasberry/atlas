@@ -92,7 +92,7 @@ const UserInfo = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-h-[80vh] overflow-hidden")}>
+          <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-h-[80vh] overflow-hidden max-w-[min(760px,calc(100vw-16px))]!")}>
             <div className="flex flex-col gap-1 pr-8">
               <Dialog.Title className={dialogVariant.title()}>
                 Профиль и права
