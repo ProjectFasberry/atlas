@@ -42,11 +42,11 @@ bun run gen:icons                     # regenerate the SVG sprite
 
 - The app is built by `.github/workflows/build-minotaur.yml` into
   `registry.fasberry.fun/<stage>/minotaur:latest` and `:sha-<commit>`.
-- The documented branch rule is `main` -> prod, `dev`/`staging` -> staging; the
-  current workflow resolves `prod` for every push event, so verify the workflow
-  before deploying from a non-main branch.
-- The host pulls images on a timer; do not ssh/scp/docker into `i-m` or run
-  compose there. Host, registry and compose changes belong to the infra repo.
+- Branch rule: `main` -> prod, `staging` -> staging, `dev` -> dev.
+- Rollout is manual: after CI pushes, run
+  `ssh i-m '/opt/main/fasberry deploy prod minotaur'`. The
+  `fasberry-pull-update.timer` is not installed; do not edit the host or compose
+  files from a workstation.
 - Deploy only on an explicit request, from a clean tree, and report the image
   digest plus a health check.
 - Local `bun --bun run vike build` needs the production `VITE_*` env

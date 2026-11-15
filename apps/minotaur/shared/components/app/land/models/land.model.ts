@@ -12,13 +12,10 @@ import { render } from "vike/abort";
 import { getNotExistUrlByEntity } from "@/shared/lib/helpers";
 
 export type Land = ExtractApiData<"getServerLandsByUlid">["data"]
-type LandExtended = Land & {
-  points?: { [key: string]: { x: number, y: number } }
-}
 
 export const landState = atom(null, "landState").pipe(
   withAssign((_, name) => ({
-    data: atom<LandExtended | null>(null, `${name}.data`).pipe(withReset(), withSsr(`${name}.data`))
+    data: atom<Land | null>(null, `${name}.data`).pipe(withReset(), withSsr(`${name}.data`))
   }))
 )
 
@@ -71,13 +68,8 @@ export const land = atom(null, "lands").pipe(
 
       if (!land) throw render(getNotExistUrlByEntity("land"))
 
-      const item = {
-        ...land,
-        points: { ["init"]: { x: 412.12, y: 65.6 } }
-      };
-
-      landState.data(ctx, item)
-      return item
+      landState.data(ctx, land)
+      return land
     }),
     fetchSimilar: reatomAsync(async (ctx) => {
       const nickname = ctx.get(landOwnerAtom)

@@ -6,7 +6,6 @@ import { Link } from "@/shared/components/config/link/link"
 import { FormattedText } from "./land-title"
 import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button"
-import { navigate } from "vike/client/router"
 import { changesIsExistsAtom, landActionTitleAtom, landEditing, landEditingState } from "../models/edit-land.model"
 import { LandBanner, LandBannerWithEditing } from "./land-banner"
 import { Carousel } from '@ark-ui/react/carousel'
@@ -101,10 +100,6 @@ const LandToggleMode = reatomComponent(({ ctx }) => {
     </div>
   )
 }, "LandToggleMode")
-
-const Splitter = ({ className }: { className?: string }) => (
-  <Icon name="sprite:circle" className={`text-neutral-400 size-2 relative top-0.5 ${className}`} />
-);
 
 const sectionTitleVariant = "text-base sm:text-2xl font-semibold"
 
@@ -202,7 +197,6 @@ const LandDetails = reatomComponent(({ ctx }) => {
   console.log(ENVIRONMENT, isAccessible); // server, true
 
   const isOwner = ctx.spy(landIsOwnerAtom);
-  const points = land?.points
 
   return (
     <div
@@ -218,14 +212,6 @@ const LandDetails = reatomComponent(({ ctx }) => {
             {land?.members.length} {land?.members.length === 1 ? "участник" : "участников"}
           </Typography>
         )}
-        <Splitter className="hidden sm:inline" />
-        <Typography
-          className="text-base cursor-pointer hover:text-neutral-50 text-nowrap truncate"
-          color='gray'
-          onClick={() => navigate("#points", { overwriteLastHistoryEntry: false })}
-        >
-          {points ? Object.keys(points)?.length : 0} {translate["land.point"]()}
-        </Typography>
       </div>
       <div className="flex items-center gap-2 min-w-0">
         {isAccessible && (
@@ -309,40 +295,6 @@ const LandSimilar = () => {
   )
 }
 
-const LandPoints = reatomComponent(({ ctx }) => {
-  const land = ctx.spy(landState.data);
-  if (!land) return null;
-
-  const points = land?.points
-  if (!points) return null;
-
-  const pointsCount = Object.keys(points).length
-  if (pointsCount === 0) return null;
-
-  return (
-    <div id="points" className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 w-full">
-        <Typography className={sectionTitleVariant}>
-          {translate["land.points"]()}
-        </Typography>
-        <SummaryNumber value={pointsCount} />
-      </div>
-      <div className="grid grid-cols-2 w-full h-full gap-4">
-        {Object.entries(points).map(([key, value]) => (
-          <div key={key} className="flex flex-col p-4 rounded-lg border border-neutral-800">
-            <Typography className="text-base">
-              {key}
-            </Typography>
-            <Typography color="gray" className="text-sm">
-              {value.x} {value.y}
-            </Typography>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}, "LandPoints")
-
 export const Land = () => {
   return (
     <div className="flex flex-col xl:flex-row items-start gap-6 w-full h-full relative">
@@ -355,7 +307,6 @@ export const Land = () => {
           </div>
         </div>
         <LandGallery />
-        <LandPoints />
       </div>
       <div className="flex flex-col gap-6 w-full xl:w-1/4 sticky top-2 h-full">
         <LandLinks />
