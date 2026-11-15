@@ -67,21 +67,31 @@ const skinSubmitIsDisabledAtom = atom<boolean>((ctx) => {
 
 const getSkinVariantIsActiveAtom = (t: string) => atom((ctx) => ctx.spy(skinsState.control.variant) === t)
 
+/** Canonical applied skin: the first history row is always the current one. */
+export const currentSkinAtom = atom<Nullable<SkinSelected>>((ctx) => {
+  const first = ctx.spy(skins.fetch.dataAtom)?.[0]
+  if (!first) return null
+
+  return {
+    identifier: first.skin_identifier,
+    skin_url: first.skin_url ?? null,
+    skin_head_url: first.skin_head_url ?? null,
+  }
+}, "currentSkin")
+
 const getIsSelectSkinAtom = atom<boolean>((ctx) => {
   if (!ctx.spy(isIdentityAtom)) return false;
 
-  const state = ctx.spy(skins.fetch.dataAtom)
-  if (!state) return false;
+  const current = ctx.spy(currentSkinAtom)?.identifier.toLowerCase()
+  const preview = ctx.spy(skinsState.preview)?.identifier.toLowerCase()
 
-  const current = state[0].skin_identifier.toLowerCase()
-  const selected = ctx.spy(skinsState.selected)?.identifier.toLowerCase()
-
-  return current !== selected
+  return current !== preview
 })
 
 const skinsState = atom(null, "skinsState").pipe(
   withAssign((_, name) => ({
-    selected: atom<Nullable<SkinSelected>>(null, `${name}.selected`).pipe(withReset()),
+    /** Preview chosen in the history; the applied skin comes from `skins.fetch`. */
+    preview: atom<Nullable<SkinSelected>>(null, `${name}.preview`).pipe(withReset()),
     control: atom(null, `${name}.state`).pipe(
       withAssign((_, name) => ({
         isOpen: atom(false, `${name}.isOpen`).pipe(withReset()),
@@ -175,7 +185,7 @@ const skins = atom(null, "skins").pipe(
           withStatusesAtom()
         ),
         set: reatomAsync(async (ctx) => {
-          const selectedSkin = ctx.get(skinsState.selected)
+          const selectedSkin = ctx.get(skinsState.preview)
           if (!selectedSkin) return null;
 
           const id = selectedSkin.identifier
@@ -200,7 +210,7 @@ const skins = atom(null, "skins").pipe(
             // must put the canonical current skin back into the UI.
             const current = ctx.get(skins.fetch.dataAtom)?.[0]
             if (current) {
-              skinsState.selected(ctx, {
+              skinsState.preview(ctx, {
                 identifier: current.skin_identifier,
                 skin_url: current.skin_url ?? null,
                 skin_head_url: current.skin_head_url ?? null,
@@ -230,16 +240,7 @@ const skins = atom(null, "skins").pipe(
           return { result }
         }, {
           name: `${name}.change`,
-          onFulfill: async (ctx, res) => {
-            // No URL means the job is still processing; the skin is not
-            // applied yet, so keep the dialog open and just refresh the list.
-            if (!res?.result?.url) {
-              toast.info(translate["player.skin.toast.processing"]())
-              await sleep(5000)
-              skins.updateSkinAndHead(ctx)
-              return
-            }
-
+          onFulfill: async (ctx) => {
             toast.success(translate["player.skin.toast.updated"](), {
               description: translate["player.skin.toast.rejoin"](),
             })
@@ -298,7 +299,7 @@ const skins = atom(null, "skins").pipe(
         const first = res[0]
         if (!first) return;
 
-        skinsState.selected(ctx, {
+        skinsState.preview(ctx, {
           skin_url: first.skin_url!,
           skin_head_url: first.skin_head_url!,
           identifier: first.skin_identifier
@@ -326,7 +327,7 @@ const skins = atom(null, "skins").pipe(
       const isHardwareAccEnabled = ctx.get(appState.inited.hardwaveIsEnabled)
       if (!isHardwareAccEnabled) return;
 
-      skinsState.selected.reset(ctx);
+      skinsState.preview.reset(ctx);
 
       spawn(ctx, (sCtx) => skins.fetch(sCtx, nickname));
     }, `${name}.init`)

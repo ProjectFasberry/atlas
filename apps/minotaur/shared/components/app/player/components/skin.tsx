@@ -7,7 +7,7 @@ import React from "react";
 import { Icon, type IconName } from "@/shared/ui/icon"
 import { pageState } from "@/shared/models/page-context.model";
 import { Button } from "@/shared/ui/button";
-import { type SkinAnimationType, skinModel, type SkinVariant, type SkinsHistory } from "../models/skin.model";
+import { currentSkinAtom, type SkinAnimationType, skinModel, type SkinVariant, type SkinsHistory } from "../models/skin.model";
 import { getStaticImage } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { dayjs } from "@/shared/lib/dayjs";
@@ -45,7 +45,7 @@ const SkinRender = reatomComponent(({ ctx }) => {
     return <SkinRenderSkeleton />;
   }
 
-  const skinData = ctx.spy(skinsState.selected);
+  const skinData = ctx.spy(skinsState.preview);
   if (!skinData) return (
     <div className="flex items-center h-[390px] justify-center overflow-hidden w-full">
       <Noop title={translate["player.skin.nothing"]()} />
@@ -110,13 +110,13 @@ const SkinsHistoryItem = reatomComponent<SkinsHistory & { variant: "mobile" | "d
 }) => {
   if (!skin_head_url) return null;
 
-  const currentSkin = ctx.spy(skins.fetch.dataAtom)?.[0]?.skin_identifier;
+  const currentSkin = ctx.spy(currentSkinAtom)?.identifier;
   const isIdentity = ctx.spy(isIdentityAtom);
   const canRemove = isIdentity && identifier.toLowerCase().startsWith("sr-");
   const isRemoving = ctx.spy(skins.remove.statusesAtom).isPending;
 
   const handleClick = () => {
-    skinsState.selected(ctx, {
+    skinsState.preview(ctx, {
       identifier,
       skin_url: skin_url ?? null,
       skin_head_url: skin_head_url ?? null
@@ -244,7 +244,7 @@ const SkinMainHead = reatomComponent(({ ctx }) => {
     return <SkinMainHeadSkeleton />
   }
 
-  const data = ctx.spy(skinsState.selected)
+  const data = ctx.spy(skinsState.preview)
   if (!data) return null;
 
   return (
