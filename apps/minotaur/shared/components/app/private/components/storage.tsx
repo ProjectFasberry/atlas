@@ -123,7 +123,8 @@ export const storageModel = ({
     if (!bucket) return null
 
     if (folders.length === 0 && objects.length === 0) {
-      return <Noop title={folder ? "Папка пуста" : "Бакет пуст"} />
+      const debug = JSON.stringify(data)?.slice(0, 180) ?? "null"
+      return <Noop title={`${folder ? "Папка пуста" : "Бакет пуст"} :: ${debug}`} />
     }
 
     return (
