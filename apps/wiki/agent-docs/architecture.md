@@ -58,8 +58,8 @@ live under a prefix.
 - `export const dynamic = 'force-dynamic'` - the sidebar and permissions depend on the database
   and on a cookie;
 - the theme class is rendered on `<html>` by the server from the `theme` cookie, so there is
-  no flash and no script before paint; the same value seeds `$theme` in the Reatom context
-  (`ReatomProvider initialTheme`), so the first client render matches the SSR markup;
+  no flash and no script before paint; the same value seeds `$theme` through `ThemeSync`,
+  so the first client render matches the SSR markup;
 - `RootProvider theme={{ enabled: false }}` - a custom theme instead of the Fumadocs one;
 - `getServers()` (`lib/content/servers.ts`) reads the public `/servers-with-map` endpoint and
   caches it for five minutes; a failed call falls back to `bisquite`, so the wiki does not

@@ -26,7 +26,9 @@ refs for DOM only. Below are the wiki naming and model conventions.
   is the default way to connect a component to a model.
 - `onConnect($atom, ...)` handles lazy initialisation on the first subscription (that is how the
   theme is read).
-- The provider is `shared/components/app/reatom-provider.tsx`.
+- The provider is `shared/components/app/reatom-provider.tsx`: it only creates the context.
+  Server props reach the atoms through `*-sync.tsx` components next to it (`ThemeSync`,
+  `ServersSync`, `LocaleSync`, `ViewerSync`), never through the provider.
 
 ## Next.js
 

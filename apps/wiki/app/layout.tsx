@@ -21,9 +21,11 @@ import { baseOptions, defaultTranslations, translations } from '@/lib/ui/layout'
 import { cn } from '@/lib/utils/cn';
 import { m } from '@/paraglide/messages';
 import { Footer } from '@/shared/components/app/footer';
-import { ViewerSync } from '@/shared/components/app/viewer-sync';
 import { LocaleSync } from '@/shared/components/app/locale-sync';
 import { ReatomProvider } from '@/shared/components/app/reatom-provider';
+import { ServersSync } from '@/shared/components/app/servers-sync';
+import { ThemeSync } from '@/shared/components/app/theme-sync';
+import { ViewerSync } from '@/shared/components/app/viewer-sync';
 import { SidebarLinks } from '@/shared/ui/sidebar-links';
 import { SidebarSection } from '@/shared/ui/sidebar-section';
 import { WikiSidebar } from '@/shared/ui/wiki-sidebar';
@@ -77,9 +79,11 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
           i18n={i18nProvider(locale === 'ru' ? translations : defaultTranslations)}
           theme={{ enabled: false }}
         >
-          <ReatomProvider initialTheme={theme} servers={servers} slugs={slugs}>
+          <ReatomProvider>
             <LocaleSync locale={locale} />
             <ViewerSync viewer={viewer} />
+            <ThemeSync theme={theme} />
+            <ServersSync servers={servers} slugs={slugs} />
             <DocsLayout
               tree={await getPageTree(server, locale)}
               {...options}

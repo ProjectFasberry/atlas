@@ -35,7 +35,7 @@ skin-head badge (`shared/components/app/user-menu.tsx`) whose dropdown holds the
 The theme icon is `Classic` from `@theme-toggles/react`: the sun collapses into a crescent and
 back, the click still starts the circle reveal from its coordinates. The language is just a flag;
 the menu lists the languages natively and writes the same `locale` cookie. The server switcher
-reads `$servers` / `$serverSlugs` from Reatom, seeded by the layout through `ReatomProvider`, and
+reads `$servers` / `$serverSlugs` from Reatom, seeded by the layout through `ServersSync`, and
 derives the current server from `usePathname`, so no props cross the fumadocs client boundary.
 
 `lib/ui/layout.tsx` defines `nav.title`: the `/favicon.svg` image at 40x40, the name
