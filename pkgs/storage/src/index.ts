@@ -70,7 +70,6 @@ export const createStorageModel = ({ name, api }: { name: string, api: StorageAp
 		withAssign((_, name) => ({
 			listBuckets: reatomAsync(async () => api.listBuckets(), `${name}.listBuckets`).pipe(
 				withDataAtom(null),
-				withCache({ swr: false }),
 				withStatusesAtom(),
 				withErrorAtom(),
 			),
@@ -86,7 +85,6 @@ export const createStorageModel = ({ name, api }: { name: string, api: StorageAp
 				`${name}.listObjects`,
 			).pipe(
 				withDataAtom(null),
-				withCache({ swr: false }),
 				withStatusesAtom(),
 				withErrorAtom(),
 			),
