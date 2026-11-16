@@ -84,6 +84,9 @@ export const UsersItemMenu = reatomComponent(({ ctx }) => {
     <Menu.Root
       open={!!nickname}
       anchorPoint={point}
+      // `anchorPoint` is viewport-based; the default absolute strategy would
+      // offset the menu by the page scroll.
+      positioning={{ strategy: "fixed" }}
       aria-label="Действия с пользователем"
       onOpenChange={({ open }) => {
         if (!open) usersRestrictState.selectedUser.reset(ctx);

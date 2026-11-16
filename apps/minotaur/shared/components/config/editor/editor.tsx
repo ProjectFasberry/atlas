@@ -1,18 +1,51 @@
-import { Editor, useEditorState } from "@tiptap/react"
+import { type Editor, useEditorState } from "@tiptap/react"
+import type { ReactNode } from "react"
+import { Portal } from "@ark-ui/react/portal"
 import { tv } from "tailwind-variants"
 import { scrollableVariant } from "@/shared/consts/style-variants"
 import { reatomComponent } from "@reatom/npm-react"
 import { Icon } from "@/shared/ui/icon"
+import { Input } from "@/shared/ui/input"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
-import { editorBar, editorBarState, editorSelectors } from "./editor.model"
+import { editorBar, editorBarState, editorSelectors, type EditorUrlPanel } from "./editor.model"
 
 const controlVariant = tv({
   base: `
-    shrink-0 data-[state=active]:bg-neutral-600 [&:not([data-state])]:bg-neutral-800 data-[state=inactive]:bg-neutral-800
-    disabled:opacity-60 disabled:pointer-events-none font-semibold h-7 min-w-7 px-2 rounded-md text-nowrap
+    inline-flex shrink-0 items-center justify-center gap-1 rounded-md px-2 h-7 min-w-7 text-nowrap text-xs font-semibold
+    bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100
+    data-[state=active]:bg-neutral-600 data-[state=active]:text-neutral-50
+    disabled:pointer-events-none disabled:opacity-50
   `
 })
+
+type ToolbarButtonProps = {
+  label: string
+  title?: string
+  active?: boolean
+  disabled?: boolean
+  onClick: () => void
+  children?: ReactNode
+}
+
+const ToolbarButton = ({ label, title, active, disabled, onClick, children }: ToolbarButtonProps) => (
+  <button
+    type="button"
+    aria-label={label}
+    aria-pressed={active}
+    title={title ?? label}
+    disabled={disabled}
+    data-state={active ? "active" : "inactive"}
+    onClick={onClick}
+    className={controlVariant()}
+  >
+    {children ?? label}
+  </button>
+)
+
+const ToolbarSeparator = () => <span aria-hidden="true" className="mx-0.5 h-5 w-px shrink-0 bg-neutral-700" />
+
+const HEADING_LEVELS = [1, 2, 3, 4, 5, 6] as const
 
 export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor }) => {
   const editorState = useEditorState({
@@ -21,333 +54,216 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
   })
 
   const isTable = ctx.spy(editorBarState.isTable);
-  const isLink = ctx.spy(editorBarState.isLink);
+  const panel = ctx.spy(editorBarState.panel);
+  const url = ctx.spy(editorBarState.url);
+  const urlError = ctx.spy(editorBarState.urlError);
+
+  const headingFlags = [
+    editorState.isHeading1,
+    editorState.isHeading2,
+    editorState.isHeading3,
+    editorState.isHeading4,
+    editorState.isHeading5,
+    editorState.isHeading6,
+  ];
+  const headingIndex = headingFlags.indexOf(true);
+  const headingLevel = headingIndex === -1 ? null : headingIndex + 1;
+
+  const openUrl = (next: EditorUrlPanel) => editorBar.openUrl(ctx, editor, next);
 
   return (
-    <>
+    <div className="flex w-full flex-col gap-1 border-b border-neutral-800 pb-1">
       <div
         className={scrollableVariant({
-          className: "flex flex-wrap pb-2 rounded-lg scrollbar-h-2 items-center w-full gap-1",
+          className: "flex flex-wrap items-center gap-1",
           variant: "hovered"
         })}
       >
-        <button
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editorState.canUndo}
-          className={controlVariant()}
-        >
-          <Icon name='sprite:arrow-back-up' />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editorState.canRedo}
-          className={controlVariant()}
-        >
-          <Icon name="sprite:arrow-forward-up" />
-        </button>
-        <div>
-          <Menu.Root>
-            <Menu.Trigger asChild>
-              <button className={controlVariant()} data-state={"inactive"}>
-                <Icon name="sprite:settings" />
-              </button>
-            </Menu.Trigger>
+        <ToolbarButton label="Отменить" disabled={!editorState.canUndo} onClick={() => editor.chain().focus().undo().run()}>
+          <Icon name='sprite:arrow-back-up' className="size-4" />
+        </ToolbarButton>
+        <ToolbarButton label="Повторить" disabled={!editorState.canRedo} onClick={() => editor.chain().focus().redo().run()}>
+          <Icon name="sprite:arrow-forward-up" className="size-4" />
+        </ToolbarButton>
+
+        <ToolbarSeparator />
+
+        <ToolbarButton label="Жирный" title="Жирный (Ctrl+B)" active={editorState.isBold} disabled={!editorState.canBold} onClick={() => editor.chain().focus().toggleBold().run()}>
+          <span className="font-bold">B</span>
+        </ToolbarButton>
+        <ToolbarButton label="Курсив" title="Курсив (Ctrl+I)" active={editorState.isItalic} disabled={!editorState.canItalic} onClick={() => editor.chain().focus().toggleItalic().run()}>
+          <span className="italic">I</span>
+        </ToolbarButton>
+        <ToolbarButton label="Зачёркнутый" title="Зачёркнутый" active={editorState.isStrike} disabled={!editorState.canStrike} onClick={() => editor.chain().focus().toggleStrike().run()}>
+          <span className="line-through">S</span>
+        </ToolbarButton>
+        <ToolbarButton label="Код" title="Инлайн-код" active={editorState.isCode} disabled={!editorState.canCode} onClick={() => editor.chain().focus().toggleCode().run()}>
+          {"</>"}
+        </ToolbarButton>
+
+        <ToolbarSeparator />
+
+        <Menu.Root>
+          <Menu.Trigger asChild>
+            <button
+              type="button"
+              aria-label="Стиль абзаца"
+              data-state={headingLevel ? "active" : "inactive"}
+              className={controlVariant()}
+            >
+              {headingLevel ? `H${headingLevel}` : "P"}
+            </button>
+          </Menu.Trigger>
+          <Portal>
             <Menu.Positioner>
-              <Menu.Content className={menuVariant.content()}>
-                <Menu.Arrow className={menuVariant.arrow()}>
-                  <Menu.ArrowTip className={menuVariant.arrowTip()} />
-                </Menu.Arrow>
-                <Menu.Item
-                  value="clear_marks"
-                  className={controlVariant()}
-                  onClick={() => editor.chain().focus().unsetAllMarks().run()}
-                >
-                  Clear marks
+              <Menu.Content className={menuVariant.content("min-w-32")}>
+                <Menu.Item value="paragraph" className={menuVariant.item()} onClick={() => editor.chain().focus().setParagraph().run()}>
+                  Обычный текст
                 </Menu.Item>
-                <Menu.Item
-                  value="clear_nodes"
-                  className={controlVariant()}
-                  onClick={() => editor.chain().focus().clearNodes().run()}
-                >
-                  Clear nodes
-                </Menu.Item>
+                {HEADING_LEVELS.map((level) => (
+                  <Menu.Item
+                    key={level}
+                    value={`heading-${level}`}
+                    className={menuVariant.item()}
+                    onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
+                  >
+                    Заголовок {level}
+                  </Menu.Item>
+                ))}
               </Menu.Content>
             </Menu.Positioner>
-          </Menu.Root >
-        </div>
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          disabled={!editorState.canBold}
-          data-state={editorState.isBold ? "active" : "inactive"}
-          className={controlVariant()}
+          </Portal>
+        </Menu.Root>
+
+        <ToolbarSeparator />
+
+        <ToolbarButton label="Маркированный список" active={editorState.isBulletList} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+          {"•—"}
+        </ToolbarButton>
+        <ToolbarButton label="Нумерованный список" active={editorState.isOrderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+          {"1."}
+        </ToolbarButton>
+        <ToolbarButton label="Цитата" active={editorState.isBlockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+          {"❝"}
+        </ToolbarButton>
+        <ToolbarButton label="Блок кода" active={editorState.isCodeBlock} onClick={() => editor.chain().focus().toggleCodeBlock().run()}>
+          {"{ }"}
+        </ToolbarButton>
+        <ToolbarButton label="Разделитель" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+          {"—"}
+        </ToolbarButton>
+
+        <ToolbarSeparator />
+
+        <ToolbarButton
+          label="Ссылка"
+          title="Ссылка"
+          active={editorState.isLink || panel === "link"}
+          onClick={() => openUrl("link")}
         >
-          B
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          disabled={!editorState.canItalic}
-          data-state={editorState.isItalic ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          I
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          disabled={!editorState.canStrike}
-          data-state={editorState.isStrike ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          S
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          disabled={!editorState.canCode}
-          data-state={editorState.isCode ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          C
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setParagraph().run()}
-          data-state={editorState.isParagraph ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          P
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          data-state={editorState.isHeading1 ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          H1
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          data-state={editorState.isHeading2 ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          H2
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          data-state={editorState.isHeading3 ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          H3
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-          data-state={editorState.isHeading4 ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          H4
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-          data-state={editorState.isHeading5 ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          H5
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-          data-state={editorState.isHeading6 ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          H6
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          data-state={editorState.isBulletList ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          BL
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          data-state={editorState.isOrderedList ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          OL
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          data-state={editorState.isCodeBlock ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          CB
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          data-state={editorState.isBlockquote ? 'active' : 'inactive'}
-          className={controlVariant()}
-        >
-          BQ
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          className={controlVariant()}
-        >
-          HR
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setHardBreak().run()}
-          className={controlVariant()}
-        >
-          HB
-        </button>
-        <div
-          className={controlVariant()}
-          onClick={() => editorBar.toggleLink(ctx)}
-          data-state={isLink ? 'active' : 'inactive'}
-        >
-          Link
-        </div>
-        <button
-          className={controlVariant()}
-          onClick={() => editorBar.addImage(ctx, editor)}
-          data-state={isLink ? 'active' : 'inactive'}
-        >
-          <Icon name="sprite:picture-in-picture" />
-        </button>
-        {isLink && (
-          <>
-            <button
-              onClick={() => editorBar.setLink(ctx, editor)}
-              data-state={editorState.isLink ? 'active' : 'inactive'}
-              className={controlVariant()}
-            >
-              Set link
+          <Icon name="sprite:link" className="size-4" />
+        </ToolbarButton>
+        <ToolbarButton label="Изображение" active={panel === "image"} onClick={() => openUrl("image")}>
+          <Icon name="sprite:picture-in-picture" className="size-4" />
+        </ToolbarButton>
+        <ToolbarButton label="Таблица" active={isTable} onClick={() => editorBar.toggleTable(ctx)}>
+          {"▦"}
+        </ToolbarButton>
+
+        <ToolbarSeparator />
+
+        <Menu.Root>
+          <Menu.Trigger asChild>
+            <button type="button" aria-label="Очистить форматирование" className={controlVariant()}>
+              <Icon name="sprite:settings" className="size-4" />
             </button>
-            <button
-              onClick={() => editor.chain().focus().unsetLink().run()}
-              disabled={!editorState.isLink}
-              className={controlVariant()}
-            >
-              Unset link
-            </button>
-          </>
-        )}
-        <div
-          className={controlVariant()}
-          onClick={() => editorBar.toggleTable(ctx)}
-          data-state={isTable ? 'active' : 'inactive'}
-        >
-          Table
-        </div>
-        {isTable && (
-          <div className="flex items-center gap-1 w-full">
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-            >
-              Insert table
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().addColumnBefore().run()}
-            >
-              Add column before
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().addColumnAfter().run()}
-            >
-              Add column after
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().deleteColumn().run()}
-            >
-              Delete column
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().addRowBefore().run()}
-            >
-              Add row before
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().addRowAfter().run()}
-            >
-              Add row after
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().deleteRow().run()}
-            >
-              Delete row
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().deleteTable().run()}
-            >
-              Delete table
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().mergeCells().run()}
-            >
-              Merge cells
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().splitCell().run()}
-            >
-              Split cell
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
-            >
-              Toggle header column
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().toggleHeaderRow().run()}
-            >
-              Toggle header row
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().toggleHeaderCell().run()}
-            >
-              Toggle header cell
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().mergeOrSplit().run()}
-            >
-              Merge or split
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().setCellAttribute('colspan', 2).run()}
-            >
-              Set cell attribute
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().fixTables().run()}
-            >
-              Fix tables
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().goToNextCell().run()}
-            >
-              Go to next cell
-            </button>
-            <button
-              className={controlVariant()}
-              onClick={() => editor.chain().focus().goToPreviousCell().run()}
-            >
-              Go to previous cell
-            </button>
-          </div>
-        )}
+          </Menu.Trigger>
+          <Portal>
+            <Menu.Positioner>
+              <Menu.Content className={menuVariant.content()}>
+              <Menu.Item value="clear_marks" className={menuVariant.item()} onClick={() => editor.chain().focus().unsetAllMarks().run()}>
+                Убрать форматирование
+              </Menu.Item>
+              <Menu.Item value="clear_nodes" className={menuVariant.item()} onClick={() => editor.chain().focus().clearNodes().run()}>
+                Сбросить блоки
+              </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Portal>
+        </Menu.Root>
       </div>
-    </>
+
+      {panel ? (
+        <form
+          className="flex flex-wrap items-center gap-1"
+          onSubmit={(event) => {
+            event.preventDefault();
+            editorBar.submitUrl(ctx, editor);
+          }}
+        >
+          <Input
+            autoFocus
+            value={url}
+            onChange={(event) => editorBar.setUrl(ctx, event.target.value)}
+            aria-label={panel === "link" ? "Адрес ссылки" : "Адрес изображения"}
+            placeholder={panel === "link" ? "https://fasberry.su/wiki" : "https://volume.fasberry.fun/..."}
+            className="h-8 min-w-48 flex-1 text-sm"
+          />
+          <ToolbarButton label="Применить" onClick={() => editorBar.submitUrl(ctx, editor)}>
+            Применить
+          </ToolbarButton>
+          {panel === "link" && editorState.isLink ? (
+            <ToolbarButton label="Удалить ссылку" onClick={() => editorBar.removeLink(ctx, editor)}>
+              Удалить
+            </ToolbarButton>
+          ) : null}
+          <ToolbarButton label="Закрыть" onClick={() => editorBar.closeUrl(ctx)}>
+            Отмена
+          </ToolbarButton>
+          {urlError ? <span className="text-[11px] text-red-400">{urlError}</span> : null}
+        </form>
+      ) : null}
+
+      {isTable ? (
+        <div className="flex flex-wrap items-center gap-1">
+          <ToolbarButton label="Вставить таблицу" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
+            + Таблица
+          </ToolbarButton>
+          <ToolbarButton label="Добавить колонку слева" onClick={() => editor.chain().focus().addColumnBefore().run()}>
+            + Колонка ←
+          </ToolbarButton>
+          <ToolbarButton label="Добавить колонку справа" onClick={() => editor.chain().focus().addColumnAfter().run()}>
+            + Колонка →
+          </ToolbarButton>
+          <ToolbarButton label="Удалить колонку" onClick={() => editor.chain().focus().deleteColumn().run()}>
+            − Колонка
+          </ToolbarButton>
+          <ToolbarButton label="Добавить строку сверху" onClick={() => editor.chain().focus().addRowBefore().run()}>
+            + Строка ↑
+          </ToolbarButton>
+          <ToolbarButton label="Добавить строку снизу" onClick={() => editor.chain().focus().addRowAfter().run()}>
+            + Строка ↓
+          </ToolbarButton>
+          <ToolbarButton label="Удалить строку" onClick={() => editor.chain().focus().deleteRow().run()}>
+            − Строка
+          </ToolbarButton>
+          <ToolbarButton label="Удалить таблицу" onClick={() => editor.chain().focus().deleteTable().run()}>
+            − Таблица
+          </ToolbarButton>
+          <ToolbarButton label="Объединить ячейки" onClick={() => editor.chain().focus().mergeCells().run()}>
+            Объединить
+          </ToolbarButton>
+          <ToolbarButton label="Разъединить ячейку" onClick={() => editor.chain().focus().splitCell().run()}>
+            Разъединить
+          </ToolbarButton>
+          <ToolbarButton label="Заголовок строки" onClick={() => editor.chain().focus().toggleHeaderRow().run()}>
+            Header row
+          </ToolbarButton>
+          <ToolbarButton label="Заголовок колонки" onClick={() => editor.chain().focus().toggleHeaderColumn().run()}>
+            Header col
+          </ToolbarButton>
+        </div>
+      ) : null}
+    </div>
   )
 }, "EditorMenuBar")

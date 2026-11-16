@@ -16,7 +16,8 @@
 		"type-check": "bun scripts/fix-sprite.ts && tsc --build",
 		"circular-check": "bunx dpdm --no-warning ./renderer/+onCreatePageContext.server.ts",
 		"gen:translate": "inlang machine translate --project project.inlang",
-		"gen:icons": "bun run scripts/generate-icons.ts"
+		"gen:icons": "bun run scripts/generate-icons.ts",
+		"test": "vitest run"
 	},
 	"sideEffects": [
 		"**/*.css"
@@ -60,11 +61,11 @@
 		"openapi-fetch": "0.17.0",
 		"react": "19.3.1",
 		"react-dom": "19.3.1",
-		"react-is": "19.3.1",
-		"recharts": "3.10.1",
 		"react-error-boundary": "6.0.0",
 		"react-intersection-observer": "10.0.0",
+		"react-is": "19.3.1",
 		"react-skinview3d": "7.0.0",
+		"recharts": "3.10.1",
 		"skinview3d": "3.4.1",
 		"sonner": "2.0.7",
 		"tailwind-variants": "3.1.1",
@@ -76,16 +77,18 @@
 		"@inlang/cli": "3.0.0",
 		"@inlang/paraglide-js": "2.18.0",
 		"@neodx/svg": "0.8.0",
+		"@projectfasberry/storage": "0.3.0",
 		"@repo/config-biome": "workspace:*",
 		"@repo/config-typescript": "workspace:*",
 		"@repo/shared": "workspace:*",
-		"@projectfasberry/storage": "0.3.0",
+		"@repo/ui": "workspace:*",
 		"@tailwindcss/vite": "4.3.3",
 		"@tweakpane/core": "2.0.5",
 		"@types/react": "19.3.0",
 		"@types/react-dom": "19.3.0",
 		"@vitejs/plugin-react": "5.0.2",
 		"consola": "3.4.2",
+		"jsdom": "^31.0.1",
 		"tailwind-scrollbar": "4.0.2",
 		"tailwindcss": "4.3.3",
 		"tw-animate-css": "1.3.4",
@@ -94,6 +97,6 @@
 		"vite": "7.2.7",
 		"vite-bundle-analyzer": "1.3.8",
 		"vite-tsconfig-paths": "5.1.4",
-		"@repo/ui": "workspace:*"
+		"vitest": "^5.1.0"
 	}
 }
