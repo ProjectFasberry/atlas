@@ -63,11 +63,42 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
+      # Public build-time config for the client bundle: Vite inlines VITE_* and
+      # PUBLIC_ENV__* at build time. Defaults below are the live prod values;
+      # staging and dev use the alpha hosts. Repository variables of the same
+      # name override them.
+      - name: Resolve build env
+        env:
+          STAGE: ${{ steps.stage.outputs.stage }}
+          VITE_APP_URL: ${{ vars.VITE_APP_URL }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_VOLUME_URL: ${{ vars.VITE_VOLUME_URL }}
+          VITE_MAIN_DOMAIN: ${{ vars.VITE_MAIN_DOMAIN }}
+          VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL }}
+          VITE_LANDING_ENDPOINT: ${{ vars.VITE_LANDING_ENDPOINT }}
+          PUBLIC_ENV__API_URL: ${{ vars.PUBLIC_ENV__API_URL }}
+          PUBLIC_ENV__TG_NAME: ${{ vars.PUBLIC_ENV__TG_NAME }}
+        run: |
+          case "$STAGE" in
+            prod) suffix="" ;;
+            *) suffix=".alpha" ;;
+          esac
+          {
+            echo "VITE_APP_URL=${VITE_APP_URL:-https://app$suffix.fasberry.fun}"
+            echo "VITE_API_URL=${VITE_API_URL:-https://api$suffix.fasberry.fun}"
+            echo "PUBLIC_ENV__API_URL=${PUBLIC_ENV__API_URL:-https://api$suffix.fasberry.fun}"
+            echo "VITE_VOLUME_URL=${VITE_VOLUME_URL:-https://volume.fasberry.fun}"
+            echo "VITE_MAIN_DOMAIN=${VITE_MAIN_DOMAIN:-fasberry.fun}"
+            echo "VITE_SUPPORT_EMAIL=${VITE_SUPPORT_EMAIL:-support@fasberry.fun}"
+            echo "VITE_LANDING_ENDPOINT=${VITE_LANDING_ENDPOINT:-https://fasberry.fun}"
+            echo "PUBLIC_ENV__TG_NAME=${PUBLIC_ENV__TG_NAME:-fasberry}"
+          } >> "$GITHUB_ENV"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter taurus... --ignore-scripts
 
       # The image only contains the runtime; the client bundle is built here,
-      # on native amd64. Vite reads the VITE_* values passed below.
+      # on native amd64. Vite reads the env resolved above.
       - name: Build client bundle
         working-directory: apps/taurus
         # node, not bun: the rolldown adapter needs module.registerHooks, which
@@ -78,10 +109,6 @@ jobs:
           NODE_ENV: production
           # Self-hosted runtime: no Cloudflare plugin, plain Node server entry.
           DEPLOY_TARGET: node
-          VITE_MAIN_DOMAIN: ${{ vars.VITE_MAIN_DOMAIN || 'fasberry.fun' }}
-          VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL || 'support@fasberry.fun' }}
-          VITE_LANDING_ENDPOINT: ${{ vars.VITE_LANDING_ENDPOINT || 'https://fasberry.fun' }}
-          PUBLIC_ENV__TG_NAME: ${{ vars.PUBLIC_ENV__TG_NAME || 'fasberry' }}
 
       - name: Measure build size
         if: github.ref_name == github.event.repository.default_branch
