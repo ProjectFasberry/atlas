@@ -190,7 +190,7 @@ importers:
         specifier: 0.8.0
         version: 0.8.0(prettier@3.8.4)
       '@projectfasberry/storage':
-        specifier: https://registry.npmjs.org/@projectfasberry/storage/-/storage-0.2.0.tgz
+        specifier: 0.2.0
         version: 0.2.0(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@repo/config-biome':
         specifier: workspace:*
