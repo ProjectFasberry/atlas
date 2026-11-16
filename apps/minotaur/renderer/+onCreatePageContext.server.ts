@@ -1,6 +1,6 @@
 import type { PageContextServer } from 'vike/types';
 import { createCtx } from '@reatom/framework';
-import { currentUser, currentUserState, getMe } from "@/shared/models/current-user/index.model";
+import { currentUser, currentUserState } from "@/shared/models/current-user/index.model";
 import { logRouting } from '@/shared/lib/log';
 import { isBotRequest } from "@/shared/lib/helpers";
 import { redirect } from 'vike/abort';
@@ -89,7 +89,7 @@ export async function onCreatePageContext(pageCtx: PageContextServer) {
     return updateSnapshot();
   }
 
-  await getMe({ headers })
+  await client.get("/me", { headers, })
     .then(r => {
       currentUserState(ctx, r);
     })

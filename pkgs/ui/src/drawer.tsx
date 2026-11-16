@@ -84,15 +84,30 @@ type DrawerContentProps = PropsWithChildren<
 		side?: DrawerSide;
 		/** The grabber is a bottom-sheet affordance; side drawers hide it. */
 		grabber?: boolean;
+		/**
+		 * Swipe the whole panel by dragging its content. Off by default: a press
+		 * anywhere inside the panel (inputs, buttons, scroll areas) would
+		 * otherwise start a drag and can get stuck following the pointer.
+		 * Bottom sheets still drag from the grabber.
+		 */
+		draggable?: boolean;
 	}
 >;
 
-export function DrawerContent({ side = "bottom", className, children, grabber = true, ...props }: DrawerContentProps) {
+export function DrawerContent({
+	side = "bottom",
+	className,
+	children,
+	grabber = true,
+	draggable = false,
+	...props
+}: DrawerContentProps) {
 	return (
 		<Portal>
 			<ArkDrawer.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
 			<ArkDrawer.Positioner className={cn("fixed inset-0 z-50 flex", POSITIONER[side])}>
 				<ArkDrawer.Content
+					draggable={draggable}
 					className={cn(
 						`pointer-events-auto relative flex h-fit flex-col gap-4 p-2
             text-start outline-none`,

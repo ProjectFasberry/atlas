@@ -1,6 +1,5 @@
 import { action, atom } from "@reatom/framework";
 import { withAssign, withReset } from "@reatom/framework";
-import { client } from "../../lib/client-wrapper";
 import { withSsr } from "../ssr";
 import { invariant } from "@/shared/lib/utils";
 import type { PageContextServer } from 'vike/types';
@@ -10,6 +9,7 @@ import { isError } from "@/shared/lib/utils";
 export type MePayload = ExtractApiData<"getMe">['data'];
 
 export const CURRENT_USER_KEY = 'currentUser' as const
+
 export {
   CONFIG_PANEL_READ_PERMISSION,
   ECONOMY_READ_PERMISSION,
@@ -57,13 +57,6 @@ export const currentUser = atom(null, "currentUser").pipe(
     })
   }))
 )
-
-export async function getMe(init: RequestInit) {
-  return client.get("/me", {
-    headers: init.headers,
-    signal: init.signal,
-  })
-}
 
 export const CURRENT_USER_CALLBACK_MAP: Record<"BANNED", (pageCtx: PageContextServer) => void> = {
   "BANNED": ({ urlParsed: { pathname } }) => {
