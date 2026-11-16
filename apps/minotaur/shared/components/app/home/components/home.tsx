@@ -12,8 +12,8 @@ import { referralLinkUrl, referrals } from "@/shared/components/app/referrals/mo
 import { serverStatus } from "@/shared/components/app/intro/models/intro.model";
 import { formatDuration, formatNumber } from "@/shared/components/app/ratings/format";
 import { newsState } from "@/shared/components/app/news/models/news.model";
-import { eventsState } from "@/shared/components/app/events/models/events.model";
 import { Link } from "@/shared/components/config/link/link";
+import { FormattedText } from "@/shared/components/app/land/components/land-title";
 import { createLink } from "@/shared/components/config/link/link.model";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -245,7 +245,11 @@ const PlayerLand = reatomComponent(({ ctx }) => {
         <Skeleton className="h-10 w-full" />
       ) : land ? (
         <div className="flex flex-col gap-0.5">
-          <span className="truncate text-lg font-semibold">{land.title || land.name}</span>
+          {land.title ? (
+            <FormattedText text={land.title} className="truncate text-lg font-semibold" />
+          ) : (
+            <span className="truncate text-lg font-semibold">{land.name}</span>
+          )}
           <span className="text-xs text-neutral-500">Уровень {land.level}</span>
         </div>
       ) : (
@@ -390,9 +394,7 @@ const GuestFaq = () => (
 
 const GuestSeason = reatomComponent(({ ctx }) => {
   const news = ctx.spy(newsState.data);
-  const events = ctx.spy(eventsState.data);
   const latestNews = news[0];
-  const latestEvent = events[0];
 
   return (
     <Card>
@@ -406,12 +408,7 @@ const GuestSeason = reatomComponent(({ ctx }) => {
             <span className="text-xs text-neutral-500">Последняя новость</span>
           </li>
         ) : null}
-        {latestEvent ? (
-          <li className="flex flex-col">
-            <span className="truncate font-medium">{latestEvent.title}</span>
-            <span className="text-xs text-neutral-500">Последнее событие</span>
-          </li>
-        ) : null}
+
       </ul>
       <Link href="/news" className="text-xs text-green-400 hover:text-green-300">
         Все новости
