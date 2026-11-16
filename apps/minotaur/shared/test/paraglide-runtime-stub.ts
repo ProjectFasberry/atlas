@@ -18,3 +18,16 @@ export const deLocalizeHref = (href: string): string => href;
 export const localizeUrl = (url: URL): URL => url;
 
 export const deLocalizeUrl = (url: URL): URL => url;
+
+export const cookieName = "PARAGLIDE_LOCALE";
+
+export const isLocale = (value: unknown): value is Locale =>
+	locales.includes(value as Locale);
+
+export const toLocale = (value: unknown): Locale | undefined => {
+	if (typeof value !== "string") return undefined;
+
+	return locales.find((locale) => locale.toLowerCase() === value.toLowerCase());
+};
+
+export const extractLocaleFromNavigator = (): Locale | undefined => undefined;

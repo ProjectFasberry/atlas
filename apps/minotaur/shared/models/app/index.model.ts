@@ -1,4 +1,7 @@
-import { action, atom, withAssign, connectLogger, type Unsubscribe, withInit, type Ctx, createLogBatched, type AtomCache } from "@reatom/framework";
+import {
+  action, atom, withAssign, connectLogger,
+  type Unsubscribe, withInit, type Ctx, createLogBatched, type AtomCache
+} from "@reatom/framework";
 import type { PageContext } from "vike/types";
 import { withSsr } from "../ssr";
 import { parseBoolean } from "../../lib/utils";
@@ -9,6 +12,7 @@ import { snapshots } from "../ssr";
 import { pageState } from "../page-context.model";
 import { logger } from "@/shared/lib/logger";
 import { sound } from "../sounds.model";
+import { appearanceState } from "../../components/app/settings/models/settings-appearance.model";
 
 export const APP_OPTIONS_KEY = "appState.options" as const;
 export const APP_DICTIONARIES_KEY = "appState.dict" as const;
@@ -35,8 +39,12 @@ export const appState = atom(null, "appState").pipe(
         )
       }))
     ),
-    options: atom<Nullable<AppOptionsPayloadExtend>>(null, `${name}.options`).pipe(withSsr(APP_OPTIONS_KEY)),
-    dict: atom<Nullable<AppDictionaries>>(null, `${name}.dict`).pipe(withSsr(APP_DICTIONARIES_KEY))
+    options: atom<Nullable<AppOptionsPayloadExtend>>(null, `${name}.options`).pipe(
+      withSsr(APP_OPTIONS_KEY)
+    ),
+    dict: atom<Nullable<AppDictionaries>>(null, `${name}.dict`).pipe(
+      withSsr(APP_DICTIONARIES_KEY)
+    )
   })),
 );
 
@@ -75,7 +83,8 @@ const lazyInitDevModules = action(async (ctx, by: string) => {
       cd ? fn() : Promise.resolve(null);
 
     const [devtools] = await Promise.all([
-      validateImport(DEVTOOLS_ENABLED, () => import("../devtools/index.model").then(m => m.devtools))
+      validateImport(DEVTOOLS_ENABLED, () => import("../devtools/index.model")
+        .then(m => m.devtools))
     ]);
 
     const modules = [
@@ -208,7 +217,7 @@ const defineListeners = action((ctx) => {
 
       const isSound = target.dataset.sound;
 
-      if (isSound && parseBoolean(isSound)) {
+      if (isSound && parseBoolean(isSound) && ctx.get(appearanceState.soundsEnabled)) {
         sound.play(ctx, "click");
       }
     });

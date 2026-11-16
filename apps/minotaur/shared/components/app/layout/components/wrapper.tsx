@@ -1,14 +1,17 @@
 import { useCtx, useIsomorphicEffect, useUpdate } from '@reatom/npm-react';
 import { setupUrlAtomBrowserSettings } from '@reatom/url';
+import { reatomComponent } from '@reatom/npm-react';
 import { reatomContext } from '@reatom/npm-react'
-import { type PropsWithChildren } from 'react'
+import { Fragment, type PropsWithChildren } from 'react'
 import { usePageContext } from 'vike-react/usePageContext'
 import { Footer } from '@/shared/components/app/layout/components/footer';
 import { app, syncIsMobile } from '@/shared/models/app/index.model';
 import { ErrorBoundaryProvider } from './error-boundary';
 import { Global } from './global';
+import { AppearanceSync } from './appearance-sync';
 import { useCreateCtx } from '@/shared/lib/reatom/index';
 import { ENVIRONMENT } from '@/shared/consts';
+import { localeState } from '@/shared/models/shared.model';
 
 const Sync = () => {
   const pageCtx = usePageContext()
@@ -57,11 +60,19 @@ const ReatomProvider = ({ children }: PropsWithChildren) => {
   return <reatomContext.Provider value={reatomCtx}>{children}</reatomContext.Provider>
 }
 
+/** Remounts translated content after a locale switch; atom state survives. */
+export const LocaleBoundary = reatomComponent<PropsWithChildren>(({ ctx, children }) => {
+  const locale = ctx.spy(localeState.current)
+
+  return <Fragment key={locale}>{children}</Fragment>
+}, "LocaleBoundary")
+
 export const WrapperChild = ({ children }: PropsWithChildren) => {
   return (
     <ReatomProvider>
       <ErrorBoundaryProvider>
         <MobileSync />
+        <AppearanceSync />
         <Sync />
         <AppProvider>
           {children}

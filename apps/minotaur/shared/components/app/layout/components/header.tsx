@@ -13,9 +13,9 @@ import { Banner } from "../../widgets/components/banner";
 import { translate } from "@/shared/locales/helpers";
 import { action } from "@reatom/framework";
 import { Portal } from "@ark-ui/react/portal";
-import { getLocale, locales } from "@/paraglide/runtime";
-import { LOCALES_MAP } from "@/shared/locales";
-import { locale } from "@/shared/models/shared.model";
+import { locales } from "@/paraglide/runtime";
+import { LOCALES_NATIVE_MAP } from "@/shared/locales";
+import { locale, localeState } from "@/shared/models/shared.model";
 import { createListCollection, Select } from "@ark-ui/react/select";
 import { SelectItemIndicator, selectVariant } from "@/shared/ui/select";
 import { UserMenu } from "./header-menu";
@@ -92,7 +92,7 @@ const LangSwitcher = reatomComponent(({ ctx }) => {
         placement: "bottom-end"
       }}
       multiple={false}
-      value={[getLocale()]}
+      value={[ctx.spy(localeState.current)]}
       collection={createListCollection({ items: locales })}
     >
       <Select.Trigger
@@ -113,7 +113,7 @@ const LangSwitcher = reatomComponent(({ ctx }) => {
                   className={selectVariant.item("text-base")}
                 >
                   <Select.ItemText className={selectVariant.itemText()}>
-                    {LOCALES_MAP[locale]}
+                    {LOCALES_NATIVE_MAP[locale]}
                   </Select.ItemText>
                   <SelectItemIndicator />
                 </Select.Item>

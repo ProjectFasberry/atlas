@@ -9,6 +9,7 @@ import { Avatar } from "@/shared/ui/avatar";
 import { Icon } from "@/shared/ui/icon";
 import { Typography } from "@/shared/ui/typography";
 import { WalletChips } from "../../wallet/components/wallet-chips";
+import { appearanceState } from "../../settings/models/settings-appearance.model";
 import { navigate } from "vike/client/router";
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import { clsx } from "cnfast";
@@ -68,9 +69,11 @@ const MenuWallet = reatomComponent<{ variant: ItemVariant }>(({ ctx, variant }) 
     "aria-label": translate["shared.header.menu.wallet"]()
   })
 
+  const masked = ctx.spy(appearanceState.hideHeaderBalance)
+
   return (
     <Item {...itemProps} data-sound={true}>
-      <WalletChips />
+      <WalletChips masked={masked} />
       <Icon name="sprite:chevron-right" className="size-4 text-neutral-500" />
     </Item>
   )

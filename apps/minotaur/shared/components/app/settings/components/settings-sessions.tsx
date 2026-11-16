@@ -126,7 +126,7 @@ const SessionItem = reatomComponent<{ session: SessionPayload, type: "current" |
 const SessionsListActive = reatomComponent(({ ctx }) => {
   if (ctx.spy(sessions.fetchActive.errorAtom)) return <SessionsError />
 
-  if (ctx.spy(sessions.fetchActive.statusesAtom).isPending) {
+  if (ctx.spy(sessions.fetchActive.statusesAtom).isFirstPending) {
     return Array.from({ length: 2 }).map((_, idx) => <Skeleton key={idx} className="h-16 w-full" />)
   }
 
@@ -145,7 +145,7 @@ const SessionsListActive = reatomComponent(({ ctx }) => {
 const SessionsListCurrent = reatomComponent(({ ctx }) => {
   if (ctx.spy(sessions.fetchCurrent.errorAtom)) return <SessionsError />
 
-  if (ctx.spy(sessions.fetchCurrent.statusesAtom).isPending) {
+  if (ctx.spy(sessions.fetchCurrent.statusesAtom).isFirstPending) {
     return <Skeleton className="h-16 w-full" />
   }
 

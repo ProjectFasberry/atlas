@@ -967,12 +967,42 @@
         },
         "balance-animation": {
           "description": "Numbers will change smoothly when the balance increases or decreases."
+        },
+        "reduce-motion": {
+          "title": "Reduce motion",
+          "description": "Turn off decorative transitions and highlights."
+        },
+        "sounds": {
+          "title": "Interface sounds",
+          "description": "A short click when pressing buttons and links."
+        },
+        "hide-header-balance": {
+          "title": "Hide balance in the header",
+          "description": "Amounts in the profile menu are masked - handy for streams and screenshots."
+        },
+        "static-skin": {
+          "title": "Static skin",
+          "description": "Show a skin head instead of the 3D model. Saves resources."
+        },
+        "store-view": {
+          "title": "Store layout",
+          "description": "Show items as a grid or a list.",
+          "grid": "Grid",
+          "list": "List"
         }
       },
       "personalization": "Personalization"
     },
     "language": {
-      "title": "Language"
+      "title": "Language",
+      "description": "Interface language. News and the wiki are Russian-only for now.",
+      "auto": {
+        "title": "Auto",
+        "description": "Follow the browser language"
+      },
+      "preview": "Format preview",
+      "preview.date": "Date",
+      "preview.number": "Number"
     },
     "logout": {
       "title": "Log out"

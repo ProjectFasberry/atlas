@@ -8,8 +8,10 @@ import type { PageContextServer } from "vike/types";
 import { useInView } from "react-intersection-observer";
 import { useUpdate } from "@reatom/npm-react";
 import { withSsr } from "./ssr";
-import { locales, setLocale, type Locale } from "@/paraglide/runtime";
+import { cookieName, getLocale, setLocale, type Locale } from "@/paraglide/runtime";
 import { logError } from "../lib/log";
+import { detectBrowserLocale, isAvailableLang } from "../lib/locale";
+export { detectBrowserLocale, hasLocaleCookie } from "../lib/locale";
 
 export async function getExistNickname(nickname: string) {
   return client.get("/validate/nickname/{nickname}", { params: { path: { nickname } } })
@@ -85,7 +87,13 @@ export const getCurrencies = (ctx: Ctx | CtxSpy): Currencies => {
   return data ?? {}
 }
 
-const isAvailableLang = (lang: string): lang is Locale => locales.includes(lang as Locale)
+export const localeState = atom(null, "localeState").pipe(
+  withAssign((_, name) => ({
+    /** Bumped after a locale switch: the layout remounts translated content. */
+    current: atom<Locale>(getLocale(), `${name}.current`),
+    isAuto: atom(false, `${name}.isAuto`)
+  }))
+)
 
 export const locale = atom(null, "locale").pipe(
   withAssign((_, name) => ({
@@ -96,16 +104,40 @@ export const locale = atom(null, "locale").pipe(
       }
 
       await setLocale(lang, { reload: false })
-      return { cb }
+      return { lang, cb }
     }, {
       name: `${name}.change`,
-      onFulfill: (_, res) => {
+      onFulfill: (ctx, res) => {
         if (!res) return;
 
-        const { cb } = res;
-        cb?.();
+        localeState.current(ctx, res.lang as Locale)
+        localeState.isAuto(ctx, false)
+        res.cb?.()
+      },
+      onReject: (_, e) => {
+        logError(e)
+      }
+    }).pipe(
+      withErrorAtom(),
+      withStatusesAtom()
+    ),
+    auto: reatomAsync(async () => {
+      const lang = detectBrowserLocale()
 
-        window.location.reload();
+      await setLocale(lang, { reload: false })
+
+      if (typeof document !== "undefined") {
+        document.cookie = `${cookieName}=; Max-Age=0; path=/`
+      }
+
+      return { lang }
+    }, {
+      name: `${name}.auto`,
+      onFulfill: (ctx, res) => {
+        if (!res) return;
+
+        localeState.current(ctx, res.lang)
+        localeState.isAuto(ctx, true)
       },
       onReject: (_, e) => {
         logError(e)

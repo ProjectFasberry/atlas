@@ -183,3 +183,45 @@ export const StoreItem = ({
     </div>
   )
 }
+
+export const StoreItemRow = ({
+  description, id, title, price, imageUrl, currency
+}: StoreItemProps) => {
+  return (
+    <div className="flex flex-col gap-3 rounded-xl bg-neutral-900 p-3 sm:flex-row sm:items-center">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <Link
+          href={createLink("store", id)}
+          className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-neutral-800"
+        >
+          <img
+            src={imageUrl}
+            draggable={false}
+            width={56}
+            height={56}
+            alt=""
+            className="size-14 object-contain"
+          />
+        </Link>
+        <div className="flex min-w-0 flex-col gap-1">
+          <Link
+            href={createLink("store", id)}
+            className="truncate text-base font-semibold text-white
+              duration-150 hover:text-neutral-300"
+          >
+            {title}
+          </Link>
+          <Typography color="gray" className="line-clamp-2 text-sm">{description}</Typography>
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-3 sm:shrink-0 sm:justify-end">
+        <div className="flex h-9 items-center rounded-full bg-blue-600 px-4">
+          <ItemPrice currency={currency} price={{ value: price }} />
+        </div>
+        <div className="w-32 sm:w-36">
+          <ItemSelectToCart id={id} />
+        </div>
+      </div>
+    </div>
+  )
+}

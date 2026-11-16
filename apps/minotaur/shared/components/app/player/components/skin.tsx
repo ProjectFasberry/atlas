@@ -20,6 +20,7 @@ import { Dialog, DialogTitle } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { dialogVariant } from "@/shared/ui/dialog";
 import { Noop } from "@/shared/ui/noop";
+import { appearanceState } from "../../settings/models/settings-appearance.model";
 
 const {
   getIsSelectSkinAtom,
@@ -52,9 +53,25 @@ const SkinRender = reatomComponent(({ ctx }) => {
     </div>
   )
 
+  const staticSkin = ctx.spy(appearanceState.staticSkin)
+  const hardware = ctx.spy(appState.inited.hardwaveIsEnabled)
+
   return (
     <div className="flex items-center h-[390px] justify-center overflow-hidden w-full">
-      {ctx.spy(appState.inited.hardwaveIsEnabled) ? (
+      {staticSkin && skinData.skin_head_url && (
+        <img
+          src={skinData.skin_head_url}
+          width={192}
+          height={192}
+          alt=""
+          draggable={false}
+          className="size-48 select-none"
+        />
+      )}
+      {staticSkin && !skinData.skin_head_url && (
+        <Noop title={translate["player.skin.nothing"]()} />
+      )}
+      {!staticSkin && hardware && (
         <ClientOnly fallback={<SkinRenderSkeleton />}>
           {skinData.skin_url && (
             <ReactSkinview3d
@@ -66,7 +83,8 @@ const SkinRender = reatomComponent(({ ctx }) => {
             />
           )}
         </ClientOnly>
-      ) : (
+      )}
+      {!staticSkin && !hardware && (
         <div className="flex w-full px-2 py-6 items-center justify-center h-full">
           <Typography color="gray" className="text-lg truncate text-center whitespace-pre-wrap">
             {translate["player.skin.hardware-off"]()}
@@ -587,6 +605,17 @@ const SkinControlsListItem = reatomComponent<typeof SKIN_ANIMATIONS[number]>(({ 
 const SkinControlsList = () =>
   SKIN_ANIMATIONS.map((control, i) => <SkinControlsListItem key={i} {...control} />)
 
+const SkinAnimationControls = reatomComponent(({ ctx }) => {
+  if (ctx.spy(appearanceState.staticSkin)) return null
+
+  return (
+    <>
+      <SkinControlsList />
+      <SkinControlRotate />
+    </>
+  )
+}, "SkinAnimationControls")
+
 export const PlayerSkin = () => {
   return (
     <div className="flex flex-col h-full gap-4 w-full">
@@ -606,8 +635,7 @@ export const PlayerSkin = () => {
       <div className="hidden lg:flex flex-col items-center w-full justify-center gap-4">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center gap-1 w-full">
-            <SkinControlsList />
-            <SkinControlRotate />
+            <SkinAnimationControls />
           </div>
           <div className='flex items-center gap-1'>
             <SkinControlChangeSkin />
