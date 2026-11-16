@@ -190,8 +190,8 @@ importers:
         specifier: 0.8.0
         version: 0.8.0(prettier@3.8.4)
       '@projectfasberry/storage':
-        specifier: github:ProjectFasberry/storage#b0a0930
-        version: https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)
+        specifier: 0.1.0
+        version: 0.1.0(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)
       '@repo/config-biome':
         specifier: workspace:*
         version: link:../../pkgs/config-biome
@@ -2173,9 +2173,8 @@ packages:
   '@poppinss/exception@1.2.3':
     resolution: {integrity: sha512-dCED+QRChTVatE9ibtoaxc+WkdzOSjYTKi/+uacHWIsfodVfpsueo3+DKpgU5Px8qXjgmXkSvhXvSCz3fnP9lw==}
 
-  '@projectfasberry/storage@https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93':
-    resolution: {gitHosted: true, integrity: sha512-XFcAPglIxOYxrM6IJw1XppDtvCut79IMNy0cTYbNay1kzPUAOjO9coMcyNyhRskhHnDksT3E30emEBAN+E9xQQ==, tarball: https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93}
-    version: 0.1.0
+  '@projectfasberry/storage@0.1.0':
+    resolution: {integrity: sha512-cNDRqCjjoG+I2zo+zDsIZB0Zq6ArhzunItSa5j93iNiV9m69wy5IK+wT56k/Jvb0C6ARZXBRWilh0SOAzgyeYg==}
     peerDependencies:
       '@reatom/framework': '>=3.4'
       '@reatom/npm-react': '>=3.10'
@@ -7939,7 +7938,7 @@ snapshots:
 
   '@poppinss/exception@1.2.3': {}
 
-  '@projectfasberry/storage@https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)':
+  '@projectfasberry/storage@0.1.0(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@reatom/framework': 3.4.68
     optionalDependencies:
