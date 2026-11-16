@@ -23,14 +23,13 @@ Content commands and storage are in [`agent-docs/data.md`](./agent-docs/data.md)
 
 ## Deploy
 
-Push to `dev`/`staging` for staging, `main` for prod.
+Push to `main`.
 `.github/workflows/build-wiki.yml` builds `linux/amd64` and pushes
-`registry.fasberry.fun/<stage>/wiki:latest` plus `:sha-<commit>`; the host pulls
-it every two minutes and recreates `prod-app-wiki` only when the digest changed.
-`NEXT_PUBLIC_SITE_URL` is baked at build time, database/auth settings are read at
-runtime, and rollback pins `:sha-<commit>` in the host compose. Registry, routes
-and staging rollout belong to `ProjectFasberry/infra`; the staging image is built
-for parity.
+`registry.fasberry.fun/prod/wiki:latest` plus `:sha-<commit>`. Rollout is manual:
+`ssh i-m '/opt/main/fasberry deploy prod wiki'`. `NEXT_PUBLIC_SITE_URL` is baked
+at build time, database/auth settings are read at runtime, and rollback pins
+`:sha-<commit>` in the host compose. Registry, routes and rollout belong to
+`ProjectFasberry/infra`.
 
 ## Development
 

@@ -101,11 +101,10 @@ filter for one app.
 
 ## Deploy
 
-Container apps (`minotaur`, `wiki`) deploy by push: `main` goes to `prod`,
-`dev`/`staging` goes to `staging`. `.github/workflows/build-<app>.yml` builds a
-`linux/amd64` image and pushes `registry.fasberry.fun/<stage>/<app>:latest` plus
-`:sha-<commit>`. The deploy host runs a pull timer installed from the infra repo
-(every two minutes) and recreates a container only when the image digest changed.
+Container apps (`minotaur`, `wiki`) deploy by push to `main`.
+`.github/workflows/build-<app>.yml` builds a `linux/amd64` image and pushes
+`registry.fasberry.fun/prod/<app>:latest` plus `:sha-<commit>`. Rollout is
+manual: `ssh i-m '/opt/main/fasberry deploy prod <app>'`.
 
 - Required repo secrets: `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`; add
   `NODE_AUTH_TOKEN` only when the build installs private packages.
