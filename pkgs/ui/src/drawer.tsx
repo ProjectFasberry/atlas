@@ -20,6 +20,16 @@ const SHAPE: Record<DrawerSide, string> = {
 type DrawerRootProps = PropsWithChildren<{
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/**
+	 * A drawer is modal by default: it traps focus and blocks the page below.
+	 * Pass `modal: false` only for a non-blocking side panel.
+	 */
+	modal?: boolean;
+	trapFocus?: boolean;
+	preventScroll?: boolean;
+	restoreFocus?: boolean;
+	closeOnInteractOutside?: boolean;
+	closeOnEscape?: boolean;
 }>;
 
 /**
@@ -27,9 +37,30 @@ type DrawerRootProps = PropsWithChildren<{
  * grabber as the minotaur drawer. Colours come from the app through `className`,
  * so it works with the neutral palette and with the fumadocs tokens.
  */
-export function DrawerRoot({ open, onOpenChange, children }: DrawerRootProps) {
+export function DrawerRoot({
+	open,
+	onOpenChange,
+	modal = true,
+	trapFocus = true,
+	preventScroll = true,
+	restoreFocus = true,
+	closeOnInteractOutside = true,
+	closeOnEscape = true,
+	children,
+}: DrawerRootProps) {
 	return (
-		<ArkDrawer.Root open={open} onOpenChange={({ open: next }) => onOpenChange(next)} lazyMount unmountOnExit>
+		<ArkDrawer.Root
+			open={open}
+			onOpenChange={({ open: next }) => onOpenChange(next)}
+			modal={modal}
+			trapFocus={trapFocus}
+			preventScroll={preventScroll}
+			restoreFocus={restoreFocus}
+			closeOnInteractOutside={closeOnInteractOutside}
+			closeOnEscape={closeOnEscape}
+			lazyMount
+			unmountOnExit
+		>
 			{children}
 		</ArkDrawer.Root>
 	);

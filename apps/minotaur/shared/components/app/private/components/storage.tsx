@@ -8,6 +8,10 @@ import { Vaul, VaulContent, VaulHeader, VaulTrigger } from "@/shared/ui/vaul";
 type StorageModel = {
   name: string,
   onSelectFile?: (ctx: Ctx, fileName: string) => void,
+  /** Pick several files; the footer shows the count and confirms them together. */
+  multiple?: boolean,
+  maxSelected?: number,
+  onSelectFiles?: (ctx: Ctx, fileNames: string[]) => void,
 } & ({
   as: "drawer", Slot: React.ReactNode
 } | {
@@ -38,7 +42,11 @@ const labels = {
   cancel: "Отмена",
   preview: "Открыть превью",
   closePreview: "Закрыть",
+  selectedCount: (count: number, max?: number) =>
+    max ? `Выбрано ${count} из ${max}` : `Выбрано ${count}`,
   tree: "Папки",
+  expand: "Развернуть",
+  collapse: "Свернуть",
   noResults: "Ничего не найдено",
   listView: "Список",
   gridView: "Сетка",
@@ -53,7 +61,10 @@ export const storageModel = ({
   name,
   as = "headless",
   Slot,
-  onSelectFile
+  onSelectFile,
+  multiple = false,
+  maxSelected,
+  onSelectFiles,
 }: StorageModel) => {
   const { storage, storageState } = createStorageModel(name);
   const { StorageContent } = createStorageView({
@@ -61,6 +72,9 @@ export const storageModel = ({
     storage,
     storageState,
     onSelectFile,
+    onSelectFiles,
+    multiple,
+    maxSelected,
     labels,
     formatDate,
     previews: true,

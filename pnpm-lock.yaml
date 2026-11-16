@@ -190,8 +190,8 @@ importers:
         specifier: 0.8.0
         version: 0.8.0(prettier@3.8.4)
       '@projectfasberry/storage':
-        specifier: 0.2.0
-        version: 0.2.0(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 0.3.0
+        version: 0.3.0(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)
       '@repo/config-biome':
         specifier: workspace:*
         version: link:../../pkgs/config-biome
@@ -2173,19 +2173,16 @@ packages:
   '@poppinss/exception@1.2.3':
     resolution: {integrity: sha512-dCED+QRChTVatE9ibtoaxc+WkdzOSjYTKi/+uacHWIsfodVfpsueo3+DKpgU5Px8qXjgmXkSvhXvSCz3fnP9lw==}
 
-  '@projectfasberry/storage@0.2.0':
-    resolution: {integrity: sha512-7CH/dxThy5b3G8kd+xKdrJxJWCJBGFNIvEM8LDJcYbKRdck2StjjXu9I7B3j8CNrTvFT1P60KhdYorkoiWWYHA==}
+  '@projectfasberry/storage@0.3.0':
+    resolution: {integrity: sha512-IWIHpHmMSpYBcGFQuUIUIlscsf/eYC4vjSi5GLURj7PchtH65mekzqdUiN3fxpVyWNUp9eJuMP479QXn+2OAvA==}
     peerDependencies:
       '@reatom/framework': '>=3.4'
       '@reatom/npm-react': '>=3.10'
       react: '>=18'
-      react-dom: '>=18'
     peerDependenciesMeta:
       '@reatom/npm-react':
         optional: true
       react:
-        optional: true
-      react-dom:
         optional: true
 
   '@reatom/async@3.16.10':
@@ -7941,13 +7938,12 @@ snapshots:
 
   '@poppinss/exception@1.2.3': {}
 
-  '@projectfasberry/storage@0.2.0(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@projectfasberry/storage@0.3.0(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@reatom/framework': 3.4.68
     optionalDependencies:
       '@reatom/npm-react': 3.10.6(react@19.3.1)
       react: 19.3.1
-      react-dom: 19.3.1(react@19.3.1)
 
   '@reatom/async@3.16.10':
     dependencies:
