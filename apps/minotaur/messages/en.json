@@ -144,7 +144,8 @@
       "description": "Join the Fasberry community, grow, and spend time in a warm and friendly environment!",
       "actionButton": "Start playing",
       "statusLabel": "playing now"
-    }
+    },
+    "news-mark-read": "{count} new · mark as read"
   },
   "auth": {
     "page": {
@@ -275,6 +276,23 @@
       "description": "Sign in to get access to the full functionality of the site.",
       "action": "Sign in",
       "hide": "Do not show"
+    },
+    "link": {
+      "checking": "Checking the link...",
+      "invalid-title": "The link is invalid",
+      "invalid-text": "The link has expired or was already used. Ask for a new one.",
+      "complete-registration": "Finish registration",
+      "invite-registration": "Registration by invite",
+      "reserved-nickname": "The nickname is already reserved for you, just set a password.",
+      "new-nickname": "Pick a nickname and a password to join the project.",
+      "nickname": "Nickname",
+      "password": "Password",
+      "password-repeat": "Repeat the password",
+      "submit": "Create a password",
+      "error-invalid": "The link is invalid or expired",
+      "error-passwords": "Passwords do not match",
+      "error-password-short": "The password must be at least 4 characters",
+      "error-nickname-short": "The nickname must be at least 3 characters"
     }
   },
   "ratings": {
@@ -328,6 +346,10 @@
     "filters": {
       "server": "Server",
       "type": "Type"
+    },
+    "rates": {
+      "empty": "empty",
+      "voters": "Rated by {nickname}"
     }
   },
   "land": {
@@ -350,8 +372,15 @@
     },
     "gallery": {
       "title": "Gallery",
-      "hint": "Up to 3 images, PNG/JPEG/WebP under 2 MB"
-    }
+      "hint": "Up to 3 images, PNG/JPEG/WebP under 2 MB",
+      "remove": "Remove",
+      "remove-pending": "Discard"
+    },
+    "member-count": "{count} member",
+    "member-count-other": "{count} members",
+    "remove-banner": "Remove the banner",
+    "title-placeholder": "Region description",
+    "color-codes": "Color codes: &0-&f, &l, &o, &n, &m"
   },
   "default": {
     "not-found": "Resource not found"
@@ -359,11 +388,13 @@
   "player": {
     "not-found": "Player not found",
     "lands": {
-      "title": "Territories"
+      "title": "Territories",
+      "empty": "none"
     },
     "seems-like-players": {
       "title": "Similar players",
-      "notShow": "Do not show"
+      "notShow": "Do not show",
+      "hidden": "Block hidden for 30 days"
     },
     "activity": {
       "online": "Online",
@@ -376,7 +407,10 @@
         "less": "Less",
         "more": "More",
         "tooltip": "{date}: {hours} h"
-      }
+      },
+      "world": "World:",
+      "server": "on server",
+      "location": "Player location"
     },
     "balance": {
       "title": "Balance",
@@ -386,7 +420,9 @@
           "animation": "Show animation"
         }
       },
-      "server_unavailable": "the server is unavailable"
+      "server_unavailable": "the server is unavailable",
+      "server": "Server:",
+      "servers": "Available servers:"
     },
     "purchases": {
       "title": "Purchases",
@@ -435,6 +471,9 @@
         "run": "Run",
         "flying": "Flying"
       }
+    },
+    "socials": {
+      "copied": "Copied to the clipboard"
     }
   },
   "lands": {
@@ -518,7 +557,8 @@
         "desc": "Newest first",
         "asc": "Oldest first"
       },
-      "items_count": "Items: {count}"
+      "items_count": "Items: {count}",
+      "loadMore": "Show more"
     },
     "order": {
       "status": "Status",
@@ -540,7 +580,12 @@
       },
       "show-qr": "Show the QR code",
       "pay": "Pay",
-      "amount": "Amount due"
+      "amount": "Amount due",
+      "delivery": {
+        "revoked": "Refunded",
+        "pending": "Delivering",
+        "failed": "Delivery failed"
+      }
     },
     "topup": {
       "rules": {
@@ -648,12 +693,41 @@
       "title": "News",
       "description": "Fasberry project news"
     },
-    "sort": "Sort"
+    "sort": "Sort",
+    "filters": {
+      "title": "Title"
+    },
+    "author": "Author",
+    "created": "Created",
+    "read": "read",
+    "empty": "Nothing here yet",
+    "search-empty": "Nothing found for \"{query}\"",
+    "heading": "News"
   },
   "referrals": {
     "page": {
       "title": "Referrals",
       "description": "Referrals page description"
+    },
+    "card": {
+      "title": "Invite your friends",
+      "description": "The reward arrives after 24 hours and 3 hours of play by the invited player. The limit is 5 accepted invites per rolling 12 months."
+    },
+    "stats": "{left} of {limit} left",
+    "new-link": "New link",
+    "invite": "Invite a player",
+    "how-it-works": "How it works",
+    "link-title": "Referral link",
+    "copy": "Copy",
+    "link-hint": "The link lives for 7 days; a new link makes the old one stop working.",
+    "limit-reached": "The invite limit for 12 months is used up.",
+    "copy-error": "Could not copy the link",
+    "issue-error": "Can't issue a link right now",
+    "list": {
+      "completed": "Completed",
+      "in-progress": "In progress",
+      "empty": "Nobody invited yet",
+      "empty-hint": "Copy the link above and send it to a friend. They register with it and become your referral."
     }
   },
   "tasks": {
@@ -662,7 +736,18 @@
       "description": "Tasks page description"
     },
     "reward": "Reward",
-    "empty": "No tasks yet"
+    "empty": "No tasks yet",
+    "heading": "Tasks",
+    "action": {
+      "complete": "Complete"
+    },
+    "sort": {
+      "label": "Sort by:",
+      "relevance": "Relevance"
+    },
+    "filter": {
+      "title": "Title"
+    }
   },
   "support": {
     "page": {
@@ -997,5 +1082,80 @@
         "cancel": "Cancel"
       }
     }
+  },
+  "layout": {
+    "cart": {
+      "open": "Open the cart"
+    },
+    "menu": {
+      "player": "player"
+    }
+  },
+  "errors": {
+    "player-not-found": "Player not found",
+    "land-not-found": "This region seems to be gone",
+    "item-not-found": "Item not found",
+    "resource-not-found": "Resource not found"
+  },
+  "editor": {
+    "undo": "Undo",
+    "redo": "Redo",
+    "bold": "Bold",
+    "bold-title": "Bold (Ctrl+B)",
+    "italic": "Italic",
+    "italic-title": "Italic (Ctrl+I)",
+    "strike": "Strikethrough",
+    "code": "Code",
+    "code-title": "Inline code",
+    "paragraph-style": "Paragraph style",
+    "paragraph": "Paragraph",
+    "heading": "Heading {level}",
+    "bullet-list": "Bullet list",
+    "ordered-list": "Numbered list",
+    "blockquote": "Quote",
+    "code-block": "Code block",
+    "divider": "Divider",
+    "link": "Link",
+    "image": "Image",
+    "table": "Table",
+    "clear-format": "Clear formatting",
+    "remove-format": "Remove formatting",
+    "reset-blocks": "Reset blocks",
+    "link-url": "Link URL",
+    "image-url": "Image URL",
+    "apply": "Apply",
+    "remove-link": "Remove the link",
+    "remove": "Remove",
+    "close": "Close",
+    "cancel": "Cancel",
+    "insert-table": "Insert a table",
+    "insert-table-action": "+ Table",
+    "add-column-left": "Add a column to the left",
+    "add-column-left-action": "+ Column ←",
+    "add-column-right": "Add a column to the right",
+    "add-column-right-action": "+ Column →",
+    "delete-column": "Delete the column",
+    "delete-column-action": "− Column",
+    "add-row-above": "Add a row above",
+    "add-row-above-action": "+ Row ↑",
+    "add-row-below": "Add a row below",
+    "add-row-below-action": "+ Row ↓",
+    "delete-row": "Delete the row",
+    "delete-row-action": "− Row",
+    "delete-table": "Delete the table",
+    "delete-table-action": "− Table",
+    "merge-cells": "Merge cells",
+    "merge-cells-action": "Merge",
+    "split-cell": "Split the cell",
+    "split-cell-action": "Split",
+    "header-row": "Header row label",
+    "header-column": "Header column label",
+    "error-empty": "Enter a link",
+    "error-parse": "Could not parse the link",
+    "error-scheme": "Only http and https are allowed",
+    "error-domain": "The domain is not in the allowlist"
+  },
+  "validation": {
+    "command-value": "The command needs a value"
   }
 }

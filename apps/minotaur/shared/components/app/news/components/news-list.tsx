@@ -7,6 +7,7 @@ import { Typography } from "@/shared/ui/typography"
 import { Link } from "@/shared/components/config/link/link"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { createLink } from "@/shared/components/config/link/link.model"
+import { translate } from "@/shared/locales/helpers"
 
 const NewsListNotFound = reatomComponent(({ ctx }) =>
   <NotFound title={ctx.spy(newsNotFoundTitleAtom)} />
@@ -37,7 +38,7 @@ export const NewsList = reatomComponent(({ ctx }) => {
             </Typography>
             <Link href={createLink("news", news.id)}>
               <Typography className="text-neutral-400 font-semibold text-sm">
-                прочитать
+                {translate["news.read"]()}
               </Typography>
             </Link>
           </div>

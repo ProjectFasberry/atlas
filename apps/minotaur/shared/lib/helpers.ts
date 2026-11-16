@@ -1,4 +1,5 @@
 import { apiBaseUrl, env } from "../env";
+import { translate } from "@/shared/locales/helpers"
 
 export const getApiMiscRoute = (path: string) => `${env.VITE_API_URL}/misc/${path}`;
 export const getApiHost = () => new URL(env.VITE_API_URL).hostname;
@@ -144,12 +145,19 @@ export function isBotRequest(headers: Record<string, string | undefined>, pathna
 
 const NOT_EXIST_TYPES_ARR = ["player", "land", "store.item", "default"] as const;
 
+const NOT_EXIST_TYPE_KEYS = {
+  "player": "errors.player-not-found",
+  "land": "errors.land-not-found",
+  "store.item": "errors.item-not-found",
+  "default": "errors.resource-not-found",
+} as const satisfies Record<typeof NOT_EXIST_TYPES_ARR[number], string>;
+
 export const NOT_EXIST_TYPES: Record<typeof NOT_EXIST_TYPES_ARR[number], string> = {
-  "player": "Игрок не найден",
-  "land": "Похоже этого региона уже нет",
-  "store.item": "Товар не найден",
-  "default": "Ресурс не найден"
-} as const;
+  "player": translate[NOT_EXIST_TYPE_KEYS.player](),
+  "land": translate[NOT_EXIST_TYPE_KEYS.land](),
+  "store.item": translate[NOT_EXIST_TYPE_KEYS["store.item"]](),
+  "default": translate[NOT_EXIST_TYPE_KEYS.default](),
+};
 
 export const getNotExistUrlByEntity = (t?: keyof typeof NOT_EXIST_TYPES): `/not-exist?t=${NonNullable<typeof t>}` => {
   return `/not-exist?t=${t ?? "default"}`

@@ -6,6 +6,7 @@ import { dayjs } from "@/shared/lib/dayjs";
 import { client } from "@/shared/lib/client-wrapper";
 import { withSsr } from "@/shared/models/ssr";
 import { setCookie } from "@/shared/lib/cookie-utils";
+import { translate } from "@/shared/locales/helpers"
 
 export const playerSeemsLikePlayersIsShowKey = "playerSLPState.isShow"
 type SeemsLikePlayersPayload = ExtractApiData<"getServerSeems-likeByNickname">["data"]
@@ -31,7 +32,7 @@ export const playerSLPState = atom(null, "playerSLPState").pipe(
 
               if (!isInputed) {
                 if (!value) {
-                  toast.success(`Блок скрыт на 30 дней`)
+                  toast.success(translate["player.seems-like-players.hidden"]())
                 }
               }
             }, `${name}.toggle`)

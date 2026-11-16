@@ -44,7 +44,7 @@ const LandGallery = reatomComponent(({ ctx }) => {
               <img src={url} className="h-full w-full object-cover" alt="" />
               <button
                 type="button"
-                title="Удалить"
+                title={translate["land.gallery.remove"]()}
                 className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
                 onClick={() => landEditing.gallery.removeExisting(ctx, url)}
               >
@@ -57,7 +57,7 @@ const LandGallery = reatomComponent(({ ctx }) => {
               <img src={item.preview} className="h-full w-full object-cover" alt="" />
               <button
                 type="button"
-                title="Убрать"
+                title={translate["land.gallery.remove-pending"]()}
                 className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
                 onClick={() => landEditing.gallery.removePending(ctx, idx)}
               >
@@ -269,7 +269,9 @@ const LandDetails = reatomComponent(({ ctx }) => {
             className="text-base text-nowrap truncate"
             color='gray'
           >
-            {land?.members.length} {land?.members.length === 1 ? "участник" : "участников"}
+            {land?.members.length === 1
+              ? translate["land.member-count"]({ count: land.members.length })
+              : translate["land.member-count-other"]({ count: land?.members.length ?? 0 })}
           </Typography>
         )}
       </div>
@@ -305,7 +307,7 @@ const LandHead = reatomComponent(({ ctx }) => {
             value={title}
             onChange={(e) => landEditingState.title(ctx, e.target.value)}
             maxLength={300}
-            placeholder="Описание региона"
+            placeholder={translate["land.title-placeholder"]()}
             className="
               px-4 py-2 min-h-20 text-sm rounded-xl placeholder:text-neutral-400
               bg-neutral-800 border outline-none border-transparent resize-y
@@ -313,7 +315,7 @@ const LandHead = reatomComponent(({ ctx }) => {
             "
           />
           <span className="text-[11px] text-neutral-500">
-            Цветовые коды: &amp;0-&amp;f, &amp;l, &amp;o, &amp;n, &amp;m
+            {translate["land.color-codes"]()}
           </span>
           {title && <FormattedText as="span" text={title} />}
         </div>

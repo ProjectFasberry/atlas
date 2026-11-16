@@ -9,6 +9,7 @@ import { Input } from "@/shared/ui/input"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
 import { editorBar, editorBarState, editorSelectors, type EditorUrlPanel } from "./editor.model"
+import { translate } from "@/shared/locales/helpers"
 
 const controlVariant = tv({
   base: `
@@ -81,25 +82,25 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
           variant: "hovered"
         })}
       >
-        <ToolbarButton label="Отменить" disabled={!editorState.canUndo} onClick={() => editor.chain().focus().undo().run()}>
+        <ToolbarButton label={translate["editor.undo"]()} disabled={!editorState.canUndo} onClick={() => editor.chain().focus().undo().run()}>
           <Icon name='sprite:arrow-back-up' className="size-4" />
         </ToolbarButton>
-        <ToolbarButton label="Повторить" disabled={!editorState.canRedo} onClick={() => editor.chain().focus().redo().run()}>
+        <ToolbarButton label={translate["editor.redo"]()} disabled={!editorState.canRedo} onClick={() => editor.chain().focus().redo().run()}>
           <Icon name="sprite:arrow-forward-up" className="size-4" />
         </ToolbarButton>
 
         <ToolbarSeparator />
 
-        <ToolbarButton label="Жирный" title="Жирный (Ctrl+B)" active={editorState.isBold} disabled={!editorState.canBold} onClick={() => editor.chain().focus().toggleBold().run()}>
+        <ToolbarButton label={translate["editor.bold"]()} title={translate["editor.bold-title"]()} active={editorState.isBold} disabled={!editorState.canBold} onClick={() => editor.chain().focus().toggleBold().run()}>
           <span className="font-bold">B</span>
         </ToolbarButton>
-        <ToolbarButton label="Курсив" title="Курсив (Ctrl+I)" active={editorState.isItalic} disabled={!editorState.canItalic} onClick={() => editor.chain().focus().toggleItalic().run()}>
+        <ToolbarButton label={translate["editor.italic"]()} title={translate["editor.italic-title"]()} active={editorState.isItalic} disabled={!editorState.canItalic} onClick={() => editor.chain().focus().toggleItalic().run()}>
           <span className="italic">I</span>
         </ToolbarButton>
-        <ToolbarButton label="Зачёркнутый" title="Зачёркнутый" active={editorState.isStrike} disabled={!editorState.canStrike} onClick={() => editor.chain().focus().toggleStrike().run()}>
+        <ToolbarButton label={translate["editor.strike"]()} title={translate["editor.strike"]()} active={editorState.isStrike} disabled={!editorState.canStrike} onClick={() => editor.chain().focus().toggleStrike().run()}>
           <span className="line-through">S</span>
         </ToolbarButton>
-        <ToolbarButton label="Код" title="Инлайн-код" active={editorState.isCode} disabled={!editorState.canCode} onClick={() => editor.chain().focus().toggleCode().run()}>
+        <ToolbarButton label={translate["editor.code"]()} title={translate["editor.code-title"]()} active={editorState.isCode} disabled={!editorState.canCode} onClick={() => editor.chain().focus().toggleCode().run()}>
           {"</>"}
         </ToolbarButton>
 
@@ -109,7 +110,7 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
           <Menu.Trigger asChild>
             <button
               type="button"
-              aria-label="Стиль абзаца"
+              aria-label={translate["editor.paragraph-style"]()}
               data-state={headingLevel ? "active" : "inactive"}
               className={controlVariant()}
             >
@@ -120,7 +121,7 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
             <Menu.Positioner>
               <Menu.Content className={menuVariant.content("min-w-32")}>
                 <Menu.Item value="paragraph" className={menuVariant.item()} onClick={() => editor.chain().focus().setParagraph().run()}>
-                  Обычный текст
+                  {translate["editor.paragraph"]()}
                 </Menu.Item>
                 {HEADING_LEVELS.map((level) => (
                   <Menu.Item
@@ -129,7 +130,7 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
                     className={menuVariant.item()}
                     onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
                   >
-                    Заголовок {level}
+                    {translate["editor.heading"]({ level })}
                   </Menu.Item>
                 ))}
               </Menu.Content>
@@ -139,36 +140,36 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
 
         <ToolbarSeparator />
 
-        <ToolbarButton label="Маркированный список" active={editorState.isBulletList} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <ToolbarButton label={translate["editor.bullet-list"]()} active={editorState.isBulletList} onClick={() => editor.chain().focus().toggleBulletList().run()}>
           {"•—"}
         </ToolbarButton>
-        <ToolbarButton label="Нумерованный список" active={editorState.isOrderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <ToolbarButton label={translate["editor.ordered-list"]()} active={editorState.isOrderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
           {"1."}
         </ToolbarButton>
-        <ToolbarButton label="Цитата" active={editorState.isBlockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+        <ToolbarButton label={translate["editor.blockquote"]()} active={editorState.isBlockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
           {"❝"}
         </ToolbarButton>
-        <ToolbarButton label="Блок кода" active={editorState.isCodeBlock} onClick={() => editor.chain().focus().toggleCodeBlock().run()}>
+        <ToolbarButton label={translate["editor.code-block"]()} active={editorState.isCodeBlock} onClick={() => editor.chain().focus().toggleCodeBlock().run()}>
           {"{ }"}
         </ToolbarButton>
-        <ToolbarButton label="Разделитель" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+        <ToolbarButton label={translate["editor.divider"]()} onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           {"—"}
         </ToolbarButton>
 
         <ToolbarSeparator />
 
         <ToolbarButton
-          label="Ссылка"
-          title="Ссылка"
+          label={translate["editor.link"]()}
+          title={translate["editor.link"]()}
           active={editorState.isLink || panel === "link"}
           onClick={() => openUrl("link")}
         >
           <Icon name="sprite:link" className="size-4" />
         </ToolbarButton>
-        <ToolbarButton label="Изображение" active={panel === "image"} onClick={() => openUrl("image")}>
+        <ToolbarButton label={translate["editor.image"]()} active={panel === "image"} onClick={() => openUrl("image")}>
           <Icon name="sprite:picture-in-picture" className="size-4" />
         </ToolbarButton>
-        <ToolbarButton label="Таблица" active={isTable} onClick={() => editorBar.toggleTable(ctx)}>
+        <ToolbarButton label={translate["editor.table"]()} active={isTable} onClick={() => editorBar.toggleTable(ctx)}>
           {"▦"}
         </ToolbarButton>
 
@@ -176,7 +177,7 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
 
         <Menu.Root>
           <Menu.Trigger asChild>
-            <button type="button" aria-label="Очистить форматирование" className={controlVariant()}>
+            <button type="button" aria-label={translate["editor.clear-format"]()} className={controlVariant()}>
               <Icon name="sprite:settings" className="size-4" />
             </button>
           </Menu.Trigger>
@@ -184,10 +185,10 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
             <Menu.Positioner>
               <Menu.Content className={menuVariant.content()}>
               <Menu.Item value="clear_marks" className={menuVariant.item()} onClick={() => editor.chain().focus().unsetAllMarks().run()}>
-                Убрать форматирование
+                {translate["editor.remove-format"]()}
               </Menu.Item>
               <Menu.Item value="clear_nodes" className={menuVariant.item()} onClick={() => editor.chain().focus().clearNodes().run()}>
-                Сбросить блоки
+                {translate["editor.reset-blocks"]()}
               </Menu.Item>
               </Menu.Content>
             </Menu.Positioner>
@@ -207,20 +208,20 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
             autoFocus
             value={url}
             onChange={(event) => editorBar.setUrl(ctx, event.target.value)}
-            aria-label={panel === "link" ? "Адрес ссылки" : "Адрес изображения"}
+            aria-label={panel === "link" ? translate["editor.link-url"]() : translate["editor.image-url"]()}
             placeholder={panel === "link" ? "https://fasberry.su/wiki" : "https://volume.fasberry.fun/..."}
             className="h-8 min-w-48 flex-1 text-sm"
           />
-          <ToolbarButton label="Применить" onClick={() => editorBar.submitUrl(ctx, editor)}>
-            Применить
+          <ToolbarButton label={translate["editor.apply"]()} onClick={() => editorBar.submitUrl(ctx, editor)}>
+            {translate["editor.apply"]()}
           </ToolbarButton>
           {panel === "link" && editorState.isLink ? (
-            <ToolbarButton label="Удалить ссылку" onClick={() => editorBar.removeLink(ctx, editor)}>
-              Удалить
+            <ToolbarButton label={translate["editor.remove-link"]()} onClick={() => editorBar.removeLink(ctx, editor)}>
+              {translate["editor.remove"]()}
             </ToolbarButton>
           ) : null}
-          <ToolbarButton label="Закрыть" onClick={() => editorBar.closeUrl(ctx)}>
-            Отмена
+          <ToolbarButton label={translate["editor.close"]()} onClick={() => editorBar.closeUrl(ctx)}>
+            {translate["editor.cancel"]()}
           </ToolbarButton>
           {urlError ? <span className="text-[11px] text-red-400">{urlError}</span> : null}
         </form>
@@ -228,40 +229,40 @@ export const EditorMenuBar = reatomComponent<{ editor: Editor }>(({ ctx, editor 
 
       {isTable ? (
         <div className="flex flex-wrap items-center gap-1">
-          <ToolbarButton label="Вставить таблицу" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
-            + Таблица
+          <ToolbarButton label={translate["editor.insert-table"]()} onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
+            {translate["editor.insert-table-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Добавить колонку слева" onClick={() => editor.chain().focus().addColumnBefore().run()}>
-            + Колонка ←
+          <ToolbarButton label={translate["editor.add-column-left"]()} onClick={() => editor.chain().focus().addColumnBefore().run()}>
+            {translate["editor.add-column-left-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Добавить колонку справа" onClick={() => editor.chain().focus().addColumnAfter().run()}>
-            + Колонка →
+          <ToolbarButton label={translate["editor.add-column-right"]()} onClick={() => editor.chain().focus().addColumnAfter().run()}>
+            {translate["editor.add-column-right-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Удалить колонку" onClick={() => editor.chain().focus().deleteColumn().run()}>
-            − Колонка
+          <ToolbarButton label={translate["editor.delete-column"]()} onClick={() => editor.chain().focus().deleteColumn().run()}>
+            {translate["editor.delete-column-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Добавить строку сверху" onClick={() => editor.chain().focus().addRowBefore().run()}>
-            + Строка ↑
+          <ToolbarButton label={translate["editor.add-row-above"]()} onClick={() => editor.chain().focus().addRowBefore().run()}>
+            {translate["editor.add-row-above-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Добавить строку снизу" onClick={() => editor.chain().focus().addRowAfter().run()}>
-            + Строка ↓
+          <ToolbarButton label={translate["editor.add-row-below"]()} onClick={() => editor.chain().focus().addRowAfter().run()}>
+            {translate["editor.add-row-below-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Удалить строку" onClick={() => editor.chain().focus().deleteRow().run()}>
-            − Строка
+          <ToolbarButton label={translate["editor.delete-row"]()} onClick={() => editor.chain().focus().deleteRow().run()}>
+            {translate["editor.delete-row-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Удалить таблицу" onClick={() => editor.chain().focus().deleteTable().run()}>
-            − Таблица
+          <ToolbarButton label={translate["editor.delete-table"]()} onClick={() => editor.chain().focus().deleteTable().run()}>
+            {translate["editor.delete-table-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Объединить ячейки" onClick={() => editor.chain().focus().mergeCells().run()}>
-            Объединить
+          <ToolbarButton label={translate["editor.merge-cells"]()} onClick={() => editor.chain().focus().mergeCells().run()}>
+            {translate["editor.merge-cells-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Разъединить ячейку" onClick={() => editor.chain().focus().splitCell().run()}>
-            Разъединить
+          <ToolbarButton label={translate["editor.split-cell"]()} onClick={() => editor.chain().focus().splitCell().run()}>
+            {translate["editor.split-cell-action"]()}
           </ToolbarButton>
-          <ToolbarButton label="Заголовок строки" onClick={() => editor.chain().focus().toggleHeaderRow().run()}>
+          <ToolbarButton label={translate["editor.header-row"]()} onClick={() => editor.chain().focus().toggleHeaderRow().run()}>
             Header row
           </ToolbarButton>
-          <ToolbarButton label="Заголовок колонки" onClick={() => editor.chain().focus().toggleHeaderColumn().run()}>
+          <ToolbarButton label={translate["editor.header-column"]()} onClick={() => editor.chain().focus().toggleHeaderColumn().run()}>
             Header col
           </ToolbarButton>
         </div>

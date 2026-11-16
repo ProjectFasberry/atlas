@@ -144,7 +144,8 @@
       "description": "Присоединяйтесь к сообществу Fasberry, развивайтесь и проводите время в теплой и уютной компании!",
       "actionButton": "Начать играть",
       "statusLabel": "играют сейчас"
-    }
+    },
+    "news-mark-read": "{count} новых · отметить прочитанными"
   },
   "auth": {
     "page": {
@@ -275,6 +276,23 @@
       "description": "Авторизуйтесь, чтобы получить доступ к полному функционалу сайта.",
       "action": "Авторизоваться",
       "hide": "Не показывать"
+    },
+    "link": {
+      "checking": "Проверяем ссылку...",
+      "invalid-title": "Ссылка недействительна",
+      "invalid-text": "Срок действия ссылки истёк или её уже использовали. Попроси новую.",
+      "complete-registration": "Завершение регистрации",
+      "invite-registration": "Регистрация по приглашению",
+      "reserved-nickname": "Ник уже закреплён за тобой, осталось задать пароль.",
+      "new-nickname": "Придумай ник и пароль, чтобы присоединиться к проекту.",
+      "nickname": "Никнейм",
+      "password": "Пароль",
+      "password-repeat": "Повторите пароль",
+      "submit": "Создать пароль",
+      "error-invalid": "Ссылка недействительна или истекла",
+      "error-passwords": "Пароли не совпадают",
+      "error-password-short": "Пароль должен быть не короче 4 символов",
+      "error-nickname-short": "Ник должен быть не короче 3 символов"
     }
   },
   "ratings": {
@@ -328,6 +346,10 @@
     "filters": {
       "server": "Сервер",
       "type": "Тип"
+    },
+    "rates": {
+      "empty": "пусто",
+      "voters": "Оценившие {nickname}"
     }
   },
   "land": {
@@ -350,8 +372,15 @@
     },
     "gallery": {
       "title": "Галерея",
-      "hint": "До 3 изображений, PNG/JPEG/WebP до 2 МБ"
-    }
+      "hint": "До 3 изображений, PNG/JPEG/WebP до 2 МБ",
+      "remove": "Удалить",
+      "remove-pending": "Убрать"
+    },
+    "member-count": "{count} участник",
+    "member-count-other": "{count} участников",
+    "remove-banner": "Убрать баннер",
+    "title-placeholder": "Описание региона",
+    "color-codes": "Цветовые коды: &0-&f, &l, &o, &n, &m"
   },
   "default": {
     "not-found": "Ресурс не найден"
@@ -359,11 +388,13 @@
   "player": {
     "not-found": "Игрок не найден",
     "lands": {
-      "title": "Территории"
+      "title": "Территории",
+      "empty": "нет"
     },
     "seems-like-players": {
       "title": "Похожие игроки",
-      "notShow": "Не показывать"
+      "notShow": "Не показывать",
+      "hidden": "Блок скрыт на 30 дней"
     },
     "activity": {
       "online": "Онлайн",
@@ -376,7 +407,10 @@
         "less": "Меньше",
         "more": "Больше",
         "tooltip": "{date}: {hours} ч"
-      }
+      },
+      "world": "Мир:",
+      "server": "на сервере",
+      "location": "Локация игрока"
     },
     "balance": {
       "title": "Баланс",
@@ -386,7 +420,9 @@
           "animation": "Показывать анимацию"
         }
       },
-      "server_unavailable": "сервер недоступен"
+      "server_unavailable": "сервер недоступен",
+      "server": "Сервер:",
+      "servers": "Доступные сервера:"
     },
     "purchases": {
       "title": "Покупки",
@@ -435,6 +471,9 @@
         "run": "Бег",
         "flying": "Полёт"
       }
+    },
+    "socials": {
+      "copied": "Скопировано в буфер обмена"
     }
   },
   "lands": {
@@ -518,7 +557,8 @@
         "desc": "Сначала новые",
         "asc": "Сначала старые"
       },
-      "items_count": "Позиций: {count}"
+      "items_count": "Позиций: {count}",
+      "loadMore": "Показать ещё"
     },
     "order": {
       "status": "Статус",
@@ -540,7 +580,12 @@
       },
       "show-qr": "Показать QR-код",
       "pay": "Оплатить",
-      "amount": "К оплате"
+      "amount": "К оплате",
+      "delivery": {
+        "revoked": "Возвращён",
+        "pending": "Выдаётся",
+        "failed": "Ошибка выдачи"
+      }
     },
     "topup": {
       "rules": {
@@ -648,12 +693,41 @@
       "title": "Новости",
       "description": "Новости проекта Fasberry"
     },
-    "sort": "Сортировка"
+    "sort": "Сортировка",
+    "filters": {
+      "title": "Название"
+    },
+    "author": "Автор",
+    "created": "Создано",
+    "read": "прочитать",
+    "empty": "Пока ничего нет",
+    "search-empty": "Ничего не нашлось по запросу «{query}»",
+    "heading": "Новости"
   },
   "referrals": {
     "page": {
       "title": "Рефералы",
       "description": "Рефералы страница описание"
+    },
+    "card": {
+      "title": "Приглашай друзей",
+      "description": "Награда приходит после 24 часов и 3 часов игры приглашённого. Лимит - 5 принятых приглашений за скользящие 12 месяцев."
+    },
+    "stats": "осталось {left} из {limit}",
+    "new-link": "Новая ссылка",
+    "invite": "Пригласить игрока",
+    "how-it-works": "Как это работает",
+    "link-title": "Реферальная ссылка",
+    "copy": "Копировать",
+    "link-hint": "Ссылка действует 7 дней; после новой генерации старая перестаёт работать.",
+    "limit-reached": "Лимит приглашений за 12 месяцев исчерпан.",
+    "copy-error": "Не удалось скопировать ссылку",
+    "issue-error": "Ссылку сейчас выдать нельзя",
+    "list": {
+      "completed": "Завершён",
+      "in-progress": "В процессе",
+      "empty": "Пока никого не пригласили",
+      "empty-hint": "Скопируй ссылку выше и отправь другу. Он зарегистрируется по ней и станет твоим рефералом."
     }
   },
   "tasks": {
@@ -662,7 +736,18 @@
       "description": "Задачи страница описание"
     },
     "reward": "Награда",
-    "empty": "Заданий пока нет"
+    "empty": "Заданий пока нет",
+    "heading": "Задания",
+    "action": {
+      "complete": "Выполнить"
+    },
+    "sort": {
+      "label": "Сортировать по:",
+      "relevance": "Актуальности"
+    },
+    "filter": {
+      "title": "Название"
+    }
   },
   "support": {
     "page": {
@@ -997,5 +1082,80 @@
         "cancel": "Отмена"
       }
     }
+  },
+  "layout": {
+    "cart": {
+      "open": "Перейти в корзину"
+    },
+    "menu": {
+      "player": "игрок"
+    }
+  },
+  "errors": {
+    "player-not-found": "Игрок не найден",
+    "land-not-found": "Похоже этого региона уже нет",
+    "item-not-found": "Товар не найден",
+    "resource-not-found": "Ресурс не найден"
+  },
+  "editor": {
+    "undo": "Отменить",
+    "redo": "Повторить",
+    "bold": "Жирный",
+    "bold-title": "Жирный (Ctrl+B)",
+    "italic": "Курсив",
+    "italic-title": "Курсив (Ctrl+I)",
+    "strike": "Зачёркнутый",
+    "code": "Код",
+    "code-title": "Инлайн-код",
+    "paragraph-style": "Стиль абзаца",
+    "paragraph": "Обычный текст",
+    "heading": "Заголовок {level}",
+    "bullet-list": "Маркированный список",
+    "ordered-list": "Нумерованный список",
+    "blockquote": "Цитата",
+    "code-block": "Блок кода",
+    "divider": "Разделитель",
+    "link": "Ссылка",
+    "image": "Изображение",
+    "table": "Таблица",
+    "clear-format": "Очистить форматирование",
+    "remove-format": "Убрать форматирование",
+    "reset-blocks": "Сбросить блоки",
+    "link-url": "Адрес ссылки",
+    "image-url": "Адрес изображения",
+    "apply": "Применить",
+    "remove-link": "Удалить ссылку",
+    "remove": "Удалить",
+    "close": "Закрыть",
+    "cancel": "Отмена",
+    "insert-table": "Вставить таблицу",
+    "insert-table-action": "+ Таблица",
+    "add-column-left": "Добавить колонку слева",
+    "add-column-left-action": "+ Колонка ←",
+    "add-column-right": "Добавить колонку справа",
+    "add-column-right-action": "+ Колонка →",
+    "delete-column": "Удалить колонку",
+    "delete-column-action": "− Колонка",
+    "add-row-above": "Добавить строку сверху",
+    "add-row-above-action": "+ Строка ↑",
+    "add-row-below": "Добавить строку снизу",
+    "add-row-below-action": "+ Строка ↓",
+    "delete-row": "Удалить строку",
+    "delete-row-action": "− Строка",
+    "delete-table": "Удалить таблицу",
+    "delete-table-action": "− Таблица",
+    "merge-cells": "Объединить ячейки",
+    "merge-cells-action": "Объединить",
+    "split-cell": "Разъединить ячейку",
+    "split-cell-action": "Разъединить",
+    "header-row": "Заголовок строки",
+    "header-column": "Заголовок колонки",
+    "error-empty": "Введите ссылку",
+    "error-parse": "Не удалось разобрать ссылку",
+    "error-scheme": "Разрешены только http и https",
+    "error-domain": "Домен не входит в список разрешённых"
+  },
+  "validation": {
+    "command-value": "У команды должно быть значение"
   }
 }

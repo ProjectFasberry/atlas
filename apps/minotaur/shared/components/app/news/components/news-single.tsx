@@ -9,6 +9,7 @@ import { renderTiptapContent } from "@/shared/lib/tiptap-content";
 import { editorExtensions as extensions } from "@/shared/components/config/editor/editor.model";
 import { defineNewsMeta, newsSingleState, type NewsSingle as NewsSingleType } from "../models/news-single.model";
 import { createLink } from "@/shared/components/config/link/link.model";
+import { translate } from "@/shared/locales/helpers"
 
 const NewsSingleEdit = reatomComponent(({ ctx }) => {
   const data = ctx.spy(newsSingleState.editParams)
@@ -29,7 +30,7 @@ const NewsSingleHeader = reatomComponent<{ data: NewsSingleType }>(({ ctx, data 
       *:border *:border-neutral-800 *:rounded-xl *:px-3 *:h-9"
     >
       <div className="flex items-center gap-2 text-base font-semibold w-fit">
-        <Typography color="gray">Автор</Typography>
+        <Typography color="gray">{translate["news.author"]()}</Typography>
         <Link href={createLink("player", data.creator.nickname)} className="flex items-center gap-1">
           <Avatar
             url={data.creator.avatar}
@@ -43,7 +44,7 @@ const NewsSingleHeader = reatomComponent<{ data: NewsSingleType }>(({ ctx, data 
         title={dayjs(data.created_at).format("DD.MM.YYYY")}
         className="flex items-center gap-2 text-base font-semibold"
       >
-        <Typography color="gray">Создано</Typography>
+        <Typography color="gray">{translate["news.created"]()}</Typography>
         <Typography>{dayjs(data.created_at).format('D MMM YYYY')}</Typography>
       </div>
       <div className="flex items-center text-base font-semibold gap-2">

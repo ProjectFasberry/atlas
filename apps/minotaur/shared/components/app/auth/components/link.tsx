@@ -3,6 +3,7 @@ import { Button } from "@/shared/ui/button";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { Input } from "@/shared/ui/input";
 import { linkFlow, linkState } from "../models/link.model";
+import { translate } from "@/shared/locales/helpers"
 
 export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) => {
   useUpdate((ctx) => {
@@ -19,7 +20,7 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
   if (checking) {
     return (
       <div className="flex w-full max-w-lg flex-col gap-2 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6">
-        <span className="text-sm text-neutral-400">Проверяем ссылку...</span>
+        <span className="text-sm text-neutral-400">{translate["auth.link.checking"]()}</span>
       </div>
     );
   }
@@ -27,11 +28,11 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
   if (!kind) {
     return (
       <div className="flex w-full max-w-lg flex-col gap-4 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6">
-        <h2 className="text-lg font-semibold">Ссылка недействительна</h2>
+        <h2 className="text-lg font-semibold">{translate["auth.link.invalid-title"]()}</h2>
         <p className="text-sm text-neutral-400">
-          Срок действия ссылки истёк или её уже использовали. Попроси новую.
+          {translate["auth.link.invalid-text"]()}
         </p>
-        <ErrorBlock title={error ?? "Ссылка недействительна"} raw />
+        <ErrorBlock title={error ?? translate["auth.link.invalid-title"]()} raw />
       </div>
     );
   }
@@ -46,17 +47,19 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
     >
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold">
-          {kind === "invite" ? "Завершение регистрации" : "Регистрация по приглашению"}
+          {kind === "invite"
+            ? translate["auth.link.complete-registration"]()
+            : translate["auth.link.invite-registration"]()}
         </h2>
         <p className="text-sm text-neutral-400">
           {kind === "invite"
-            ? "Ник уже закреплён за тобой, осталось задать пароль."
-            : "Придумай ник и пароль, чтобы присоединиться к проекту."}
+            ? translate["auth.link.reserved-nickname"]()
+            : translate["auth.link.new-nickname"]()}
         </p>
       </div>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-neutral-300">Никнейм</span>
+        <span className="text-sm font-medium text-neutral-300">{translate["auth.link.nickname"]()}</span>
         <Input
           value={ctx.spy(linkState.nickname)}
           onChange={(event) => linkState.nickname(ctx, event.target.value)}
@@ -68,7 +71,7 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-neutral-300">Пароль</span>
+        <span className="text-sm font-medium text-neutral-300">{translate["auth.link.password"]()}</span>
         <Input
           type="password"
           value={ctx.spy(linkState.password)}
@@ -79,7 +82,7 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-neutral-300">Повторите пароль</span>
+        <span className="text-sm font-medium text-neutral-300">{translate["auth.link.password-repeat"]()}</span>
         <Input
           type="password"
           value={ctx.spy(linkState.passwordRepeat)}
@@ -99,7 +102,7 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
         isLoading={pending}
         disabled={pending}
       >
-        Создать пароль
+        {translate["auth.link.submit"]()}
       </Button>
     </form>
   );

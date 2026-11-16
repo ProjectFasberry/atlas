@@ -9,9 +9,9 @@ export type TasksFilterSortBy = "relevance"
 
 export const TASKS_FILTERS = [
   {
-    title: "Актуальности", value: "relevance"
+    titleKey: "tasks.sort.relevance", value: "relevance"
   }
-]
+] as const
 
 export const tasksState = atom(null, "tasksState").pipe(
   withAssign((_, name) => ({

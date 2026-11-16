@@ -50,7 +50,7 @@ const CartTrigger = reatomComponent(({ ctx }) => {
 
   return (
     <Link
-      aria-label="Перейти в корзину"
+      aria-label={translate["layout.cart.open"]()}
       href="/store/cart"
       data-trigger={initial}
       className="

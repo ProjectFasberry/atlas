@@ -11,6 +11,7 @@ import { navigate } from "vike/client/router";
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import { clsx } from "cnfast";
 import { createLink } from "@/shared/components/config/link/link.model";
+import { translate } from "@/shared/locales/helpers"
 
 const ITEM_VARIANT = ["menu", "drawer"] as const;;
 type ItemVariant = typeof ITEM_VARIANT[number];
@@ -50,7 +51,7 @@ const MenuCurrentUser = reatomComponent<{ variant: ItemVariant }>(({ ctx, varian
           {currentUser.nickname.slice(0, 32)}
         </Typography>
         <Typography className="text-neutral-400 leading-4 text-sm truncate">
-          игрок
+          {translate["layout.menu.player"]()}
         </Typography>
       </div>
     </Item>

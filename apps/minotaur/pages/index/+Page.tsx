@@ -60,7 +60,7 @@ const MarkRead = reatomComponent(({ ctx }) => {
       onClick={() => home.markNewsRead(ctx, news.map((item) => String(item.id)))}
       className="text-xs text-green-400 hover:text-green-300"
     >
-      {unread.length} новых · отметить прочитанными
+      {translate["index.news-mark-read"]({ count: unread.length })}
     </button>
   )
 }, "MarkRead")

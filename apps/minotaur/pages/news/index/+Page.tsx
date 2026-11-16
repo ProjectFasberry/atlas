@@ -4,6 +4,7 @@ import { news, NewsViewer } from "@/shared/components/app/news/models/news-list.
 import { createPageModel } from "@/shared/lib/events";
 import { Typography } from "@/shared/ui/typography"
 import { useAtom } from "@reatom/npm-react";
+import { translate } from "@/shared/locales/helpers"
 
 const page = createPageModel({
   name: "news-list",
@@ -20,7 +21,7 @@ export default function Page() {
   return (
     <div className="flex flex-col w-full h-full gap-6">
       <Typography className="text-3xl font-semibold">
-        Новости
+        {translate["news.heading"]()}
       </Typography>
       <div className="flex flex-col gap-4 h-full w-full">
         <NewsFilters />

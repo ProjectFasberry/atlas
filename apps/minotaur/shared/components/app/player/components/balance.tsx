@@ -39,7 +39,7 @@ const BalanceServerSelect = reatomComponent(({ ctx }) => {
     >
       <Menu.Trigger asChild>
         <Button className="py-0.5 px-2" background="default">
-          Сервер:&nbsp;
+          {translate["player.balance.server"]()}&nbsp;
           <span className="text-nowrap text-sm capitalize text-neutral-400">
             {current}
           </span>
@@ -52,7 +52,7 @@ const BalanceServerSelect = reatomComponent(({ ctx }) => {
           </Menu.Arrow>
           <div className="flex flex-col gap-2 items-center justify-center w-full">
             <Typography className="text-sm" color="gray">
-              Доступные сервера:
+              {translate["player.balance.servers"]()}
             </Typography>
             <div className="flex flex-col gap-1 w-full">
               {SERVERS.map((server) => (

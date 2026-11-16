@@ -7,6 +7,7 @@ import { Typography } from "@/shared/ui/typography";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { createLink } from "@/shared/components/config/link/link.model";
 import { dayjs } from "@/shared/lib/dayjs";
+import { translate } from "@/shared/locales/helpers"
 
 const ReferralCard = reatomComponent<Referral>(({ ctx, completed, created_at, referral }) => {
   return (
@@ -30,7 +31,9 @@ const ReferralCard = reatomComponent<Referral>(({ ctx, completed, created_at, re
           completed ? "bg-green-500/15 text-green-300" : "bg-neutral-800 text-neutral-400"
         }`}
       >
-        {completed ? "Завершён" : "В процессе"}
+        {completed
+          ? translate["referrals.list.completed"]()
+          : translate["referrals.list.in-progress"]()}
       </span>
     </div>
   )
@@ -56,9 +59,9 @@ export const ReferralsList = reatomComponent(({ ctx }) => {
   if (!data) {
     return (
       <div className="flex w-full flex-col items-center gap-2 rounded-xl bg-neutral-900 p-6 text-center">
-        <Typography className="text-sm font-semibold">Пока никого не пригласили</Typography>
+        <Typography className="text-sm font-semibold">{translate["referrals.list.empty"]()}</Typography>
         <Typography className="max-w-sm text-xs text-neutral-400">
-          Скопируй ссылку выше и отправь другу. Он зарегистрируется по ней и станет твоим рефералом.
+          {translate["referrals.list.empty-hint"]()}
         </Typography>
       </div>
     )

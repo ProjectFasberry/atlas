@@ -12,6 +12,7 @@ import type { PropsWithChildren } from "react";
 import { Noop } from "@/shared/ui/noop";
 import { createLink } from "@/shared/components/config/link/link.model";
 import { PlayerCard } from "@/shared/ui/player-card";
+import { translate } from "@/shared/locales/helpers"
 
 const RateList = reatomComponent(({ ctx }) => {
   if (!ctx.spy(pageState.isClientside) || ctx.spy(player.rate.fetchList.statusesAtom).isPending) {
@@ -19,7 +20,7 @@ const RateList = reatomComponent(({ ctx }) => {
   }
 
   const data = ctx.spy(player.rate.fetchList.dataAtom)?.data;
-  if (!data || isEmptyArray(data)) return <Noop title="пусто" />
+  if (!data || isEmptyArray(data)) return <Noop title={translate["ratings.rates.empty"]()} />
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-auto gap-2 w-full h-full">
@@ -74,7 +75,7 @@ export default function Page() {
   return (
     <div className='flex flex-col gap-8 w-full h-full'>
       <PageHeaderWrapper href={createLink("player", nickname)}>
-        <Typography variant="title">Оценившие {nickname}</Typography>
+        <Typography variant="title">{translate["ratings.rates.voters"]({ nickname })}</Typography>
       </PageHeaderWrapper>
       <RateList />
     </div>

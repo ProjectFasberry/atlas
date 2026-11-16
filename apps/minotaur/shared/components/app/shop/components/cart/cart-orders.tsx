@@ -163,7 +163,7 @@ export const CartOrdersList = reatomComponent(({ ctx }) => {
           disabled={loadingMore}
           onClick={() => cartOrders.loadMore(ctx)}
         >
-          {loadingMore ? "..." : "Показать ещё"}
+          {loadingMore ? "..." : translate["store.orders.loadMore"]()}
         </Button>
       )}
     </div>

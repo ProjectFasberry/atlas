@@ -45,7 +45,7 @@ const ACTION: Record<string, (value: string) => ReactNode> = {
   "link": (value: string) => (
     <a href={value} target="_blank" rel="noreferrer">
       <Button background="white" className="w-full lg:w-fit h-10 font-semibold">
-        Выполнить
+        {translate["tasks.action.complete"]()}
       </Button>
     </a>
   )
@@ -115,7 +115,7 @@ const TasksFilterSearch = reatomComponent(({ ctx }) => {
       />
       <Input
         className="w-full h-10 pl-12"
-        placeholder="Название"
+        placeholder={translate["tasks.filter.title"]()}
         onChange={e => tasks.onChangeEvent(ctx, e)}
         value={ctx.spy(tasksState.filters.searchQuery)}
         maxLength={1024}
@@ -136,7 +136,7 @@ const TasksFilterType = reatomComponent(({ ctx }) => {
             "
             disabled={ctx.spy(tasks.fetch.statusesAtom).isPending}
           >
-            Сортировать по:&nbsp;<span className="text-neutral-400">Актуальности</span>
+            {translate["tasks.sort.label"]()}&nbsp;<span className="text-neutral-400">{translate["tasks.sort.relevance"]()}</span>
           </Button>
         </Menu.Trigger>
         <Menu.Positioner>
@@ -147,7 +147,7 @@ const TasksFilterType = reatomComponent(({ ctx }) => {
                 onClick={() => tasksState.filters.sortBy(ctx, filter.value as TasksFilterSortBy)}
                 className="font-semibold w-full text-sm sm:text-base justify-start hover:bg-neutral-800"
               >
-                {filter.title}
+                {translate[filter.titleKey]()}
               </Button>
             ))}
           </Menu.Content>

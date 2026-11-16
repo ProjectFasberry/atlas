@@ -29,7 +29,7 @@ const PlayerLocation = reatomComponent<{ nickname: string }>(({ ctx, nickname })
     <div className="flex flex-col items-start overflow-x-auto gap-2 w-full">
       <div className="flex items-center min-w-0 truncate gap-2 w-full">
         <Typography>
-          Мир: {data.world}
+          {translate["player.activity.world"]()} {data.world}
         </Typography>
         <Typography>
           x: {data.x} y:{data.y} z:{data.z} pitch: {data.pitch} yaw: {data.yaw}
@@ -53,14 +53,14 @@ const PlayerServer = reatomComponent(({ ctx }) => {
         {server === 'Lobby' ? (
           <div className="flex justify-start cursor-pointer items-center overflow-x-auto gap-2 w-full">
             <Typography className="text-neutral-400 font-semibold text-sm">
-              на сервере <span className="text-neutral-50">{server}</span>
+              {translate["player.activity.server"]()} <span className="text-neutral-50">{server}</span>
             </Typography>
           </div>
         ) : (
           <Dialog.Trigger>
             <div className="flex justify-start cursor-pointer items-center overflow-x-auto gap-2 w-full">
               <Typography className="text-neutral-400 font-semibold text-sm">
-                на сервере <span className="text-neutral-50">{server}</span>
+                {translate["player.activity.server"]()} <span className="text-neutral-50">{server}</span>
               </Typography>
             </div>
           </Dialog.Trigger>
@@ -69,7 +69,7 @@ const PlayerServer = reatomComponent(({ ctx }) => {
           <Dialog.Backdrop className={dialogVariant.backdrop()} />
           <Dialog.Positioner className={dialogVariant.positioner()}>
             <Dialog.Content className={dialogVariant.content("overflow-hidden h-2/3")}>
-              <DialogTitle>Локация игрока</DialogTitle>
+              <DialogTitle>{translate["player.activity.location"]()}</DialogTitle>
               <PlayerLocation nickname={nickname} />
               <Dialog.CloseTrigger />
             </Dialog.Content>

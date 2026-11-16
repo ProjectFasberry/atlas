@@ -6,6 +6,7 @@ import {
 import { getNews, type PublicNewsParams } from "./news.model"
 import { createViewerModel } from "@/shared/models/shared.model"
 import { DEFAULT_SOFT_DELAY } from "@/shared/consts"
+import { translate } from "@/shared/locales/helpers"
 
 type NewsPayload = ExtractApiData<"getNewsList">["data"]
 
@@ -111,6 +112,6 @@ newsStateInView.onChange((ctx, state) => state && news.onIsViewEvent(ctx))
 
 export const newsNotFoundTitleAtom = atom((ctx) => {
   const data = ctx.get(newsState.filters.searchQuery)
-  if (data) return `Ничего не нашлось по запросу "${data}"`
-  return "Пока ничего нет"
+  if (data) return translate["news.search-empty"]({ query: data })
+  return translate["news.empty"]()
 })

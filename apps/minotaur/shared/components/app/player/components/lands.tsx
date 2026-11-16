@@ -45,7 +45,7 @@ const PlayerLandsList = reatomComponent(({ ctx }) => {
   const data = ctx.spy(playerLandsState.data)?.data
 
   if (!data) {
-    return <Typography color="gray" className="text-lg">нет</Typography>
+    return <Typography color="gray" className="text-lg">{translate["player.lands.empty"]()}</Typography>
   }
 
   return data.map(land => <PlayerLand key={land.ulid} {...land} />)

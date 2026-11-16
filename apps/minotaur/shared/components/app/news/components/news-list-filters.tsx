@@ -11,7 +11,7 @@ const NewsFilterSearch = reatomComponent(({ ctx }) => {
       <Icon name='sprite:search' className="size-5 text-neutral-400 absolute z-1 left-4" />
       <Input
         className="w-full h-10 pl-12"
-        placeholder="Название"
+        placeholder={translate["news.filters.title"]()}
         onChange={e => newsState.filters.searchQuery.onChangeEvent(ctx, e)}
         value={ctx.spy(newsState.filters.searchQuery)}
         maxLength={1024}

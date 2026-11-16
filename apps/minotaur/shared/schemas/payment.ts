@@ -1,6 +1,7 @@
 // todo: use openapi-to-zod schema generation
 import * as z from "zod";
 import { editorFieldSchema } from "./news";
+import { translate } from "@/shared/locales/helpers"
 
 export const STORE_TYPES = ["donate", "event"] as const;
 
@@ -16,7 +17,7 @@ export const storeCommandSchema = z
 		if (!parent || !commandValue) {
 			ctx.addIssue({
 				code: "custom",
-				message: "У команды должно быть значение",
+				message: translate["validation.command-value"](),
 			});
 			return;
 		}

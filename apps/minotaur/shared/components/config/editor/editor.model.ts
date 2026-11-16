@@ -1,3 +1,4 @@
+import { translate } from "@/shared/locales/helpers"
 import { TableKit } from '@tiptap/extension-table'
 import { TextStyleKit } from "@tiptap/extension-text-style"
 import Image from '@tiptap/extension-image'
@@ -98,10 +99,10 @@ export type LinkValidation =
   | { ok: false; reason: "empty" | "invalid" | "protocol" | "domain" };
 
 export const LINK_ERROR_MESSAGES: Record<Exclude<LinkValidation, { ok: true }>["reason"], string> = {
-  empty: "Введите ссылку",
-  invalid: "Не удалось разобрать ссылку",
-  protocol: "Разрешены только http и https",
-  domain: "Домен не входит в список разрешённых",
+  empty: translate["editor.error-empty"](),
+  invalid: translate["editor.error-parse"](),
+  protocol: translate["editor.error-scheme"](),
+  domain: translate["editor.error-domain"](),
 };
 
 /** Adds `https://` when the scheme is missing and validates the result. */

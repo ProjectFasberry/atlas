@@ -1,6 +1,7 @@
 import { action, atom, reatomAsync, withAssign, withReset } from "@reatom/framework";
 import { client } from "@/shared/lib/client-wrapper";
 import { logError } from "@/shared/lib/log";
+import { translate } from "@/shared/locales/helpers"
 
 type LinkKind = "invite" | "referral";
 
@@ -28,7 +29,7 @@ export const linkState = atom(null, "linkState").pipe(
   })),
 );
 
-const INVALID_LINK = "Ссылка недействительна или истекла";
+const invalidLink = () => translate["auth.link.error-invalid"]();
 
 export const linkFlow = atom(null, "linkFlow").pipe(
   withAssign((_, name) => ({
@@ -56,7 +57,7 @@ export const linkFlow = atom(null, "linkFlow").pipe(
       name: `${name}.check`,
       onReject: (ctx, error) => {
         logError(error);
-        linkState.error(ctx, INVALID_LINK);
+        linkState.error(ctx, invalidLink());
       },
     }),
     accept: reatomAsync(async (ctx) => {
@@ -65,17 +66,17 @@ export const linkFlow = atom(null, "linkFlow").pipe(
       const password = ctx.get(linkState.password);
       const nickname = ctx.get(linkState.nickname).trim();
 
-      if (!token) throw new Error(INVALID_LINK);
+      if (!token) throw new Error(invalidLink());
       if (password !== ctx.get(linkState.passwordRepeat)) {
-        linkState.error(ctx, "Пароли не совпадают");
+        linkState.error(ctx, translate["auth.link.error-passwords"]());
         return null;
       }
       if (password.length < 4) {
-        linkState.error(ctx, "Пароль должен быть не короче 4 символов");
+        linkState.error(ctx, translate["auth.link.error-password-short"]());
         return null;
       }
       if (kind === "referral" && nickname.length < 3) {
-        linkState.error(ctx, "Ник должен быть не короче 3 символов");
+        linkState.error(ctx, translate["auth.link.error-nickname-short"]());
         return null;
       }
 
@@ -100,7 +101,7 @@ export const linkFlow = atom(null, "linkFlow").pipe(
       },
       onReject: (ctx, error) => {
         logError(error);
-        linkState.error(ctx, INVALID_LINK);
+        linkState.error(ctx, invalidLink());
       },
     }),
   })),

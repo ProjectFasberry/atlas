@@ -4,6 +4,7 @@ import { isEmptyArray } from "@/shared/lib/utils"
 import { toast } from "sonner"
 import { action, atom, withAssign } from "@reatom/framework"
 import { playerState } from "./player.model"
+import { translate } from "@/shared/locales/helpers"
 
 type PlayerSocialsPayload = ExtractApiData<"getServerSocialsListByNickname">["data"];
 export type PlayerSocialsItem = PlayerSocialsPayload[number];
@@ -52,7 +53,7 @@ export const SOCIAL_EVENTS: Record<string, SocialEvent> = {
     type: "fn",
     cb: (value) => {
       navigator.clipboard.writeText(value)
-      toast.info("Скопировано в буфер обмена")
+      toast.info(translate["player.socials.copied"]())
     }
   }
 }

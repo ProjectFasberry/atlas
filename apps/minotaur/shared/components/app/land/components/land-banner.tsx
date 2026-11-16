@@ -4,6 +4,7 @@ import { tv, type VariantProps } from "tailwind-variants";
 import { landBannerAtom } from "../models/land.model";
 import { landEditing, landEditingState } from "../models/edit-land.model";
 import { Icon } from "@/shared/ui/icon"
+import { translate } from "@/shared/locales/helpers"
 
 const bannerInputAtom = atom<HTMLInputElement | null>(null, "landBannerInput")
 
@@ -78,7 +79,7 @@ export const LandBannerWithEditing = reatomComponent(({ ctx }) => {
       {editIsAllow && banner && (
         <button
           type="button"
-          title="Убрать баннер"
+          title={translate["land.remove-banner"]()}
           className="absolute right-1 top-1 z-10 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
           onClick={(event) => {
             event.stopPropagation()
