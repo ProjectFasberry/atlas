@@ -13,11 +13,10 @@ See [SETUP.md](./SETUP.md).
 
 ## Deploy
 
-Images are built by `.github/workflows/build-minotaur.yml`: push to `main` for
-prod, `staging` for staging, `dev` for dev. CI builds on `ubuntu-latest`, pushes
-`registry.fasberry.fun/<stage>/minotaur:latest` and `:sha-<commit>`. Rollout is
-manual: `ssh i-m '/opt/main/fasberry deploy prod minotaur'`; the pull-update
-timer is not installed. Staging bakes the `*.alpha.fasberry.fun` URLs.
+Images are built by `.github/workflows/build-minotaur.yml` on push to `main`.
+CI builds on `ubuntu-latest` and pushes
+`registry.fasberry.fun/prod/minotaur:latest` and `:sha-<commit>`. Rollout is
+manual: `ssh i-m '/opt/main/fasberry deploy prod minotaur'`.
 
 ## Development
 

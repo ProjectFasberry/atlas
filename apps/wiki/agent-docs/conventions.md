@@ -70,19 +70,16 @@ database `general`).
 pnpm --filter wiki type-check
 ```
 
-Deploys are pull-based: push to `dev`/`staging` for the staging image or `main` for prod.
+Deploys are pull-based: push to `main`.
 `.github/workflows/build-wiki.yml` builds `linux/amd64` on `ubuntu-latest` and pushes
-`registry.fasberry.fun/<stage>/wiki:latest` plus `:sha-<commit>`. The host runs a pull timer
-installed from the infra repo every two minutes and recreates `prod-app-wiki` only when the
-digest changed. There is no ssh/buildx path from a workstation.
-
-The staging stack currently has no `wiki` service, so the staging image is built for parity but
-is not rolled out until the infra repo adds it.
+`registry.fasberry.fun/prod/wiki:latest` plus `:sha-<commit>`. Rollout is manual:
+`ssh i-m '/opt/main/fasberry deploy prod wiki'`; there is no ssh/buildx path from a
+workstation.
 
 The workflow needs `REGISTRY_USERNAME` and `REGISTRY_PASSWORD`; `NODE_AUTH_TOKEN` is optional and
-is mounted as a BuildKit secret for private packages. `NEXT_PUBLIC_SITE_URL_{PROD,STAGING}`
+is mounted as a BuildKit secret for private packages. `NEXT_PUBLIC_SITE_URL`
 is a repo variable (default `https://wiki.fasberry.fun`) and is baked into the image at build
-time; database and auth settings are read at runtime.
+time; database and auth settings are read at runtime from the host env file.
 
 The app lives in the pnpm workspace, so the build context is the repository root and
 `next.config.mjs` sets `outputFileTracingRoot` to it. Dependencies come from the root

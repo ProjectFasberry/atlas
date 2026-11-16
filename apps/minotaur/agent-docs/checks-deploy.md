@@ -40,8 +40,8 @@ bun run gen:icons                     # regenerate the SVG sprite
 ## Deploy
 
 - The app is built by `.github/workflows/build-minotaur.yml` into
-  `registry.fasberry.fun/<stage>/minotaur:latest` and `:sha-<commit>`.
-- Branch rule: `main` -> prod, `staging` -> staging, `dev` -> dev.
+  `registry.fasberry.fun/prod/minotaur:latest` and `:sha-<commit>`.
+- Only `main` is built.
 - Rollout is manual: after CI pushes, run
   `ssh i-m '/opt/main/fasberry deploy prod minotaur'`. The
   `fasberry-pull-update.timer` is not installed; do not edit the host or compose

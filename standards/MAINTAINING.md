@@ -47,11 +47,11 @@ consumed by `POST /metrics/build` on glaux, which stores rows in the
 - `minotaur` and `wiki` upload after the production build on `main`
   (`build-*.yml`) when `BUILD_METRICS_TOKEN` is set.
 - `taurus` deploys manually with `wrangler`: `pnpm --filter taurus size` prints
-  a local report, `pnpm --filter taurus size:prod` uploads it through
-  `infisical run --env=prod --path=/glaux`, and `deploy:all` calls `size:prod`.
-- Repo secret `BUILD_METRICS_TOKEN` must match `BUILD_METRICS_TOKEN` in
-  Infisical `/glaux`; glaux also needs `BUILD_METRICS_POSTGRES_URI` pointing at
-  the `build_metrics` database.
+  a local report, `pnpm --filter taurus size:prod` uploads it, and `deploy:all`
+  calls `size:prod`.
+- Repo secret `BUILD_METRICS_TOKEN` must match the same value in the host
+  `glaux` env; glaux also needs `BUILD_METRICS_POSTGRES_URI` pointing at the
+  `build_metrics` database.
 - The table is created by glaux on boot; the database itself is provisioned on
   the host.
 
@@ -60,20 +60,20 @@ consumed by `POST /metrics/build` on glaux, which stores rows in the
 Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:
 
 - `.github/workflows/build-<app>.yml` runs on `ubuntu-latest` for push to `main`
-  (prod) and `dev`/`staging` (staging), plus manual dispatch with a stage input.
-- It pushes `registry.fasberry.fun/<stage>/<app>:latest` and
-  `:sha-<commit>`; the image is `linux/amd64`, never QEMU on the arm64 workstation.
+  and for manual dispatch; the stage is always `prod`.
+- It pushes `registry.fasberry.fun/prod/<app>:latest` and `:sha-<commit>`; the
+  image is `linux/amd64`, never QEMU on the arm64 workstation.
 - The deploy host runs a pull timer installed from the infra repo (cron every two
   minutes). It pulls the configured services and recreates a container only when
   the digest changed.
 - Repo secrets: `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`; `NODE_AUTH_TOKEN` only
   when private `@projectfasberry` packages are installed (passed as the BuildKit
   secret `npm_token`).
-- Per-stage public URLs for the client bundles come from GitHub repo variables:
-  `VITE_API_URL_{PROD,STAGING}`, `VITE_APP_URL_{PROD,STAGING}`,
-  `VITE_PANEL_API_URL_{PROD,STAGING}` for minotaur, and
-  `NEXT_PUBLIC_SITE_URL_{PROD,STAGING}` for wiki. Shared minotaur values (`VITE_LANDING_URL`, `VITE_VOLUME_URL`,
-  `VITE_CAP_URL`, ...) are optional; the workflows carry safe defaults.
+- Public URLs for the client bundles come from GitHub repo variables
+  (`VITE_API_URL`, `VITE_APP_URL`, `VITE_PANEL_API_URL` for minotaur,
+  `NEXT_PUBLIC_SITE_URL` for wiki). Shared minotaur values (`VITE_LANDING_URL`,
+  `VITE_VOLUME_URL`, `VITE_CAP_URL`, ...) are optional; the workflows carry safe
+  defaults.
 - There is no ssh/scp/docker path to the host from this repo. Host-side changes
   (Traefik, Zot, compose files, cron install) belong to the infra repo.
 - Rollback pins `:sha-<commit>` in the host compose file.
@@ -82,10 +82,11 @@ Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:
 
 ## Environment & Secrets
 
-Environment variables are securely injected via **Infisical**.
+Runtime secrets live in the host-only `/opt/main/env/prod/<service>.env` files.
+Public build-time values come from GitHub repository variables.
 - Do not add `.env` files with real secrets to the repository.
-- Prefix commands requiring secrets with `infisical run --env=[environment] --path=/app -- [command]`.
-- For staging or production builds, always verify that the Infisical project variables are correctly set in the dashboard.
+- For a local run, put the keys you need into the app's `.env` (see each app's
+  `env.d.ts`); never commit it.
 
 ## Dependency Management
 
@@ -94,4 +95,4 @@ Environment variables are securely injected via **Infisical**.
   - `vike` / `vike-react`
   - `react` / `react-dom` (Version 19+)
   - `@reatom/*` (State management)
-- After upgrading dependencies, verify SSR still functions via `pnpm build:staging` and `pnpm start:staging`.
+- After upgrading dependencies, verify SSR still functions via `pnpm --filter <app> build:prod` and `start:prod`.
