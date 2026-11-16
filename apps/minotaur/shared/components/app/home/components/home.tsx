@@ -25,7 +25,7 @@ import { home } from "../models/home.model";
 const HERO_IMAGE = getStaticImage("images/village_pillage.webp");
 
 const Card = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
-  <div className={`flex flex-col gap-2 rounded-xl bg-neutral-900/40 p-4 ${className}`}>
+  <div className={`flex flex-col gap-2 rounded-xl bg-neutral-900 p-4 ${className}`}>
     {children}
   </div>
 );
