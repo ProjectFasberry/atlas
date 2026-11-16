@@ -16,6 +16,14 @@ function metadata(
   const description = item.description ?? "";
   const image = item.imageUrl
   const keywords = `${item.title}, fasberry, fasberry page, store, marketplace, item`
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: item.title,
+    description: item.description ?? "",
+    image: item.imageUrl,
+    category: item.type,
+  }
 
   return {
     title,
@@ -29,6 +37,10 @@ function metadata(
         <meta name="twitter:description" content={description} />
         <link rel="preload" as="image" href={image} imageSrcSet="" imageSizes="" />
         <meta name="keywords" content={keywords} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </>
     ),
   }

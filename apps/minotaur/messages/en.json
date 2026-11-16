@@ -525,7 +525,21 @@
     "item": {
       "not-found": "Item not found",
       "description": "Description",
-      "last-buyers": "Recent buyers"
+      "last-buyers": "Recent buyers",
+      "breadcrumb": "Store",
+      "about": "About this item",
+      "buy-now": "Buy now",
+      "checkout": "Checkout",
+      "share": "Share",
+      "link-copied": "Link copied",
+      "link-copy-error": "Could not copy the link",
+      "related": "Related items",
+      "vat-included": "Final price",
+      "features": {
+        "instant": "Delivered automatically",
+        "payment": "Pay by card or wallet",
+        "refund": "Refunds follow the store rules"
+      }
     },
     "list": {
       "empty": "No items available"
