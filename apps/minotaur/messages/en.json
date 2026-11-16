@@ -359,8 +359,13 @@
       "type": "Type"
     },
     "rates": {
-      "empty": "empty",
-      "voters": "Rated by {nickname}"
+      "empty": "No ratings yet",
+      "voters": "Rated by {nickname}",
+      "rated-at": "Rated {date}",
+      "you": "you",
+      "auth": "Sign in to see who rated you",
+      "auth-action": "Sign in",
+      "load-error": "Could not load ratings"
     },
     "meta": {
       "title": "{type} rating — {server}",
