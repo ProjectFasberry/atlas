@@ -9,6 +9,7 @@ on:
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
+      - ".npmrc"
       - ".github/workflows/build-minotaur.yml"
   workflow_dispatch:
     inputs:
