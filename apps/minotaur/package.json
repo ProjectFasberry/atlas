@@ -7,8 +7,6 @@
 	"scripts": {
 		"dev": "cross-env STAGE=dev bun --bun run vike dev",
 		"dev:prod": "cross-env STAGE=prod bun --bun run vike dev",
-		"build:staging": "cross-env STAGE=staging bun --bun run vike build",
-		"start:staging": "cross-env STAGE=staging bun --bun run ./dist/server/index.mjs",
 		"build:prod": "cross-env NODE_ENV=production STAGE=prod bun --bun run vike build",
 		"start:prod": "cross-env NODE_ENV=production STAGE=prod bun --bun run ./dist/server/index.mjs",
 		"----------------": "",

@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env STAGE=dev vike dev --port 3005 --host",
-    "build:staging": "cross-env STAGE=staging vike build && cross-env STAGE=staging bun run seo",
     "build:prod": "cross-env STAGE=prod vike build && cross-env STAGE=prod bun run seo",
     "seo": "bun run scripts/seo.ts",
     "start:prod": "cross-env STAGE=prod node ./dist/server/index.mjs --port 3005",
