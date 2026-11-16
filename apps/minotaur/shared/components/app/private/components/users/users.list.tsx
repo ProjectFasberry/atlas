@@ -10,7 +10,7 @@ import { Avatar } from "../../../../../ui/avatar";
 import { Typography } from "@/shared/ui/typography"
 import { UserActionsWrapper } from "./users.restrict";
 import { checkboxVariant } from "@/shared/ui/checkbox";
-import { Menu } from '@ark-ui/react/menu'
+import { Menu, type UseMenuContext } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu";
 import { Portal } from "@ark-ui/react/portal";
 import { atom, type Ctx, spawn } from "@reatom/framework";
@@ -75,39 +75,86 @@ const UserMenuRoles = reatomComponent<{ nickname: string; currentRoleId: number 
   );
 }, "UserMenuRoles");
 
+const anchorRect = (point: { x: number; y: number }) => ({
+  x: point.x,
+  y: point.y,
+  width: 0,
+  height: 0,
+});
+
+/**
+ * The menu body lives under `Menu.Context` because Zag ignores an `anchorPoint`
+ * prop: the anchor is only known through `reposition`/`getAnchorRect`.
+ */
+const UsersItemMenuBody = reatomComponent<{
+  menu: UseMenuContext;
+  open: boolean;
+  point: { x: number; y: number };
+  nickname: string | null;
+  roleId?: number;
+}>(({ ctx, menu, open, point, nickname, roleId }) => {
+  useUpdate(
+    (_ctx, isOpen, currentPoint) => {
+      if (!isOpen) return;
+
+      menu.reposition({
+        placement: "bottom-start",
+        getAnchorRect: () => anchorRect(currentPoint),
+      });
+    },
+    [open, point],
+  );
+
+  return (
+    <Portal>
+      <Menu.Positioner>
+        <Menu.Content className={menuVariant.content("min-w-52")}>
+          <div className="flex flex-col gap-0.5 p-1">
+            {nickname ? (
+              <Typography className="truncate px-2 py-1 text-xs text-neutral-400">
+                {nickname}
+              </Typography>
+            ) : null}
+            {nickname && roleId ? <UserMenuRoles nickname={nickname} currentRoleId={roleId} /> : null}
+            {nickname ? <div className="my-1 h-px bg-neutral-800" /> : null}
+            {nickname ? <UserActionsWrapper nickname={nickname} type="single" /> : null}
+          </div>
+        </Menu.Content>
+      </Menu.Positioner>
+    </Portal>
+  );
+}, "UsersItemMenuBody");
+
 export const UsersItemMenu = reatomComponent(({ ctx }) => {
   const nickname = ctx.spy(usersRestrictState.selectedUser);
   const point = ctx.spy(menuPointAtom);
   const roleId = ctx.spy(usersDataArrAtom)?.find((user) => user.nickname === nickname)?.role?.id;
+  const open = !!nickname;
 
   return (
     <Menu.Root
-      open={!!nickname}
-      anchorPoint={point}
-      // `anchorPoint` is viewport-based; the default absolute strategy would
-      // offset the menu by the page scroll.
-      positioning={{ strategy: "fixed" }}
+      open={open}
+      positioning={{
+        strategy: "fixed",
+        placement: "bottom-start",
+        getAnchorRect: () => anchorRect(point),
+      }}
       aria-label="Действия с пользователем"
-      onOpenChange={({ open }) => {
-        if (!open) usersRestrictState.selectedUser.reset(ctx);
+      onOpenChange={({ open: next }) => {
+        if (!next) usersRestrictState.selectedUser.reset(ctx);
       }}
     >
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content className={menuVariant.content("min-w-52")}>
-            <div className="flex flex-col gap-0.5 p-1">
-              {nickname ? (
-                <Typography className="truncate px-2 py-1 text-xs text-neutral-400">
-                  {nickname}
-                </Typography>
-              ) : null}
-              {nickname && roleId ? <UserMenuRoles nickname={nickname} currentRoleId={roleId} /> : null}
-              {nickname ? <div className="my-1 h-px bg-neutral-800" /> : null}
-              {nickname ? <UserActionsWrapper nickname={nickname} type="single" /> : null}
-            </div>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
+      <Menu.Context>
+        {(menu) => (
+          <UsersItemMenuBody
+            menu={menu}
+            open={open}
+            point={point}
+            nickname={nickname}
+            roleId={roleId}
+          />
+        )}
+      </Menu.Context>
     </Menu.Root>
   );
 }, "UsersItemMenu");
