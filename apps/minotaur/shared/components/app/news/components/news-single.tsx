@@ -5,8 +5,7 @@ import { usePageContext } from "vike-react/usePageContext";
 import { Avatar } from "@/shared/ui/avatar";
 import { dayjs } from "@/shared/lib/dayjs";
 import { Icon } from "@/shared/ui/icon";
-import { renderToHTMLString } from "@tiptap/static-renderer";
-import type { JSONContent } from "@tiptap/react";
+import { renderTiptapContent } from "@/shared/lib/tiptap-content";
 import { editorExtensions as extensions } from "@/shared/components/config/editor/editor.model";
 import { defineNewsMeta, newsSingleState, type NewsSingle as NewsSingleType } from "../models/news-single.model";
 import { createLink } from "@/shared/components/config/link/link.model";
@@ -56,8 +55,8 @@ const NewsSingleHeader = reatomComponent<{ data: NewsSingleType }>(({ ctx, data 
   )
 }, "NewsHeader")
 
-const NewsSingleContent = ({ content }: { content: JSONContent }) => {
-  const html = renderToHTMLString({ extensions, content })
+const NewsSingleContent = ({ content }: { content: unknown }) => {
+  const html = renderTiptapContent(content, extensions)
 
   return (
     <div
@@ -86,7 +85,7 @@ export const NewsSingle = reatomComponent(({ ctx }) => {
         {data.title}
       </Typography>
       <NewsSingleHeader data={data} />
-      <NewsSingleContent content={data.content as JSONContent} />
+      <NewsSingleContent content={data.content} />
     </div>
   )
 }, "NewsSingle")

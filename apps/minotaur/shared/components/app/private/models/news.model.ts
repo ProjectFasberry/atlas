@@ -8,6 +8,7 @@ import { generateHTML, type JSONContent } from "@tiptap/react"
 import { actions, actionsState, collectChanges, compareChanges, notifyAboutRestrictRole } from "./actions.model";
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 import { editorExtensions } from "@/shared/components/config/editor/editor.model";
+import { normalizeTiptapContent } from "@/shared/lib/tiptap-content";
 import { env } from "@/shared/env";
 
 export type NewsPayload = ExtractApiData<"getNewsList">["data"]
@@ -74,7 +75,7 @@ export const createNews = atom(null, "createNews").pipe(
       createNewsSchema.safeParse({
         title: ctx.spy(createNewsState.title),
         description: ctx.spy(createNewsState.desc),
-        imageUrl: ctx.spy(createNewsState.imageUrl),
+        imageUrl: ctx.spy(createNewsState.imageUrl.data),
         content: ctx.spy(createNewsState.content),
       }).success
     ),
@@ -258,9 +259,10 @@ export const editNews = atom(null, "editNews").pipe(
       editNewsSourceId(ctx, item.id)
       editNewsState.title(ctx, item.title)
       editNewsState.description(ctx, item.description)
-      editNewsState.content(ctx, item.content as JSONContent)
+      const content = normalizeTiptapContent(item.content)
+      editNewsState.content(ctx, content)
       editNewsState.imageUrl(ctx, item.imageUrl ?? "")
-      editNewsState.tempContent(ctx, generateHTML(item.content as JSONContent, editorExtensions))
+      editNewsState.tempContent(ctx, generateHTML(content, editorExtensions))
     }),
     /** Clears the form and the fill marker, so the next open starts from the item. */
     reset: action((ctx) => {

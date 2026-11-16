@@ -16,6 +16,7 @@ import { EditorContent, useEditor, type JSONContent } from "@tiptap/react"
 import { getFromDictionary } from "@/shared/models/app/utils"
 import { type StoreItem as StoreItemProps } from "../../shop/models/store-item.model"
 import { editorExtensions } from "@/shared/components/config/editor/editor.model"
+import { normalizeTiptapContent } from "@/shared/lib/tiptap-content"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { Input } from "@/shared/ui/input";
 import { Portal } from '@ark-ui/react/portal'
@@ -441,7 +442,7 @@ const EditItem = reatomComponent(({ ctx }) => {
     if (!data) return;
 
     editStoreItem.load(ctx, data);
-    editor.commands.setContent((data.content ?? {}) as JSONContent)
+    editor.commands.setContent(normalizeTiptapContent(data.content))
   }, [data?.id, editor])
 
   if (ctx.spy(storeItems.fetch.statusesAtom).isPending) {

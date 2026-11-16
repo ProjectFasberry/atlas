@@ -1,87 +1,110 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import {
-  isCheckedAtom, userIsSelectedAtom, type PrivatedUser, users, usersListInView, usersRestrict,
-  usersRestrictState, usersState, usersDataArrAtom
+  isCheckedAtom, type PrivatedUser, users, usersListInView, usersRestrict,
+  usersRestrictState, usersState, usersDataArrAtom, usersRoles
 } from "../../models/users.model";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { tv } from "tailwind-variants";
 import { currentUser } from "@/shared/models/current-user/index.model";
 import { Link } from "@/shared/components/config/link/link";
 import { Avatar } from "../../../../../ui/avatar";
 import { Typography } from "@/shared/ui/typography"
-import { UserActionsChangeRoleLocal } from "./users.change-role";
 import { UserActionsWrapper } from "./users.restrict";
 import { checkboxVariant } from "@/shared/ui/checkbox";
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu";
 import { Portal } from "@ark-ui/react/portal";
-import { atom, spawn } from "@reatom/framework";
+import { atom, type Ctx, spawn } from "@reatom/framework";
 import { isEmptyArray } from "@/shared/lib/utils";
 import { Noop } from "@/shared/ui/noop";
 import { Checkbox } from "@ark-ui/react/checkbox";
 import { Button } from "@/shared/ui/button";
+import { Icon } from "@/shared/ui/icon";
+import { getFromDictionary } from "@/shared/models/app/utils";
 
-const userItemVariant = tv({
-  base: `flex flex-col rounded-lg w-full px-4 border`,
-  variants: {
-    variant: {
-      default: "border-neutral-800",
-      selected: "border-green-500/60",
-    },
-    state: {
-      default: "",
-      active: "bg-neutral-700"
-    }
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-})
+/**
+ * The list keeps a single Ark menu for every row: a menu per card would mount a
+ * root, positioner and content for each user, and the list is long. The open
+ * menu is anchored to a point in the viewport, so it follows the click even
+ * after the list is scrolled.
+ */
+const menuPointAtom = atom({ x: 0, y: 0 }, "users.menuPoint");
 
-const coordsAtom = atom({ x: 0, y: 0 }, "coords");
+const openUserMenu = (ctx: Ctx, nickname: string, point: { x: number; y: number }) => {
+  usersRestrictState.targetRoleId.reset(ctx);
+  usersRestrictState.selectedUser(ctx, nickname);
+  menuPointAtom(ctx, point);
+};
 
-usersRestrictState.selectedUser.onChange((ctx, state) => {
-  const isOpen = !!state;
+const bottomLeft = (element: HTMLElement) => {
+  const rect = element.getBoundingClientRect();
+  return { x: rect.left, y: rect.bottom };
+};
 
-  if (isOpen) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "auto";
-  }
-})
+const UserMenuRoles = reatomComponent<{ nickname: string; currentRoleId: number }>(({ ctx, nickname, currentRoleId }) => {
+  const roles = ctx.spy(usersRoles.fetch.dataAtom);
+  const pending = ctx.spy(usersRoles.submit.statusesAtom).isPending;
+
+  if (!roles) return null;
+
+  return (
+    <>
+      <Typography className="px-2 pt-1 text-[10px] uppercase tracking-wide text-neutral-500">
+        Роль
+      </Typography>
+      {roles.map((role) => (
+        <Menu.Item
+          key={role.id}
+          value={`role-${role.id}`}
+          disabled={pending || role.id === currentRoleId}
+          className={menuVariant.item()}
+          onClick={() => {
+            usersRestrictState.targetRoleId(ctx, role.id);
+            usersRoles.before(ctx, [nickname], { type: "change_role" });
+          }}
+        >
+          <span className="flex w-full items-center justify-between gap-2">
+            {getFromDictionary(ctx, role.name)}
+            {role.id === currentRoleId ? <Icon name="sprite:check" className="size-3.5 text-green-400" /> : null}
+          </span>
+        </Menu.Item>
+      ))}
+    </>
+  );
+}, "UserMenuRoles");
 
 export const UsersItemMenu = reatomComponent(({ ctx }) => {
   const nickname = ctx.spy(usersRestrictState.selectedUser);
-  const coords = ctx.spy(coordsAtom);
+  const point = ctx.spy(menuPointAtom);
+  const roleId = ctx.spy(usersDataArrAtom)?.find((user) => user.nickname === nickname)?.role?.id;
 
   return (
     <Menu.Root
       open={!!nickname}
-      onOpenChange={({ open }) => !open && usersRestrictState.selectedUser.reset(ctx)}
+      anchorPoint={point}
+      aria-label="Действия с пользователем"
+      onOpenChange={({ open }) => {
+        if (!open) usersRestrictState.selectedUser.reset(ctx);
+      }}
     >
       <Portal>
-        {nickname && (
-          <Menu.Positioner
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              transform: `translate3d(${coords.x}px, ${coords.y}px, 0)`,
-              zIndex: 9999,
-            }}
-          >
-            <Menu.Content className={menuVariant.content("min-w-40")}>
-              <Menu.Arrow className={menuVariant.arrow()}>
-                <Menu.ArrowTip className={menuVariant.arrowTip()} />
-              </Menu.Arrow>
-              <UserActionsWrapper nickname={nickname} type="single" />
-            </Menu.Content>
-          </Menu.Positioner>
-        )}
+        <Menu.Positioner>
+          <Menu.Content className={menuVariant.content("min-w-52")}>
+            <div className="flex flex-col gap-0.5 p-1">
+              {nickname ? (
+                <Typography className="truncate px-2 py-1 text-xs text-neutral-400">
+                  {nickname}
+                </Typography>
+              ) : null}
+              {nickname && roleId ? <UserMenuRoles nickname={nickname} currentRoleId={roleId} /> : null}
+              {nickname ? <div className="my-1 h-px bg-neutral-800" /> : null}
+              {nickname ? <UserActionsWrapper nickname={nickname} type="single" /> : null}
+            </div>
+          </Menu.Content>
+        </Menu.Positioner>
       </Portal>
     </Menu.Root>
-  )
-}, "UsersItemMenu")
+  );
+}, "UsersItemMenu");
 
 const UsersItemCheckbox = reatomComponent<{ nickname: string }>(({ ctx, nickname }) => {
   return (
@@ -96,33 +119,49 @@ const UsersItemCheckbox = reatomComponent<{ nickname: string }>(({ ctx, nickname
   )
 }, 'UsersItemCheckbox')
 
-const UsersItem = reatomComponent<PrivatedUser>(({ ctx, player, role, avatar, nickname, uuid }) => {
-  const isExpanded = ctx.spy(userIsSelectedAtom(nickname));
+const UsersItem = reatomComponent<PrivatedUser>(({ ctx, avatar, nickname, role }) => {
+  const isSelected = ctx.spy(isCheckedAtom(nickname));
   const isIdentity = currentUser.getNickname(ctx) === nickname;
 
-  const variant = isIdentity ? "selected" : "default"
-  const state = isExpanded ? "active" : "default"
-
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    usersRestrictState.selectedUser(ctx, nickname);
-    coordsAtom(ctx, { x: e.clientX, y: e.clientY });
-  };
-
   return (
-    <div className={userItemVariant({ variant, state })} onContextMenu={handleContextMenu}>
-      <div className="flex items-center gap-3 h-12 min-w-0 justify-start">
-        <UsersItemCheckbox nickname={nickname} />
-        <Link href={`/private/users/${nickname}`} className="flex items-center min-w-0 gap-2">
-          <Avatar url={avatar} nickname={nickname} className="h-6 w-6" />
-          <Typography className="font-semibold text-sm truncate">
-            {nickname}
-          </Typography>
-        </Link>
-        {role && (
-          <UserActionsChangeRoleLocal nickname={nickname} role_id={role.id} role_name={role.name} />
-        )}
-      </div>
+    <div
+      onContextMenu={(event) => {
+        event.preventDefault();
+        openUserMenu(ctx, nickname, { x: event.clientX, y: event.clientY });
+      }}
+      className={`group flex h-9 w-full items-center gap-2 rounded-lg border px-2 transition-colors ${
+        isSelected
+          ? "border-green-500/50 bg-neutral-800/60"
+          : "border-transparent hover:bg-neutral-800/40"
+      }`}
+    >
+      <UsersItemCheckbox nickname={nickname} />
+      <Link href={`/private/users/${nickname}`} className="flex min-w-0 items-center gap-2">
+        <Avatar url={avatar} nickname={nickname} className="size-6" />
+        <Typography className="truncate text-sm font-semibold">
+          {nickname}
+        </Typography>
+        {isIdentity ? (
+          <span className="rounded bg-green-500/15 px-1 text-[10px] text-green-300">вы</span>
+        ) : null}
+      </Link>
+      {role ? (
+        <button
+          type="button"
+          onClick={(event) => openUserMenu(ctx, nickname, bottomLeft(event.currentTarget))}
+          className="ms-auto max-w-36 truncate rounded-md border border-neutral-700 px-1.5 py-0.5 text-[11px] text-neutral-300 hover:border-neutral-500 hover:text-neutral-100"
+        >
+          {getFromDictionary(ctx, role.name)}
+        </button>
+      ) : null}
+      <button
+        type="button"
+        aria-label="Действия с пользователем"
+        onClick={(event) => openUserMenu(ctx, nickname, bottomLeft(event.currentTarget))}
+        className={`${role ? "" : "ms-auto"} flex size-6 shrink-0 items-center justify-center rounded text-neutral-500 opacity-0 hover:bg-neutral-700 hover:text-neutral-100 focus-visible:opacity-100 group-hover:opacity-100`}
+      >
+        <Icon name="sprite:dots-vertical" className="size-4" />
+      </button>
     </div>
   )
 }, "UsersItem")
@@ -130,7 +169,7 @@ const UsersItem = reatomComponent<PrivatedUser>(({ ctx, player, role, avatar, ni
 const UsersSkeleton = ({ length = 32 }: { length?: number }) => {
   return (
     <div className="flex flex-col gap-1 w-full h-full">
-      {Array.from({ length }).map((_, idx) => <Skeleton key={idx} className="h-12 w-full" />)}
+      {Array.from({ length }).map((_, idx) => <Skeleton key={idx} className="h-9 w-full" />)}
     </div>
   )
 }

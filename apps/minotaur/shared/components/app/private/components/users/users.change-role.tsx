@@ -26,22 +26,6 @@ const UserActionsChangeRoleGlobalSubmit = reatomComponent(({ ctx }) => {
   )
 }, "UserActionsChangeRoleGlobalSubmit")
 
-const UserActionsChangeRoleSubmit = reatomComponent<{ nickname: string }>(({ ctx, nickname }) => {
-  const isDisabled = !ctx.spy(usersRestrictState.targetRoleId)
-    || ctx.spy(usersRoles.submit.statusesAtom).isPending
-
-  return (
-    <Button
-      background="white"
-      className="font-semibold"
-      disabled={isDisabled}
-      onClick={() => usersRoles.before(ctx, [nickname], { type: "change_role" })}
-    >
-      Применить
-    </Button>
-  )
-}, "UserActionsChangeRoleSubmit")
-
 const Role = reatomComponent<RoleProps>(({ ctx, name, id, selectedId, onClick }) => {
   const title = getFromDictionary(ctx, name)
   const isSelected = selectedId === id;
@@ -106,46 +90,3 @@ export const UserActionsChangeRoleGlobal = reatomComponent(({ ctx }) => {
     </Menu.Root >
   )
 }, "UserActionsChangeRoleGlobal")
-
-export const UserActionsChangeRoleLocal = reatomComponent<{
-  nickname: string, role_id: number, role_name: string
-}>(({
-  ctx, nickname, role_id, role_name
-}) => {
-  const openedId = ctx.spy(usersRestrictState.selectedId)
-  const isThisOpen = openedId === nickname
-
-  const roleTitle = getFromDictionary(ctx, role_name)
-
-  return (
-    <Menu.Root>
-      <Menu.Trigger asChild>
-        <Button background="white" className="flex py-1 gap-1 items-center justify-center max-w-36 px-2 h-5">
-          <Icon name="sprite:pencil" className="size-[12px]" />
-          <Typography className='select-none text-sm leading-4'>
-            {roleTitle}
-          </Typography>
-        </Button>
-      </Menu.Trigger>
-      <Menu.Positioner>
-        <Menu.Content className={menuVariant.content()}>
-          <Menu.Arrow className={menuVariant.arrow()}>
-            <Menu.ArrowTip className={menuVariant.arrowTip()} />
-          </Menu.Arrow>
-          <div className="flex flex-col gap-2 p-2 w-full h-full min-w-40">
-            <Typography className="text-sm text-neutral-400">
-              Доступные роли
-            </Typography>
-            <div className="flex flex-col gap-1 w-full h-full">
-              <Roles
-                selectedId={ctx.spy(usersRestrictState.targetRoleId) ?? role_id}
-                onClick={(roleId) => usersRestrictState.targetRoleId(ctx, roleId)}
-              />
-            </div>
-            <UserActionsChangeRoleSubmit nickname={nickname} />
-          </div>
-        </Menu.Content>
-      </Menu.Positioner>
-    </Menu.Root>
-  )
-}, "UserActionsChangeRoleLocal")
