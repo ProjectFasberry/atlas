@@ -5,7 +5,7 @@ import { Portal } from "@ark-ui/react/portal"
 import { reatomComponent } from "@reatom/npm-react"
 import { Icon } from "@/shared/ui/icon"
 import { scan, scanReaderModel, scanState } from "../models/settings-devices.model"
-import { dialogVariant } from "@/shared/ui/dialog"
+import { dialogVariant, DialogClose } from "@/shared/ui/dialog"
 import { Scanner } from "@yudiel/react-qr-scanner"
 import { authLoginQRIsErrorAtom, qrLogin, qrState } from "../../auth/models/qr.model"
 import type { ReactNode } from "react"
@@ -137,7 +137,15 @@ const ScanReader = reatomComponent(({ ctx }) => {
     <div className="fixed top-0 bottom-0 right-0 left-0 z-1000 w-full h-dvh bg-neutral-900">
       <div className="absolute right-0 left-0 z-100 w-full flex items-center px-4 justify-between top-4">
         <div className="flex items-center justify-start">
-          <Icon name="sprite:arrow-left" className="size-[26px]" onClick={() => scan.stop(ctx)} />
+          <button
+            type="button"
+            aria-label={translate["shared.back"]()}
+            className="flex size-10 items-center justify-center rounded-lg
+              duration-150 hover:bg-neutral-800"
+            onClick={() => scan.stop(ctx)}
+          >
+            <Icon name="sprite:arrow-left" className="size-6.5" />
+          </button>
         </div>
         <div className="flex items-center justify-center">
           <Typography>
@@ -182,7 +190,7 @@ const ConnectNewConfirmDialog = reatomComponent(({ ctx }) => {
             <div className="flex items-center justify-center w-full h-full">
               <ConnectNewVerifyLogin />
             </div>
-            <Dialog.CloseTrigger />
+            <DialogClose />
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>

@@ -22,8 +22,9 @@ export const sessionsState = atom(null, "sessionsState").pipe(
 
 export const sessions = atom(null, "sessions").pipe(
   withAssign((_, name) => ({
+    /** Sessions go stale while the settings stay cached, so always refetch. */
     init: action((ctx) => {
-      sessions.fetchCurrent(ctx)
+      sessions.refetchAll(ctx)
     }, `${name}.init`),
     fetchCurrent: reatomAsync(async (ctx) => {
       return await ctx.schedule(() =>
@@ -93,6 +94,19 @@ export const sessions = atom(null, "sessions").pipe(
           return;
         }
 
+        if (e.message === 'INSUFFICIENT_PERMISSION_BY_EXISTANCE') {
+          toast.error(translate["settings.devices.sections.sessions.expired"]())
+          sessions.refetchAll(ctx)
+
+          return;
+        }
+
+        if (e.message === 'CANNOT_DELETE_CURRENT') {
+          toast.error(translate["settings.devices.sections.sessions.cannot-delete-current"]())
+
+          return;
+        }
+
         toast.error(translate["settings.errors.title"]())
       }
     }).pipe(
@@ -136,6 +150,13 @@ export const sessions = atom(null, "sessions").pipe(
             confirmLabel: translate["settings.sessions.ok"](),
             withCancel: false
           })
+
+          return;
+        }
+
+        if (e.message === 'INSUFFICIENT_PERMISSION_BY_EXISTANCE') {
+          toast.error(translate["settings.devices.sections.sessions.expired"]())
+          sessions.refetchAll(ctx)
 
           return;
         }

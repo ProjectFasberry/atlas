@@ -499,6 +499,16 @@
     "page": {
       "description": "Профиль игрока {nickname}. Привилегия: {group}. Играет с {reg}. Последний вход: {login}.",
       "keywords": "{nickname}, fasberry, fasberry page, профиль {nickname}"
+    },
+    "groups": {
+      "default": "Игрок",
+      "arkhont": "Архонт",
+      "authentic": "Аутентик",
+      "loyal": "Лоял",
+      "helper": "Хелпер",
+      "dev": "Разработчик",
+      "moder": "Модератор",
+      "testers": "Тестер"
     }
   },
   "lands": {
@@ -894,7 +904,15 @@
           "active-sessions": "Активные сессии",
           "end-all-sessions": "Выйти из остальных сессий",
           "end-this-session": "Выйти из сессии",
-          "empty": "Других активных сессий нет"
+          "empty": "Других активных сессий нет",
+          "created": "Вход: {date}",
+          "this-device": "Это устройство",
+          "unknown-device": "Неизвестное устройство",
+          "load-error": "Не удалось загрузить сессии",
+          "end-session-confirm": "Завершить эту сессию?",
+          "end-session-description": "Устройство будет разлогинено. Продолжить?",
+          "expired": "Сессия устарела, обновите список",
+          "cannot-delete-current": "Нельзя завершить текущую сессию"
         },
         "add-device": {
           "title": "Привяжи устройство к аккаунту, отсканировав QR-код",

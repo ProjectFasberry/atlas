@@ -499,6 +499,16 @@
     "page": {
       "description": "Player {nickname} profile. Role: {group}. Playing since {reg}. Last login: {login}.",
       "keywords": "{nickname}, fasberry, fasberry page, player profile"
+    },
+    "groups": {
+      "default": "Player",
+      "arkhont": "Arkhont",
+      "authentic": "Authentic",
+      "loyal": "Loyal",
+      "helper": "Helper",
+      "dev": "Developer",
+      "moder": "Moderator",
+      "testers": "Tester"
     }
   },
   "lands": {
@@ -894,7 +904,15 @@
           "active-sessions": "Active sessions",
           "end-all-sessions": "Log out of all other sessions",
           "end-this-session": "Log out of session",
-          "empty": "No other active sessions"
+          "empty": "No other active sessions",
+          "created": "Signed in: {date}",
+          "this-device": "This device",
+          "unknown-device": "Unknown device",
+          "load-error": "Could not load sessions",
+          "end-session-confirm": "End this session?",
+          "end-session-description": "The device will be signed out. Continue?",
+          "expired": "The session is stale, refresh the list",
+          "cannot-delete-current": "You cannot end the current session"
         },
         "add-device": {
           "title": "Link a device to your account by scanning a QR code",

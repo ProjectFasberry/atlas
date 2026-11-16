@@ -1,25 +1,28 @@
 import { reatomComponent } from "@reatom/npm-react";
 import { Rate } from "./rate";
 import { playerState, wrapAsClientSideAtom } from "../models/player.model";
-import { DONATE_COLORS } from "@/shared/consts";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { getFromDictionary } from "@/shared/models/app/utils";
+import { translate } from "@/shared/locales/helpers";
+import {
+  getPlayerGroupMeta,
+  UNKNOWN_PLAYER_GROUP_COLOR,
+} from "@/shared/components/app/player/groups";
 
 type Player = ExtractApiData<"getServerPlayerByNickname">["data"]
 
-const PlayerTag = reatomComponent<{ group: Player["group"] }>(({ ctx, group }) => {
-  const title = getFromDictionary(ctx, group);
+const PlayerTag = reatomComponent<{ group: Player["group"] }>(({ group }) => {
+  const meta = getPlayerGroupMeta(group)
+  const title = meta ? translate[meta.label]() : group
+  const color = meta?.color ?? UNKNOWN_PLAYER_GROUP_COLOR
 
   return (
     <div
-      style={{ borderColor: DONATE_COLORS[group as keyof typeof DONATE_COLORS] }}
-      className="flex px-3 items-center justify-center gap-2 py-0.5 rounded-full border"
+      title={group}
+      style={{ borderColor: color }}
+      className="flex items-center justify-center gap-2 rounded-full border px-3 py-0.5"
     >
-      <span
-        style={{ backgroundColor: DONATE_COLORS[group as keyof typeof DONATE_COLORS] }}
-        className="h-3 w-3 rounded-full"
-      />
-      <span className="capitalize">{title}</span>
+      <span style={{ backgroundColor: color }} className="size-3 rounded-full" />
+      <span>{title}</span>
     </div>
   )
 }, "PlayerTag")

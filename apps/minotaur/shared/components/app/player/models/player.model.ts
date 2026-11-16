@@ -14,6 +14,7 @@ import type { PageContextServer } from "vike/types"
 import { redirect } from "vike/abort"
 import { pageState } from "@/shared/models/page-context.model"
 import { getNotExistUrlByEntity } from "@/shared/lib/helpers"
+import { buildPlayerTags, sortPlayerGroups } from "../groups"
 
 export const PLAYER_RATE_DATA_KEY = "playerRateState.data";
 export const PLAYER_TAGS_DATA_KEY = "playerState.tags"
@@ -51,14 +52,7 @@ export type RateUser = {
 };
 
 function definePlayerTags(group: Player["group"]) {
-  const tags: Player["group"][] = [];
-
-  if (group !== 'default') {
-    tags.push(...[group, "default"])
-  } else {
-    tags.push(group)
-  }
-  return tags
+  return sortPlayerGroups(buildPlayerTags(group))
 }
 
 export const player = atom(null, "player").pipe(

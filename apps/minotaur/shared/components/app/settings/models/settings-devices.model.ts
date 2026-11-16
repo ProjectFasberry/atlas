@@ -6,6 +6,21 @@ import { isError } from "@/shared/lib/utils"
 import { toast } from "sonner"
 import { translate } from "@/shared/locales/helpers"
 
+const QR_PROTOCOLS = new Set(["http:", "https:"])
+
+/** Only login links carrying a token may open the confirmation dialog. */
+export function getQrToken(value: string): string | null {
+  try {
+    const url = new URL(value)
+
+    if (!QR_PROTOCOLS.has(url.protocol)) return null
+
+    return url.searchParams.get("token")
+  } catch {
+    return null
+  }
+}
+
 export const scanState = atom(null, "scanState").pipe(
 	withAssign((_, name) => ({
 		isStarted: atom(false, `${name}.isStarted`),
@@ -35,14 +50,12 @@ export const scan = atom(null, "scan").pipe(
 			scanState.cleanup.reset(ctx)
 		}, `${name}.stop`),
 		verify: action((ctx, value: string) => {
-			scan.stop(ctx);
+			const token = getQrToken(value)
+			if (!token) return
+
+			scan.stop(ctx)
 
 			scanState.confirmDialogIsOpen(ctx, true)
-
-			const url = new URL(value)
-
-			const token = url.searchParams.get("token");
-			if (!token) throw new Error('Token is not defined')
 
 			qrLogin.verify.validateToken(ctx, token)
 		}, `${name}.verify`),
@@ -106,7 +119,7 @@ export const scanReaderModel = {
         description: error.message
       })
 
-      scanState.isStarted(ctx, false)
+      scan.stop(ctx)
     }
   })
 }
