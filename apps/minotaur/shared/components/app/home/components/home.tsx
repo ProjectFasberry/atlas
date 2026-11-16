@@ -21,13 +21,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { Typography } from "@/shared/ui/typography";
 import { home } from "../models/home.model";
 
-const SERVER_IP = `play.${env.VITE_MAIN_DOMAIN}`;
 const HERO_IMAGE = getStaticImage("images/village_pillage.webp");
-
-const copyServerIp = async () => {
-  await navigator.clipboard.writeText(SERVER_IP);
-  toast.success("IP скопирован");
-};
 
 const Card = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
   <div className={`flex flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 ${className}`}>
@@ -84,11 +78,6 @@ export const HomeHero = reatomComponent(({ ctx }) => {
           <div className="flex items-center gap-2 text-sm text-neutral-300">
             <span className={`size-2 rounded-full ${status ? "bg-green-400" : "bg-neutral-500"}`} />
             <span>{status?.proxy.online ?? 0} онлайн</span>
-            <span className="text-neutral-600">·</span>
-            <button type="button" onClick={copyServerIp} className="flex items-center gap-1 hover:text-neutral-100">
-              <span className="font-mono">{SERVER_IP}</span>
-              <Icon name="sprite:copy" className="size-3.5" />
-            </button>
           </div>
 
           {user ? (
@@ -106,9 +95,11 @@ export const HomeHero = reatomComponent(({ ctx }) => {
               <span className="rounded-lg bg-black/40 px-2 py-1 text-sm">
                 {formatNumber(balanceData.charism)} CHARISM
               </span>
-              <Button background="white" className="h-8 text-sm font-semibold" onClick={copyServerIp}>
-                В игру
-              </Button>
+              <a href={`${env.VITE_LANDING_URL}/start`} target="_blank" rel="noreferrer">
+                <Button background="white" className="h-8 text-sm font-semibold">
+                  Как играть
+                </Button>
+              </a>
             </div>
           ) : (
             <div className="flex flex-wrap items-center gap-2">
@@ -119,7 +110,7 @@ export const HomeHero = reatomComponent(({ ctx }) => {
               </Link>
               <a href={`${env.VITE_LANDING_URL}/start`} target="_blank" rel="noreferrer">
                 <Button background="default" className="h-9 text-sm font-semibold">
-                  Как начать
+                  Скачать лаунчер
                 </Button>
               </a>
             </div>
@@ -275,7 +266,7 @@ const GuestSteps = () => (
       {[
         ["1", "Создай аккаунт", "Ник и пароль - всё, что нужно."],
         ["2", "Поставь лаунчер", "Версия 1.20.x, клиентские моды по желанию."],
-        ["3", "Заходи на сервер", `Добавь ${SERVER_IP} и играй.`],
+        ["3", "Открой лаунчер", "Войди под своим аккаунтом и выбери сервер."],
       ].map(([step, title, text]) => (
         <li key={step} className="flex gap-2">
           <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-green-500/15 text-xs font-semibold text-green-300">
@@ -358,7 +349,7 @@ const GuestStore = reatomComponent(({ ctx }) => {
 
 const FAQ = [
   ["Нужна ли лицензия Minecraft?", "Нет, сервер работает в offline-режиме: нужен только ник."],
-  ["Какие версии поддерживаются?", "Java Edition 1.20.1-1.20.4, вход через лаунчер или наш клиент."],
+  ["Какие версии поддерживаются?", "Java Edition 1.20.1-1.20.4, вход через наш лаунчер."],
   ["Это платный сервер?", "Играть можно бесплатно. Донат ускоряет прогресс, но не даёт преимуществ в бою."],
   ["Что такое земли?", "Своя территория с защитой, участниками и статистикой - основа выживания."],
 ] as const;
