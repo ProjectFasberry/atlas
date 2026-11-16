@@ -6505,6 +6505,7 @@ export interface operations {
             query?: {
                 folder?: string;
                 delimiter?: string;
+                continuationToken?: string;
             };
             header?: never;
             path: {

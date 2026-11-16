@@ -11,7 +11,7 @@ minimumReleaseAgeExclude:
   - '@distribate/reatom-kit@0.2.0'
   - '@fumadocs/base-ui@16.17.9'
   - fumadocs-core@16.17.9
-  - '@projectfasberry/storage@0.1.0'
+  - '@projectfasberry/storage@0.1.0 || 0.2.0'
 overrides:
   "@reatom/core": "3.10.3"
   "@tiptap/core": "3.10.5"

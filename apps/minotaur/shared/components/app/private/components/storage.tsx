@@ -24,6 +24,24 @@ const labels = {
   unavailable: "Бакет недоступен",
   back: "Назад",
   close: "Закрыть",
+  search: "Поиск",
+  clearSearch: "Очистить",
+  sort: "Сортировка",
+  sortName: "Имя",
+  sortSize: "Размер",
+  sortDate: "Дата",
+  sortAsc: "По возрастанию",
+  sortDesc: "По убыванию",
+  loadMore: "Показать ещё",
+  retry: "Повторить",
+  select: "Выбрать",
+  cancel: "Отмена",
+  preview: "Открыть превью",
+  closePreview: "Закрыть",
+  tree: "Папки",
+  noResults: "Ничего не найдено",
+  listView: "Список",
+  gridView: "Сетка",
 };
 
 const formatDate = (value: string, kind: "object" | "bucket") =>
@@ -45,6 +63,10 @@ export const storageModel = ({
     onSelectFile,
     labels,
     formatDate,
+    previews: true,
+    selectionMode: "confirm",
+    defaultViewMode: "list",
+    showTree: true,
   });
 
   const StorageWrapper = reatomComponent(({ ctx }) => {
@@ -52,9 +74,9 @@ export const storageModel = ({
       return (
         <Vaul openAtom={storageState.isOpen}>
           <VaulTrigger asChild>{Slot}</VaulTrigger>
-          <VaulContent side="right" className="w-full! max-w-md">
+          <VaulContent side="right" className="w-full! max-w-4xl">
             <VaulHeader title="Хранилище" />
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <div className="flex min-h-0 flex-1 flex-col">
               <StorageContent />
             </div>
           </VaulContent>

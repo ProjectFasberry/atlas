@@ -25,6 +25,7 @@ export const minotaurStorageApi: StorageApi = {
 					// Elysia rejects empty strings for these optional query fields.
 					folder: options?.folder || undefined,
 					delimiter: options?.delimiter || undefined,
+					continuationToken: options?.continuationToken || undefined,
 				},
 			},
 		})
