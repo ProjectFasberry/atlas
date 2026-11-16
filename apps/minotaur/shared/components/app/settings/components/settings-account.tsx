@@ -8,14 +8,12 @@ import { Portal } from "@ark-ui/react/portal"
 import { DialogClose,dialogVariant } from "@/shared/ui/dialog"
 import { currentUserState } from "@/shared/models/current-user/index.model"
 import { Avatar } from "@/shared/ui/avatar"
-import { Menu } from "@ark-ui/react/menu"
-import { menuVariant } from "@/shared/ui/menu"
+import { getFromDictionary } from "@/shared/models/app/utils"
 import { Icon } from "@/shared/ui/icon"
 import { dayjs } from "@/shared/lib/dayjs"
 import { settingsAccountModel } from "../models/settings-account.model"
 import { Input } from "@/shared/ui/input"
 import { toast } from "sonner"
-import { action } from "@reatom/framework"
 import { useState } from "react"
 import { passwordSchema } from "@/shared/schemas/auth"
 import { ErrorBlock } from "@/shared/ui/error-block"
@@ -213,55 +211,61 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
   )
 }, "ChangePassword")
 
-const getInfoActions = () => [
-  {
-    label: translate["settings.account.uuid-copy"](),
-    action: (value: string) => action(async (ctx) => {
-      await navigator.clipboard.writeText(value);
-      toast.success(translate["shared.copy.success"]())
-    }),
-    value: "copy-uuid"
-  }
-]
+const ROLE_LABEL_KEYS = {
+  player: "settings.account.roles.player",
+  moderator: "settings.account.roles.moderator",
+  admin: "settings.account.roles.admin",
+} as const
+
 const SettingsMainInfo = reatomComponent(({ ctx }) => {
   const currentUser = ctx.spy(currentUserState);
   if (!currentUser) return null;
 
   const { nickname, avatar, meta, uuid } = currentUser;
-  const infoActions = getInfoActions();
+  const roleKey = ROLE_LABEL_KEYS[meta.role.name as keyof typeof ROLE_LABEL_KEYS]
+  const roleTitle = roleKey
+    ? translate[roleKey]()
+    : getFromDictionary(ctx, meta.role.name)
+
+  const copyUuid = () => {
+    navigator.clipboard.writeText(uuid)
+      .then(() => toast.success(translate["shared.copy.success"]()))
+      .catch(() => toast.error(translate["settings.errors.title"]()))
+  }
 
   return (
-    <div className="flex flex-col gap-4 bg-neutral-800 rounded-xl p-4 w-full h-full">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Avatar url={avatar} nickname={nickname} className="h-12 w-12" />
-          {nickname}
+    <div className="flex flex-col gap-4 rounded-xl bg-neutral-800 p-4 w-full h-full">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar url={avatar} nickname={nickname} className="h-12 w-12 shrink-0" />
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <Typography className="truncate text-lg font-semibold">{nickname}</Typography>
+            <span className="text-xs text-neutral-400">
+              {translate["settings.account.registration"]()}: {dayjs(meta.reg_date.toString()).format("DD.MM.YYYY")}
+            </span>
+          </div>
         </div>
-        <Menu.Root
-          onSelect={({ value }) => infoActions.find(d => d.value === value)?.action(uuid)(ctx)}
-        >
-          <Menu.Trigger className={menuVariant.trigger()} aria-label={translate["settings.actions"]()}>
-            <Icon name="sprite:dots" className="size-[22px] text-neutral-400" />
-          </Menu.Trigger>
-          <Portal>
-            <Menu.Positioner>
-              <Menu.Content className={menuVariant.content()}>
-                {infoActions.map((item) => (
-                  <Menu.Item key={item.value} value={item.value} className={menuVariant.item()}>
-                    {item.label}
-                  </Menu.Item>
-                ))}
-              </Menu.Content>
-            </Menu.Positioner>
-          </Portal>
-        </Menu.Root>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span
+            title={uuid}
+            className="rounded-lg bg-neutral-900 px-2 py-1 font-mono text-[11px] text-neutral-400"
+          >
+            {uuid.slice(0, 8)}
+          </span>
+          <Button
+            background="default"
+            aria-label={translate["shared.copy.aria"]()}
+            title={translate["shared.copy.aria"]()}
+            className="size-8 p-0"
+            onClick={copyUuid}
+          >
+            <Icon name="sprite:copy" className="size-4" />
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-col w-full gap-1">
-        <span>
-          {translate["settings.account.registration"]()}: {dayjs(meta.reg_date.toString()).format("DD.MM.YYYY")}
-        </span>
-        <span>
-          {translate["settings.account.role"]()}: {meta.role.name}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-lg bg-green-500/15 px-2 py-1 text-xs font-semibold text-green-400">
+          {roleTitle}
         </span>
       </div>
     </div>

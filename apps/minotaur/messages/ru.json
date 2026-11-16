@@ -792,7 +792,13 @@
     "read": "прочитать",
     "empty": "Пока ничего нет",
     "search-empty": "Ничего не нашлось по запросу «{query}»",
-    "heading": "Новости"
+    "heading": "Новости",
+    "single": {
+      "back": "Все новости",
+      "reading-time": "{count} мин чтения",
+      "share": "Скопировать ссылку",
+      "views": "Просмотры"
+    }
   },
   "referrals": {
     "page": {
@@ -897,7 +903,12 @@
       "change-password-cancel": "Отмена",
       "show-password": "Показать пароль",
       "hide-password": "Скрыть пароль",
-      "password-error": "Не удалось изменить пароль"
+      "password-error": "Не удалось изменить пароль",
+      "roles": {
+        "player": "Игрок",
+        "moderator": "Модератор",
+        "admin": "Админ"
+      }
     },
     "devices": {
       "title": "Устройства",

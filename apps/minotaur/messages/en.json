@@ -792,7 +792,13 @@
     "read": "read",
     "empty": "Nothing here yet",
     "search-empty": "Nothing found for \"{query}\"",
-    "heading": "News"
+    "heading": "News",
+    "single": {
+      "back": "All news",
+      "reading-time": "{count} min read",
+      "share": "Copy link",
+      "views": "Views"
+    }
   },
   "referrals": {
     "page": {
@@ -897,7 +903,12 @@
       "change-password-cancel": "Cancel",
       "show-password": "Show password",
       "hide-password": "Hide password",
-      "password-error": "Could not change the password"
+      "password-error": "Could not change the password",
+      "roles": {
+        "player": "Player",
+        "moderator": "Moderator",
+        "admin": "Admin"
+      }
     },
     "devices": {
       "title": "Devices",

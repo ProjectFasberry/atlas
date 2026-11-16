@@ -12,7 +12,8 @@ import { newsSingleState } from "@/shared/components/app/news/models/news-single
 export type Data = Awaited<ReturnType<typeof data>>;
 export type News = ExtractApiData<"getNewsById">["data"]
 
-const image = (url: News["imageUrl"]) => getStaticImage(url.slice(1));
+const image = (url: News["imageUrl"]) =>
+  url.startsWith("http") ? url : getStaticImage(url.slice(1));
 
 function metadata(
   news: News
