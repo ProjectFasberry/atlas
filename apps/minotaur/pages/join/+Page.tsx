@@ -1,9 +1,9 @@
 import { useAtom } from "@reatom/npm-react"
 import { Typography } from "@/shared/ui/typography"
-import { translate } from "@/shared/locales/helpers"
 import { JoinForm } from "@/shared/components/app/join/components/join-form"
 import { resetJoin } from "@/shared/components/app/join/models/join.model"
 import { createPageModel } from "@/shared/lib/events"
+import { translate } from "@/shared/locales/helpers"
 
 const STEPS = [
   { title: "team.join.step-1-title", text: "team.join.step-1-text" },

@@ -1,11 +1,11 @@
 import { Link } from "../../../config/link/link"
 import { env } from "@/shared/env"
 import { Logotype } from "./logotype"
-import { translate } from "@/shared/locales/helpers"
 import { type AtomState } from "@reatom/framework"
 import { reatomComponent } from "@reatom/npm-react"
 import { socialsAtom } from "@/shared/models/shared.model"
 import { SiteFooter, type SiteFooterColumn, type SiteFooterSocial } from "@repo/ui"
+import { translate } from "@/shared/locales/helpers"
 
 const getHrefs = (data: AtomState<typeof socialsAtom>) => {
   let telegramHref: string | undefined;

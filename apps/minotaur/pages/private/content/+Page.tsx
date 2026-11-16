@@ -12,16 +12,17 @@ import { landsSection } from "@/shared/components/app/private/components/lands"
 import { tasksSection } from "@/shared/components/app/private/components/tasks"
 import { createTabAtom, hasTabAccess, type PanelTab } from "@/shared/components/app/private/models/tabs.model"
 import { type ActionParent } from "@/shared/components/app/private/models/actions.model"
+import { translate } from "@/shared/locales/helpers"
 
 type ContentTab = Extract<ActionParent, "news" | "banner" | "event" | "modpack" | "lands" | "task">
 
 const CONTENT_TABS: PanelTab<ContentTab>[] = [
-  { value: "news", title: "Новости", permissions: ["news.create", "news.update", "news.delete"] },
-  { value: "banner", title: "Баннеры", permissions: ["banners.create", "banners.delete"] },
-  { value: "event", title: "Ивенты", permissions: ["events.create", "events.delete"] },
-  { value: "modpack", title: "Модпаки", permissions: ["modpacks.create", "modpacks.delete"] },
-  { value: "lands", title: "Регионы", permissions: ["lands.read"] },
-  { value: "task", title: "Задания", permissions: ["tasks.create", "tasks.update", "tasks.delete"] },
+  { value: "news", title: translate["panel.news"](), permissions: ["news.create", "news.update", "news.delete"] },
+  { value: "banner", title: translate["panel.banners"](), permissions: ["banners.create", "banners.delete"] },
+  { value: "event", title: translate["panel.events"](), permissions: ["events.create", "events.delete"] },
+  { value: "modpack", title: translate["panel.modpacks"](), permissions: ["modpacks.create", "modpacks.delete"] },
+  { value: "lands", title: translate["panel.lands"](), permissions: ["lands.read"] },
+  { value: "task", title: translate["panel.tasks"](), permissions: ["tasks.create", "tasks.update", "tasks.delete"] },
 ]
 
 const contentTab = createTabAtom("contentTab", CONTENT_TABS, "news")
@@ -41,17 +42,17 @@ const ContentSection = reatomComponent(({ ctx }) => {
   const section = (() => {
     switch (active) {
       case "news":
-        return { title: "Новости", wrapper: <newsSection.Wrapper /> }
+        return { title: translate["panel.news"](), wrapper: <newsSection.Wrapper /> }
       case "banner":
-        return { title: "Баннеры", wrapper: <bannersSection.Wrapper /> }
+        return { title: translate["panel.banners"](), wrapper: <bannersSection.Wrapper /> }
       case "event":
-        return { title: "Ивенты", wrapper: <eventsSection.Wrapper /> }
+        return { title: translate["panel.events"](), wrapper: <eventsSection.Wrapper /> }
       case "modpack":
-        return { title: "Модпаки", wrapper: <modpackSection.Wrapper /> }
+        return { title: translate["panel.modpacks"](), wrapper: <modpackSection.Wrapper /> }
       case "lands":
-        return { title: "Регионы", wrapper: <landsSection.Wrapper /> }
+        return { title: translate["panel.lands"](), wrapper: <landsSection.Wrapper /> }
       case "task":
-        return { title: "Задания", wrapper: <tasksSection.Wrapper /> }
+        return { title: translate["panel.tasks"](), wrapper: <tasksSection.Wrapper /> }
     }
   })()
 

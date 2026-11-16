@@ -1,5 +1,4 @@
 import { logError } from "@/shared/lib/log"
-import { translate } from "@/shared/locales/helpers"
 import { reatomAsync, withErrorAtom, withStatusesAtom } from "@reatom/framework"
 import { action, atom } from "@reatom/framework"
 import { withAssign, withReset } from "@reatom/framework"
@@ -7,6 +6,7 @@ import { toast } from "sonner"
 import { client } from "@/shared/lib/client-wrapper"
 import { env } from "@/shared/env"
 import { landState } from "./land.model"
+import { translate } from "@/shared/locales/helpers"
 
 const LANDS_PREFIX = `${env.VITE_VOLUME_URL}/lands/`
 

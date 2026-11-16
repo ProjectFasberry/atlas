@@ -8,12 +8,13 @@ import { clsx } from "cnfast"
 import { dayjs } from "@/shared/lib/dayjs"
 import { TEAM_STATUSES, type TeamStatus } from "@/shared/schemas/team"
 import { loadTeamApplications, setTeamApplicationStatus, teamState, type TeamApplication } from "../models/team.model"
+import { translate } from "@/shared/locales/helpers"
 
 const STATUS_LABEL: Record<TeamStatus, string> = {
-  new: "Новые",
-  reviewed: "Просмотрены",
-  invited: "Приглашены",
-  rejected: "Отклонены",
+  new: translate["panel.new"](),
+  reviewed: translate["panel.viewed"](),
+  invited: translate["panel.invited"](),
+  rejected: translate["panel.rejected"](),
 }
 
 const StatusFilter = reatomComponent(({ ctx }) => {
@@ -26,8 +27,7 @@ const StatusFilter = reatomComponent(({ ctx }) => {
         className={clsx("h-7 rounded-lg px-2 text-xs", selected === null ? "bg-neutral-50! text-neutral-950!" : "bg-neutral-800")}
         onClick={() => { teamState.status(ctx, null); loadTeamApplications(ctx) }}
       >
-        Все
-      </Button>
+        {translate["panel.all"]()}</Button>
       {TEAM_STATUSES.map((status) => (
         <Button
           key={status}
@@ -98,7 +98,7 @@ const ApplicationCard = reatomComponent<{ application: TeamApplication }>(({ app
           <a href={`mailto:${application.email}`} className="hover:text-neutral-100">Email: {application.email}</a>
         )}
         {application.portfolio && (
-          <span className="truncate max-w-full whitespace-pre-wrap">Портфолио: {application.portfolio}</span>
+          <span className="truncate max-w-full whitespace-pre-wrap">{translate["panel.portfolio"]()}{application.portfolio}</span>
         )}
       </div>
     </div>

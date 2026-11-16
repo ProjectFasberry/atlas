@@ -9,6 +9,7 @@ import { Input } from "@/shared/ui/input"
 import { Typography } from "@/shared/ui/typography"
 import { toast } from "sonner"
 import { usersAuth, usersAuthState } from "../../models/users.model"
+import { translate } from "@/shared/locales/helpers"
 
 type FieldProps = {
   label: string
@@ -36,19 +37,18 @@ const DeleteUser = reatomComponent(({ ctx }) => {
     >
       <Dialog.Trigger asChild>
         <Button variant="danger" background="default" className="h-8 text-sm font-semibold">
-          Удалить
-        </Button>
+          {translate["panel.delete"]()}</Button>
       </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
           <Dialog.Content className={dialogVariant.content("w-full max-w-md")}>
-            <DialogTitle className={dialogVariant.title()}>Удаление пользователя</DialogTitle>
+            <DialogTitle className={dialogVariant.title()}>{translate["panel.user-deletion"]()}</DialogTitle>
             <form
               onSubmit={(event) => usersAuth.deleteUser.submit(ctx, event)}
               className="flex w-full flex-col gap-3"
             >
-              <Field label="Никнейм">
+              <Field label={translate["panel.nickname"]()}>
                 <Input
                   value={nickname}
                   onChange={(event) => usersAuthState.deleteUser.nickname(ctx, event.target.value)}
@@ -58,9 +58,7 @@ const DeleteUser = reatomComponent(({ ctx }) => {
                 />
               </Field>
               <Typography className="rounded-lg border border-red/40 bg-red/5 p-2 text-xs text-red">
-                Пользователь будет удалён из всех баз: игровой и сайтовой. Действие
-                необратимо.
-              </Typography>
+                {translate["panel.the-user-will-be-deleted-from-every-database-gam"]()}</Typography>
               {error ? <ErrorBlock title={error.message} /> : null}
               <div className="flex items-center justify-end gap-2">
                 <Button
@@ -69,8 +67,7 @@ const DeleteUser = reatomComponent(({ ctx }) => {
                   className="h-8 text-sm font-semibold"
                   onClick={() => usersAuthState.deleteUser.isOpen(ctx, false)}
                 >
-                  Отмена
-                </Button>
+                  {translate["panel.cancel"]()}</Button>
                 <Button
                   type="submit"
                   variant="danger"
@@ -80,8 +77,7 @@ const DeleteUser = reatomComponent(({ ctx }) => {
                   isLoading={isPending}
                   disabled={isPending}
                 >
-                  Удалить
-                </Button>
+                  {translate["panel.delete"]()}</Button>
               </div>
             </form>
             <DialogClose />
@@ -111,19 +107,17 @@ const InviteUser = reatomComponent(({ ctx }) => {
     >
       <Dialog.Trigger asChild>
         <Button background="positive" className="h-8 text-sm font-semibold">
-          Пригласить
-        </Button>
+          {translate["panel.invite"]()}</Button>
       </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
           <Dialog.Content className={dialogVariant.content("w-full max-w-md")}>
-            <DialogTitle className={dialogVariant.title()}>Приглашение игрока</DialogTitle>
+            <DialogTitle className={dialogVariant.title()}>{translate["panel.player-invitation"]()}</DialogTitle>
             {link ? (
               <div className="flex w-full flex-col gap-3">
                 <Typography className="text-xs text-neutral-400">
-                  Ссылка действует 7 дней. Аккаунт уже создан во всех базах, пароль игрок задаст сам.
-                </Typography>
+                  {translate["panel.the-link-lives-for-7-days-the-account-is-already"]()}</Typography>
                 <Input readOnly value={link} onFocus={(event) => event.currentTarget.select()} />
                 <div className="flex items-center justify-end gap-2">
                   <Button
@@ -132,14 +126,12 @@ const InviteUser = reatomComponent(({ ctx }) => {
                     className="h-8 text-sm font-semibold"
                     onClick={() => {
                       void navigator.clipboard.writeText(link)
-                      toast.success("Ссылка скопирована")
+                      toast.success(translate["panel.link-copied"]())
                     }}
                   >
-                    Скопировать
-                  </Button>
+                    {translate["panel.copy"]()}</Button>
                   <Button type="button" background="default" className="h-8 text-sm font-semibold" onClick={close}>
-                    Готово
-                  </Button>
+                    {translate["panel.done"]()}</Button>
                 </div>
               </div>
             ) : (
@@ -147,7 +139,7 @@ const InviteUser = reatomComponent(({ ctx }) => {
                 onSubmit={(event) => usersAuth.invite(ctx, event)}
                 className="flex w-full flex-col gap-3"
               >
-                <Field label="Никнейм" hint="Аккаунт создаётся сразу, пароль игрок задаст по ссылке">
+                <Field label={translate["panel.nickname"]()} hint={translate["panel.the-account-is-created-right-away-the-player-set"]()}>
                   <Input
                     value={ctx.spy(usersAuthState.invite.nickname)}
                     onChange={(event) => usersAuthState.invite.nickname(ctx, event.target.value)}
@@ -161,8 +153,7 @@ const InviteUser = reatomComponent(({ ctx }) => {
                 {error ? <ErrorBlock title={error.message} /> : null}
                 <div className="flex items-center justify-end gap-2">
                   <Button type="button" background="default" className="h-8 text-sm font-semibold" onClick={close}>
-                    Отмена
-                  </Button>
+                    {translate["panel.cancel"]()}</Button>
                   <Button
                     type="submit"
                     background="white"
@@ -171,8 +162,7 @@ const InviteUser = reatomComponent(({ ctx }) => {
                     isLoading={isPending}
                     disabled={isPending}
                   >
-                    Создать ссылку
-                  </Button>
+                    {translate["panel.create-a-link"]()}</Button>
                 </div>
               </form>
             )}

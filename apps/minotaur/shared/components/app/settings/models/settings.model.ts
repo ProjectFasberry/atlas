@@ -7,8 +7,8 @@ import { listenBackOnce } from "@/shared/lib/events"
 import { withUndo } from '@reatom/undo'
 import { appState } from "@/shared/models/app/index.model"
 import { DIALOG_DELAY } from "@/shared/consts/index"
-import { translate } from "@/shared/locales/helpers"
 import { isEmpty } from "@/shared/lib/utils"
+import { translate } from "@/shared/locales/helpers"
 
 export type SettingsNavigationNode = {
   title: string,

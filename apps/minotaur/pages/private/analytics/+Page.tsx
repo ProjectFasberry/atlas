@@ -9,24 +9,25 @@ import { BuildMetrics } from "@/shared/components/app/private/components/build-m
 import { createTabAtom, hasTabAccess, type PanelTab } from "@/shared/components/app/private/models/tabs.model"
 import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
+import { translate } from "@/shared/locales/helpers"
 
 type AnalyticsTab = "players" | "builds"
 
 const ANALYTICS_TABS: PanelTab<AnalyticsTab>[] = [
-  { value: "players", title: "Игроки" },
-  { value: "builds", title: "Инфраструктура" },
+  { value: "players", title: translate["panel.players"]() },
+  { value: "builds", title: translate["panel.infrastructure"]() },
 ]
 
 const analyticsTab = createTabAtom("analyticsTab", ANALYTICS_TABS, "players")
 
 const EXTERNAL_SERVICES = [
-  { title: "Umami", description: "Веб-аналитика", href: "https://umami.fasberry.fun" },
-  { title: "Portainer", description: "Контейнеры", href: "https://portainer.fasberry.fun" },
-  { title: "Gotify", description: "Алерты", href: "https://gotify.fasberry.fun" },
+  { title: "Umami", description: translate["panel.web-analytics"](), href: "https://umami.fasberry.fun" },
+  { title: "Portainer", description: translate["panel.containers"](), href: "https://portainer.fasberry.fun" },
+  { title: "Gotify", description: translate["panel.alerts"](), href: "https://gotify.fasberry.fun" },
 ]
 
 const ExternalServices = () => (
-  <PanelSection title="Внешние сервисы">
+  <PanelSection title={translate["panel.external-services"]()}>
     <div className="grid gap-2 sm:grid-cols-3">
       {EXTERNAL_SERVICES.map((service) => (
         <a

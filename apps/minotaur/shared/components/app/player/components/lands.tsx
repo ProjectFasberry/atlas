@@ -4,10 +4,10 @@ import { Typography } from "@/shared/ui/typography"
 import { Link } from "../../../config/link/link"
 import { playerLands, playerLandsState } from "../models/player-lands.model"
 import { atom } from "@reatom/framework"
-import { translate } from "@/shared/locales/helpers"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import type { LandSimilar } from "../../lands/models/lands.model"
+import { translate } from "@/shared/locales/helpers"
 
 const PlayerLand = ({ ulid, title, details, name, members }: LandSimilar) => {
   return (

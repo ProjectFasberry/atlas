@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { SectionAction } from "../components/ui";
 import { reatomComponent } from "@reatom/npm-react";
 import { actionsState, getSelectedParentAtom, type ActionParent, type ActionType } from "./actions.model";
+import { translate } from "@/shared/locales/helpers"
 
 /** Toggle plus the section's own submit button, same shape for every section. */
 const SectionActions = ({ parent, type, submit }: {
@@ -25,7 +26,7 @@ export const createPrivatedSectionModel = ({
   }
 }) => {
   const HeaderViewElement = () => (
-    <SectionAction title="Создать" parent={event} type="create" />
+    <SectionAction title={translate["panel.create"]()} parent={event} type="create" />
   );
 
   const HeaderCreateElement = () => (

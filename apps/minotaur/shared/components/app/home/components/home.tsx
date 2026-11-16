@@ -20,8 +20,8 @@ import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { Typography } from "@/shared/ui/typography"
-import { translate } from "@/shared/locales/helpers"
 import { home } from "../models/home.model"
+import { translate } from "@/shared/locales/helpers"
 
 const HERO_IMAGE = getStaticImage("images/village_pillage.webp")
 

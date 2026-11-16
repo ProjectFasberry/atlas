@@ -1,4 +1,3 @@
-import { translate } from "@/shared/locales/helpers"
 import { reatomComponent } from "@reatom/npm-react"
 import { serverStatus } from "../../intro/models/intro.model"
 import { Toolbar, ToolbarActions, ToolbarSelect } from "@/shared/ui/toolbar"
@@ -9,6 +8,7 @@ import { Typography } from "@/shared/ui/typography"
 import { Icon } from "@/shared/ui/icon"
 import { Avatar } from "@/shared/ui/avatar"
 import { pageState } from "@/shared/models/page-context.model"
+import { translate } from "@/shared/locales/helpers"
 
 const serversListClassname = "grid grid-cols-1 gap-3 sm:grid-cols-2"
 

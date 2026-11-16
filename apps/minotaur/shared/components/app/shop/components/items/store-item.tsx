@@ -7,9 +7,9 @@ import { pageState } from "@/shared/models/page-context.model"
 import { reatomComponent } from "@reatom/npm-react"
 import { tv, type VariantProps } from "tailwind-variants"
 import { Button } from "@/shared/ui/button"
-import { translate } from "@/shared/locales/helpers"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { getCurrencies } from "@/shared/models/shared.model"
+import { translate } from "@/shared/locales/helpers"
 
 const buyButtonVariants = tv({
   base: `group gap-2 duration-150 h-10 *:duration-150 px-6 w-full rounded-xl`,

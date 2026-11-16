@@ -10,6 +10,7 @@ import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialo
 import { editorExtensions } from "@/shared/components/config/editor/editor.model";
 import { normalizeTiptapContent } from "@/shared/lib/tiptap-content";
 import { env } from "@/shared/env";
+import { translate } from "@/shared/locales/helpers"
 
 export type NewsPayload = ExtractApiData<"getNewsList">["data"]
 export type NewsSingle = NewsPayload["data"][number];
@@ -133,7 +134,7 @@ export const createNews = atom(null, "createNews").pipe(
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
-        toast.success("Новость создана")
+        toast.success(translate["panel.news-created"]())
 
         newsList.fetch.cacheAtom.reset(ctx)
         newsList.fetch.dataAtom(ctx, (state) => state
@@ -320,7 +321,7 @@ export const deleteNews = atom(null, "deleteNews").pipe(
   withAssign((_, name) => ({
     deleteBefore: action((ctx, item: { id: number, title: string }) => {
       alertDialog.open(ctx, {
-        title: `Вы точно хотите удалить "${item.title}"?`,
+        title: translate["panel.confirm-delete"]({ title: item.title }),
         onConfirm: () => deleteNews.submit(ctx, item.id),
         errorAtom: deleteNews.submit.errorAtom,
       });
@@ -344,7 +345,7 @@ export const deleteNews = atom(null, "deleteNews").pipe(
           : null
         );
 
-        toast.success("Новость удалена")
+        toast.success(translate["panel.news-deleted"]())
       },
       onReject: (_, e) => notifyAboutRestrictRole(e, { withToast: false })
     }).pipe(

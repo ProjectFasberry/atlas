@@ -3,6 +3,7 @@ import { action, atom, isDeepEqual, withAssign } from "@reatom/framework"
 import { navigate } from "vike/client/router";
 import { toast } from "sonner";
 import { pageState } from "@/shared/models/page-context.model";
+import { translate } from "@/shared/locales/helpers"
 
 const PARENTS = ["news", "banner", "event", "dictionaries", "modpack", "lands", "api", "task"] as const
 const TYPES = ["create", "edit", "view"] as const;
@@ -108,8 +109,8 @@ export const getIsSelectedActionAtom = (targetParent: ActionParent, targetType: 
 )
 
 const ERRORS_MAP: Record<string, string> = {
-  "RESTRICTED_BY_ROLE": "Действие недоступно из-за политики ролей",
-  "NULL": "Произошла ошибка"
+  "RESTRICTED_BY_ROLE": translate["panel.the-action-is-unavailable-because-of-the-role-po"](),
+  "NULL": translate["panel.an-error-occurred"]()
 }
 
 export function notifyAboutRestrictRole(e: unknown, { withToast = true } = {}) {

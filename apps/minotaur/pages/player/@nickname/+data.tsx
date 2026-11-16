@@ -8,6 +8,7 @@ import { createCtx, type Ctx } from "@reatom/framework";
 import { playerLands } from "@/shared/components/app/player/models/player-lands.model";
 import { snapshots } from "@/shared/models/ssr";
 import { getFromDictionary } from "@/shared/models/app/utils";
+import { translate } from "@/shared/locales/helpers"
 
 export type Player = ExtractApiData<"getServerPlayerByNickname">["data"]
 export type Data = Awaited<ReturnType<typeof data>>;
@@ -22,18 +23,19 @@ function buildMetadataValues(ctx: Ctx, user: Player, pageCtx: PageContextServer)
   return {
     title: wrapTitle(nickname),
     image: user.avatar ?? "",
-    description: `
-      Профиль игрока ${nickname}.
-      Привилегия: ${group}.
-      Играет с ${reg}. Последний вход: ${login}.
-    `,
+    description: translate["player.page.description"]({
+      nickname,
+      group,
+      reg,
+      login,
+    }),
     url: pageCtx.urlPathname,
     nickname
   };
 }
 
 function buildMetadataHead({ title, nickname, description, image, url }: ReturnType<typeof buildMetadataValues>) {
-  const keywords = `${nickname}, fasberry, fasberry page, профиль ${nickname}`
+  const keywords = translate["player.page.keywords"]({ nickname })
 
   return (
     <>

@@ -4,6 +4,7 @@ import {
 } from "@reatom/framework"
 import { apiBaseUrl } from "@/shared/env"
 import { client } from "@/shared/lib/client-wrapper"
+import { translate } from "@/shared/locales/helpers"
 
 export type PlayersRange = "24h" | "7d" | "30d"
 
@@ -29,16 +30,16 @@ const RANGE_MS: Record<PlayersRange, number> = {
 export type PlayersChartMode = "all" | "joins" | "quits" | "online"
 
 export const PLAYERS_CHARTS: { value: PlayersChartMode, label: string }[] = [
-  { value: "all", label: "Все" },
-  { value: "joins", label: "Входы" },
-  { value: "quits", label: "Выходы" },
-  { value: "online", label: "Онлайн" },
+  { value: "all", label: translate["panel.all"]() },
+  { value: "joins", label: translate["panel.logins"]() },
+  { value: "quits", label: translate["panel.logouts"]() },
+  { value: "online", label: translate["panel.online"]() },
 ]
 
 export const PLAYERS_RANGES: { value: PlayersRange, label: string }[] = [
-  { value: "24h", label: "24 часа" },
-  { value: "7d", label: "7 дней" },
-  { value: "30d", label: "30 дней" },
+  { value: "24h", label: translate["panel.24-hours"]() },
+  { value: "7d", label: translate["panel.7-days"]() },
+  { value: "30d", label: translate["panel.30-days"]() },
 ]
 
 export const playersState = atom(null, "playersState").pipe(

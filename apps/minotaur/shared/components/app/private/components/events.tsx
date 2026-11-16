@@ -8,12 +8,13 @@ import { createPrivatedSectionModel } from "../models/shared.model"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { Noop } from "@/shared/ui/noop"
+import { translate } from "@/shared/locales/helpers"
 
 const fields = [
-  { label: "Заголовок", atom: createEventState.title },
-  { label: "Тип", atom: createEventState.type, },
-  { label: "Описание", atom: createEventState.description },
-  { label: "Инициатор", atom: createEventState.initiator }
+  { label: translate["panel.title"](), atom: createEventState.title },
+  { label: translate["panel.type"](), atom: createEventState.type, },
+  { label: translate["panel.description"](), atom: createEventState.description },
+  { label: translate["panel.initiator"](), atom: createEventState.initiator }
 ]
 
 const CreateEventSubmit = reatomComponent(({ ctx }) => {

@@ -19,14 +19,15 @@ import {
   economy, economyBusyAtom, economyState,
   type EconomyCurrency, type EconomyOperation, type LedgerItem,
 } from "../models/economy.model";
+import { translate } from "@/shared/locales/helpers"
 
 export const ECONOMY_WRITE_PERMISSION = "economy.write";
 
 const CURRENCIES: EconomyCurrency[] = ["BELKOIN", "CHARISM"];
 
 const CURRENCY_LABEL: Record<EconomyCurrency, string> = {
-  BELKOIN: "Белкоин",
-  CHARISM: "Харизма",
+  BELKOIN: translate["panel.belkoin"](),
+  CHARISM: translate["panel.charism"](),
 };
 
 const CURRENCY_IMAGE: Record<EconomyCurrency, string> = {
@@ -35,21 +36,21 @@ const CURRENCY_IMAGE: Record<EconomyCurrency, string> = {
 };
 
 const OPERATIONS: { label: string, value: EconomyOperation, icon: "sprite:plus" | "sprite:arrow-down" }[] = [
-  { label: "Начислить", value: "credit", icon: "sprite:plus" },
-  { label: "Списать", value: "debit", icon: "sprite:arrow-down" },
+  { label: translate["panel.accrue"](), value: "credit", icon: "sprite:plus" },
+  { label: translate["panel.write-off-2"](), value: "debit", icon: "sprite:arrow-down" },
 ];
 
 const REASON_LABEL: Record<string, string> = {
-  "migration": "Миграция баланса",
-  "admin.adjustment": "Корректировка админа",
-  "server.give_balance": "Выдача с сервера",
-  "referral:initiator": "Реферал (инициатор)",
-  "referral:recipient": "Реферал (приглашённый)",
-  "referral:bonus": "Реферальный бонус",
-  "store.purchase:BELKOIN": "Покупка за белкоин",
-  "store.purchase:CHARISM": "Покупка за харизму",
-  "store.refund:BELKOIN": "Возврат белкоина",
-  "store.refund:CHARISM": "Возврат харизмы",
+  "migration": translate["panel.balance-migration"](),
+  "admin.adjustment": translate["panel.admin-adjustment"](),
+  "server.give_balance": translate["panel.server-grant"](),
+  "referral:initiator": translate["panel.referral-initiator"](),
+  "referral:recipient": translate["panel.referral-invited"](),
+  "referral:bonus": translate["panel.referral-bonus"](),
+  "store.purchase:BELKOIN": translate["panel.purchase-for-belkoin"](),
+  "store.purchase:CHARISM": translate["panel.purchase-for-charism"](),
+  "store.refund:BELKOIN": translate["panel.belkoin-refund"](),
+  "store.refund:CHARISM": translate["panel.charism-refund"](),
 };
 
 const number = new Intl.NumberFormat("ru-RU");
@@ -89,13 +90,12 @@ const SearchBar = reatomComponent(({ ctx }) => {
         <Input
           value={target}
           onChange={(event) => economyState.target(ctx, event.target.value)}
-          placeholder="Никнейм игрока"
+          placeholder={translate["panel.player-nickname"]()}
           maxLength={32}
           className="h-8 flex-1"
         />
         <Button background="white" className="h-8 px-4 text-xs" disabled={loading || target.trim().length === 0}>
-          Найти
-        </Button>
+          {translate["panel.search"]()}</Button>
       </form>
       {error && !loading && <ErrorBlock title={error.message} />}
     </div>
@@ -110,9 +110,9 @@ const WalletBalances = reatomComponent(({ ctx }) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Typography className="text-sm font-semibold">Кошелёк</Typography>
+        <Typography className="text-sm font-semibold">{translate["panel.wallet"]()}</Typography>
         <Typography className="text-xs text-neutral-400">
-          Игрок: <span className="text-neutral-50 font-semibold">{wallet.nickname}</span>
+          {translate["panel.player-2"]()}<span className="text-neutral-50 font-semibold">{wallet.nickname}</span>
         </Typography>
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
@@ -148,7 +148,7 @@ const WalletBalances = reatomComponent(({ ctx }) => {
                   </Typography>
                   {wallet.refundable && (
                     <Typography className="text-[10px] text-neutral-500">
-                      К возврату: {number.format(wallet.refundable[currency] ?? 0)}
+                      {translate["panel.to-refund-2"]()}{number.format(wallet.refundable[currency] ?? 0)}
                     </Typography>
                   )}
                 </div>
@@ -159,8 +159,7 @@ const WalletBalances = reatomComponent(({ ctx }) => {
         })}
       </div>
       <Typography className="text-xs text-neutral-500">
-        Выберите кошелёк, чтобы сразу подготовить операцию.
-      </Typography>
+        {translate["panel.pick-a-wallet-to-prepare-an-operation-right-away"]()}</Typography>
     </div>
   );
 }, "EconomyWallet");
@@ -199,10 +198,9 @@ const AdjustForm = reatomComponent(({ ctx }) => {
     <SectionWrapper className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-col gap-0.5">
-          <Typography className="text-sm font-semibold">Начисление и списание</Typography>
+          <Typography className="text-sm font-semibold">{translate["panel.accrual-and-write-off"]()}</Typography>
           <Typography color="gray" className="text-xs">
-            Изменения применяются сразу и попадают в журнал операций.
-          </Typography>
+            {translate["panel.changes-apply-immediately-and-go-to-the-operatio"]()}</Typography>
         </div>
         <span className="rounded-lg bg-neutral-800 px-2 py-1 text-[11px] font-medium text-neutral-400">
           {number.format(currentBalance)} {CURRENCY_LABEL[currency].toLowerCase()}
@@ -211,7 +209,7 @@ const AdjustForm = reatomComponent(({ ctx }) => {
 
       <div className="grid gap-2 sm:grid-cols-2">
         <div className="flex flex-col gap-1">
-          <Typography color="gray" className="text-xs">Операция</Typography>
+          <Typography color="gray" className="text-xs">{translate["panel.operation"]()}</Typography>
           <div className="flex items-center gap-1 rounded-xl bg-neutral-800 p-1">
             {OPERATIONS.map((item) => (
               <button
@@ -229,7 +227,7 @@ const AdjustForm = reatomComponent(({ ctx }) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <Typography color="gray" className="text-xs">Валюта</Typography>
+          <Typography color="gray" className="text-xs">{translate["panel.currency"]()}</Typography>
           <div className="flex items-center gap-1 rounded-xl bg-neutral-800 p-1">
             {CURRENCIES.map((item) => (
               <button
@@ -256,7 +254,7 @@ const AdjustForm = reatomComponent(({ ctx }) => {
 
       <div className="grid gap-2 sm:grid-cols-[minmax(0,10rem)_1fr]">
         <div className="flex flex-col gap-1">
-          <Typography color="gray" className="text-xs">Сумма</Typography>
+          <Typography color="gray" className="text-xs">{translate["panel.amount"]()}</Typography>
           <Input
             value={amount}
             onChange={(event) => economyState.form.amount(ctx, event.target.value.replace(/\D/g, ""))}
@@ -267,11 +265,11 @@ const AdjustForm = reatomComponent(({ ctx }) => {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <Typography color="gray" className="text-xs">Причина</Typography>
+          <Typography color="gray" className="text-xs">{translate["panel.reason"]()}</Typography>
           <Input
             value={reason}
             onChange={(event) => economyState.form.reason(ctx, event.target.value)}
-            placeholder="Например: компенсация за ивент"
+            placeholder={translate["panel.for-example-event-compensation"]()}
             maxLength={200}
             className="h-10 w-full"
           />
@@ -280,7 +278,7 @@ const AdjustForm = reatomComponent(({ ctx }) => {
 
       <div className="flex flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-800/40 p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
-          <Typography color="gray" className="text-xs">Баланс после операции</Typography>
+          <Typography color="gray" className="text-xs">{translate["panel.balance-after-the-operation"]()}</Typography>
           <span className="text-sm font-semibold text-neutral-400">{number.format(currentBalance)}</span>
           <Icon name="sprite:arrow-right" className="size-4 text-neutral-500" />
           <span
@@ -300,20 +298,19 @@ const AdjustForm = reatomComponent(({ ctx }) => {
           disabled={!valid || busy}
           onClick={() => economy.adjust(ctx)}
         >
-          {isCredit ? "Начислить" : "Списать"}
+          {isCredit ? translate["panel.accrue"]() : translate["panel.write-off-2"]()}
           {amountValue > 0 ? ` ${number.format(amountValue)}` : ""}
         </Button>
       </div>
 
       {insufficient && (
         <Typography className="text-xs text-red">
-          Недостаточно средств: на балансе {number.format(currentBalance)} {CURRENCY_LABEL[currency].toLowerCase()}.
+          {translate["panel.insufficient-funds-the-balance-has"]()}{number.format(currentBalance)} {CURRENCY_LABEL[currency].toLowerCase()}.
         </Typography>
       )}
       {error && <ErrorBlock title={error.message} />}
       <Typography className="text-xs text-neutral-500">
-        Каждая правка пишется в журнал с актором и причиной, прямые изменения балансов запрещены.
-      </Typography>
+        {translate["panel.every-edit-is-written-to-the-log-with-an-actor-a"]()}</Typography>
     </SectionWrapper>
   );
 }, "EconomyAdjustForm");
@@ -343,8 +340,7 @@ const LedgerRow = reatomComponent<{
             disabled={busy}
             onClick={() => onRefund(item)}
           >
-            Вернуть
-          </Button>
+            {translate["panel.revert"]()}</Button>
         )}
       </TableCell>
     </TableRow>
@@ -395,26 +391,24 @@ const RefundDialog = reatomComponent<{ item: LedgerItem | null, onClose: () => v
         <Dialog.Positioner className={dialogVariant.positioner()}>
           <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-w-lg!")}>
             <div className="flex flex-col gap-1 pr-8 w-full">
-              <Dialog.Title className={dialogVariant.title("text-left!")}>Возврат заказа</Dialog.Title>
+              <Dialog.Title className={dialogVariant.title("text-left!")}>{translate["panel.order-refund"]()}</Dialog.Title>
               <Typography color="gray" className="text-sm">
-                Средства вернутся на кошелёк игрока, действие попадёт в журнал операций.
-                Отзыв выданного товара выполняется отдельной задачей и может занять время.
-              </Typography>
+                {translate["panel.the-funds-go-back-to-the-player-s-wallet-the-act"]()}</Typography>
             </div>
 
             <div className="flex w-full flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-800/40 p-3">
-              <RefundInfoRow label="Игрок" value={item.nickname} />
-              <RefundInfoRow label="Заказ" value={item.order_id ?? "—"} mono />
-              <RefundInfoRow label="Списание" value={`${formatAmount(item.delta)} ${CURRENCY_LABEL[item.currency]}`} />
-              <RefundInfoRow label="К возврату" value={`${number.format(amount)} ${CURRENCY_LABEL[item.currency]}`} accent />
+              <RefundInfoRow label={translate["panel.player"]()} value={item.nickname} />
+              <RefundInfoRow label={translate["panel.order"]()} value={item.order_id ?? "—"} mono />
+              <RefundInfoRow label={translate["panel.write-off"]()} value={`${formatAmount(item.delta)} ${CURRENCY_LABEL[item.currency]}`} />
+              <RefundInfoRow label={translate["panel.to-refund"]()} value={`${number.format(amount)} ${CURRENCY_LABEL[item.currency]}`} accent />
             </div>
 
             <div className="flex w-full flex-col gap-1">
-              <Typography color="gray" className="text-xs">Причина возврата</Typography>
+              <Typography color="gray" className="text-xs">{translate["panel.refund-reason"]()}</Typography>
               <Input
                 value={reason}
                 onChange={(event) => economyState.refundReason(ctx, event.target.value)}
-                placeholder="Например: возврат по запросу игрока"
+                placeholder={translate["panel.for-example-refund-at-the-player-s-request"]()}
                 maxLength={200}
                 className="h-10 w-full"
               />
@@ -424,8 +418,7 @@ const RefundDialog = reatomComponent<{ item: LedgerItem | null, onClose: () => v
 
             <div className="flex w-full items-center justify-end gap-2">
               <Button background="default" className="h-10 px-4 text-sm" onClick={onClose}>
-                Отмена
-              </Button>
+                {translate["panel.cancel"]()}</Button>
               <Button
                 background="white"
                 withSpinner
@@ -434,8 +427,7 @@ const RefundDialog = reatomComponent<{ item: LedgerItem | null, onClose: () => v
                 disabled={busy || reason.trim().length < 3}
                 onClick={submit}
               >
-                Вернуть средства
-              </Button>
+                {translate["panel.refund-the-funds"]()}</Button>
             </div>
             <DialogClose />
           </Dialog.Content>
@@ -457,7 +449,7 @@ const LedgerTable = reatomComponent(({ ctx }) => {
 
   const openRefund = (item: LedgerItem) => {
     if (ctx.get(economyState.refundReason).trim().length === 0) {
-      economyState.refundReason(ctx, "Возврат по запросу игрока");
+      economyState.refundReason(ctx, translate["panel.refund-at-the-player-s-request"]());
     }
 
     economyState.refundTarget(ctx, item);
@@ -466,7 +458,7 @@ const LedgerTable = reatomComponent(({ ctx }) => {
   return (
     <SectionWrapper className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Typography className="text-sm font-semibold">Журнал операций</Typography>
+        <Typography className="text-sm font-semibold">{translate["panel.operation-log"]()}</Typography>
         <div className="flex items-center gap-2">
           <Button
             background="default"
@@ -474,26 +466,25 @@ const LedgerTable = reatomComponent(({ ctx }) => {
             disabled={ctx.spy(economy.search.statusesAtom).isPending}
             onClick={() => economy.refresh(ctx)}
           >
-            Обновить
-          </Button>
+            {translate["panel.refresh"]()}</Button>
         </div>
       </div>
 
       {ledger.length === 0
-        ? <Noop title="Операций пока нет" />
+        ? <Noop title={translate["panel.no-operations-yet"]()} />
         : (
           <Table>
-            <TableCaption>Операции игрока</TableCaption>
+            <TableCaption>{translate["panel.player-operations"]()}</TableCaption>
             <TableHeader>
               <TableRow className="*:font-semibold *:text-base">
-                <TableHead>Дата</TableHead>
-                <TableHead>Валюта</TableHead>
-                <TableHead>Изменение</TableHead>
-                <TableHead>Баланс</TableHead>
-                <TableHead>Причина</TableHead>
-                <TableHead>Актор</TableHead>
-                <TableHead>Заказ</TableHead>
-                <TableHead className="text-right">Действие</TableHead>
+                <TableHead>{translate["panel.date"]()}</TableHead>
+                <TableHead>{translate["panel.currency"]()}</TableHead>
+                <TableHead>{translate["panel.change"]()}</TableHead>
+                <TableHead>{translate["panel.balance"]()}</TableHead>
+                <TableHead>{translate["panel.reason"]()}</TableHead>
+                <TableHead>{translate["panel.actor"]()}</TableHead>
+                <TableHead>{translate["panel.order"]()}</TableHead>
+                <TableHead className="text-right">{translate["panel.action"]()}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -518,7 +509,7 @@ const LedgerTable = reatomComponent(({ ctx }) => {
           disabled={loadMore}
           onClick={() => economy.loadMore(ctx)}
         >
-          {loadMore ? "Загрузка..." : "Показать ещё"}
+          {loadMore ? translate["panel.loading"]() : translate["panel.show-more"]()}
         </Button>
       )}
 
@@ -536,10 +527,9 @@ const MigrationPanel = reatomComponent(({ ctx }) => {
 
   return (
     <SectionWrapper className="flex flex-col gap-2">
-      <Typography className="text-sm font-semibold">Миграция балансов</Typography>
+      <Typography className="text-sm font-semibold">{translate["panel.balance-migrations"]()}</Typography>
       <Typography className="text-xs text-neutral-400">
-        Переносит балансы плагинов в кошелёк один раз; повторный запуск безопасен и пропускает уже перенесённых.
-      </Typography>
+        {translate["panel.moves-plugin-balances-into-the-wallet-once-a-rep"]()}</Typography>
 
       <div className="flex items-center gap-2">
         <Button
@@ -548,13 +538,13 @@ const MigrationPanel = reatomComponent(({ ctx }) => {
           disabled={busy}
           onClick={() => economy.migrate(ctx)}
         >
-          {busy ? "Миграция..." : "Запустить миграцию"}
+          {busy ? translate["panel.migrating"]() : translate["panel.start-the-migration"]()}
         </Button>
 
         {batch && (
           <Typography className="text-xs text-neutral-400">
-            Проверено {batch.scanned}, перенесено {batch.migrated}, пропущено {batch.skipped}
-            {batch.nextCursor ? ", продолжение..." : ", завершено"}
+            {translate["panel.checked"]()}{batch.scanned}{translate["panel.transferred"]()}{batch.migrated}{translate["panel.skipped"]()}{batch.skipped}
+            {batch.nextCursor ? translate["panel.continuation"]() : translate["panel.completed"]()}
           </Typography>
         )}
       </div>
@@ -581,22 +571,21 @@ const RatesSection = reatomComponent(({ ctx }) => {
 
   return (
     <SectionWrapper className="flex flex-col gap-2">
-      <Typography className="text-sm font-semibold">Курсы валют</Typography>
+      <Typography className="text-sm font-semibold">{translate["panel.currency-rates"]()}</Typography>
       <Typography className="text-xs text-neutral-400">
-        База - цена BELKOIN в рублях; остальные валюты считаются через BELKOIN. Спред удерживается при конвертации.
-      </Typography>
+        {translate["panel.base-the-belkoin-price-in-rubles-other-currencie"]()}</Typography>
 
       {payload && payload.current.length > 0
         ? (
           <Table>
             <TableHeader>
               <TableRow className="*:font-semibold *:text-base">
-                <TableHead>Из</TableHead>
-                <TableHead>В</TableHead>
-                <TableHead>Курс</TableHead>
-                <TableHead>Спред</TableHead>
-                <TableHead className="text-right">Действует с</TableHead>
-                {canWrite && <TableHead className="text-right">Действия</TableHead>}
+                <TableHead>{translate["panel.from"]()}</TableHead>
+                <TableHead>{translate["panel.in"]()}</TableHead>
+                <TableHead>{translate["panel.rate"]()}</TableHead>
+                <TableHead>{translate["panel.spread"]()}</TableHead>
+                <TableHead className="text-right">{translate["panel.valid-from"]()}</TableHead>
+                {canWrite && <TableHead className="text-right">{translate["panel.actions"]()}</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -616,16 +605,14 @@ const RatesSection = reatomComponent(({ ctx }) => {
                           disabled={busy}
                           onClick={() => economy.startEditRate(ctx, item)}
                         >
-                          Изменить
-                        </Button>
+                          {translate["panel.edit"]()}</Button>
                         <Button
                           size="small"
                           background="default"
                           disabled={busy}
                           onClick={() => economy.confirmDeleteRate(ctx, item)}
                         >
-                          Удалить
-                        </Button>
+                          {translate["panel.delete"]()}</Button>
                       </div>
                     </TableCell>
                   )}
@@ -634,7 +621,7 @@ const RatesSection = reatomComponent(({ ctx }) => {
             </TableBody>
           </Table>
         )
-        : <Noop title="Курсы ещё не заданы" />}
+        : <Noop title={translate["panel.rates-are-not-set-yet"]()} />}
 
       {canWrite && (
         <div className="flex flex-wrap items-center gap-2">
@@ -658,7 +645,7 @@ const RatesSection = reatomComponent(({ ctx }) => {
           <Input
             value={rate}
             onChange={(event) => economyState.rateForm.rate(ctx, event.target.value.replace(/[^0-9.]/g, ""))}
-            placeholder="Курс"
+            placeholder={translate["panel.rate"]()}
             inputMode="decimal"
             maxLength={12}
             className="h-8 w-28"
@@ -666,7 +653,7 @@ const RatesSection = reatomComponent(({ ctx }) => {
           <Input
             value={spread}
             onChange={(event) => economyState.rateForm.spread(ctx, event.target.value.replace(/[^0-9.]/g, ""))}
-            placeholder="Спред, 0.05"
+            placeholder={translate["panel.spread-0-05"]()}
             inputMode="decimal"
             maxLength={6}
             className="h-8 w-28"
@@ -677,7 +664,7 @@ const RatesSection = reatomComponent(({ ctx }) => {
             disabled={!valid || busy}
             onClick={() => economy.addRate(ctx)}
           >
-            {editing !== null ? "Сохранить" : "Добавить курс"}
+            {editing !== null ? translate["panel.save"]() : translate["panel.add-a-rate"]()}
           </Button>
           {editing !== null && (
             <Button
@@ -686,8 +673,7 @@ const RatesSection = reatomComponent(({ ctx }) => {
               disabled={busy}
               onClick={() => economy.cancelEditRate(ctx)}
             >
-              Отмена
-            </Button>
+              {translate["panel.cancel"]()}</Button>
           )}
           {error && <ErrorBlock title={error.message} />}
         </div>
@@ -707,16 +693,15 @@ const FakePaymentSection = reatomComponent(({ ctx }) => {
 
   return (
     <SectionWrapper className="flex flex-col gap-2">
-      <Typography className="text-sm font-semibold">Тестовая оплата</Typography>
+      <Typography className="text-sm font-semibold">{translate["panel.test-payment"]()}</Typography>
       <Typography className="text-xs text-neutral-400">
-        Создаёт счёт фейкового провайдера и открывает страницу оплаты. Доступно только админам.
-      </Typography>
+        {translate["panel.creates-an-invoice-of-the-fake-provider-and-open"]()}</Typography>
 
       <div className="flex flex-wrap items-center gap-2">
         <Input
           value={amount}
           onChange={(event) => economyState.fakeAmount(ctx, event.target.value.replace(/\D/g, ""))}
-          placeholder="Сумма, ₽"
+          placeholder={translate["panel.amount-rub"]()}
           inputMode="numeric"
           maxLength={10}
           className="h-8 w-36"
@@ -727,8 +712,7 @@ const FakePaymentSection = reatomComponent(({ ctx }) => {
           disabled={busy || amount.length === 0}
           onClick={() => economy.createFakeInvoice(ctx)}
         >
-          Создать счёт
-        </Button>
+          {translate["panel.create-an-invoice"]()}</Button>
       </div>
 
       {error && <ErrorBlock title={error.message} />}
@@ -736,12 +720,11 @@ const FakePaymentSection = reatomComponent(({ ctx }) => {
       {order && (
         <div className="flex flex-col gap-1 text-xs text-neutral-400">
           <span>
-            Заказ {order.orderId}: {order.status}, к начислению BELKOIN {order.belkoin}
+            {translate["panel.order"]()}{order.orderId}: {order.status}{translate["panel.to-accrue-belkoin"]()}{order.belkoin}
           </span>
           {order.payUrl && (
             <a className="text-neutral-50 underline" href={order.payUrl} target="_blank" rel="noreferrer">
-              Открыть страницу оплаты
-            </a>
+              {translate["panel.open-the-payment-page"]()}</a>
           )}
         </div>
       )}
@@ -767,7 +750,7 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
   return (
     <SectionWrapper className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Typography className="text-sm font-semibold">Сверка и отчёт</Typography>
+        <Typography className="text-sm font-semibold">{translate["panel.reconciliation-and-report"]()}</Typography>
         <div className="flex items-center gap-2">
           <Button
             background="default"
@@ -775,7 +758,7 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
             disabled={checking}
             onClick={() => economy.loadReconciliation(ctx)}
           >
-            {checking ? "Проверка..." : "Проверить сверку"}
+            {checking ? translate["panel.checking"]() : translate["panel.run-the-reconciliation"]()}
           </Button>
           <Button
             background="default"
@@ -783,7 +766,7 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
             disabled={loadingReport}
             onClick={() => economy.loadReport(ctx)}
           >
-            {loadingReport ? "Загрузка..." : "Отчёт за 7 дней"}
+            {loadingReport ? translate["panel.loading"]() : translate["panel.7-day-report"]()}
           </Button>
         </div>
       </div>
@@ -793,21 +776,17 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
       {data && (
         <div className="flex flex-col gap-2">
           <Typography className="text-xs text-neutral-400">
-            Проверено {data.balances.checked}, расхождений {data.balances.mismatchCount},
-            лотов не сходится {data.balances.lotMismatch},
-            ждут проекции {data.balances.pendingProjection}, без строки плагина {data.balances.missingPlugin}.
-            Очередь: {data.jobs.pending} в ожидании, {data.jobs.failed} с ошибкой, {data.jobs.stuck} зависло.
-          </Typography>
+            {translate["panel.checked"]()}{data.balances.checked}{translate["panel.discrepancies"]()}{data.balances.mismatchCount}{translate["panel.lots-do-not-match"]()}{data.balances.lotMismatch}{translate["panel.awaiting-the-projection"]()}{data.balances.pendingProjection}{translate["panel.without-the-plugin-line"]()}{data.balances.missingPlugin}{translate["panel.queue"]()}{data.jobs.pending} {translate["panel.pending"]()}{data.jobs.failed} {translate["panel.with-an-error"]()}{data.jobs.stuck} {translate["panel.stuck"]()}</Typography>
 
           {data.balances.mismatches.length > 0 && (
             <Table>
               <TableHeader>
                 <TableRow className="*:font-semibold *:text-base">
-                  <TableHead>Игрок</TableHead>
-                  <TableHead>Валюта</TableHead>
+                  <TableHead>{translate["panel.player"]()}</TableHead>
+                  <TableHead>{translate["panel.currency"]()}</TableHead>
                   <TableHead>Ledger</TableHead>
-                  <TableHead>Плагин</TableHead>
-                  <TableHead className="text-right">Разница</TableHead>
+                  <TableHead>{translate["panel.plugin"]()}</TableHead>
+                  <TableHead className="text-right">{translate["panel.difference"]()}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -828,8 +807,7 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
             <div className="flex flex-col gap-1 text-xs text-red">
               {data.jobs.failedSamples.map((job) => (
                 <span key={`${job.orderId}:${job.kind}`}>
-                  {job.kind} {job.orderId}: {job.error ?? "unknown"} ({job.attempts} попыток)
-                </span>
+                  {job.kind} {job.orderId}: {job.error ?? "unknown"} ({job.attempts} {translate["panel.attempts"]()}</span>
               ))}
             </div>
           )}
@@ -839,27 +817,20 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
       {report && (
         <div className="flex flex-col gap-2">
           <Typography className="text-xs text-neutral-400">
-            Период: {formatDate(report.period.from)} - {formatDate(report.period.to)}.
-            Заказов {report.payments.created}, оплачено {report.payments.succeeded},
-            возвращено {report.payments.refunded},
-            конверсия {(report.payments.conversion * 100).toFixed(1)}%,
-            плательщиков {report.payments.uniquePayers},
-            выдано BELKOIN {number.format(report.payments.belkoinIssued)}.
-            Топ-5 держателей: {(report.whales.topShare * 100).toFixed(1)}% от {number.format(report.whales.totalBelkoin)} BELKOIN.
+            {translate["panel.period"]()}{formatDate(report.period.from)} - {formatDate(report.period.to)}{translate["panel.orders"]()}{report.payments.created}{translate["panel.paid"]()}{report.payments.succeeded}{translate["panel.refunded"]()}{report.payments.refunded}{translate["panel.conversion"]()}{(report.payments.conversion * 100).toFixed(1)}{translate["panel.payers"]()}{report.payments.uniquePayers}{translate["panel.issued-belkoin"]()}{number.format(report.payments.belkoinIssued)}{translate["panel.top-5-holders"]()}{(report.whales.topShare * 100).toFixed(1)}{translate["panel.of"]()}{number.format(report.whales.totalBelkoin)} BELKOIN.
           </Typography>
 
           {(Object.entries(report.payments.revenueMinor).length > 0 || Object.entries(report.payments.refundedMinor).length > 0) && (
             <Typography className="text-xs text-neutral-400">
-              Выручка: {Object.entries(report.payments.revenueMinor)
+              {translate["panel.revenue"]()}{Object.entries(report.payments.revenueMinor)
                 .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
-                .join(", ") || "0"}.
-              Возвраты: {Object.entries(report.payments.refundedMinor)
+                .join(", ") || "0"}{translate["panel.refunds"]()}{Object.entries(report.payments.refundedMinor)
                 .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
                 .join(", ") || "0"}.
               Net: {Object.entries(report.payments.netRevenueMinor)
                 .map(([currency, amount]) => `${formatMinor(amount, currency)} ${currency}`)
                 .join(", ") || "0"}.
-              {!report.payments.providerRefundsImplemented && " Возвраты у провайдера ещё не реализованы."}
+              {!report.payments.providerRefundsImplemented && translate["panel.provider-refunds-are-not-implemented-yet"]()}
             </Typography>
           )}
 
@@ -867,12 +838,12 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
             <Table>
               <TableHeader>
                 <TableRow className="*:font-semibold *:text-base">
-                  <TableHead>Валюта</TableHead>
-                  <TableHead>Причина</TableHead>
-                  <TableHead>Приход</TableHead>
-                  <TableHead>Расход</TableHead>
-                  <TableHead>Итог</TableHead>
-                  <TableHead className="text-right">Операций</TableHead>
+                  <TableHead>{translate["panel.currency"]()}</TableHead>
+                  <TableHead>{translate["panel.reason"]()}</TableHead>
+                  <TableHead>{translate["panel.income"]()}</TableHead>
+                  <TableHead>{translate["panel.expense"]()}</TableHead>
+                  <TableHead>{translate["panel.total-3"]()}</TableHead>
+                  <TableHead className="text-right">{translate["panel.operations"]()}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -897,11 +868,11 @@ const ReconciliationSection = reatomComponent(({ ctx }) => {
 
 
 const ORDER_STATUS_LABEL: Record<string, string> = {
-  pending: "Ожидает",
-  succeeded: "Оплачен",
-  failed: "Ошибка",
-  expired: "Истёк",
-  refunded: "Возврат",
+  pending: translate["panel.pending-2"](),
+  succeeded: translate["panel.paid-2"](),
+  failed: translate["panel.error"](),
+  expired: translate["panel.expired"](),
+  refunded: translate["panel.refund"](),
 };
 
 const ORDER_STATUS_STYLE: Record<string, string> = {
@@ -913,16 +884,16 @@ const ORDER_STATUS_STYLE: Record<string, string> = {
 };
 
 const ORDER_STATUSES: { label: string, value: Nullable<string> }[] = [
-  { label: "Все", value: null },
-  { label: "Ожидают", value: "pending" },
-  { label: "Оплачены", value: "succeeded" },
-  { label: "Возвраты", value: "refunded" },
-  { label: "Ошибки", value: "failed" },
-  { label: "Истекли", value: "expired" },
+  { label: translate["panel.all"](), value: null },
+  { label: translate["panel.pending-3"](), value: "pending" },
+  { label: translate["panel.paid-3"](), value: "succeeded" },
+  { label: translate["panel.refunds-2"](), value: "refunded" },
+  { label: translate["panel.errors"](), value: "failed" },
+  { label: translate["panel.expired-2"](), value: "expired" },
 ];
 
 const ORDER_PROVIDERS = [
-  { label: "Все провайдеры", value: "" },
+  { label: translate["panel.all-providers"](), value: "" },
   { label: "Fake", value: "fake" },
   { label: "SBP", value: "sbp" },
 ];
@@ -987,7 +958,7 @@ const OrdersSection = reatomComponent(({ ctx }) => {
               onKeyDown={(event) => {
                 if (event.key === "Enter") economy.applyOrdersNickname(ctx);
               }}
-              placeholder="Никнейм"
+              placeholder={translate["panel.nickname"]()}
               maxLength={32}
               className="h-8 w-44"
             />
@@ -997,7 +968,7 @@ const OrdersSection = reatomComponent(({ ctx }) => {
               disabled={loading}
               onClick={() => economy.applyOrdersNickname(ctx)}
             >
-              {loading ? "Загрузка..." : "Найти"}
+              {loading ? translate["panel.loading"]() : translate["panel.search"]()}
             </Button>
           </div>
 
@@ -1005,7 +976,7 @@ const OrdersSection = reatomComponent(({ ctx }) => {
             value={status ?? ""}
             onChange={(event) => setStatus(event.target.value)}
             className={FILTER_CONTROL_CLASS}
-            aria-label="Фильтр по статусу"
+            aria-label={translate["panel.filter-by-status"]()}
           >
             {ORDER_STATUSES.map((item) => (
               <option key={item.label} value={item.value ?? ""}>{item.label}</option>
@@ -1016,7 +987,7 @@ const OrdersSection = reatomComponent(({ ctx }) => {
             value={provider ?? ""}
             onChange={(event) => setProvider(event.target.value)}
             className={FILTER_CONTROL_CLASS}
-            aria-label="Фильтр по провайдеру"
+            aria-label={translate["panel.filter-by-provider"]()}
           >
             {ORDER_PROVIDERS.map((item) => (
               <option key={item.label} value={item.value}>{item.label}</option>
@@ -1027,19 +998,19 @@ const OrdersSection = reatomComponent(({ ctx }) => {
             value={sort}
             onChange={(event) => applySort(event.target.value as "date" | "amount")}
             className={FILTER_CONTROL_CLASS}
-            aria-label="Сортировка"
+            aria-label={translate["panel.sorting"]()}
           >
-            <option value="date">По дате</option>
-            <option value="amount">По сумме</option>
+            <option value="date">{translate["panel.by-date"]()}</option>
+            <option value="amount">{translate["panel.by-amount"]()}</option>
           </select>
 
           <Button
             background="default"
             className="h-8 px-3 text-xs"
             onClick={toggleOrder}
-            title={order === "desc" ? "По убыванию" : "По возрастанию"}
+            title={order === "desc" ? translate["panel.descending-2"]() : translate["panel.ascending-2"]()}
           >
-            {order === "desc" ? "↓ Убывание" : "↑ Возрастание"}
+            {order === "desc" ? translate["panel.descending"]() : translate["panel.ascending"]()}
           </Button>
 
           <Button
@@ -1048,20 +1019,19 @@ const OrdersSection = reatomComponent(({ ctx }) => {
             disabled={!hasFilters || loading}
             onClick={() => economy.resetOrdersFilters(ctx)}
           >
-            Сбросить
-          </Button>
+            {translate["panel.reset"]()}</Button>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500">
-          <span>Показано: {orders.length}{meta?.hasNextPage ? "+" : ""}</span>
+          <span>{translate["panel.shown"]()}{orders.length}{meta?.hasNextPage ? "+" : ""}</span>
           {appliedNickname && (
-            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">Игрок: {appliedNickname}</span>
+            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">{translate["panel.player-2"]()}{appliedNickname}</span>
           )}
           {status && (
-            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">Статус: {statusLabel}</span>
+            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">{translate["panel.status-2"]()}{statusLabel}</span>
           )}
           {provider && (
-            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">Провайдер: {providerLabel}</span>
+            <span className="rounded-sm bg-neutral-800 px-1.5 py-0.5">{translate["panel.provider-2"]()}{providerLabel}</span>
           )}
         </div>
       </div>
@@ -1071,11 +1041,10 @@ const OrdersSection = reatomComponent(({ ctx }) => {
       {orders.length === 0
         ? (
           <div className="flex flex-col items-center gap-2">
-            <Noop title={loading ? "Загрузка..." : "Заказов нет"} />
+            <Noop title={loading ? translate["panel.loading"]() : translate["panel.no-orders"]()} />
             {hasFilters && (
               <Button background="default" className="h-8 px-3 text-xs" onClick={() => economy.resetOrdersFilters(ctx)}>
-                Сбросить фильтры
-              </Button>
+                {translate["panel.reset-the-filters"]()}</Button>
             )}
           </div>
         )
@@ -1089,14 +1058,14 @@ const OrdersSection = reatomComponent(({ ctx }) => {
                     className="inline-flex items-center gap-1 hover:text-neutral-50"
                     onClick={() => applySort("date")}
                   >
-                    Дата {sort === "date" ? (order === "desc" ? "↓" : "↑") : ""}
+                    {translate["panel.date"]()}{sort === "date" ? (order === "desc" ? "↓" : "↑") : ""}
                   </button>
                 </TableHead>
-                <TableHead>Заказ</TableHead>
-                <TableHead>Игрок</TableHead>
-                <TableHead>Провайдер</TableHead>
-                <TableHead>Статус</TableHead>
-                <TableHead>Сумма</TableHead>
+                <TableHead>{translate["panel.order"]()}</TableHead>
+                <TableHead>{translate["panel.player"]()}</TableHead>
+                <TableHead>{translate["panel.provider"]()}</TableHead>
+                <TableHead>{translate["panel.status"]()}</TableHead>
+                <TableHead>{translate["panel.amount"]()}</TableHead>
                 <TableHead>
                   <button
                     type="button"
@@ -1106,7 +1075,7 @@ const OrdersSection = reatomComponent(({ ctx }) => {
                     BELKOIN {sort === "amount" ? (order === "desc" ? "↓" : "↑") : ""}
                   </button>
                 </TableHead>
-                <TableHead className="text-right">Действие</TableHead>
+                <TableHead className="text-right">{translate["panel.action"]()}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -1136,8 +1105,7 @@ const OrdersSection = reatomComponent(({ ctx }) => {
                         disabled={busy}
                         onClick={() => economy.confirmRefundOrder(ctx, order)}
                       >
-                        Вернуть
-                      </Button>
+                        {translate["panel.revert"]()}</Button>
                     )}
                   </TableCell>
                 </TableRow>
@@ -1153,7 +1121,7 @@ const OrdersSection = reatomComponent(({ ctx }) => {
           disabled={loadingMore}
           onClick={() => economy.loadMoreOrders(ctx)}
         >
-          {loadingMore ? "Загрузка..." : "Показать ещё"}
+          {loadingMore ? translate["panel.loading"]() : translate["panel.show-more"]()}
         </Button>
       )}
     </SectionWrapper>
@@ -1161,10 +1129,10 @@ const OrdersSection = reatomComponent(({ ctx }) => {
 }, "EconomyOrders");
 
 const PANEL_TABS = [
-  { value: "player", label: "Игрок" },
-  { value: "rates", label: "Курсы" },
-  { value: "payments", label: "Платежи" },
-  { value: "reconciliation", label: "Сверка" },
+  { value: "player", label: translate["panel.player"]() },
+  { value: "rates", label: translate["panel.rates"]() },
+  { value: "payments", label: translate["panel.payments"]() },
+  { value: "reconciliation", label: translate["panel.reconciliation"]() },
 ] as const;
 
 type PanelTab = typeof PANEL_TABS[number]["value"];
@@ -1204,7 +1172,7 @@ export const EconomyPanel = reatomComponent(({ ctx }) => {
           {loading && !wallet && <PageLoader />}
 
           {!wallet && !loading && (
-            <Noop title="Найдите игрока, чтобы увидеть его кошелёк и журнал" />
+            <Noop title={translate["panel.find-a-player-to-see-the-wallet-and-the-log"]()} />
           )}
 
           {wallet && (
@@ -1239,5 +1207,5 @@ export const EconomyPanel = reatomComponent(({ ctx }) => {
 }, "EconomyPanel");
 
 export const EconomyHeader = () => (
-  <WithHeader title="Экономика" />
+  <WithHeader title={translate["panel.economy"]()} />
 );

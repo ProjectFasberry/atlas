@@ -7,6 +7,7 @@ import { logRouting } from "@/shared/lib/log";
 import { land } from "@/shared/components/app/land/models/land.model";
 import { createCtx } from "@reatom/framework";
 import { snapshots } from "@/shared/models/ssr";
+import { translate } from "@/shared/locales/helpers"
 
 const image = getStaticImage("arts/adventure-in-blossom.jpg")
 
@@ -20,13 +21,12 @@ function metadata(
   const title = wrapTitle(land.name.slice(0, 64))
   const created_at = dayjs(land.created_at.toString()).format("DD MMM YYYY");
   // todo: i18n meta
-  const description = `
-    Территория ${land.name}. Создана ${created_at}. ${land.members.length} участников
-  `
-  const keywords = `
-    ${land.name}, fasberry, fasberry page, территория ${land.name},
-    land, fasberry land, fasberry ${land.name}
-  `
+  const description = translate["land.page.description"]({
+    name: land.name,
+    date: created_at,
+    count: land.members.length,
+  })
+  const keywords = translate["land.page.keywords"]({ name: land.name })
 
   return {
     title,

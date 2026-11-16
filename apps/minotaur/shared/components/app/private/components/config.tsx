@@ -11,14 +11,15 @@ import { Roles } from "./roles"
 import { dictionariesSection } from "./dictionaries"
 import { Servers } from "./servers"
 import { createTabAtom, hasTabAccess, type PanelTab } from "../models/tabs.model"
+import { translate } from "@/shared/locales/helpers"
 
 type ConfigTab = "general" | "roles" | "dictionaries" | "servers"
 
 const CONFIG_TABS: PanelTab<ConfigTab>[] = [
-  { value: "general", title: "Основное" },
-  { value: "roles", title: "Роли", permissions: ["roles.read"] },
-  { value: "dictionaries", title: "Справочник", permissions: ["dictionaries.read"] },
-  { value: "servers", title: "Серверы", permissions: ["servers.read"] },
+  { value: "general", title: translate["panel.main"]() },
+  { value: "roles", title: translate["panel.roles"](), permissions: ["roles.read"] },
+  { value: "dictionaries", title: translate["panel.dictionary"](), permissions: ["dictionaries.read"] },
+  { value: "servers", title: translate["panel.servers"](), permissions: ["servers.read"] },
 ]
 
 const configTab = createTabAtom("configTab", CONFIG_TABS, "general")
@@ -44,14 +45,14 @@ export const Config = reatomComponent(({ ctx }) => {
       />
 
       {active === "general" && (
-        <PanelSection title="Основное">
+        <PanelSection title={translate["panel.main"]()}>
           <div className="flex flex-col sm:flex-row gap-2 sm:items-stretch w-full">
             <div className="flex flex-col gap-1 w-full">
-              <WithHeader title="Глобальные параметры" />
+              <WithHeader title={translate["panel.global-settings"]()} />
               <Options />
             </div>
             <div className="flex flex-col gap-1 w-full">
-              <WithHeader title="Платежные методы" />
+              <WithHeader title={translate["panel.payment-methods"]()} />
               <Methods />
             </div>
           </div>
@@ -59,14 +60,14 @@ export const Config = reatomComponent(({ ctx }) => {
       )}
 
       {active === "roles" && (
-        <PanelSection title="Роли">
+        <PanelSection title={translate["panel.roles"]()}>
           <Roles />
         </PanelSection>
       )}
 
       {active === "dictionaries" && (
         <PanelSection
-          title="Справочник"
+          title={translate["panel.dictionary"]()}
           parent="dictionaries"
           action={<ActionsHeaderSlot parent="dictionaries" />}
         >
@@ -75,7 +76,7 @@ export const Config = reatomComponent(({ ctx }) => {
       )}
 
       {active === "servers" && (
-        <PanelSection title="Серверы">
+        <PanelSection title={translate["panel.servers"]()}>
           <Servers />
         </PanelSection>
       )}

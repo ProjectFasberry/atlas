@@ -14,6 +14,7 @@ import { invariant } from "@/shared/lib/utils"
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
 import { createViewerModel } from "@/shared/models/shared.model"
 import { env } from "@/shared/env"
+import { translate } from "@/shared/locales/helpers"
 
 export type PrivatedUser = PrivatedUsersPayload["data"][number]
 export type PrivatedUsersPayload = ExtractApiData<"getPrivatedUserList">["data"]
@@ -142,7 +143,7 @@ export const users = atom(null, "users").pipe(
       return result
     }, {
       name: `${name}.rejectSkin`,
-      onFulfill: () => toast.success("Скин отклонён"),
+      onFulfill: () => toast.success(translate["panel.skin-rejected"]()),
       onReject: (_, e) => logError(e, { type: "combined" }),
     }).pipe(withStatusesAtom()),
     rejectAllSkins: reatomAsync(async (ctx, nickname: string) => {
@@ -158,7 +159,7 @@ export const users = atom(null, "users").pipe(
       return result
     }, {
       name: `${name}.rejectAllSkins`,
-      onFulfill: () => toast.success("Скины отклонены"),
+      onFulfill: () => toast.success(translate["panel.skins-rejected"]()),
       onReject: (_, e) => logError(e, { type: "combined" }),
     }).pipe(withStatusesAtom())
   }))
@@ -432,7 +433,7 @@ export const usersAuth = atom(null, "usersAuth").pipe(
 
           if (!isConfirmed) {
             alertDialog.open(ctx, {
-              title: "Вы точно хотите удалить этого игрока?",
+              title: translate["panel.delete-this-player"](),
               onConfirm: () => {
                 usersAuthState.deleteUser.isConfirmed(ctx, true)
                 return usersAuth.deleteUser.submit(ctx, e)
@@ -529,7 +530,7 @@ export const usersAuth = atom(null, "usersAuth").pipe(
           name: `${name}.submit`,
           onFulfill: (ctx) => {
             usersAuthState.createUser.isOpen(ctx, false)
-            toast.success("Пользователь создан")
+            toast.success(translate["panel.user-created"]())
             users.refetchAll(ctx)
           },
           onReject: (_, e) => logError(e, { type: "combined" })
@@ -577,51 +578,51 @@ export type UserAction = UserActionBase & {
 export const USER_ACTIONS: UserAction[] = [
   {
     group: "restricts",
-    label: "Рестрикты",
+    label: translate["panel.restrictions"](),
     childs: [
       {
-        label: "Бан",
+        label: translate["panel.ban"](),
         event: "ban",
         fields: [
-          { label: "Срок", value: "duration" },
-          { label: "Причина", value: "reason" }
+          { label: translate["panel.term"](), value: "duration" },
+          { label: translate["panel.reason"](), value: "reason" }
         ]
       },
       {
-        label: "Разбан",
+        label: translate["panel.unban"](),
         event: "unban",
       },
       {
-        label: "Мут",
+        label: translate["panel.mute"](),
         event: "mute",
         fields: [
-          { label: "Срок", value: "duration" },
-          { label: "Причина", value: "reason" }
+          { label: translate["panel.term"](), value: "duration" },
+          { label: translate["panel.reason"](), value: "reason" }
         ]
       },
       {
-        label: "Размут",
+        label: translate["panel.unmute"](),
         event: "unmute"
       },
       {
-        label: "Кик",
+        label: translate["panel.kick"](),
         event: "kick",
         fields: [
-          { label: "Причина", value: "reason" }
+          { label: translate["panel.reason"](), value: "reason" }
         ]
       },
       {
-        label: "Выйти из сессии",
+        label: translate["panel.sign-out-of-the-session"](),
         event: "unlogin",
       },
     ]
   },
   {
     group: "auth",
-    label: "Удалить",
+    label: translate["panel.delete"](),
     childs: [
       {
-        label: "Удалить",
+        label: translate["panel.delete"](),
         event: "unregister",
       }
     ]

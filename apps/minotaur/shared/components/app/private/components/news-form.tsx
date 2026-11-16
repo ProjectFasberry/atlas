@@ -12,6 +12,7 @@ import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import { CharacterCount, Placeholder } from "@tiptap/extensions";
 import { editorExtensions } from "@/shared/components/config/editor/editor.model";
 import { EditorMenuBar } from "@/shared/components/config/editor/editor";
+import { translate } from "@/shared/locales/helpers"
 
 const CONTENT_LIMIT = 1024;
 
@@ -55,7 +56,7 @@ export const NewsEditor = reatomComponent<NewsEditorProps>(({ ctx, tempContentAt
     extensions: [
       ...editorExtensions,
       CharacterCount,
-      Placeholder.configure({ placeholder: "Напишите что-нибудь..." }),
+      Placeholder.configure({ placeholder: translate["panel.type-something"]() }),
     ],
     content: initValue as JSONContent | undefined,
     onUpdate: ({ editor }) => {
@@ -82,11 +83,10 @@ export const NewsEditor = reatomComponent<NewsEditorProps>(({ ctx, tempContentAt
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
-          Содержание<span className="text-red-400"> *</span>
+          {translate["panel.content-2"]()}<span className="text-red-400"> *</span>
         </span>
         <span className={`text-[11px] ${overLimit ? "text-red-400" : "text-neutral-500"}`}>
-          {charactersCount}/{CONTENT_LIMIT} символов · {wordsCount} слов
-        </span>
+          {charactersCount}/{CONTENT_LIMIT} {translate["panel.characters"]()}{wordsCount} {translate["panel.words"]()}</span>
       </div>
       <div className="flex flex-col overflow-hidden rounded-lg border border-neutral-800">
         <EditorMenuBar editor={editor} />
@@ -97,7 +97,7 @@ export const NewsEditor = reatomComponent<NewsEditorProps>(({ ctx, tempContentAt
       </div>
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] text-neutral-500">
-          {overLimit ? "Слишком длинный текст, сократите его" : "Ссылки, списки и таблицы поддерживаются"}
+          {overLimit ? translate["panel.the-text-is-too-long-shorten-it"]() : translate["panel.links-lists-and-tables-are-supported"]()}
         </span>
         <Button
           type="button"
@@ -112,8 +112,7 @@ export const NewsEditor = reatomComponent<NewsEditorProps>(({ ctx, tempContentAt
           }}
         >
           <Icon name="sprite:check" className="size-4" />
-          Применить
-        </Button>
+          {translate["panel.apply"]()}</Button>
       </div>
     </div>
   );
@@ -142,15 +141,14 @@ export const NewsImagePanel = reatomComponent<NewsImagePanelProps>(({ ctx, url, 
   return (
     <div className="flex w-full flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-900/40 p-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Изображение</span>
+        <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">{translate["panel.image"]()}</span>
         {url ? (
           <button
             type="button"
             onClick={onClear}
             className="text-[11px] text-neutral-400 underline hover:text-red-300"
           >
-            Удалить
-          </button>
+            {translate["panel.delete"]()}</button>
         ) : null}
       </div>
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -164,7 +162,7 @@ export const NewsImagePanel = reatomComponent<NewsImagePanelProps>(({ ctx, url, 
             />
           ) : (
             <Typography className="px-2 text-center text-[11px] text-neutral-500">
-              {loading ? "Загрузка..." : "Изображение не выбрано"}
+              {loading ? translate["panel.loading"]() : translate["panel.no-image-selected"]()}
             </Typography>
           )}
         </div>
@@ -188,18 +186,17 @@ export const NewsImagePanel = reatomComponent<NewsImagePanelProps>(({ ctx, url, 
               name="url"
               defaultValue={isAbsoluteUrl(url) ? url : ""}
               placeholder="https://..."
-              aria-label="Ссылка на изображение"
+              aria-label={translate["panel.image-link"]()}
               className="h-8 text-sm"
             />
             <Button type="submit" background="default" className="h-8 shrink-0 text-sm font-semibold">
-              Применить
-            </Button>
+              {translate["panel.apply"]()}</Button>
           </form>
           {linkError ? (
-            <span className="text-[11px] text-red-400">Ссылка должна начинаться с http:// или https://</span>
+            <span className="text-[11px] text-red-400">{translate["panel.the-link-must-start-with-http-or-https"]()}</span>
           ) : null}
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-neutral-500">или</span>
+            <span className="text-[11px] text-neutral-500">{translate["panel.or"]()}</span>
             {storage}
           </div>
         </div>

@@ -1,8 +1,9 @@
 import { atom } from "@reatom/framework"
 import { withSearchParamsPersist } from "@reatom/url"
+import { translate } from "@/shared/locales/helpers"
 
 export const AUDIT_TABS = [
-  { value: "history", label: "История" },
+  { value: "history", label: translate["panel.history"]() },
 ] as const
 
 export type AuditTab = (typeof AUDIT_TABS)[number]["value"]

@@ -11,6 +11,7 @@ import { PageLoader } from "@/shared/ui/page-loader"
 import { BackButton } from "@/shared/ui/back-button"
 import { ClientOnly } from "vike-react/ClientOnly"
 import { lazy } from "react"
+import { translate } from "@/shared/locales/helpers"
 
 const ReactSkinview3d = lazy(() => import("react-skinview3d").then((m) => ({ default: m.ReactSkinview3d })));
 
@@ -29,14 +30,14 @@ const UserInfo = reatomComponent(({ ctx }) => {
           ID: {data.player?.id ?? "Unregistered"}
         </Typography>
         <Typography>
-          Никнейм: {data.nickname} ({data.lower_case_nickname})
+          {translate["panel.nickname-2"]()}{data.nickname} ({data.lower_case_nickname})
         </Typography>
-        Регистрация: {data.created_at ? dayjs(data.created_at.toString()).format("DD.MM.YYYY hh:mm") : "none"}
+        {translate["panel.registration-2"]()}{data.created_at ? dayjs(data.created_at.toString()).format("DD.MM.YYYY hh:mm") : "none"}
         <Typography>
           UUID: {data.uuid}
         </Typography>
         <Typography>
-          Роль: {data.role ? `${data.role.name} ${data.role.id}` : `none`}
+          {translate["panel.role-2"]()}{data.role ? `${data.role.name} ${data.role.id}` : `none`}
         </Typography>
       </div>
       <div className="flex w-full bg-neutral-900 h-[390px] rounded-lg p-2 sm:w-[300px]">
@@ -50,7 +51,7 @@ const UserInfo = reatomComponent(({ ctx }) => {
             />
           </ClientOnly>
         ) : (
-          <span className="m-auto text-neutral-400">Скина нет</span>
+          <span className="m-auto text-neutral-400">{translate["panel.no-skin"]()}</span>
         )}
       </div>
       </div>
@@ -65,7 +66,7 @@ const SkinsModeration = reatomComponent<{ nickname: string, skins: NonNullable<P
   ctx, nickname, skins
 }) => (
   <div className="flex flex-col gap-2 w-full max-w-2xl">
-    <Typography className="font-semibold">Скины</Typography>
+    <Typography className="font-semibold">{translate["panel.skins"]()}</Typography>
     {skins.map((skin) => (
       <div
         key={skin.skin_identifier}
@@ -83,8 +84,7 @@ const SkinsModeration = reatomComponent<{ nickname: string, skins: NonNullable<P
           disabled={ctx.spy(users.rejectSkin.statusesAtom).isPending}
           onClick={() => users.rejectSkin(ctx, { nickname, skinName: skin.skin_identifier })}
         >
-          Отклонить
-        </Button>
+          {translate["panel.reject"]()}</Button>
       </div>
     ))}
     <Button
@@ -93,8 +93,7 @@ const SkinsModeration = reatomComponent<{ nickname: string, skins: NonNullable<P
       disabled={ctx.spy(users.rejectAllSkins.statusesAtom).isPending}
       onClick={() => users.rejectAllSkins(ctx, nickname)}
     >
-      Отклонить все
-    </Button>
+      {translate["panel.reject-all"]()}</Button>
   </div>
 ), "SkinsModeration")
 

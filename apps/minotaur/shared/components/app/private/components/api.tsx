@@ -15,6 +15,7 @@ import { Typography } from "@/shared/ui/typography";
 import { Button } from "@/shared/ui/button";
 import { Noop } from "@/shared/ui/noop";
 import { clsx } from "cnfast";
+import { translate } from "@/shared/locales/helpers"
 
 type Field = {
   label: string;
@@ -27,18 +28,18 @@ type Field = {
 
 const fields: Field[] = [
   {
-    label: "Описание",
+    label: translate["panel.description"](),
     atom: apiKeysState.description,
-    placeholder: "Например: CI deploy",
+    placeholder: translate["panel.for-example-ci-deploy"](),
     type: "text",
   },
   {
-    label: "Длительность, сек",
+    label: translate["panel.duration-sec"](),
     atom: apiKeysState.duration,
     placeholder: "2592000",
     type: "number",
     min: 60,
-    hint: "Минимум 60 секунд, 2592000 = 30 дней.",
+    hint: translate["panel.at-least-60-seconds-2592000-30-days"](),
   },
 ];
 
@@ -92,19 +93,18 @@ const AfterCreateApiKeyDialogContent = reatomComponent(({ ctx }) => {
             {data.rawKey}
           </code>
           <span className="text-xs text-amber-400">
-            Скопируй ключ сейчас: после закрытия окна он больше не показывается.
+            {translate["panel.copy-the-key-now-it-is-not-shown-again-after-the"]()}</span>
+        </div>
+        <div className="flex flex-col w-full">
+          <Typography className="text-base">{translate["panel.description"]()}</Typography>
+          <span className="text-sm font-normal text-neutral-400">
+            {data.description || translate["panel.no-description"]()}
           </span>
         </div>
         <div className="flex flex-col w-full">
-          <Typography className="text-base">Описание</Typography>
+          <Typography className="text-base">{translate["panel.expiration"]()}</Typography>
           <span className="text-sm font-normal text-neutral-400">
-            {data.description || "Без описания"}
-          </span>
-        </div>
-        <div className="flex flex-col w-full">
-          <Typography className="text-base">Срок действия</Typography>
-          <span className="text-sm font-normal text-neutral-400">
-            {data.duration ? `${dayjs.duration(data.duration, "seconds").humanize(false)} (${data.duration} сек)` : "Бессрочно"}
+            {data.duration ? `${dayjs.duration(data.duration, "seconds").humanize(false)} ${translate["panel.seconds-suffix"]({ seconds: data.duration })}` : translate["panel.indefinitely"]()}
           </span>
         </div>
       </div>
@@ -123,8 +123,7 @@ const AfterCreateApiKeyDialogContent = reatomComponent(({ ctx }) => {
             })
           }}
         >
-          Удалить
-        </Button>
+          {translate["panel.delete"]()}</Button>
         <Copy
           as="button"
           onClick={() => navigator.clipboard.writeText(data.rawKey)}
@@ -167,15 +166,15 @@ const CreateApiKeySubmit = reatomComponent(({ ctx }) => {
 
 const expiryState = (key: { created_at: string; duration: number | null }) => {
   if (key.duration == null) {
-    return { label: "Бессрочно", className: "border-neutral-600/30 bg-neutral-600/10 text-neutral-300" };
+    return { label: translate["panel.indefinitely"](), className: "border-neutral-600/30 bg-neutral-600/10 text-neutral-300" };
   }
 
   const expires = dayjs(key.created_at).add(key.duration, "seconds");
   if (expires.isBefore(dayjs())) {
-    return { label: "Истёк", className: "border-red/30 bg-red/10 text-red" };
+    return { label: translate["panel.expired"](), className: "border-red/30 bg-red/10 text-red" };
   }
 
-  return { label: "Активно", className: "border-green-500/20 bg-green-500/10 text-green-400" };
+  return { label: translate["panel.active"](), className: "border-green-500/20 bg-green-500/10 text-green-400" };
 };
 
 export const ApiKeys = reatomComponent(({ ctx }) => {
@@ -190,7 +189,7 @@ export const ApiKeys = reatomComponent(({ ctx }) => {
 
   const data = ctx.spy(apiKeysState.data)
   if (!data) return <Skeleton className="h-12 w-full" />
-  if (data.length === 0) return <Noop title="API-ключей пока нет" />
+  if (data.length === 0) return <Noop title={translate["panel.no-api-keys-yet"]()} />
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -217,9 +216,11 @@ export const ApiKeys = reatomComponent(({ ctx }) => {
                 <code className="rounded-sm bg-neutral-800 px-1.5 py-0.5 font-mono text-xs text-neutral-300">
                   #{key.id}
                 </code>
-                <span>Создано: {created.format("DD.MM.YYYY HH:mm")}</span>
+                <span>{translate["panel.created"]()}{created.format("DD.MM.YYYY HH:mm")}</span>
                 <span>
-                  {expires ? `Действует до: ${expires.format("DD.MM.YYYY HH:mm")}` : "Без срока"}
+                  {expires
+                    ? translate["panel.valid-until"]({ date: expires.format("DD.MM.YYYY HH:mm") })
+                    : translate["panel.no-deadline"]()}
                 </span>
               </div>
             </div>

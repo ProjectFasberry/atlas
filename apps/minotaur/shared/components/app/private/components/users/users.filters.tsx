@@ -12,6 +12,7 @@ import { createViewerModel } from "@/shared/models/shared.model";
 import { Checkbox } from "@ark-ui/react/checkbox";
 import { checkboxVariant } from "@/shared/ui/checkbox";
 import { UsersManagement } from "./users-management";
+import { translate } from "@/shared/locales/helpers"
 
 const UsersGlobalActions = reatomComponent(({ ctx }) => {
   const isSelectedOver = ctx.spy(usersSelectedOverAtom);
@@ -45,15 +46,14 @@ const UsersSelectedLength = reatomComponent(({ ctx }) => {
   const data = ctx.spy(usersSelectedLengthAtom)
   if (data < 2) return null;
 
-  return <>Выбрано:&nbsp;{data}</>
+  return <>{translate["panel.selected"]()}{data}</>
 }, "UsersSelectedLength")
 
 const UsersFiltersLength = reatomComponent(({ ctx }) => {
   return (
     <div className="flex items-center gap-4 w-full text-neutral-400 text-sm">
       <div className="flex text-sm items-center gap-1">
-        Загружено:&nbsp;
-        {ctx.spy(users.fetch.statusesAtom).isPending ? <Skeleton className="h-5 w-5" /> : ctx.spy(usersLengthAtom)}
+        {translate["panel.loaded-2"]()}{ctx.spy(users.fetch.statusesAtom).isPending ? <Skeleton className="h-5 w-5" /> : ctx.spy(usersLengthAtom)}
       </div>
       <div className="flex text-sm items-center gap-1">
         <UsersSelectedLength />
@@ -71,7 +71,7 @@ const UsersFiltersAsc = reatomComponent(({ ctx }) => {
       className="h-8 aspect-square p-0"
       onClick={() => usersState.filters.asc(ctx, (state) => !state)}
       disabled={ctx.spy(users.fetch.statusesAtom).isPending || searching}
-      title={searching ? "При поиске результаты упорядочены по релевантности" : undefined}
+      title={searching ? translate["panel.search-results-are-ordered-by-relevance"]() : undefined}
     >
       {ctx.spy(usersState.filters.asc) ? <Icon name="sprite:arrow-up" className="size-4" /> : <Icon name="sprite:arrow-down" className="size-4" />}
     </Button>
@@ -91,7 +91,7 @@ const UsersFiltersSelect = reatomComponent(({ ctx }) => {
           <Checkbox.Control className={checkboxVariant.control()} />
           <Checkbox.HiddenInput />
         </Checkbox.Root>
-        <label htmlFor="checkbox:users-filter-selectAll:input">Выбрать загруженных</label>
+        <label htmlFor="checkbox:users-filter-selectAll:input">{translate["panel.select-uploaded"]()}</label>
       </div>
       <UsersGlobalActions />
     </div>
@@ -103,7 +103,7 @@ const UsersFiltersSearchQuery = reatomComponent(({ ctx }) => {
     <Input
       value={ctx.spy(usersState.filters.searchQuery) ?? ""}
       onChange={e => users.searchQueryChangeEvent(ctx, e)}
-      placeholder="Поиск по никнейму"
+      placeholder={translate["panel.search-by-nickname"]()}
       maxLength={32}
       className="w-full h-8 flex-1"
     />
@@ -111,9 +111,9 @@ const UsersFiltersSearchQuery = reatomComponent(({ ctx }) => {
 }, "UsersFiltersSearchQuery")
 
 const SORTS = [
-  { label: "По дате регистрации", value: "created_at" },
-  { label: "По роли", value: "role" },
-  { label: "По алфавиту", value: "abc" }
+  { label: translate["panel.by-registration-date"](), value: "created_at" },
+  { label: translate["panel.by-role"](), value: "role" },
+  { label: translate["panel.alphabetically"](), value: "abc" }
 ] as const
 
 const UsersFiltersSort = reatomComponent(({ ctx }) => {
@@ -124,8 +124,7 @@ const UsersFiltersSort = reatomComponent(({ ctx }) => {
   if (searching) {
     return (
       <Button className="px-4 h-8 w-full text-nowrap truncate min-w-0" background="default" disabled>
-        По релевантности
-      </Button>
+        {translate["panel.by-relevance"]()}</Button>
     )
   }
 

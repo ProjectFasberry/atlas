@@ -12,6 +12,7 @@ import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { currentUserState } from "@/shared/models/current-user/index.model"
 import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
 import { patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
+import { translate } from "@/shared/locales/helpers"
 
 const Flag = ({ active, label }: { active: boolean, label: string }) => (
   <span
@@ -72,22 +73,22 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
-        <Field label="Название" val={form.fullname} onChange={handleSet("fullname")} />
+        <Field label={translate["panel.title-2"]()} val={form.fullname} onChange={handleSet("fullname")} />
         <Field label="Origin" val={server.origin} onChange={() => undefined} />
-        <Field label="Описание" val={form.description} onChange={handleSet("description")} />
-        <Field label="Превью (URL)" val={form.thumbnail} onChange={handleSet("thumbnail")} />
-        <Field label="Версия Minecraft" val={form.client_version} onChange={handleSet("client_version")} />
+        <Field label={translate["panel.description"]()} val={form.description} onChange={handleSet("description")} />
+        <Field label={translate["panel.preview-url"]()} val={form.thumbnail} onChange={handleSet("thumbnail")} />
+        <Field label={translate["panel.minecraft-version"]()} val={form.client_version} onChange={handleSet("client_version")} />
         <SelectField
-          label="Загрузчик"
+          label={translate["panel.loader"]()}
           val={form.loader}
           options={LOADERS}
           onChange={handleSet("loader")}
         />
-        <Field label="Версия загрузчика" val={form.loader_version} onChange={handleSet("loader_version")} />
+        <Field label={translate["panel.loader-version"]()} val={form.loader_version} onChange={handleSet("loader_version")} />
         <Field label="Java major" val={form.java_major} onChange={handleSet("java_major")} />
-        <Field label="Ресурс-пак" val={form.resource_pack} onChange={handleSet("resource_pack")} />
+        <Field label={translate["panel.resource-pack"]()} val={form.resource_pack} onChange={handleSet("resource_pack")} />
         <SelectField
-          label="Клиентский мод"
+          label={translate["panel.client-mod"]()}
           val={form.client_mod}
           options={["required", "optional"]}
           onChange={handleSet("client_mod")}
@@ -96,8 +97,7 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
       <div className="flex justify-end gap-2 w-full">
         <Dialog.CloseTrigger asChild>
           <Button background="default" className="h-9">
-            Отмена
-          </Button>
+            {translate["panel.cancel"]()}</Button>
         </Dialog.CloseTrigger>
         <Dialog.CloseTrigger asChild>
           <Button
@@ -106,8 +106,7 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
             disabled={isSaving}
             onClick={handleSave}
           >
-            Сохранить
-          </Button>
+            {translate["panel.save"]()}</Button>
         </Dialog.CloseTrigger>
       </div>
     </>
@@ -126,8 +125,7 @@ const ServersDialog = reatomComponent(({ ctx }) => {
           <Dialog.Content className={dialogVariant.content()}>
             <DialogClose />
             <Dialog.Title className={dialogVariant.title()}>
-              Изменить сервер
-            </Dialog.Title>
+              {translate["panel.edit-the-server"]()}</Dialog.Title>
             <ServerEditorFields />
           </Dialog.Content>
         </Dialog.Positioner>
@@ -156,25 +154,23 @@ export const Servers = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
         <Typography color="gray" className="text-sm">
-          available блокирует вход до подключения: билет на сервер не выдаётся, reconnect-пасс не принимается.
-        </Typography>
+          {translate["panel.available-blocks-the-login-until-connected-no-se"]()}</Typography>
         <Button
           background="default"
           className="h-8 text-sm"
           disabled={status.isPending}
           onClick={() => servers.fetch(ctx)}
         >
-          Обновить
-        </Button>
+          {translate["panel.refresh"]()}</Button>
       </div>
       <ServersDialog />
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Сервер</TableHead>
-            <TableHead>Клиент</TableHead>
-            <TableHead>Флаги</TableHead>
-            <TableHead>Действия</TableHead>
+            <TableHead>{translate["panel.server"]()}</TableHead>
+            <TableHead>{translate["panel.client"]()}</TableHead>
+            <TableHead>{translate["panel.flags"]()}</TableHead>
+            <TableHead>{translate["panel.actions"]()}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -200,10 +196,10 @@ export const Servers = reatomComponent(({ ctx }) => {
                 <div className="flex flex-wrap gap-1">
                   <Flag
                     active={s.available}
-                    label={s.available ? "доступен" : "закрыт"}
+                    label={s.available ? translate["panel.available"]() : translate["panel.closed"]()}
                   />
                   {s.is_default && <Flag active label="default" />}
-                  {s.excluded && <Flag active={false} label="скрыт" />}
+                  {s.excluded && <Flag active={false} label={translate["panel.hidden"]()} />}
                 </div>
               </TableCell>
               <TableCell>
@@ -214,7 +210,7 @@ export const Servers = reatomComponent(({ ctx }) => {
                     disabled={!canEdit || isSaving}
                     onClick={() => handlePatch(s, { available: !s.available })}
                   >
-                    {s.available ? "Закрыть вход" : "Открыть вход"}
+                    {s.available ? translate["panel.close-the-login"]() : translate["panel.open-the-login"]()}
                   </Button>
                   <Button
                     background="default"
@@ -222,8 +218,7 @@ export const Servers = reatomComponent(({ ctx }) => {
                     disabled={!canEdit || isSaving}
                     onClick={() => serverEditor.open(ctx, s)}
                   >
-                    Изменить
-                  </Button>
+                    {translate["panel.edit"]()}</Button>
                 </div>
               </TableCell>
             </TableRow>

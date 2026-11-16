@@ -13,6 +13,7 @@ import { Button } from "@/shared/ui/button";
 import { DeleteButton } from "./ui";
 import { isEmptyArray } from "@/shared/lib/utils";
 import { Noop } from "@/shared/ui/noop";
+import { translate } from "@/shared/locales/helpers"
 
 const modpackItemVariant = tv({
   base: "flex items-center justify-between h-18 px-2 border border-neutral-800 rounded-lg",
@@ -40,7 +41,7 @@ const ModpackList = reatomComponent(({ ctx }) => {
   if (error) return <ErrorBlock title={error.message} />
 
   const data = ctx.spy(modpackState.data)
-  if (!data || isEmptyArray(data)) return <Noop title="пусто" />
+  if (!data || isEmptyArray(data)) return <Noop title={translate["panel.empty"]()} />
 
   return (
     <div className={modpacksListVariant()}>
@@ -54,7 +55,7 @@ const ModpackList = reatomComponent(({ ctx }) => {
             <div className="flex flex-col">
               <p className={modpackItemVariant().name()}>{item.name}</p>
               <span className="text-neutral-400 text-[12px]">
-                от {dayjs(item.created_at).format("DD MMM YYYY")}
+                {translate["panel.from-2"]()}{dayjs(item.created_at).format("DD MMM YYYY")}
               </span>
             </div>
           </div>
@@ -65,8 +66,7 @@ const ModpackList = reatomComponent(({ ctx }) => {
               target="_blank"
             >
               <Button background="white" className="text-sm h-6 font-semibold">
-                Перейти
-              </Button>
+                {translate["panel.go"]()}</Button>
             </a>
             <DeleteButton
               disabled={ctx.spy(modpack.delete.statusesAtom).isPending}
@@ -90,8 +90,8 @@ const CreateModpackSubmit = reatomComponent(({ ctx }) => {
 }, "CreateModpackSubmit")
 
 const fields = [
-  { label: "Название", atom: modpackState.create.modpackName },
-  { label: "Ссылка на скачивание", atom: modpackState.create.downloadLink }
+  { label: translate["panel.title-2"](), atom: modpackState.create.modpackName },
+  { label: translate["panel.download-link"](), atom: modpackState.create.downloadLink }
 ]
 
 const CreateModpackField = reatomComponent<typeof fields[number]>(({ ctx, label, atom }) => {

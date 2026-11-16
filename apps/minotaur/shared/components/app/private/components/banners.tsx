@@ -11,12 +11,13 @@ import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { Tooltip } from "@ark-ui/react/tooltip"
 import { createPrivatedSectionModel } from "../models/shared.model"
 import { menuVariant } from "@/shared/ui/menu"
+import { translate } from "@/shared/locales/helpers"
 
 const fields = [
-  { placeholder: "Заголовок", value: createBannerState.title },
-  { placeholder: "Описание", value: createBannerState.desc },
-  { placeholder: "Заголовок ссылки", value: createBannerState.hrefTitle },
-  { placeholder: "Ссылка", value: createBannerState.hrefValue },
+  { placeholder: translate["panel.title"](), value: createBannerState.title },
+  { placeholder: translate["panel.description"](), value: createBannerState.desc },
+  { placeholder: translate["panel.link-title"](), value: createBannerState.hrefTitle },
+  { placeholder: translate["panel.link"](), value: createBannerState.hrefValue },
 ]
 const CreateBannerSubmit = reatomComponent(({ ctx }) => {
   return (

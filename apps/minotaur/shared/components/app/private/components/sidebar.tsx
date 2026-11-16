@@ -20,6 +20,7 @@ import {
   sidebarLinks, toggleSidebar
 } from "../models/sidebar.model";
 import { Input } from "@/shared/ui/input";
+import { translate } from "@/shared/locales/helpers"
 
 const InfoCell = ({ label, value }: { label: string, value: string }) => (
   <div className="flex flex-col gap-0.5 rounded-lg border border-neutral-800 bg-neutral-800/40 px-3 py-1">
@@ -73,8 +74,8 @@ const PermissionsGrid = ({ groups }: { groups: PermissionGroups }) => (
 )
 
 const PermissionsBody = ({ groups, permissionsCount }: { groups: PermissionGroups, permissionsCount: number }) => {
-  if (permissionsCount === 0) return <Noop title="Права не назначены" />
-  if (groups.length === 0) return <Noop title="Ничего не найдено" />
+  if (permissionsCount === 0) return <Noop title={translate["panel.no-permissions-assigned"]()} />
+  if (groups.length === 0) return <Noop title={translate["panel.nothing-found"]()} />
 
   return <PermissionsGrid groups={groups} />
 }
@@ -132,7 +133,7 @@ const UserInfo = reatomComponent(({ ctx }) => {
         </div>
         <div className={clsx("flex shrink-0 items-center gap-1.5 text-neutral-400", collapsed && "lg:hidden")}>
           <span
-            title="Всего прав"
+            title={translate["panel.total-permissions"]()}
             className="hidden rounded-lg bg-neutral-900
               px-1.5 py-0.5 text-[10px] font-semibold sm:inline-flex"
           >
@@ -147,11 +148,9 @@ const UserInfo = reatomComponent(({ ctx }) => {
           <Dialog.Content className={dialogVariant.content("items-start! justify-start! max-h-[80vh] overflow-hidden max-w-[min(760px,calc(100vw-16px))]!")}>
             <div className="flex flex-col gap-1 pr-8">
               <Dialog.Title className={dialogVariant.title()}>
-                Профиль и права
-              </Dialog.Title>
+                {translate["panel.profile-and-permissions"]()}</Dialog.Title>
               <Typography color="gray" className="text-sm">
-                Роль определяет доступные разделы приватной панели.
-              </Typography>
+                {translate["panel.the-role-defines-the-available-sections-of-the-p"]()}</Typography>
             </div>
             <div
               className="
@@ -180,22 +179,22 @@ const UserInfo = reatomComponent(({ ctx }) => {
               </div>
             </div>
             <div className="grid w-full gap-2 sm:grid-cols-3">
-              <InfoCell label="Права" value={permissionsCount.toString()} />
-              <InfoCell label="Разделы" value={groups.length.toString()} />
-              <InfoCell label="Регистрация" value={registeredAt} />
+              <InfoCell label={translate["panel.permissions"]()} value={permissionsCount.toString()} />
+              <InfoCell label={translate["panel.sections"]()} value={groups.length.toString()} />
+              <InfoCell label={translate["panel.registration"]()} value={registeredAt} />
             </div>
             <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
               <Input
                 value={search}
                 onChange={(event) => permissionSearch(ctx, event.target.value)}
-                placeholder="Поиск по правам"
+                placeholder={translate["panel.search-by-permissions"]()}
                 className="h-8 flex-1"
               />
               <div className="flex items-center gap-2">
                 <span className="text-xs text-neutral-500">
                   {filteredCount === permissionsCount
-                    ? `${permissionsCount} прав`
-                    : `${filteredCount} из ${permissionsCount}`}
+                    ? translate["panel.permissions-count"]({ count: permissionsCount })
+                    : translate["panel.permissions-filtered"]({ filtered: filteredCount, total: permissionsCount })}
                 </span>
                 <Button
                   background="default"
@@ -203,7 +202,7 @@ const UserInfo = reatomComponent(({ ctx }) => {
                   disabled={filteredCount === 0}
                   onClick={() => copyPermissions(ctx)}
                 >
-                  {copied ? "Скопировано" : "Скопировать"}
+                  {copied ? translate["panel.copied"]() : translate["panel.copy"]()}
                 </Button>
               </div>
             </div>
@@ -248,7 +247,7 @@ const SidebarHeader = reatomComponent(({ ctx }) => {
 
   return (
     <div className="flex flex-col gap-1 w-full">
-      <span className={clsx("hidden lg:inline", collapsed && "lg:hidden")}>Инфо</span>
+      <span className={clsx("hidden lg:inline", collapsed && "lg:hidden")}>{translate["panel.info"]()}</span>
       <UserInfo />
     </div>
   )
@@ -260,7 +259,7 @@ const SidebarBody = reatomComponent(({ ctx }) => {
 
   return (
     <div className="flex flex-row items-center lg:items-stretch lg:flex-col gap-1 w-full">
-      <span className={clsx("hidden lg:inline", collapsed && "lg:hidden")}>Навигация</span>
+      <span className={clsx("hidden lg:inline", collapsed && "lg:hidden")}>{translate["panel.navigation"]()}</span>
       {sidebarLinks.map((link) => {
         const allowed = link.permissions.some((permission) => permissions.includes(permission))
 
@@ -293,7 +292,7 @@ const SidebarToggle = reatomComponent(({ ctx }) => {
   return (
     <Button
       background="default"
-      title={collapsed ? "Развернуть" : "Свернуть"}
+      title={collapsed ? translate["panel.expand"]() : translate["panel.collapse"]()}
       className={clsx(
         "hidden lg:flex h-8 shrink-0 items-center gap-2 rounded-xl px-3 text-neutral-400",
         collapsed && "lg:justify-center lg:px-0",
@@ -302,8 +301,7 @@ const SidebarToggle = reatomComponent(({ ctx }) => {
     >
       <Icon name={collapsed ? "sprite:arrow-right" : "sprite:arrow-left"} className="size-4 shrink-0" />
       <Typography className={clsx("text-xs font-semibold", collapsed && "lg:hidden")}>
-        Свернуть
-      </Typography>
+        {translate["panel.collapse"]()}</Typography>
     </Button>
   )
 }, "SidebarToggle")

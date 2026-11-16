@@ -9,6 +9,7 @@ import { type Role as RoleType } from "@/shared/components/app/private/models/us
 import { itemVariant } from "../ui"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
+import { translate } from "@/shared/locales/helpers"
 
 const UserActionsChangeRoleGlobalSubmit = reatomComponent(({ ctx }) => {
   const isDisabled = !ctx.spy(usersRestrictState.targetRoleId)
@@ -21,8 +22,7 @@ const UserActionsChangeRoleGlobalSubmit = reatomComponent(({ ctx }) => {
       disabled={isDisabled}
       onClick={() => usersRoles.before(ctx, [], { type: "change_role" })}
     >
-      Применить
-    </Button>
+      {translate["panel.apply"]()}</Button>
   )
 }, "UserActionsChangeRoleGlobalSubmit")
 
@@ -78,8 +78,7 @@ export const UserActionsChangeRoleGlobal = reatomComponent(({ ctx }) => {
           </Menu.Arrow>
           <div className="flex flex-col gap-2 p-2 w-full h-full min-w-40">
             <Typography className="text-neutral-400">
-              Доступные роли
-            </Typography>
+              {translate["panel.available-roles"]()}</Typography>
             <div className="flex flex-col gap-1 w-full h-full">
               <Roles onClick={(roleId) => usersRestrictState.targetRoleId(ctx, roleId)} />
             </div>

@@ -25,7 +25,7 @@ export const storeCommandSchema = z
 		if (!(STORE_COMMAND_PARENTS as readonly string[]).includes(parent)) {
 			ctx.addIssue({
 				code: "custom",
-				message: `Команда должна начинаться с ${STORE_COMMAND_PARENTS.join(", ")}`,
+				message: translate["validation.command-starts"]({ parents: STORE_COMMAND_PARENTS.join(", ") }),
 			});
 		}
 	});

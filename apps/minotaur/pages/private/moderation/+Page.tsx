@@ -10,12 +10,13 @@ import { TeamApplications } from "@/shared/components/app/private/components/tea
 import { PanelTabs } from "@/shared/components/app/private/components/panel-tabs"
 import { PanelSection } from "@/shared/components/app/private/components/panel-section"
 import { createTabAtom, hasTabAccess, type PanelTab } from "@/shared/components/app/private/models/tabs.model"
+import { translate } from "@/shared/locales/helpers"
 
 type ModerationTab = "team" | "audit"
 
 const MODERATION_TABS: PanelTab<ModerationTab>[] = [
-  { value: "team", title: "Заявки", permissions: ["team.applications.read"] },
-  { value: "audit", title: "Аудит", permissions: ["history.read"] },
+  { value: "team", title: translate["panel.applications"](), permissions: ["team.applications.read"] },
+  { value: "audit", title: translate["panel.audit"](), permissions: ["history.read"] },
 ]
 
 const moderationTab = createTabAtom("moderationTab", MODERATION_TABS, "team")
@@ -52,12 +53,12 @@ const ModerationSection = reatomComponent(({ ctx }) => {
 
   return active === "team"
     ? (
-      <PanelSection title="Заявки в команду">
+      <PanelSection title={translate["panel.team-applications"]()}>
         <TeamApplications />
       </PanelSection>
     )
     : (
-      <PanelSection title="История">
+      <PanelSection title={translate["panel.history"]()}>
         <HistoryList />
       </PanelSection>
     )

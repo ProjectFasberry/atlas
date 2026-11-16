@@ -28,6 +28,7 @@ import { menuVariant } from "@/shared/ui/menu"
 import { Noop } from "@/shared/ui/noop"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { Input } from "@/shared/ui/input"
+import { translate } from "@/shared/locales/helpers"
 
 type RolePayload = {
   id: number;
@@ -133,7 +134,7 @@ const RolesListItemPerms = reatomComponent(({ ctx }) => {
     return <RolesListItemPermsSkeleton />
   }
 
-  if (!data) return <Noop title="пусто" />
+  if (!data) return <Noop title={translate["panel.empty"]()} />
 
   return data.permissions.map((p) => <RolesListItemPermsItem key={p.id} {...p} />)
 }, "RolesListItemPerms")
@@ -202,8 +203,7 @@ const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
           className="gap-2 font-semibold h-8 text-sm bg-neutral-800"
           disabled={isDisabled}
         >
-          Добавить
-          <Icon name="sprite:plus" className="size-4" />
+          {translate["panel.add"]()}<Icon name="sprite:plus" className="size-4" />
         </Button>
       </Menu.Trigger>
       <Menu.Positioner>
@@ -213,13 +213,12 @@ const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
           </Menu.Arrow>
           <div className="flex flex-col gap-2 p-2 w-full h-fit">
             <Typography className="text-neutral-400 text-sm">
-              Доступные разрешения
-            </Typography>
+              {translate["panel.available-permissions"]()}</Typography>
             <Input
               value={query}
               onChange={(e) => rolesPermQuery(ctx, e.target.value)}
               onKeyDown={(event) => event.stopPropagation()}
-              placeholder="Поиск по названию"
+              placeholder={translate["panel.search-by-title"]()}
               className="h-8 w-full"
               maxLength={64}
             />
@@ -236,8 +235,7 @@ const RolesListItemAddPerm = reatomComponent(({ ctx }) => {
               ))}
               {filtered.length === 0 && (
                 <Typography className="text-sm text-neutral-500">
-                  Ничего не найдено
-                </Typography>
+                  {translate["panel.nothing-found"]()}</Typography>
               )}
             </div>
           </div>
@@ -334,11 +332,10 @@ const RolesEditablePermHeader = reatomComponent(({ ctx }) => {
   return (
     <div className="flex gap-3 items-center">
       <Typography className="text-neutral-50 text-base">
-        Разрешения
-      </Typography>
+        {translate["panel.permissions-2"]()}</Typography>
       <div className="flex items-center gap-2 text-sm">
         <Typography>
-          {"("}всего: {ctx.spy(permissionsByRole.fetchList.dataAtom)?.permissions.length ?? 0},&nbsp;
+          {"("}{translate["panel.total-2"]()}{ctx.spy(permissionsByRole.fetchList.dataAtom)?.permissions.length ?? 0},&nbsp;
         </Typography>
         <Typography className="text-green-500">
           +: {ctx.spy(roleNewPermsAtom).length},&nbsp;
@@ -348,8 +345,7 @@ const RolesEditablePermHeader = reatomComponent(({ ctx }) => {
         </Typography>
         {ctx.spy(saveChangesIsValidAtom) && (
           <Typography className="text-[11px] font-semibold text-yellow-400">
-            не сохранено
-          </Typography>
+            {translate["panel.not-saved"]()}</Typography>
         )}
       </div>
     </div>

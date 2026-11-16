@@ -5,6 +5,7 @@ import { actions, compareChanges, notifyAboutRestrictRole } from "./actions.mode
 import { withAssign, withReset } from "@reatom/framework";
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
 import { isEmptyArray } from "@/shared/lib/utils";
+import { translate } from "@/shared/locales/helpers"
 
 export type DictionariesItem = {
   value: string;
@@ -115,7 +116,7 @@ export const dict = atom(null, "dict").pipe(
     ),
     deleteBefore: action((ctx, item: { id: number, title: string }) => {
       alertDialog.open(ctx, {
-        title: `Вы точно хотите удалить "${item.title}"?`,
+        title: translate["panel.confirm-delete"]({ title: item.title }),
         onConfirm: () => dict.delete(ctx, item.id),
         errorAtom: dict.delete.errorAtom,
       });

@@ -8,10 +8,10 @@ import { Icon } from "@/shared/ui/icon"
 import { Button } from "@/shared/ui/button"
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { belkoinImage, charismImage } from "@/shared/consts/images"
-import { translate } from "@/shared/locales/helpers"
 import { ActionButton, ButtonXSubmit, DeleteButton, EditButton } from "./ui"
 import { createPrivatedSectionModel } from "../models/shared.model"
 import { taskDelete, taskForm, tasksPanel, type TaskCurrency, type TaskItem } from "../models/task.model"
+import { translate } from "@/shared/locales/helpers"
 
 const CURRENCIES: { value: TaskCurrency, image: string }[] = [
   { value: "BELKOIN", image: belkoinImage },

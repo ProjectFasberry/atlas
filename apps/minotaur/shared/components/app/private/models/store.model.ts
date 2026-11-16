@@ -10,6 +10,7 @@ import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialo
 import * as z from "zod";
 import type { JSONContent } from "@tiptap/react";
 import { navigate } from "vike/client/router";
+import { translate } from "@/shared/locales/helpers"
 import { type StoreItem } from '../../shop/models/store-item.model';
 
 type CreateItemStoreSchema = z.infer<typeof storeItemCreateSchema>
@@ -88,7 +89,7 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
         createStoreItemState.imageError(ctx, null)
       },
       onReject: (ctx, error) => {
-        createStoreItemState.imageError(ctx, error instanceof Error ? error.message : "Не удалось загрузить картинку")
+        createStoreItemState.imageError(ctx, error instanceof Error ? error.message : translate["panel.could-not-load-the-image"]())
         logError(error, { type: "combined" })
       }
     }).pipe(
@@ -101,7 +102,7 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
-        toast.success("Товар создан");
+        toast.success(translate["panel.item-created"]());
 
         batch(ctx, () => {
           storeItems.fetch.cacheAtom.reset(ctx);
@@ -131,7 +132,7 @@ export const duplicateStoreItem = reatomAsync(async (_, id: number) => {
   onFulfill: (ctx, item) => {
     if (!item) return
 
-    createStoreItemState.title(ctx, `${item.title} (копия)`)
+    createStoreItemState.title(ctx, translate["panel.copy-suffix"]({ title: item.title }))
     createStoreItemState.description(ctx, item.description ?? null)
     createStoreItemState.imgUrl(ctx, item.imageUrl ?? null)
     createStoreItemState.currency(ctx, item.currency as AtomState<typeof createStoreItemState.currency>)
@@ -146,7 +147,7 @@ export const duplicateStoreItem = reatomAsync(async (_, id: number) => {
   },
   onReject: (_, e) => {
     logError(e, { type: "combined" })
-    toast.error("Не удалось открыть товар")
+    toast.error(translate["panel.could-not-open-the-item"]())
   }
 }).pipe(
   withStatusesAtom()
@@ -156,7 +157,7 @@ export const deleteStoreItem = atom(null, "deleteStoreItem").pipe(
   withAssign((_, name) => ({
     before: action((ctx, item: StoreItem) => {
       alertDialog.open(ctx, {
-        title: `Вы точно хотите удалить товар "${item.title}"?`,
+        title: translate["panel.confirm-delete"]({ title: item.title }),
         onConfirm: () => deleteStoreItem.submit(ctx, item.id),
         errorAtom: deleteStoreItem.submit.errorAtom,
       });
@@ -167,7 +168,7 @@ export const deleteStoreItem = atom(null, "deleteStoreItem").pipe(
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx, res) => {
-        toast.success("Товар удален");
+        toast.success(translate["panel.item-deleted"]());
 
         storeItems.fetch.cacheAtom.reset(ctx);
         storeItems.fetch(ctx)
@@ -230,7 +231,7 @@ export const editStoreItem = atom(null, "editStoreItem").pipe(
     }, {
       name: `${name}.submit`,
       onFulfill: (ctx) => {
-        toast.success("Товар обновлён");
+        toast.success(translate["panel.item-updated"]());
         storeItems.fetch.cacheAtom.reset(ctx);
         storeItems.fetch(ctx);
         ctx.schedule(() => navigate("/private/store"));
@@ -286,7 +287,7 @@ storeState.searchParams.onChange(async (ctx, state) => {
       .catch(() => null);
 
     if (!item) {
-      throw new Error('Товар не найден')
+      throw new Error(translate["panel.item-not-found"]())
     }
 
     itemToEditAtom(ctx, item)

@@ -5,8 +5,8 @@ import { NotFound } from "@/shared/ui/not-found"
 import { tv } from "tailwind-variants"
 import { newsState, type PublicNewsSingle } from "../models/news.model"
 import { isEmptyArray } from "@/shared/lib/utils"
-import { translate } from "@/shared/locales/helpers"
 import { createLink } from "@/shared/components/config/link/link.model"
+import { translate } from "@/shared/locales/helpers"
 
 const newsItemVariant = tv({
   base: `

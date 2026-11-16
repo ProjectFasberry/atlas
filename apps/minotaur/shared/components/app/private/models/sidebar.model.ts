@@ -1,4 +1,5 @@
 import { currentUserState } from "@/shared/models/current-user/index.model";
+import { translate } from "@/shared/locales/helpers";
 import type { IconName } from "@/shared/ui/icon";
 import { action, atom, withAssign } from "@reatom/framework";
 import dayjs from "dayjs";
@@ -39,27 +40,27 @@ export type PermissionGroup = {
   items: PermissionItem[]
 }
 
-const NAMESPACE_TITLES: Record<string, string> = {
-  api: "API",
-  banners: "Баннеры",
-  dictionaries: "Словари",
-  economy: "Экономика",
-  events: "События",
-  history: "История",
-  lands: "Регионы",
-  metrics: "Метрики",
-  modpacks: "Модпаки",
-  news: "Новости",
-  options: "Настройки",
-  permissions: "Права",
-  players: "Игроки",
-  releases: "Релизы",
-  roles: "Роли",
-  servers: "Серверы",
-  skins: "Скины",
-  store: "Магазин",
-  team: "Команда",
-  volume: "Файлы",
+const NAMESPACE_KEYS: Record<string, string> = {
+  api: "private.permissions.namespaces.api",
+  banners: "private.permissions.namespaces.banners",
+  dictionaries: "private.permissions.namespaces.dictionaries",
+  economy: "private.permissions.namespaces.economy",
+  events: "private.permissions.namespaces.events",
+  history: "private.permissions.namespaces.history",
+  lands: "private.permissions.namespaces.lands",
+  metrics: "private.permissions.namespaces.metrics",
+  modpacks: "private.permissions.namespaces.modpacks",
+  news: "private.permissions.namespaces.news",
+  options: "private.permissions.namespaces.options",
+  permissions: "private.permissions.namespaces.permissions",
+  players: "private.permissions.namespaces.players",
+  releases: "private.permissions.namespaces.releases",
+  roles: "private.permissions.namespaces.roles",
+  servers: "private.permissions.namespaces.servers",
+  skins: "private.permissions.namespaces.skins",
+  store: "private.permissions.namespaces.store",
+  team: "private.permissions.namespaces.team",
+  volume: "private.permissions.namespaces.volume",
 }
 
 const NAMESPACE_ORDER = [
@@ -68,58 +69,63 @@ const NAMESPACE_ORDER = [
   "roles", "permissions", "metrics", "history", "options", "api", "tasks", "volume",
 ]
 
-const PERMISSION_TITLES: Record<string, string> = {
-  "api.keys.control": "Управление API-ключами",
-  "api.keys.list": "Просмотр API-ключей",
-  "banners.create": "Создание баннеров",
-  "banners.delete": "Удаление баннеров",
-  "dictionaries.create": "Создание словарей",
-  "dictionaries.delete": "Удаление словарей",
-  "dictionaries.read": "Просмотр словарей",
-  "dictionaries.update": "Изменение словарей",
-  "economy.read": "Просмотр экономики",
-  "economy.write": "Изменение экономики",
-  "events.create": "Создание событий",
-  "events.delete": "Удаление событий",
-  "history.read": "Просмотр истории",
-  "lands.create": "Создание регионов",
-  "lands.delete": "Удаление регионов",
-  "lands.read": "Просмотр регионов",
-  "metrics.read": "Просмотр метрик",
-  "modpacks.create": "Создание модпаков",
-  "modpacks.delete": "Удаление модпаков",
-  "news.create": "Создание новостей",
-  "news.delete": "Удаление новостей",
-  "news.update": "Изменение новостей",
-  "options.read": "Просмотр настроек",
-  "options.update": "Изменение настроек",
-  "permissions.read": "Просмотр прав",
-  "players.auth": "Авторизация игроков",
-  "players.permission.update": "Выдача прав игрокам",
-  "players.read": "Просмотр игроков",
-  "players.restrict.create": "Выдача ограничений",
-  "players.restrict.delete": "Снятие ограничений",
-  "players.role.update": "Смена роли игрока",
-  "releases.read": "Просмотр релизов",
-  "roles.read": "Просмотр ролей",
-  "roles.update": "Изменение ролей",
-  "servers.read": "Просмотр серверов",
-  "servers.update": "Изменение серверов",
-  "skins.moderate": "Модерация скинов",
-  "store.item.create": "Создание товаров",
-  "store.item.delete": "Удаление товаров",
-  "store.item.update": "Изменение товаров",
-  "store.methods.read": "Просмотр методов оплаты",
-  "store.methods.update": "Изменение методов оплаты",
-  "tasks.create": "Создание заданий",
-  "tasks.delete": "Удаление заданий",
-  "tasks.read": "Просмотр заданий",
-  "tasks.update": "Изменение заданий",
-  "team.applications.read": "Просмотр заявок",
-  "team.applications.update": "Обработка заявок",
-  "volume.control": "Управление файлами",
-}
+const translateKey = (key: string | undefined, fallback: string): string => {
+  if (!key) return fallback
 
+  const message = (translate as unknown as Record<string, (() => string) | undefined>)[key]
+  return message?.() ?? fallback
+}
+const PERMISSION_KEYS: Record<string, string> = {
+  "api.keys.control": "private.permissions.titles.api.keys.control",
+  "api.keys.list": "private.permissions.titles.api.keys.list",
+  "banners.create": "private.permissions.titles.banners.create",
+  "banners.delete": "private.permissions.titles.banners.delete",
+  "dictionaries.create": "private.permissions.titles.dictionaries.create",
+  "dictionaries.delete": "private.permissions.titles.dictionaries.delete",
+  "dictionaries.read": "private.permissions.titles.dictionaries.read",
+  "dictionaries.update": "private.permissions.titles.dictionaries.update",
+  "economy.read": "private.permissions.titles.economy.read",
+  "economy.write": "private.permissions.titles.economy.write",
+  "events.create": "private.permissions.titles.events.create",
+  "events.delete": "private.permissions.titles.events.delete",
+  "history.read": "private.permissions.titles.history.read",
+  "lands.create": "private.permissions.titles.lands.create",
+  "lands.delete": "private.permissions.titles.lands.delete",
+  "lands.read": "private.permissions.titles.lands.read",
+  "metrics.read": "private.permissions.titles.metrics.read",
+  "modpacks.create": "private.permissions.titles.modpacks.create",
+  "modpacks.delete": "private.permissions.titles.modpacks.delete",
+  "news.create": "private.permissions.titles.news.create",
+  "news.delete": "private.permissions.titles.news.delete",
+  "news.update": "private.permissions.titles.news.update",
+  "options.read": "private.permissions.titles.options.read",
+  "options.update": "private.permissions.titles.options.update",
+  "permissions.read": "private.permissions.titles.permissions.read",
+  "players.auth": "private.permissions.titles.players.auth",
+  "players.permission.update": "private.permissions.titles.players.permission.update",
+  "players.read": "private.permissions.titles.players.read",
+  "players.restrict.create": "private.permissions.titles.players.restrict.create",
+  "players.restrict.delete": "private.permissions.titles.players.restrict.delete",
+  "players.role.update": "private.permissions.titles.players.role.update",
+  "releases.read": "private.permissions.titles.releases.read",
+  "roles.read": "private.permissions.titles.roles.read",
+  "roles.update": "private.permissions.titles.roles.update",
+  "servers.read": "private.permissions.titles.servers.read",
+  "servers.update": "private.permissions.titles.servers.update",
+  "skins.moderate": "private.permissions.titles.skins.moderate",
+  "store.item.create": "private.permissions.titles.store.item.create",
+  "store.item.delete": "private.permissions.titles.store.item.delete",
+  "store.item.update": "private.permissions.titles.store.item.update",
+  "store.methods.read": "private.permissions.titles.store.methods.read",
+  "store.methods.update": "private.permissions.titles.store.methods.update",
+  "tasks.create": "private.permissions.titles.tasks.create",
+  "tasks.delete": "private.permissions.titles.tasks.delete",
+  "tasks.read": "private.permissions.titles.tasks.read",
+  "tasks.update": "private.permissions.titles.tasks.update",
+  "team.applications.read": "private.permissions.titles.team.applications.read",
+  "team.applications.update": "private.permissions.titles.team.applications.update",
+  "volume.control": "private.permissions.titles.volume.control",
+}
 const DANGEROUS_PERMISSIONS = new Set([
   "economy.write",
   "players.auth",
@@ -137,7 +143,7 @@ export const permissionCopied = atom(false, "permissionCopied")
 const permissionItems = (perms: string[]): PermissionItem[] =>
   perms.map((name) => ({
     name,
-    title: PERMISSION_TITLES[name] ?? name,
+    title: translateKey(PERMISSION_KEYS[name], name),
     danger: isDangerous(name),
   }))
 
@@ -163,7 +169,7 @@ export const permissionGroupsAtom = atom((ctx): PermissionGroup[] => {
   return [...byNamespace.entries()]
     .map(([key, items]) => ({
       key,
-      title: NAMESPACE_TITLES[key] ?? key,
+      title: translateKey(NAMESPACE_KEYS[key], key),
       items: items.sort((a, b) => a.title.localeCompare(b.title, "ru")),
     }))
     .sort((a, b) => {
@@ -208,13 +214,13 @@ export function formatAccountDate(value: unknown) {
 export type SidebarLink = { title: string, value: string, permissions: string[], icon: IconName }
 
 export const sidebarLinks: SidebarLink[] = [
-  { title: "Конфигурация", value: "/private/", permissions: [CONFIG_PANEL_READ_PERMISSION], icon: "sprite:settings" },
-  { title: "Контент", value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "modpacks.create", "modpacks.delete", "tasks.create", "tasks.update", "tasks.delete", LANDS_READ_PERMISSION], icon: "sprite:category" },
-  { title: "Магазин", value: "/private/store", permissions: [STORE_ITEM_READ_PERMISSION], icon: "sprite:building-store" },
-  { title: "Игрок", value: "/private/users", permissions: [PLAYERS_READ_PERMISSION], icon: "sprite:user-circle" },
-  { title: "Модерация", value: "/private/moderation", permissions: [TEAM_APPLICATIONS_READ_PERMISSION, HISTORY_READ_PERMISSION], icon: "sprite:shield-half" },
-  { title: "Релизы", value: "/private/releases", permissions: [RELEASES_READ_PERMISSION], icon: "sprite:download" },
-  { title: "Аналитика", value: "/private/analytics", permissions: [METRICS_READ_PERMISSION], icon: "sprite:aspect-ratio" },
-  { title: "Экономика", value: "/private/economy", permissions: [ECONOMY_READ_PERMISSION], icon: "sprite:credit-card-pay" },
-  { title: "API-ключи", value: "/private/api-keys", permissions: [API_KEYS_LIST_PERMISSION], icon: "sprite:lock" },
+  { title: translate["panel.configuration"](), value: "/private/", permissions: [CONFIG_PANEL_READ_PERMISSION], icon: "sprite:settings" },
+  { title: translate["panel.content"](), value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "modpacks.create", "modpacks.delete", "tasks.create", "tasks.update", "tasks.delete", LANDS_READ_PERMISSION], icon: "sprite:category" },
+  { title: translate["panel.store"](), value: "/private/store", permissions: [STORE_ITEM_READ_PERMISSION], icon: "sprite:building-store" },
+  { title: translate["panel.player"](), value: "/private/users", permissions: [PLAYERS_READ_PERMISSION], icon: "sprite:user-circle" },
+  { title: translate["panel.moderation"](), value: "/private/moderation", permissions: [TEAM_APPLICATIONS_READ_PERMISSION, HISTORY_READ_PERMISSION], icon: "sprite:shield-half" },
+  { title: translate["panel.releases"](), value: "/private/releases", permissions: [RELEASES_READ_PERMISSION], icon: "sprite:download" },
+  { title: translate["panel.analytics"](), value: "/private/analytics", permissions: [METRICS_READ_PERMISSION], icon: "sprite:aspect-ratio" },
+  { title: translate["panel.economy"](), value: "/private/economy", permissions: [ECONOMY_READ_PERMISSION], icon: "sprite:credit-card-pay" },
+  { title: translate["panel.api-keys"](), value: "/private/api-keys", permissions: [API_KEYS_LIST_PERMISSION], icon: "sprite:lock" },
 ]

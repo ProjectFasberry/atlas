@@ -12,12 +12,12 @@ import { AuthField, NicknameInput, PasswordInput } from "./auth"
 import { authState } from "../models/auth.model"
 import { focusFirstAuthError } from "./focus"
 import { IconLoader } from "@/shared/ui/icon-loader"
-import { translate } from "@/shared/locales/helpers"
 import { QrCode } from "@ark-ui/react/qr-code"
 import { qrCodeVariant } from "@/shared/ui/qr-code"
 import { Link } from "@/shared/components/config/link/link"
 import { pageState } from "@/shared/models/page-context.model"
 import { getNextPath } from "@/shared/lib/auth-redirect"
+import { translate } from "@/shared/locales/helpers"
 
 const LoginVariants = reatomComponent(({ ctx }) => (
   <div className="grid grid-cols-2 auto-rows-auto gap-2 w-full [&>*:only-child]:col-span-2">

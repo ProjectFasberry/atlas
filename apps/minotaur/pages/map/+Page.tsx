@@ -2,10 +2,10 @@ import { useAtom } from "@reatom/npm-react"
 import { createPageModel } from "@/shared/lib/events"
 import { availableServers } from "@/shared/components/app/map/models/map.model"
 import { getStaticImage } from "@/shared/lib/helpers"
-import { translate } from "@/shared/locales/helpers"
 import { PageHeaderImage } from "@/shared/ui/header-image"
 import { Typography } from "@/shared/ui/typography"
 import { ServersList, ServersToolbar } from "@/shared/components/app/map/components/servers-list"
+import { translate } from "@/shared/locales/helpers"
 
 const mapImage = getStaticImage("arts/6.jpg")
 

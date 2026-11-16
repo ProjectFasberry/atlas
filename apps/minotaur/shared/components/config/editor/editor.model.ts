@@ -1,8 +1,8 @@
-import { translate } from "@/shared/locales/helpers"
 import { TableKit } from '@tiptap/extension-table'
 import { TextStyleKit } from "@tiptap/extension-text-style"
 import Image from '@tiptap/extension-image'
 import StarterKit from "@tiptap/starter-kit"
+import { translate } from "@/shared/locales/helpers"
 import { env } from '@/shared/env';
 import { action, atom, withAssign } from '@reatom/framework';
 import type { Editor, EditorStateSnapshot } from '@tiptap/react';
@@ -300,7 +300,7 @@ export const editorSelectors = (editor: EditorStateSnapshot<Editor>["editor"]) =
   }
 }
 
-export const EDITOR_DEFAULT_CONTENT = `<h2>Контент</h2>`;
+export const EDITOR_DEFAULT_CONTENT = `<h2>${translate["editor.default-heading"]()}</h2>`;
 
 export const editorState = atom(null, "editorState").pipe(
   withAssign((_, name) => ({

@@ -8,6 +8,7 @@ import { createPrivatedSectionModel } from "../models/shared.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { Noop } from "@/shared/ui/noop";
+import { translate } from "@/shared/locales/helpers"
 
 type DictionariesListItemProps = Omit<DictionariesItem, "key"> & {
   itemKey: string
@@ -103,7 +104,7 @@ const DictionariesList = reatomComponent(({ ctx }) => {
 const CreateDictionariesKeyInput = reatomComponent(({ ctx }) => {
   return (
     <Input
-      placeholder="Ключ"
+      placeholder={translate["panel.key"]()}
       value={ctx.spy(dictState.createKey)}
       onChange={(e) => dictState.createKey(ctx, e.target.value)}
     />
@@ -112,7 +113,7 @@ const CreateDictionariesKeyInput = reatomComponent(({ ctx }) => {
 const CreateDictionariesValueInput = reatomComponent(({ ctx }) => {
   return (
     <Input
-      placeholder="Значение"
+      placeholder={translate["panel.value"]()}
       value={ctx.spy(dictState.createValue)}
       onChange={(e) => dictState.createValue(ctx, e.target.value)}
     />

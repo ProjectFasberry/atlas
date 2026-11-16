@@ -8,6 +8,7 @@ import { tv } from "tailwind-variants";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { Noop } from "@/shared/ui/noop";
 import { Button } from "@/shared/ui/button";
+import { translate } from "@/shared/locales/helpers"
 
 const { options, optionsControl, getOptionIsLoading, optionsAtom } = optionsModel()
 
@@ -17,18 +18,18 @@ const { options, optionsControl, getOptionIsLoading, optionsAtom } = optionsMode
  * descriptions here, next to the list, instead of guessing from the name.
  */
 const OPTION_DESCRIPTIONS: Record<string, string> = {
-  registrationEnabled: "Разрешить регистрацию новых аккаунтов",
-  botCheckEnabled: "Проверять регистрацию на ботов",
-  autoUpdatingPlayersSkins: "Автоматически обновлять скины игроков",
-  eventsLogging: "Записывать события в журнал администраторов",
-  "logging.validators": "Логировать проверки прав и сессий",
-  "logging.globalError": "Логировать необработанные ошибки",
-  "logging.requests": "Логировать HTTP-запросы",
+  registrationEnabled: translate["panel.allow-registration-of-new-accounts"](),
+  botCheckEnabled: translate["panel.check-registration-for-bots"](),
+  autoUpdatingPlayersSkins: translate["panel.automatically-refresh-player-skins"](),
+  eventsLogging: translate["panel.write-events-to-the-admin-log"](),
+  "logging.validators": translate["panel.log-permission-and-session-checks"](),
+  "logging.globalError": translate["panel.log-unhandled-errors"](),
+  "logging.requests": translate["panel.log-http-requests"](),
 }
 
 const OPTION_GROUP_LABELS: Record<string, string> = {
-  general: "Основные",
-  logging: "Логирование",
+  general: translate["panel.main-2"](),
+  logging: translate["panel.logging"](),
 }
 
 const optionItemVariant = tv({
@@ -81,7 +82,7 @@ const OptionItem = reatomComponent<Option>(({ ctx, name, title, value }) => {
         )}
       </div>
       <div className="flex items-center gap-2 shrink-0" onClick={(event) => event.stopPropagation()}>
-        <span className={optionItemVariant().state()}>{value ? "Вкл" : "Выкл"}</span>
+        <span className={optionItemVariant().state()}>{value ? translate["panel.on"]() : translate["panel.off"]()}</span>
         <Switch
           checked={value}
           onCheckedChange={({ checked }) => optionsControl.update(ctx, name, checked)}
@@ -124,8 +125,7 @@ const OptionsList = reatomComponent(({ ctx }) => {
       <div className="flex flex-col items-start gap-2">
         <ErrorBlock title={error.message} />
         <Button background="default" className="h-8 text-sm" onClick={() => options.fetch(ctx)}>
-          Повторить
-        </Button>
+          {translate["panel.retry"]()}</Button>
       </div>
     )
   }

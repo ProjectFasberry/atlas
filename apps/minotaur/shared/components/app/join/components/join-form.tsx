@@ -5,9 +5,9 @@ import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
 import { Link } from "@/shared/components/config/link/link"
 import { clsx } from "cnfast"
-import { translate } from "@/shared/locales/helpers"
 import { TEAM_CONTACTS, TEAM_ROLES, type TeamContactType, type TeamRole } from "@/shared/schemas/team"
 import { clearJoinError, joinState, submitJoin, toggleJoinRole } from "../models/join.model"
+import { translate } from "@/shared/locales/helpers"
 
 const ROLE_TITLE: Record<TeamRole, string> = {
   builder: "team.join.role-builder",

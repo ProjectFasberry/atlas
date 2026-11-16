@@ -5,6 +5,7 @@ import {
 import { toast } from "sonner";
 import { notifyAboutRestrictRole } from "./actions.model";
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model";
+import { translate } from "@/shared/locales/helpers"
 
 export type EconomyCurrency = "BELKOIN" | "CHARISM";
 export type EconomyOperation = "credit" | "debit";
@@ -303,7 +304,7 @@ export const economy = atom(null, "economy").pipe(
         economyState.form.amount(ctx, "");
         economyState.form.reason(ctx, "");
 
-        toast.success(operation === "credit" ? "Баланс пополнен" : "Баланс уменьшен", {
+        toast.success(operation === "credit" ? translate["panel.balance-topped-up"]() : translate["panel.balance-reduced"](), {
           description: `${payload.result.nickname}: ${amount} ${payload.result.currency}`,
         });
       },
@@ -316,7 +317,7 @@ export const economy = atom(null, "economy").pipe(
       const wallet = ctx.get(economyState.wallet);
       if (!wallet) return null;
 
-      const reason = ctx.get(economyState.refundReason).trim() || "Возврат по запросу игрока";
+      const reason = ctx.get(economyState.refundReason).trim() || translate["panel.refund-at-the-player-s-request"]();
 
       await ctx.schedule(() => client
         .raw.post<unknown>("/privated/economy/refund", {
@@ -338,7 +339,7 @@ export const economy = atom(null, "economy").pipe(
         economyState.wallet(ctx, payload.wallet);
         economyState.ledger(ctx, payload.page.data);
         economyState.meta(ctx, payload.page.meta);
-        toast.success("Возврат выполнен");
+        toast.success(translate["panel.refund-completed"]());
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(
@@ -435,9 +436,9 @@ export const economy = atom(null, "economy").pipe(
     ),
     confirmDeleteRate: action((ctx, rate: ExchangeRate) => {
       alertDialog.open(ctx, {
-        title: "Удалить курс?",
+        title: translate["panel.delete-the-rate"](),
         description: `${rate.from_currency} -> ${rate.to_currency} (${Number(rate.rate)})`,
-        confirmLabel: "Удалить",
+        confirmLabel: translate["panel.delete"](),
         withCancel: true,
         onConfirm: () => economy.deleteRate(ctx, rate.id),
       });
@@ -552,7 +553,7 @@ export const economy = atom(null, "economy").pipe(
       await ctx.schedule(() =>
         client.raw.post<unknown>("/payments/orders/{orderId}/refund", {
           params: { path: { orderId: order.orderId } },
-          json: { reason: "Возврат из панели" }
+          json: { reason: translate["panel.refund-from-the-panel"]() }
         })
       );
 
@@ -568,7 +569,7 @@ export const economy = atom(null, "economy").pipe(
 
         economyState.orders(ctx, page.data);
         economyState.ordersMeta(ctx, page.meta);
-        toast.success("Возврат платежа выполнен");
+        toast.success(translate["panel.payment-refund-completed"]());
       },
       onReject: (_, error) => notifyAboutRestrictRole(error),
     }).pipe(
@@ -577,10 +578,14 @@ export const economy = atom(null, "economy").pipe(
     ),
     confirmRefundOrder: action((ctx, order: AdminOrder) => {
       alertDialog.open(ctx, {
-        title: "Вернуть платёж?",
-        description: `${order.orderId}: к возврату ${order.refundableBelkoin ?? 0}
-          из ${order.belkoin} BELKOIN игроку ${order.nickname}. Потраченная часть пополнения не возвращается; купленные товары остаются.`,
-        confirmLabel: "Вернуть",
+        title: translate["panel.refund-the-payment"](),
+        description: translate["panel.refund-description"]({
+          orderId: order.orderId,
+          refundable: order.refundableBelkoin ?? 0,
+          total: order.belkoin,
+          nickname: order.nickname,
+        }),
+        confirmLabel: translate["panel.revert"](),
         withCancel: true,
         onConfirm: () => economy.refundOrder(ctx, order),
       });

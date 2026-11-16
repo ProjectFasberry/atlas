@@ -4,14 +4,14 @@ import { createNews, createNewsState } from "../models/news.model";
 import { ButtonXSubmit } from "./ui";
 import { NewsEditor, NewsField, NewsImagePanel } from "./news-form";
 import { storageModel } from "./storage";
+import { translate } from "@/shared/locales/helpers"
 
 const { Storage } = storageModel({
   name: "create-news",
   as: "drawer",
   Slot: (
     <Button background="default" className="h-8 shrink-0 text-sm font-semibold">
-      Из хранилища
-    </Button>
+      {translate["panel.from-storage"]()}</Button>
   ),
   onSelectFile(ctx, fileName) {
     createNewsState.imageUrl.data(ctx, fileName);
@@ -32,13 +32,13 @@ export const CreateNewsForm = reatomComponent(({ ctx }) => {
     <div className="flex w-full flex-col gap-4">
       <div className="grid w-full gap-3 sm:grid-cols-2">
         <NewsField
-          label="Заголовок"
+          label={translate["panel.title"]()}
           required
           value={ctx.spy(createNewsState.title)}
           onChange={(value) => createNewsState.title(ctx, value)}
         />
         <NewsField
-          label="Описание"
+          label={translate["panel.description"]()}
           required
           value={ctx.spy(createNewsState.desc)}
           onChange={(value) => createNewsState.desc(ctx, value)}

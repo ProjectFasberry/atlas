@@ -1,3 +1,4 @@
 import { wrapTitle } from "@/shared/lib/helpers";
+import { translate } from "@/shared/locales/helpers"
 
-export default wrapTitle("Управление магазином")
+export default wrapTitle(translate["panel.store-management"]())

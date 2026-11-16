@@ -10,6 +10,7 @@ import {
   RELEASE_CHANNELS, releases, releasesState, releaseDownloadUrl,
   type Release, type ReleasePlatform,
 } from "../models/releases.model"
+import { translate } from "@/shared/locales/helpers"
 
 const dateFormatter = new Intl.DateTimeFormat("ru-RU", { dateStyle: "medium", timeStyle: "short" })
 
@@ -20,17 +21,17 @@ const PLATFORM_LABELS: Record<string, string> = {
 }
 
 function formatDate(value: Nullable<string>) {
-  if (!value) return "дата неизвестна"
+  if (!value) return translate["panel.date-unknown"]()
 
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? "дата неизвестна" : dateFormatter.format(date)
+  return Number.isNaN(date.getTime()) ? translate["panel.date-unknown"]() : dateFormatter.format(date)
 }
 
 function formatSize(bytes: number) {
   if (!bytes) return "—"
 
   const mb = bytes / 1024 / 1024
-  return `${mb.toFixed(mb >= 10 ? 0 : 1)} МБ`
+  return translate["panel.size-mb"]({ size: mb.toFixed(mb >= 10 ? 0 : 1) })
 }
 
 const ReleasesSkeleton = () => (
@@ -75,8 +76,7 @@ const PlatformRow = reatomComponent<{ channel: Release["channel"], version: stri
                   className="inline-flex items-center gap-1 rounded-lg bg-neutral-800 px-2 py-1 text-xs font-semibold hover:bg-neutral-700"
                 >
                   <Icon name="sprite:download" className="size-3.5" />
-                  Скачать
-                </a>
+                  {translate["panel.download"]()}</a>
               </div>
             </div>
           )
@@ -155,8 +155,7 @@ export const Releases = reatomComponent(({ ctx }) => {
           disabled={status.isPending}
         >
           <Icon name="sprite:refresh" className={status.isPending ? "size-4 animate-spin" : "size-4"} />
-          Обновить
-        </Button>
+          {translate["panel.refresh"]()}</Button>
       </div>
 
       {(status.isFirstPending || (!data && status.isPending)) && <ReleasesSkeleton />}
@@ -165,13 +164,12 @@ export const Releases = reatomComponent(({ ctx }) => {
         <div className="flex flex-col items-start gap-2">
           <ErrorBlock title={error.message} />
           <Button background="default" className="h-8 text-sm" onClick={() => releases.fetch(ctx)}>
-            Повторить
-          </Button>
+            {translate["panel.retry"]()}</Button>
         </div>
       )}
 
       {!status.isPending && !error && data && data.length === 0 && (
-        <Noop title="Релизов в этом канале нет" />
+        <Noop title={translate["panel.there-are-no-releases-in-this-channel"]()} />
       )}
 
       {data && data.length > 0 && (

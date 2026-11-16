@@ -6,6 +6,7 @@ import type { AtomMut } from "@reatom/framework"
 import { Menu } from "@ark-ui/react/menu"
 import { menuVariant } from "@/shared/ui/menu"
 import { Portal } from "@ark-ui/react/portal"
+import { translate } from "@/shared/locales/helpers"
 
 type UserActionsWrapperProps =
   | { type: "single", nickname: string }
@@ -32,7 +33,7 @@ type ActionButtonProps = {
 }
 const ActionButton = reatomComponent<{ item: ActionButtonProps, isMenuItem?: boolean }>(({ ctx, item, isMenuItem }) => {
   const isPending = ctx.spy(usersRestrict.submit.statusesAtom).isPending
-  const label = item.label ?? "Применить";
+  const label = item.label ?? translate["panel.apply"]();
 
   if (isMenuItem) {
     return (

@@ -4,9 +4,9 @@ import {
 } from "@reatom/framework"
 import { toast } from "sonner"
 import { client } from "@/shared/lib/client-wrapper"
-import { translate } from "@/shared/locales/helpers"
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
 import { actions, notifyAboutRestrictRole } from "./actions.model"
+import { translate } from "@/shared/locales/helpers"
 
 export type TasksPanelPayload = ExtractApiData<"getPrivatedTasksList">["data"]
 export type TaskItem = TasksPanelPayload[number]

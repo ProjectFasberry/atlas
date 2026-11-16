@@ -13,12 +13,13 @@ import {
   HistoryViewer, history, historyDataAtom, historyInView, historyMetaAtom, historyPendingCountAtom, historyState,
   type HistoryItem, type HistorySeverity,
 } from "../models/history.model";
+import { translate } from "@/shared/locales/helpers"
 
 const historyFiltersReady = atom(false, "historyFiltersReady")
 const historyFiltersTimer = atom<ReturnType<typeof setTimeout> | null>(null, "historyFiltersTimer")
 
 const SEVERITIES: { label: string, value: Nullable<HistorySeverity> }[] = [
-  { label: "Все", value: null },
+  { label: translate["panel.all"](), value: null },
   { label: "Info", value: "info" },
   { label: "Warning", value: "warning" },
   { label: "Danger", value: "danger" },
@@ -59,14 +60,14 @@ const HistoryFilters = reatomComponent(({ ctx }) => {
       <Input
         value={initiator}
         onChange={(e) => historyState.filters.initiator(ctx, e.target.value)}
-        placeholder="Инициатор"
+        placeholder={translate["panel.initiator"]()}
         maxLength={32}
         className="h-8 flex-1"
       />
       <Input
         value={event}
         onChange={(e) => historyState.filters.event(ctx, e.target.value)}
-        placeholder="Событие (например players.role.update)"
+        placeholder={translate["panel.event-for-example-players-role-update"]()}
         maxLength={128}
         className="h-8 flex-1"
       />
@@ -130,7 +131,11 @@ const HistoryControls = reatomComponent(({ ctx }) => {
         className="h-8 px-3 text-xs"
         onClick={() => history.setPaused(ctx, !paused)}
       >
-        {paused ? (pending > 0 ? `Показать ${pending}` : "Продолжить") : "Пауза"}
+        {paused
+          ? pending > 0
+            ? translate["panel.show-count"]({ count: pending })
+            : translate["panel.continue"]()
+          : translate["panel.pause"]()}
       </Button>
       <Button
         background="default"
@@ -138,8 +143,7 @@ const HistoryControls = reatomComponent(({ ctx }) => {
         disabled={loading}
         onClick={() => history.refetchAll(ctx)}
       >
-        Обновить
-      </Button>
+        {translate["panel.refresh"]()}</Button>
     </div>
   )
 }, "HistoryControls")
@@ -169,7 +173,7 @@ export const HistoryList = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Typography className="text-sm text-neutral-400">
-          Загружено: {data.length}
+          {translate["panel.loaded"]()}{data.length}
         </Typography>
         <HistoryControls />
       </div>
@@ -181,19 +185,19 @@ export const HistoryList = reatomComponent(({ ctx }) => {
       {error && !loading.isPending && <ErrorBlock title={error.message} />}
 
       {!error && data.length === 0 && !loading.isPending && (
-        <Noop title="Событий пока нет" />
+        <Noop title={translate["panel.no-events-yet"]()} />
       )}
 
       {data.length > 0 && (
         <Table>
-          <TableCaption>История</TableCaption>
+          <TableCaption>{translate["panel.history"]()}</TableCaption>
           <TableHeader>
             <TableRow className="*:font-semibold *:text-base">
               <TableHead className="w-[64px]">#</TableHead>
-              <TableHead>Инициатор</TableHead>
-              <TableHead>Ивент</TableHead>
-              <TableHead className="w-[100px]">Уровень</TableHead>
-              <TableHead className="text-right">Дата</TableHead>
+              <TableHead>{translate["panel.initiator"]()}</TableHead>
+              <TableHead>{translate["panel.event"]()}</TableHead>
+              <TableHead className="w-[100px]">{translate["panel.level"]()}</TableHead>
+              <TableHead className="text-right">{translate["panel.date"]()}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -213,8 +217,7 @@ export const HistoryList = reatomComponent(({ ctx }) => {
               history.loadMore(ctx);
             }}
           >
-            Повторить
-          </Button>
+            {translate["panel.retry"]()}</Button>
         </div>
       )}
 

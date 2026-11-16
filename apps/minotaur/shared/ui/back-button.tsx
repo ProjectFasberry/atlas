@@ -1,7 +1,7 @@
 import { Button } from "@/shared/ui/button"
 import { Icon, type IconName } from "@/shared/ui/icon"
-import { translate } from "@/shared/locales/helpers"
 import { navigate } from "vike/client/router"
+import { translate } from "@/shared/locales/helpers"
 
 type BackButtonProps = {
   event?: "history" | "custom",

@@ -5,6 +5,7 @@ import { withAssign, withReset } from "@reatom/framework"
 import { toast } from "sonner"
 import { actions, notifyAboutRestrictRole } from "./actions.model"
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
+import { translate } from "@/shared/locales/helpers"
 
 export type BannerList = ExtractApiData<"getBannerList">["data"];
 export type BannerSingle = BannerList["data"][number]
@@ -64,7 +65,7 @@ export const createBanner = atom(null, "createBanner").pipe(
         createBanner.resetFull(ctx)
         actions.goBack(ctx)
 
-        toast.success("Баннер создан");
+        toast.success(translate["panel.banner-created"]());
       },
       onReject: (_, e) => {
         notifyAboutRestrictRole(e)
@@ -80,7 +81,7 @@ export const deleteBanner = atom(null, "deleteBanner").pipe(
   withAssign((_, name) => ({
     deleteBefore: action((ctx, item: { id: number, title: string }) => {
       alertDialog.open(ctx, {
-        title: `Вы точно хотите удалить "${item.title}"?`,
+        title: translate["panel.confirm-delete"]({ title: item.title }),
         onConfirm: () => deleteBanner.submit(ctx, item.id),
         errorAtom: deleteBanner.submit.errorAtom,
       });

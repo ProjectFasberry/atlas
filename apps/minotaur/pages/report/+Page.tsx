@@ -1,9 +1,9 @@
 import { type ReactNode } from "react"
 import { reatomComponent } from "@reatom/npm-react"
 import { socialsAtom } from "@/shared/models/shared.model"
-import { translate } from "@/shared/locales/helpers"
 import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
+import { translate } from "@/shared/locales/helpers"
 
 const ReportCard = ({ title, children }: { title: string, children: ReactNode }) => (
   <section className="flex flex-col gap-2 rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4">

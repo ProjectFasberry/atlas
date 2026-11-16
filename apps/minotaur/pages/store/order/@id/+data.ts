@@ -4,6 +4,7 @@ import { logRouting } from "@/shared/lib/log";
 import { getOrder } from "@/shared/components/app/shop/models/store-order.model";
 import { render } from "vike/abort";
 import { getNotExistUrlByEntity } from "@/shared/lib/helpers";
+import { translate } from "@/shared/locales/helpers"
 
 export type OrderSingleGamePayload = {
 	unique_id: string;
@@ -26,7 +27,7 @@ export type Data = Awaited<ReturnType<typeof data>>;
 
 function metadata(order: OrderSingleGamePayload) {
   return {
-    title: `Заказ ${order.unique_id}`
+    title: translate["store.order.page-title"]({ id: order.unique_id })
   }
 }
 

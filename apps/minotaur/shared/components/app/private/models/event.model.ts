@@ -5,6 +5,7 @@ import { client } from "@/shared/lib/client-wrapper"
 import { toast } from "sonner"
 import { actions, notifyAboutRestrictRole } from "./actions.model"
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
+import { translate } from "@/shared/locales/helpers"
 
 export const events = atom(null, "events").pipe(
   withAssign((_, name) => ({
@@ -59,7 +60,7 @@ export const createEvent = atom(null, "createEvent").pipe(
         createEvent.resetFull(ctx)
         actions.goBack(ctx);
 
-        toast.success("Ивент создан");
+        toast.success(translate["panel.event-created"]());
       },
       onReject: (_, e) => notifyAboutRestrictRole(e),
     }).pipe(
@@ -72,8 +73,8 @@ export const deleteEvent = atom(null, "deleteEvent").pipe(
   withAssign((_, name) => ({
     beforeSubmit: action((ctx, id: EventsSingle["id"]) => {
       alertDialog.open(ctx, {
-        title: `Удаление события`,
-        description: `Вы уверены, что хотите удалить это событие?`,
+        title: translate["panel.event-deletion"](),
+        description: translate["panel.delete-this-event"](),
         onConfirm: () => deleteEvent.submit(ctx, id),
       })
     }),

@@ -10,6 +10,7 @@ import { PageLoader } from "@/shared/ui/page-loader"
 import { Typography } from "@/shared/ui/typography"
 import { dayjs } from "@/shared/lib/dayjs"
 import { buildMetricsState, loadBuildMetrics, type BuildMetricApp } from "../models/build-metrics.model"
+import { translate } from "@/shared/locales/helpers"
 
 const APPS: { value: BuildMetricApp, label: string }[] = [
 	{ value: "minotaur", label: "minotaur" },
@@ -84,19 +85,18 @@ export const BuildMetrics = reatomComponent(({ ctx }) => {
 			<div className="flex flex-wrap items-center justify-between gap-2">
 				<AppTabs />
 				<Typography color="gray" className="text-xs">
-					main · последние {data.length} записей
-				</Typography>
+					{translate["panel.main-latest"]()}{data.length} {translate["panel.records"]()}</Typography>
 			</div>
 			{latest && (
 				<div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-					<StatCard title="Всего" value={formatBytes(latest.metrics.totalBytes)} hint={dayjs(latest.createdAt).format("DD.MM.YYYY HH:mm")} />
+					<StatCard title={translate["panel.total"]()} value={formatBytes(latest.metrics.totalBytes)} hint={dayjs(latest.createdAt).format("DD.MM.YYYY HH:mm")} />
 					<StatCard title="Client JS" value={formatBytes(latest.metrics.clientJsBytes)} />
 					<StatCard title="Server JS" value={formatBytes(latest.metrics.serverJsBytes)} />
 					<StatCard title="Commit" value={latest.commitSha.slice(0, 7)} hint={latest.stage} />
 				</div>
 			)}
 			{chartData.length === 0 ? (
-				<Noop title="Для этого приложения ещё нет замеров" />
+				<Noop title={translate["panel.there-are-no-measurements-for-this-app-yet"]()} />
 			) : (
 				<div className="h-90 w-full rounded-xl border border-neutral-800 bg-neutral-900 p-2 sm:p-4">
 					<ResponsiveContainer width="100%" height="100%">

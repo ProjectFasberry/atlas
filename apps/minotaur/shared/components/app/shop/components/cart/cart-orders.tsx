@@ -7,8 +7,8 @@ import { PageLoader } from "@/shared/ui/page-loader"
 import { type AtomMut, type Ctx } from "@reatom/framework"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
-import { translate } from "@/shared/locales/helpers"
 import { dayjs } from "@/shared/lib/dayjs"
+import { translate } from "@/shared/locales/helpers"
 
 const getStatusTitle = (status: string) => {
   switch (status) {

@@ -13,6 +13,7 @@ import {
   PLAYERS_CHARTS, PLAYERS_RANGES, playersMetrics, playersState, setPlayersRange, setPlayersServer,
   type PlayersChartMode, type PlayersPoint, type PlayersRange,
 } from "../models/players-metrics.model"
+import { translate } from "@/shared/locales/helpers"
 
 const COLORS = {
   joins: "#1db954",
@@ -70,13 +71,13 @@ const PlayersChart = ({ series, range, mode }: { series: PlayersPoint[], range: 
             labelStyle={{ color: "#a3a3a3" }}
           />
           {(mode === "all" || mode === "joins") && (
-            <Area type="monotone" dataKey="joins" name="Входы" stroke={COLORS.joins} fill={COLORS.joins} fillOpacity={0.15} strokeWidth={2} />
+            <Area type="monotone" dataKey="joins" name={translate["panel.logins"]()} stroke={COLORS.joins} fill={COLORS.joins} fillOpacity={0.15} strokeWidth={2} />
           )}
           {(mode === "all" || mode === "quits") && (
-            <Area type="monotone" dataKey="quits" name="Выходы" stroke={COLORS.quits} fill={COLORS.quits} fillOpacity={0.1} strokeWidth={2} />
+            <Area type="monotone" dataKey="quits" name={translate["panel.logouts"]()} stroke={COLORS.quits} fill={COLORS.quits} fillOpacity={0.1} strokeWidth={2} />
           )}
           {mode === "online" && (
-            <Area type="monotone" dataKey="online" name="Онлайн" stroke={COLORS.online} fill={COLORS.online} fillOpacity={0.15} strokeWidth={2} />
+            <Area type="monotone" dataKey="online" name={translate["panel.online"]()} stroke={COLORS.online} fill={COLORS.online} fillOpacity={0.15} strokeWidth={2} />
           )}
         </AreaChart>
       </ResponsiveContainer>
@@ -118,7 +119,7 @@ const ServersChart = ({ servers }: { servers: { server: string, online: number }
             contentStyle={{ background: "#171717", border: "1px solid #262626", borderRadius: 12, fontSize: 12 }}
             labelStyle={{ color: "#a3a3a3" }}
           />
-          <Bar dataKey="online" name="Онлайн" fill={COLORS.unique} radius={[6, 6, 0, 0]} />
+          <Bar dataKey="online" name={translate["panel.online"]()} fill={COLORS.unique} radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -160,8 +161,7 @@ const ServerSwitch = reatomComponent<{ servers: string[] }>(({ ctx, servers }) =
         )}
         onClick={() => setPlayersServer(ctx, null)}
       >
-        Все
-      </Button>
+        {translate["panel.all"]()}</Button>
       {servers.map((server) => (
         <Button
           key={server}
@@ -227,7 +227,7 @@ export const PlayersMetrics = reatomComponent(({ ctx }) => {
 
     return (
       <ErrorBlock
-        title={notDeployed ? "Метрики игроков ещё не задеплоены" : error.message}
+        title={notDeployed ? translate["panel.player-metrics-are-not-deployed-yet"]() : error.message}
       />
     )
   }
@@ -265,27 +265,26 @@ export const PlayersMetrics = reatomComponent(({ ctx }) => {
             className="h-7 rounded-lg px-2 text-xs"
             onClick={() => playersMetrics(ctx)}
           >
-            Обновить
-          </Button>
+            {translate["panel.refresh"]()}</Button>
         </div>
       </div>
 
       <ServerSwitch servers={summary.servers} />
 
       <div className="grid grid-cols-2 gap-2 lg:grid-cols-5">
-        <StatCard title="Онлайн" value={String(onlineTotal)} hint={`${servers.length} серверов`} />
-        <StatCard title="Входы" value={String(totals.joins)} hint="за период" />
-        <StatCard title="Выходы" value={String(totals.quits)} hint="за период" />
-        <StatCard title="Уникальные" value={String(totals.unique)} hint="за период" />
-        <StatCard title="Пик онлайна" value={String(totals.peakOnline)} hint="по часам" />
+        <StatCard title={translate["panel.online"]()} value={String(onlineTotal)} hint={translate["panel.servers-count"]({ count: servers.length })} />
+        <StatCard title={translate["panel.logins"]()} value={String(totals.joins)} hint={translate["panel.for-the-period"]()} />
+        <StatCard title={translate["panel.logouts"]()} value={String(totals.quits)} hint={translate["panel.for-the-period"]()} />
+        <StatCard title={translate["panel.unique"]()} value={String(totals.unique)} hint={translate["panel.for-the-period"]()} />
+        <StatCard title={translate["panel.online-peak"]()} value={String(totals.peakOnline)} hint={translate["panel.by-hour"]()} />
       </div>
 
       <div className={card}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Typography className="text-sm font-semibold">Активность</Typography>
+            <Typography className="text-sm font-semibold">{translate["panel.activity"]()}</Typography>
             {chartMode === "online" && (
-              <span className="text-lg font-semibold text-neutral-50" title="Игроков сейчас">
+              <span className="text-lg font-semibold text-neutral-50" title={translate["panel.players-online"]()}>
                 {onlineTotal}
               </span>
             )}
@@ -297,11 +296,11 @@ export const PlayersMetrics = reatomComponent(({ ctx }) => {
 
       <div className="grid gap-2 lg:grid-cols-2">
         <div className={card}>
-          <Typography className="text-sm font-semibold">Онлайн по серверам</Typography>
+          <Typography className="text-sm font-semibold">{translate["panel.online-by-server"]()}</Typography>
           <ServersChart servers={servers} />
         </div>
         <div className={card}>
-          <Typography className="text-sm font-semibold">Последние события</Typography>
+          <Typography className="text-sm font-semibold">{translate["panel.latest-events"]()}</Typography>
           <RecentEvents />
         </div>
       </div>

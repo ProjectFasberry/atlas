@@ -9,11 +9,11 @@ import { LandBanner } from "../../land/components/land-banner"
 import { Avatar } from "../../../../ui/avatar"
 import { Icon } from "@/shared/ui/icon"
 import { pageState } from "@/shared/models/page-context.model"
-import { translate } from "@/shared/locales/helpers"
 import { atom } from "@reatom/framework"
 import { MasonryGrid } from "@/shared/ui/masonry-grid"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { ErrorBlock } from "@/shared/ui/error-block"
+import { translate } from "@/shared/locales/helpers"
 
 const LandsEmpty = () => (
   <Typography color="gray" className="text-lg">

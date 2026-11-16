@@ -4,6 +4,7 @@ import { notifyAboutRestrictRole } from "./actions.model"
 import { toast } from "sonner"
 import { action, atom } from "@reatom/framework"
 import { withAssign, withReset } from "@reatom/framework"
+import { translate } from "@/shared/locales/helpers"
 
 export type RolesPayload = ExtractApiData<"getPrivatedRoleList">["data"];
 export type RolePayload = RolesPayload[number]
@@ -81,7 +82,7 @@ export const permissionsByRole = atom(null, "permissionsByRole").pipe(
       onFulfill: (ctx, { result, roleId }) => {
         const role = ctx.get(rolesList.fetch.dataAtom)?.find((role) => role.id === roleId);
 
-        toast.success(`Добавлено ${result} ролей для роли ${role?.name}`);
+        toast.success(translate["panel.roles-added"]({ count: result, role: role?.name ?? "" }));
 
         roleNewPermsAtom.reset(ctx)
 
@@ -113,7 +114,7 @@ export const permissionsByRole = atom(null, "permissionsByRole").pipe(
       onFulfill: (ctx, { result, roleId }) => {
         const role = ctx.get(rolesList.fetch.dataAtom)?.find((role) => role.id === roleId);
 
-        toast.success(`Удалено ${result} разрешений для роли ${role?.name}`);
+        toast.success(translate["panel.permissions-removed"]({ count: result, role: role?.name ?? "" }));
 
         roleDeletedPermsAtom.reset(ctx)
 
@@ -204,7 +205,7 @@ export const saveChangesAction = reatomAsync(async (ctx) => {
 }, {
   name: "saveChangesAction",
   onFulfill: (ctx, res) => {
-    toast.success("Изменения применены")
+    toast.success(translate["panel.changes-applied"]())
   },
   onReject: (_, e) => notifyAboutRestrictRole(e)
 }).pipe(

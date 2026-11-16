@@ -10,9 +10,9 @@ import {
   AuthField, NicknameInput, PasswordInput, PasswordVisibility
 } from "./auth"
 import { focusFirstAuthError } from "./focus"
-import { translate } from "@/shared/locales/helpers"
 import { getLocale } from "@/paraglide/runtime"
 import { checkboxVariant } from "@/shared/ui/checkbox"
+import { translate } from "@/shared/locales/helpers"
 
 const FindoutInput = reatomComponent(({ ctx }) => (
   <Input

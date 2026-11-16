@@ -20,6 +20,7 @@ import { Checkbox } from "@ark-ui/react/checkbox";
 import { Button } from "@/shared/ui/button";
 import { Icon } from "@/shared/ui/icon";
 import { getFromDictionary } from "@/shared/models/app/utils";
+import { translate } from "@/shared/locales/helpers"
 
 /**
  * The list keeps a single Ark menu for every row: a menu per card would mount a
@@ -49,8 +50,7 @@ const UserMenuRoles = reatomComponent<{ nickname: string; currentRoleId: number 
   return (
     <>
       <Typography className="px-2 pt-1 text-[10px] uppercase tracking-wide text-neutral-500">
-        Роль
-      </Typography>
+        {translate["panel.role"]()}</Typography>
       {roles.map((role) => (
         <Menu.Item
           key={role.id}
@@ -125,8 +125,7 @@ const UsersItemMenuBody = reatomComponent<{
                 className={`${menuVariant.item()} text-red`}
                 onClick={() => usersAuth.requestDelete(ctx, nickname)}
               >
-                Удалить пользователя
-              </Menu.Item>
+                {translate["panel.delete-the-user"]()}</Menu.Item>
             ) : null}
           </div>
         </Menu.Content>
@@ -149,7 +148,7 @@ export const UsersItemMenu = reatomComponent(({ ctx }) => {
         placement: "bottom-start",
         getAnchorRect: () => anchorRect(point),
       }}
-      aria-label="Действия с пользователем"
+      aria-label={translate["panel.user-actions"]()}
       onOpenChange={({ open: next }) => {
         if (!next) usersRestrictState.selectedUser.reset(ctx);
       }}
@@ -205,7 +204,7 @@ const UsersItem = reatomComponent<PrivatedUser>(({ ctx, avatar, nickname, role }
           {nickname}
         </Typography>
         {isIdentity ? (
-          <span className="rounded bg-green-500/15 px-1 text-[10px] text-green-300">вы</span>
+          <span className="rounded bg-green-500/15 px-1 text-[10px] text-green-300">{translate["panel.you"]()}</span>
         ) : null}
       </Link>
       {role ? (
@@ -219,7 +218,7 @@ const UsersItem = reatomComponent<PrivatedUser>(({ ctx, avatar, nickname, role }
       ) : null}
       <button
         type="button"
-        aria-label="Действия с пользователем"
+        aria-label={translate["panel.user-actions"]()}
         onClick={(event) => openUserMenu(ctx, nickname, bottomLeft(event.currentTarget))}
         className={`${role ? "" : "ms-auto"} flex size-6 shrink-0 items-center justify-center rounded text-neutral-500 opacity-0 hover:bg-neutral-700 hover:text-neutral-100 focus-visible:opacity-100 group-hover:opacity-100`}
       >
@@ -280,8 +279,7 @@ export const UsersLoadMoreError = reatomComponent(({ ctx }) => {
           users.update(ctx);
         }}
       >
-        Повторить
-      </Button>
+        {translate["panel.retry"]()}</Button>
     </div>
   );
 }, "UsersLoadMoreError")
@@ -290,7 +288,7 @@ export const Users = reatomComponent(({ ctx }) => {
   if (ctx.spy(users.fetch.statusesAtom).isPending) return <UsersSkeleton />
 
   const data = ctx.spy(usersDataArrAtom);
-  if (!data || isEmptyArray(data)) return <Noop title="пусто" />
+  if (!data || isEmptyArray(data)) return <Noop title={translate["panel.empty"]()} />
 
   return (
     <div className="flex flex-col gap-1 w-full h-full">

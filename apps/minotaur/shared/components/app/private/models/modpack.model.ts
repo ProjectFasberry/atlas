@@ -2,6 +2,7 @@ import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialo
 import { client } from "@/shared/lib/client-wrapper";
 import { action, atom, reatomAsync, withAssign, withCache, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { actions } from "./actions.model";
+import { translate } from "@/shared/locales/helpers"
 
 type Modpacks = ExtractApiData<"getModpackList">["data"]
 type Modpack = Modpacks[number]
@@ -61,8 +62,8 @@ export const modpack = atom(null, "modpack").pipe(
     ),
     deleteBefore: action((ctx, id: Modpack["id"]) => {
       alertDialog.open(ctx, {
-        title: `Удаление модпака`,
-        description: `Вы точно хотите удалить этот модпак?`,
+        title: translate["panel.modpack-deletion"](),
+        description: translate["panel.delete-this-modpack"](),
         onConfirm: () => modpack.delete(ctx, id),
         onClose: () => modpack.delete.errorAtom.reset(ctx),
         errorAtom: modpack.delete.errorAtom,

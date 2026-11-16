@@ -4,6 +4,7 @@ import { logError } from "@/shared/lib/log";
 import { action, atom, reatomAsync, withAssign, withErrorAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { toast } from "sonner";
 import { actions, notifyAboutRestrictRole } from "./actions.model";
+import { translate } from "@/shared/locales/helpers"
 
 export type AdminLandMember = {
 	uuid: string;
@@ -175,7 +176,7 @@ export const createRandomLand = reatomAsync(async (ctx) => {
 }, {
 	name: "lands.createRandom",
 	onFulfill: (ctx) => {
-		toast.success("Регион создан");
+		toast.success(translate["panel.land-created"]());
 		resetCreate(ctx);
 		landsState.search(ctx, "");
 		actions.goBack(ctx);
@@ -206,7 +207,7 @@ export const createManualLand = reatomAsync(async (ctx) => {
 }, {
 	name: "lands.createManual",
 	onFulfill: (ctx) => {
-		toast.success("Регион создан");
+		toast.success(translate["panel.land-created"]());
 		resetCreate(ctx);
 		landsState.search(ctx, "");
 		actions.goBack(ctx);
@@ -226,12 +227,12 @@ export const deleteLand = reatomAsync(async (_, ulid: string) => {
 }, {
 	name: "lands.delete",
 	onFulfill: (ctx) => {
-		toast.success("Регион удален");
+		toast.success(translate["panel.land-deleted"]());
 		fetchLands(ctx);
 	},
 	onReject: (_, e) => {
 		logError(e, { type: "combined" });
-		toast.error("Не удалось удалить регион");
+		toast.error(translate["panel.could-not-delete-the-land"]());
 	},
 }).pipe(
 	withStatusesAtom(),
@@ -240,9 +241,9 @@ export const deleteLand = reatomAsync(async (_, ulid: string) => {
 
 export const deleteLandConfirm = action((ctx, land: AdminLand) => {
 	alertDialog.open(ctx, {
-		title: "Удаление региона",
-		description: `Удалить регион ${land.name}?`,
-		confirmLabel: "Удалить",
+		title: translate["panel.land-deletion"](),
+		description: translate["panel.delete-land-confirm"]({ name: land.name }),
+		confirmLabel: translate["panel.delete"](),
 		onConfirm: () => deleteLand(ctx, land.ulid),
 		errorAtom: deleteLand.errorAtom,
 	});

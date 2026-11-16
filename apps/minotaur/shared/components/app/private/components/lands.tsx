@@ -20,6 +20,7 @@ import {
 	type EligiblePlayer,
 } from "../models/lands.model";
 import { ButtonXSubmit, DeleteButton, LinkButton, itemVariant } from "./ui";
+import { translate } from "@/shared/locales/helpers"
 
 const ModeButton = reatomComponent<{ mode: CreateMode; label: string }>(({ ctx, mode, label }) => {
 	const active = ctx.spy(landsState.create.mode) === mode;
@@ -75,7 +76,7 @@ const PlayerChip = reatomComponent<{ player: EligiblePlayer }>(({ ctx, player })
 		type="button"
 		onClick={() => lands.togglePlayer(ctx, player)}
 		className="flex items-center gap-2 rounded-full border border-green-800 bg-green-900/20 py-1 pl-1 pr-2"
-		title={`Убрать ${player.nickname}`}
+		title={translate["panel.remove-player"]({ nickname: player.nickname })}
 	>
 		<Avatar url={player.avatar} nickname={player.nickname} className="size-5" />
 		<span className="text-sm">{player.nickname}</span>
@@ -109,7 +110,7 @@ const PlayerPicker = reatomComponent(({ ctx }) => {
 		<div className="flex flex-col gap-2 w-full">
 			<div className="flex items-center gap-2 w-full">
 				<Input
-					placeholder="Поиск игрока без региона"
+					placeholder={translate["panel.search-for-a-player-without-a-land"]()}
 					value={ctx.spy(landsState.playerSearch)}
 					onChange={(event) => landsState.playerSearch(ctx, event.target.value)}
 					onKeyDown={(event) => {
@@ -122,8 +123,7 @@ const PlayerPicker = reatomComponent(({ ctx }) => {
 					onClick={() => lands.fetchEligible(ctx)}
 					disabled={status.isPending}
 				>
-					Найти
-				</Button>
+					{translate["panel.search"]()}</Button>
 			</div>
 			{selected.length > 0 && (
 				<div className="flex flex-wrap gap-1">
@@ -134,8 +134,7 @@ const PlayerPicker = reatomComponent(({ ctx }) => {
 				{status.isFirstPending && <Skeleton className="h-24 w-full" />}
 				{!status.isFirstPending && eligible.length === 0 && (
 					<Typography color="gray" className="text-sm">
-						Нет игроков без региона
-					</Typography>
+						{translate["panel.no-players-without-a-land"]()}</Typography>
 				)}
 				{eligible.map((player) => <EligiblePlayerItem key={player.uuid} player={player} />)}
 			</div>
@@ -157,22 +156,22 @@ const CreateLandForm = reatomComponent(({ ctx }) => {
 	return (
 		<div className="flex flex-col gap-3 w-full">
 			<div className="flex items-center gap-1">
-				<ModeButton mode="random" label="Случайные данные" />
-				<ModeButton mode="manual" label="Вручную" />
+				<ModeButton mode="random" label={translate["panel.random-data"]()} />
+				<ModeButton mode="manual" label={translate["panel.manual"]()} />
 			</div>
 			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
 				<Field
-					label={mode === "random" ? "Название (необязательно)" : "Название"}
+					label={mode === "random" ? translate["panel.name-optional"]() : translate["panel.title-2"]()}
 					value={ctx.spy(landsState.create.landName)}
 					onChange={(value) => landsState.create.landName(ctx, value)}
 				/>
 				<Field
-					label="Описание"
+					label={translate["panel.description"]()}
 					value={ctx.spy(landsState.create.title)}
 					onChange={(value) => landsState.create.title(ctx, value)}
 				/>
 				<Field
-					label="Чанков владельцу"
+					label={translate["panel.chunks-to-the-owner"]()}
 					type="number"
 					value={ctx.spy(landsState.create.chunks)}
 					onChange={(value) => landsState.create.chunks(ctx, Math.max(1, Number(value) || 1))}
@@ -180,31 +179,29 @@ const CreateLandForm = reatomComponent(({ ctx }) => {
 				{mode === "manual" && (
 					<>
 						<Field
-							label="Тип"
+							label={translate["panel.type"]()}
 							value={ctx.spy(landsState.create.type)}
 							onChange={(value) => landsState.create.type(ctx, value)}
 						/>
 						<Field
-							label="Уровень"
+							label={translate["panel.level"]()}
 							type="number"
 							value={ctx.spy(landsState.create.level)}
 							onChange={(value) => landsState.create.level(ctx, Math.max(1, Number(value) || 1))}
 						/>
-						<Field label="Убийства" type="number" value={stats.kills} onChange={(value) => setStats("kills", value)} />
-						<Field label="Смерти" type="number" value={stats.deaths} onChange={(value) => setStats("deaths", value)} />
-						<Field label="Победы" type="number" value={stats.wins} onChange={(value) => setStats("wins", value)} />
-						<Field label="Поражения" type="number" value={stats.defeats} onChange={(value) => setStats("defeats", value)} />
-						<Field label="Захваты" type="number" value={stats.captures} onChange={(value) => setStats("captures", value)} />
+						<Field label={translate["panel.kills"]()} type="number" value={stats.kills} onChange={(value) => setStats("kills", value)} />
+						<Field label={translate["panel.deaths"]()} type="number" value={stats.deaths} onChange={(value) => setStats("deaths", value)} />
+						<Field label={translate["panel.wins"]()} type="number" value={stats.wins} onChange={(value) => setStats("wins", value)} />
+						<Field label={translate["panel.losses"]()} type="number" value={stats.defeats} onChange={(value) => setStats("defeats", value)} />
+						<Field label={translate["panel.claims"]()} type="number" value={stats.captures} onChange={(value) => setStats("captures", value)} />
 					</>
 				)}
 			</div>
 			<div className="flex flex-col gap-1">
 				<Typography className="text-sm font-semibold">
-					Игроки
-				</Typography>
+					{translate["panel.players"]()}</Typography>
 				<Typography color="gray" className="text-xs">
-					Первый выбранный становится владельцем и получает чанки. Остальные - участники с 0 чанков.
-				</Typography>
+					{translate["panel.the-first-selected-player-becomes-the-owner-and-"]()}</Typography>
 			</div>
 			<PlayerPicker />
 		</div>
@@ -237,7 +234,7 @@ const LandListItem = reatomComponent<{ land: AdminLand }>(({ ctx, land }) => {
 						</Typography>
 					</div>
 					<Typography color="gray" className="truncate text-sm">
-						{land.owner?.nickname ?? "без владельца"} · {land.members.length} участн. · {land.world}
+						{land.owner?.nickname ?? translate["panel.without-an-owner"]()} · {land.members.length} {translate["panel.members"]()}{land.world}
 					</Typography>
 					<Typography color="gray" className="text-xs">
 						{dayjs(land.created_at).format("DD.MM.YYYY HH:mm")}
@@ -250,7 +247,7 @@ const LandListItem = reatomComponent<{ land: AdminLand }>(({ ctx, land }) => {
 					<DeleteButton
 						onClick={() => lands.deleteConfirm(ctx, land)}
 						disabled={isDeleting}
-						title={`Удалить ${land.name}`}
+						title={translate["panel.delete-land"]({ name: land.name })}
 					/>
 				)}
 			</div>
@@ -272,7 +269,7 @@ const LandsList = reatomComponent(({ ctx }) => {
 			<div className="flex flex-col gap-2 w-full">
 				<div className="flex items-center gap-2 w-full">
 					<Input
-						placeholder="Поиск по названию"
+						placeholder={translate["panel.search-by-title"]()}
 						value={ctx.spy(landsState.search)}
 						onChange={(event) => landsState.search(ctx, event.target.value)}
 						onKeyDown={(event) => {
@@ -280,8 +277,7 @@ const LandsList = reatomComponent(({ ctx }) => {
 						}}
 					/>
 					<Button background="default" className="h-10 shrink-0 text-sm" onClick={() => lands.fetch(ctx)}>
-						Найти
-					</Button>
+						{translate["panel.search"]()}</Button>
 				</div>
 				<Noop />
 			</div>
@@ -292,7 +288,7 @@ const LandsList = reatomComponent(({ ctx }) => {
 		<div className="flex flex-col gap-2 w-full">
 			<div className="flex items-center gap-2 w-full">
 				<Input
-					placeholder="Поиск по названию"
+					placeholder={translate["panel.search-by-title"]()}
 					value={ctx.spy(landsState.search)}
 					onChange={(event) => landsState.search(ctx, event.target.value)}
 					onKeyDown={(event) => {
@@ -300,8 +296,7 @@ const LandsList = reatomComponent(({ ctx }) => {
 					}}
 				/>
 				<Button background="default" className="h-10 shrink-0 text-sm" onClick={() => lands.fetch(ctx)}>
-					Найти
-				</Button>
+					{translate["panel.search"]()}</Button>
 			</div>
 			{data.data.map((land) => <LandListItem key={land.ulid} land={land} />)}
 			{data.meta.hasNextPage && (
@@ -311,8 +306,7 @@ const LandsList = reatomComponent(({ ctx }) => {
 					onClick={() => lands.fetchMore(ctx)}
 					disabled={status.isPending}
 				>
-					Показать ещё
-				</Button>
+					{translate["panel.show-more"]()}</Button>
 			)}
 		</div>
 	);

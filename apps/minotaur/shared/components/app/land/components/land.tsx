@@ -18,10 +18,10 @@ import { Skeleton } from "@/shared/ui/skeleton"
 import { pageState } from "@/shared/models/page-context.model"
 import { Noop } from "@/shared/ui/noop"
 import { SummaryNumber } from "@/shared/ui/summary-number"
-import { translate } from "@/shared/locales/helpers"
 import type { LandSimilar } from "../../lands/models/lands.model"
 import { LandAccess } from "./land-access"
 import { ClientOnly } from "vike-react/ClientOnly"
+import { translate } from "@/shared/locales/helpers"
 
 const LandGallery = reatomComponent(({ ctx }) => {
   const landGallery = ctx.spy(landGalleryAtom)

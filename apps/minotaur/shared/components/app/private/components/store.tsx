@@ -25,6 +25,7 @@ import { selectContentBaseStyle, selectVariant } from "@/shared/ui/select"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { getStaticImage } from "@/shared/lib/helpers"
 import { createStoreItemValidationAtom } from "@/shared/components/app/private/models/store.model"
+import { translate } from "@/shared/locales/helpers"
 
 const currencyValues = ["CHARISM", "BELKOIN"];
 const getCurrencyTitle = (ctx: Ctx, val: string) => getFromDictionary(ctx, val)
@@ -35,7 +36,7 @@ const CURRENCY_ITEMS = (ctx: Ctx) => currencyValues.map((value) => ({
 }));
 
 const TYPE_ITEMS = [
-  { title: "Ивент", value: "event" }, { title: "Донат", value: "donate" }
+  { title: translate["panel.event"](), value: "event" }, { title: translate["panel.donation"](), value: "donate" }
 ]
 
 const createTouchedAtom = atom<Set<string>>(new Set<string>(), "createStoreItemTouched")
@@ -65,9 +66,9 @@ const Field = ({ label, required, hint, error, children }: PropsWithChildren<{
 )
 
 const uploadLabel = ({ imageUploading, imgUrl }: { imageUploading: boolean, imgUrl?: string | null }) => {
-  if (imageUploading) return "Загрузка…"
-  if (imgUrl) return "Заменить"
-  return "Выбрать файл"
+  if (imageUploading) return translate["panel.loading-2"]()
+  if (imgUrl) return translate["panel.replace"]()
+  return translate["panel.select-a-file"]()
 }
 
 const fieldError = (ctx: CtxSpy, field: string, errors: Record<string, string>) => {
@@ -109,26 +110,26 @@ export const CreateItem = reatomComponent(({ ctx }) => {
   return (
     <div className="grid gap-3 w-full h-full lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
       <div className="flex flex-col gap-3 w-full">
-        <Field label="Название" required error={fieldError(ctx, "title", validation.errors)}>
+        <Field label={translate["panel.title-2"]()} required error={fieldError(ctx, "title", validation.errors)}>
           <Input
             value={ctx.spy(createStoreItemState.title)}
             onChange={e => createStoreItemState.title(ctx, e.target.value)}
             onBlur={() => markCreateTouched(ctx, "title")}
-            placeholder="Например, «Архонт»"
+            placeholder={translate["panel.for-example-archon"]()}
           />
         </Field>
 
-        <Field label="Описание" hint="Короткий текст под названием в магазине">
+        <Field label={translate["panel.description"]()} hint={translate["panel.short-text-under-the-name-in-the-store"]()}>
           <textarea
             value={ctx.spy(createStoreItemState.description) ?? ""}
             onChange={e => createStoreItemState.description(ctx, e.target.value || null)}
-            placeholder="Что получает игрок"
+            placeholder={translate["panel.what-the-player-gets"]()}
             className={textareaClass}
           />
         </Field>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <Field label="Тип" required>
+          <Field label={translate["panel.type"]()} required>
             <Select.Root
               collection={collectionss}
               value={ctx.spy(createStoreItemState.type) ? [ctx.spy(createStoreItemState.type)!] : []}
@@ -164,7 +165,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
             </Select.Root>
           </Field>
 
-          <Field label="Валюта" required>
+          <Field label={translate["panel.currency"]()} required>
             <Select.Root
               collection={collectionf}
               value={[ctx.spy(createStoreItemState.currency)]}
@@ -202,7 +203,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <Field label="Цена" required error={fieldError(ctx, "price", validation.errors)}>
+          <Field label={translate["panel.price"]()} required error={fieldError(ctx, "price", validation.errors)}>
             <Input
               value={ctx.spy(createStoreItemState.price) ?? ""}
               onChange={e => createStoreItemState.price(ctx, e.target.value)}
@@ -213,19 +214,19 @@ export const CreateItem = reatomComponent(({ ctx }) => {
             />
           </Field>
 
-          <Field label="Значение" required hint="Что подставляется в команду как {value}" error={fieldError(ctx, "value", validation.errors)}>
+          <Field label={translate["panel.value"]()} required hint={translate["panel.what-is-substituted-into-the-command-as-value"]({ value: "{value}" })} error={fieldError(ctx, "value", validation.errors)}>
             <Input
               value={ctx.spy(createStoreItemState.value) ?? ""}
               onChange={e => createStoreItemState.value(ctx, e.target.value)}
               onBlur={() => markCreateTouched(ctx, "value")}
-              placeholder="Например, 1"
+              placeholder={translate["panel.for-example-1"]()}
             />
           </Field>
         </div>
 
         <Field
-          label="Команда выдачи"
-          hint="Токены {player} и {value}; команда выполняется от консоли"
+          label={translate["panel.grant-command"]()}
+          hint={translate["panel.tokens-player-and-value-the-command-runs-from-th"]({ player: "{player}", value: "{value}" })}
           error={fieldError(ctx, "command", validation.errors)}
         >
           <Input
@@ -236,7 +237,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
           />
         </Field>
 
-        <Field label="Команда возврата" hint="Необязательно: что выполнить при возврате">
+        <Field label={translate["panel.refund-command"]()} hint={translate["panel.optional-what-to-run-on-refund"]()}>
           <Input
             value={ctx.spy(createStoreItemState.refundCmd) ?? ""}
             onChange={e => createStoreItemState.refundCmd(ctx, e.target.value || null)}
@@ -245,8 +246,8 @@ export const CreateItem = reatomComponent(({ ctx }) => {
         </Field>
 
         <Field
-          label="Картинка"
-          hint="PNG, JPEG или WebP до 2 МБ"
+          label={translate["panel.picture"]()}
+          hint={translate["panel.png-jpeg-or-webp-up-to-2-mb"]()}
           error={imageError ?? undefined}
         >
           <div className="flex flex-wrap items-center gap-2">
@@ -272,15 +273,14 @@ export const CreateItem = reatomComponent(({ ctx }) => {
                   className="h-10 px-3 text-xs"
                   onClick={() => createStoreItemState.imgUrl(ctx, null)}
                 >
-                  Убрать
-                </Button>
+                  {translate["panel.remove"]()}</Button>
               </>
             )}
           </div>
         </Field>
 
         <div className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-neutral-400">Содержимое</span>
+          <span className="text-xs font-medium text-neutral-400">{translate["panel.content-3"]()}</span>
           <div className="flex flex-col">
             <EditorMenuBar editor={editor} />
             <EditorContent editor={editor} />
@@ -290,18 +290,17 @@ export const CreateItem = reatomComponent(({ ctx }) => {
 
       <aside className="flex flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-900/60 p-3 lg:sticky lg:top-2">
         <span className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-          Предпросмотр
-        </span>
+          {translate["panel.preview"]()}</span>
         <img
           src={imgUrl ? getStaticImage(imgUrl) : getStaticImage("icons/adventure_icon.png")}
           alt=""
           className="aspect-square w-full rounded-lg object-cover bg-neutral-800"
         />
         <Typography className="font-semibold truncate">
-          {ctx.spy(createStoreItemState.title) || "Название товара"}
+          {ctx.spy(createStoreItemState.title) || translate["panel.item-name"]()}
         </Typography>
         <Typography color="gray" className="text-xs line-clamp-3">
-          {ctx.spy(createStoreItemState.description) || "Описание товара"}
+          {ctx.spy(createStoreItemState.description) || translate["panel.item-description"]()}
         </Typography>
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="font-semibold">
@@ -321,14 +320,13 @@ export const CreateItem = reatomComponent(({ ctx }) => {
           disabled={pending || imageUploading}
         >
           <Typography className="font-semibold text-lg text-neutral-50">
-            Создать
-          </Typography>
+            {translate["panel.create"]()}</Typography>
           <Icon name="sprite:check" className="size-4.5" />
         </Button>
 
         {!validation.valid && ctx.spy(createAttemptedAtom) && (
           <span className="text-[11px] text-red">
-            Заполните обязательные поля: {Object.keys(validation.errors).join(", ")}
+            {translate["panel.fill-in-the-required-fields"]()}{Object.keys(validation.errors).join(", ")}
           </span>
         )}
       </aside>
@@ -337,9 +335,9 @@ export const CreateItem = reatomComponent(({ ctx }) => {
 }, "CreateItem")
 
 const titles: Record<AtomState<typeof storeState.searchParamTarget>, string> = {
-  "create": "Создание товара",
-  "edit": "Редактирование товара",
-  "view": "Просмотр товаров"
+  "create": translate["panel.item-creation"](),
+  "edit": translate["panel.item-editing"](),
+  "view": translate["panel.view-items"]()
 }
 
 const headerTitleAtom = atom((ctx) =>
@@ -377,7 +375,7 @@ const StoreItem = reatomComponent<StoreItemProps>(({ ctx, imageUrl, description,
           />
           <Button
             className="p-0! h-6! w-6! aspect-square bg-neutral-800 hover:bg-neutral-700"
-            title="Дублировать"
+            title={translate["panel.duplicate"]()}
             onClick={() => duplicateStoreItem(ctx, id)}
           >
             <Icon name="sprite:copy" className="size-4" />
@@ -453,7 +451,7 @@ const EditItem = reatomComponent(({ ctx }) => {
   }
 
   if (!data) {
-    return <Typography>Товар не найден</Typography>;
+    return <Typography>{translate["panel.item-not-found"]()}</Typography>;
   }
 
   const currencyCollection = createListCollection({ items: CURRENCY_ITEMS(ctx) })
@@ -476,28 +474,28 @@ const EditItem = reatomComponent(({ ctx }) => {
       <Input
         value={ctx.spy(editStoreItemState.title)}
         onChange={e => editStoreItemState.title(ctx, e.target.value)}
-        placeholder="Заголовок"
+        placeholder={translate["panel.title"]()}
       />
       <Input
         value={ctx.spy(editStoreItemState.value)}
         onChange={e => editStoreItemState.value(ctx, e.target.value)}
-        placeholder="Значение"
+        placeholder={translate["panel.value"]()}
       />
       <Input
         value={ctx.spy(editStoreItemState.command)}
         onChange={e => editStoreItemState.command(ctx, e.target.value)}
-        placeholder="Команда для выдачи"
+        placeholder={translate["panel.grant-command-2"]()}
       />
       <Input
         value={ctx.spy(editStoreItemState.refundCmd) ?? ""}
         onChange={e => editStoreItemState.refundCmd(ctx, e.target.value || null)}
-        placeholder="Команда для возврата (необязательно)"
+        placeholder={translate["panel.refund-command-optional"]()}
       />
       <div className="flex items-center gap-2 w-full">
         <Input
           value={ctx.spy(editStoreItemState.price)}
           onChange={e => editStoreItemState.price(ctx, e.target.value)}
-          placeholder="Цена"
+          placeholder={translate["panel.price"]()}
           type="number"
           className="bg-transparent border border-neutral-800 text-sm h-8 w-fit"
         />
@@ -593,8 +591,7 @@ const EditItem = reatomComponent(({ ctx }) => {
         disabled={ctx.spy(editStoreItem.submit.statusesAtom).isPending}
         className="bg-neutral-50 text-neutral-950 font-semibold text-lg self-end"
       >
-        Применить
-      </Button>
+        {translate["panel.apply"]()}</Button>
     </div>
   )
 }, "EditItem")
@@ -620,7 +617,7 @@ const StoreHeader = reatomComponent(({ ctx }) => {
         onClick={() => navigate("/private/store?target=create")}
         className={styles.root()}
       >
-        <Typography className={styles.label()}>Создать</Typography>
+        <Typography className={styles.label()}>{translate["panel.create"]()}</Typography>
         <Icon name="sprite:plus" className={styles.icon()} />
       </Button>
     </div>

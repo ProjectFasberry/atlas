@@ -6,6 +6,7 @@ import { methodsModel, type PrivatedMethodsPayload } from "../models/methods.mod
 import { Switch } from "@/shared/ui/switch";
 import { ErrorBlock } from "@/shared/ui/error-block";
 import { Button } from "@/shared/ui/button";
+import { translate } from "@/shared/locales/helpers"
 
 const { methods, methodsControl, getMethodIsLoading } = methodsModel()
 
@@ -77,7 +78,7 @@ const Method = reatomComponent<PrivatedMethodsPayload[number]>(({
       </div>
       <div className={methodVariant().second_parent()} onClick={(event) => event.stopPropagation()}>
         <span className="text-[11px] font-semibold text-neutral-400">
-          {isAvailable ? "Вкл" : "Выкл"}
+          {isAvailable ? translate["panel.on"]() : translate["panel.off"]()}
         </span>
         <Switch
           checked={isAvailable}
@@ -103,8 +104,7 @@ export const Methods = reatomComponent(({ ctx }) => {
       <div className="flex flex-col items-start gap-2">
         <ErrorBlock title={error.message} />
         <Button background="default" className="h-8 text-sm" onClick={() => methods.fetch(ctx)}>
-          Повторить
-        </Button>
+          {translate["panel.retry"]()}</Button>
       </div>
     )
   }
