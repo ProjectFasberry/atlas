@@ -58,8 +58,11 @@ const UserMenuRoles = reatomComponent<{ nickname: string; currentRoleId: number 
           disabled={pending || role.id === currentRoleId}
           className={menuVariant.item()}
           onClick={() => {
-            usersRestrictState.targetRoleId(ctx, role.id);
-            usersRoles.before(ctx, [nickname], { type: "change_role" });
+            // The menu closes on select and unmounts; spawn keeps the request alive.
+            spawn(ctx, (spawnCtx) => {
+              usersRestrictState.targetRoleId(spawnCtx, role.id);
+              usersRoles.before(spawnCtx, [nickname], { type: "change_role" });
+            });
           }}
         >
           <span className="flex w-full items-center justify-between gap-2">
