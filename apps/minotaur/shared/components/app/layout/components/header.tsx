@@ -4,7 +4,8 @@ import { reatomComponent } from "@reatom/npm-react";
 import { cartDataSelectedItemsLengthAtom, cartState } from "../../shop/models/store-cart.state";
 import { Logotype } from "./logotype";
 import {
-  createHeaderLinks, type HeaderLink, showAuthorizeButtonAtom, showCartIconAtom, showCurrentUserMenuAtom
+  createHeaderLinks, type HeaderLink,
+  showAuthorizeButtonAtom, showCartIconAtom, showCurrentUserMenuAtom
 } from "../models/navigation.model";
 import { MobileBottomBar } from "./mobile-navigation";
 import { appState, userState } from "@/shared/models/app/index.model";
@@ -24,7 +25,8 @@ const AuthorizeButton = () => {
     <Link
       href="/auth"
       aria-label={translate["shared.header.authorizeTitle"]()}
-      className="flex items-center justify-center font-semibold text-sm h-9 min-w-10 px-4 py-2 bg-green-700 rounded-xl"
+      className="flex items-center justify-center
+      font-semibold text-sm h-9 min-w-10 px-4 py-2 bg-green-700 rounded-xl"
     >
       {translate["shared.header.authorizeTitle"]()}
     </Link>
@@ -61,7 +63,8 @@ const CartTrigger = reatomComponent(({ ctx }) => {
     >
       <Icon
         name="sprite:building-store"
-        className="size-[24px] group-data-[trigger=true]:text-green-500 group-data-[trigger=false]:text-neutral-400"
+        className="size-6 group-data-[trigger=true]:text-green-500
+        group-data-[trigger=false]:text-neutral-400"
       />
       {cartItemsLength > 0 && (
         <div
@@ -101,10 +104,14 @@ const LangSwitcher = reatomComponent(({ ctx }) => {
       </Select.Trigger>
       <Portal>
         <Select.Positioner>
-          <Select.Content className={selectVariant.content("min-w-[200px]" )}>
+          <Select.Content className={selectVariant.content("min-w-50" )}>
             <Select.ItemGroup className={selectVariant.itemGroup()}>
               {locales.map((locale) => (
-                <Select.Item key={locale} item={locale} className={selectVariant.item("text-base")}>
+                <Select.Item
+                  key={locale}
+                  item={locale}
+                  className={selectVariant.item("text-base")}
+                >
                   <Select.ItemText className={selectVariant.itemText()}>
                     {LOCALES_MAP[locale]}
                   </Select.ItemText>
@@ -133,7 +140,8 @@ const LinkItem = ({ title, label, href }: HeaderLink) => {
       aria-label={label}
       href={href}
       className="
-        inline-flex justify-center items-center h-full px-8 border-b-2 hover:bg-neutral-800
+        inline-flex justify-center items-center h-full px-8
+        border-b-2 hover:bg-neutral-800
         data-[state=inactive]:border-transparent data-[state=active]:border-green-500
         font-semibold text-sm truncate
       "
@@ -143,7 +151,9 @@ const LinkItem = ({ title, label, href }: HeaderLink) => {
   )
 }
 
-export const Header = reatomComponent<{ asCompact?: boolean }>(({ ctx, asCompact = false }) => {
+export const Header = reatomComponent<{ asCompact?: boolean }>(({
+  ctx, asCompact = false
+}) => {
   return (
     <div className="flex flex-col w-full border-b rounded-b-xl border-neutral-800 relative z-20">
       <div className="flex items-center justify-start w-full h-20 max-h-20 top-0">

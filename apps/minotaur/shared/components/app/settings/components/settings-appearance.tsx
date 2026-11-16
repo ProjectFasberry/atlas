@@ -4,7 +4,7 @@ import { playerSLPState } from "../../player/models/player-seems-like.model";
 import { SettingsContentWrapper } from "./ui";
 import { Switch } from "@/shared/ui/switch";
 import { translate } from "@/shared/locales/helpers";
-import { balanceState } from "../../player/models/balance.model";
+import { balanceState } from "../../wallet/models/balance.model";
 
 const BalanceSettings = reatomComponent(({ ctx }) => {
   return (

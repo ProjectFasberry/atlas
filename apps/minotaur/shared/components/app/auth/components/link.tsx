@@ -19,16 +19,22 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
 
   if (checking) {
     return (
-      <div className="flex w-full max-w-lg flex-col gap-2 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6">
-        <span className="text-sm text-neutral-400">{translate["auth.link.checking"]()}</span>
+      <div className="flex w-full max-w-lg flex-col
+        gap-2 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6">
+        <span className="text-sm text-neutral-400">
+          {translate["auth.link.checking"]()}
+        </span>
       </div>
     );
   }
 
   if (!kind) {
     return (
-      <div className="flex w-full max-w-lg flex-col gap-4 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6">
-        <h2 className="text-lg font-semibold">{translate["auth.link.invalid-title"]()}</h2>
+      <div className="flex w-full max-w-lg flex-col
+        gap-4 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6">
+        <h2 className="text-lg font-semibold">
+          {translate["auth.link.invalid-title"]()}
+        </h2>
         <p className="text-sm text-neutral-400">
           {translate["auth.link.invalid-text"]()}
         </p>
@@ -39,7 +45,8 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
 
   return (
     <form
-      className="flex w-full max-w-lg flex-col gap-4 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6"
+      className="flex w-full max-w-lg flex-col
+      gap-4 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6"
       onSubmit={(event) => {
         event.preventDefault();
         linkFlow.accept(ctx);
@@ -57,9 +64,12 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
             : translate["auth.link.new-nickname"]()}
         </p>
       </div>
-
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-neutral-300">{translate["auth.link.nickname"]()}</span>
+        <span
+          className="text-sm font-medium text-neutral-300"
+        >
+          {translate["auth.link.nickname"]()}
+        </span>
         <Input
           value={ctx.spy(linkState.nickname)}
           onChange={(event) => linkState.nickname(ctx, event.target.value)}
@@ -69,9 +79,10 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
           placeholder={reserved ?? "Steve"}
         />
       </label>
-
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-neutral-300">{translate["auth.link.password"]()}</span>
+        <span className="text-sm font-medium text-neutral-300">
+          {translate["auth.link.password"]()}
+        </span>
         <Input
           type="password"
           value={ctx.spy(linkState.password)}
@@ -80,9 +91,10 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
           maxLength={32}
         />
       </label>
-
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-neutral-300">{translate["auth.link.password-repeat"]()}</span>
+        <span className="text-sm font-medium text-neutral-300">
+          {translate["auth.link.password-repeat"]()}
+        </span>
         <Input
           type="password"
           value={ctx.spy(linkState.passwordRepeat)}
@@ -91,9 +103,7 @@ export const LinkAccept = reatomComponent<{ token: string }>(({ ctx, token }) =>
           maxLength={32}
         />
       </label>
-
-      {error ? <ErrorBlock title={error} raw /> : null}
-
+      {error && <ErrorBlock title={error} raw />}
       <Button
         type="submit"
         background="white"

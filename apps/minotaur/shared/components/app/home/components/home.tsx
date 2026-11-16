@@ -6,7 +6,6 @@ import { env } from "@/shared/env"
 import { belkoinImage, charismImage } from "@/shared/consts/images"
 import { getStaticImage } from "@/shared/lib/helpers"
 import { currentUserState } from "@/shared/models/current-user/index.model"
-import { balance, balanceState } from "@/shared/components/app/player/models/balance.model"
 import { tasks } from "@/shared/components/app/tasks/models/tasks.model"
 import { referralLinkUrl, referrals } from "@/shared/components/app/referrals/models/referrals.model"
 import { serverStatus } from "@/shared/components/app/intro/models/intro.model"
@@ -20,6 +19,7 @@ import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { Skeleton } from "@/shared/ui/skeleton"
 import { Typography } from "@/shared/ui/typography"
+import { WalletChips } from "@/shared/components/app/wallet/components/wallet-chips"
 import { home } from "../models/home.model"
 import { translate } from "@/shared/locales/helpers"
 
@@ -33,7 +33,9 @@ const Card = ({ children, className = "" }: { children: ReactNode; className?: s
 
 const CardTitle = ({ children, action }: { children: ReactNode; action?: ReactNode }) => (
   <div className="flex items-center justify-between gap-2">
-    <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">{children}</span>
+    <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+      {children}
+    </span>
     {action}
   </div>
 )
@@ -51,8 +53,10 @@ export const HomeHero = reatomComponent(({ ctx }) => {
   const text = user ? translate["home.hero.text_user"]() : translate["home.hero.text_guest"]()
 
   return (
-    <div className="relative flex min-h-60 w-full flex-col overflow-hidden rounded-xl md:h-96 max-h-80">
-      <div className="absolute inset-0 z-5 w-full bg-linear-to-r from-black/85 via-black/50 to-transparent" />
+    <div className="relative flex min-h-60 w-full
+      flex-col overflow-hidden rounded-xl md:h-96 max-h-80">
+      <div className="absolute inset-0 z-5 w-full
+      bg-linear-to-r from-black/85 via-black/50 to-transparent" />
       <img
         src={HERO_IMAGE}
         alt=""
@@ -61,7 +65,8 @@ export const HomeHero = reatomComponent(({ ctx }) => {
       />
       <div className="relative z-6 flex h-full w-full grow flex-col justify-between gap-4 p-4 lg:p-6">
         <div className="flex flex-col items-start gap-3">
-          <span className="rounded-md bg-green-500/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-green-300">
+          <span className="rounded-md bg-green-500/20 px-2
+            py-0.5 text-[11px] font-semibold uppercase tracking-wide text-green-300">
             {welcome}
           </span>
           <Typography className="text-2xl font-[PIXY] leading-[1.1] lg:text-4xl">
@@ -74,16 +79,29 @@ export const HomeHero = reatomComponent(({ ctx }) => {
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm text-neutral-300">
             <span className={`size-2 rounded-full ${status ? "bg-green-400" : "bg-neutral-500"}`} />
-            <span>{translate["home.hero.online"]({ count: status?.proxy.online ?? 0 })}</span>
+            <span>
+              {translate["home.hero.online"]({ count: status?.proxy.online ?? 0 })}
+            </span>
           </div>
-          {user ? <HeroUserActions nickname={user.nickname} avatar={user.avatar} role={user.meta.role.name} /> : <HeroGuestActions />}
+          {user
+            ? <HeroUserActions
+                nickname={user.nickname}
+                avatar={user.avatar}
+                role={user.meta.role.name}
+            />
+            : <HeroGuestActions />
+          }
         </div>
       </div>
     </div>
   )
 }, "HomeHero")
 
-const HeroUserActions = ({ nickname, avatar, role }: { nickname: string; avatar: string; role: string }) => (
+const HeroUserActions = ({
+  nickname, avatar, role
+}: {
+  nickname: string; avatar: string; role: string
+}) => (
   <div className="flex flex-wrap items-center gap-2">
     <Link
       href={createLink("player", nickname)}
@@ -118,38 +136,17 @@ const HeroGuestActions = () => (
   </div>
 )
 
-const PlayerBalance = reatomComponent(({ ctx }) => {
-  useUpdate((ctx) => { balance.fetch(ctx) }, [])
-
-  const pending = ctx.spy(balance.fetch.statusesAtom).isPending
-
+const PlayerBalance = () => {
   return (
     <Card>
       <CardTitle>{translate["home.balance.title"]()}</CardTitle>
-      {pending ? (
-        <Skeleton className="h-8 w-32" />
-      ) : (
-        <div className="flex flex-wrap items-center gap-4">
-          <span className="flex items-center gap-1.5">
-            <img src={belkoinImage} alt="BELKOIN" className="size-6" />
-            <span className="text-2xl font-semibold">
-              {formatNumber(ctx.spy(balanceState.belkoinBalance))}
-            </span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <img src={charismImage} alt="CHARISM" className="size-6" />
-            <span className="text-2xl font-semibold">
-              {formatNumber(ctx.spy(balanceState.charismBalance))}
-            </span>
-          </span>
-        </div>
-      )}
+      <WalletChips size="lg" />
       <Link href="/store" className={cardActionClass}>
         {translate["home.balance.to_store"]()}
       </Link>
     </Card>
   )
-}, "PlayerBalance")
+}
 
 const PlayerTasks = reatomComponent(({ ctx }) => {
   useUpdate((ctx) => { tasks.fetch(ctx) }, [])

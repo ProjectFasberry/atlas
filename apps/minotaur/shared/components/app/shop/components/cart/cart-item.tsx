@@ -1,9 +1,12 @@
 import { reatomComponent } from "@reatom/npm-react"
+import { spawn } from "@reatom/framework"
+import { toast } from "sonner"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
+import { Avatar } from "@/shared/ui/avatar"
 import { createLink } from "@/shared/components/config/link/link.model"
-import { storeItem } from "../../models/store-item.model"
+import { getItemStatus, storeItem } from "../../models/store-item.model"
 import { cart, cartDataItemIsSelectAtom, type CartItem as CartItemProps } from "../../models/store-cart.model"
 import { changeLocalRecipient } from "../../../settings/models/settings-store.model"
 import { getCurrencies } from "@/shared/models/shared.model"
@@ -11,113 +14,131 @@ import { Checkbox } from "@ark-ui/react/checkbox"
 import { CheckboxIndicatorIcon, checkboxVariant } from "@/shared/ui/checkbox"
 import { translate } from "@/shared/locales/helpers"
 
-const CartItemRemoveFromCart = reatomComponent<{ id: number }>(({ ctx, id }) => {
-  return (
-    <Button
-      title={translate["cart.item.remove"]()}
-      aria-label={translate["cart.item.remove"]()}
-      background="default"
-      size="headless"
-      className="h-11 min-h-11 w-11 aspect-square"
-      onClick={() => cart.removeItem(ctx, id)}
-      disabled={ctx.spy(cart.removeItem.statusesAtom).isPending}
-    >
-      <Icon name="sprite:trash" className="size-4" />
-    </Button>
-  )
-}, "CartItemRemoveFromCart")
-
-const CartItemUpdateSelectStatus = reatomComponent<{ id: number }>(({ ctx, id }) => {
+const CartItemSelect = reatomComponent<Pick<CartItemProps, "id" | "title">>(({ ctx, id, title }) => {
   const checked = ctx.spy(cartDataItemIsSelectAtom(id));
 
   return (
-    <div className="absolute z-2 top-3 left-3">
-      <Checkbox.Root
-        id={String(id)}
-        aria-label={translate["cart.item.select"]()}
-        checked={checked}
-        onCheckedChange={(e) => storeItem.updateSelectedStatus(ctx, id)}
-        className={checkboxVariant.root()}
-        disabled={ctx.spy(storeItem.updateSelectedStatus.statusesAtom).isPending}
-      >
-        <Checkbox.Control className={checkboxVariant.control({ variant: "filled", size: "medium" })}>
-          <Checkbox.Indicator className={checkboxVariant.indicator()}>
-            <CheckboxIndicatorIcon />
-          </Checkbox.Indicator>
-        </Checkbox.Control>
-        <Checkbox.HiddenInput />
-      </Checkbox.Root>
-    </div>
+    <Checkbox.Root
+      id={String(id)}
+      aria-label={`${translate["cart.item.select"]()}: ${title}`}
+      checked={checked}
+      onCheckedChange={() => storeItem.updateSelectedStatus(ctx, id)}
+      className={checkboxVariant.root()}
+      disabled={ctx.spy(storeItem.updateSelectedStatus.statusesAtom).isPending}
+    >
+      <Checkbox.Control className={checkboxVariant.control({ variant: "filled", size: "medium" })}>
+        <Checkbox.Indicator className={checkboxVariant.indicator()}>
+          <CheckboxIndicatorIcon />
+        </Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.HiddenInput />
+    </Checkbox.Root>
   )
-}, "CartItemUpdateSelectStatus")
+}, "CartItemSelect")
 
 export const CartItem = reatomComponent<CartItemProps>(({
   ctx, ...item
 }) => {
-  const { id, title, imageUrl, description, price, currency } = item
+  const { id, title, imageUrl, description, price, currency, recipient } = item
 
   const currencies = getCurrencies(ctx);
   const currencyInfo = currencies[currency];
+  const pending = ctx.spy(getItemStatus(id))?.isLoading ?? false;
+
+  const remove = () => {
+    spawn(ctx, async (spawnCtx) => {
+      try {
+        await cart.removeItem(spawnCtx, id);
+
+        toast(translate["cart.actions.removed"](), {
+          action: {
+            label: translate["cart.actions.undo"](),
+            onClick: () => { void cart.restoreItem(spawnCtx, { id, recipient }) },
+          },
+        })
+      } catch {
+        // the model already logs and toasts the failure
+      }
+    })
+  }
 
   return (
     <div
       id={id.toString()}
-      className="flex items-center w-full relative gap-2 sm:gap-4 max-h-32 overflow-hidden rounded-lg p-2 sm:p-6
-        border border-neutral-800"
+      aria-busy={pending}
+      className="flex items-center w-full relative gap-3 sm:gap-4 rounded-xl
+      border border-neutral-800 bg-neutral-900/40 p-3 sm:p-4"
     >
-      <CartItemUpdateSelectStatus id={id} />
-      <div className="flex items-center relative gap-2 sm:gap-4 min-w-0 flex-1">
-        <div className="flex items-center justify-center overflow-hidden min-h-12 min-w-12 size-12">
-          <img
-            src={imageUrl}
-            width={56}
-            height={56}
-            alt=""
-            className="select-none w-full h-full"
-          />
-        </div>
-        <div className="flex flex-col justify-center w-full gap-2">
-          <a href={createLink("store", id.toString())} target="_blank" className="flex flex-col">
-            <Typography className="text-md sm:text-base font-semibold truncate">
-              {title}
-            </Typography>
-            <Typography className="text-neutral-400 line-clamp-1 leading-tight text-sm w-full">
+      <CartItemSelect id={id} title={title} />
+      <a
+        href={createLink("store", id.toString())}
+        target="_blank"
+        rel="noreferrer"
+        className="flex shrink-0 items-center justify-center
+        overflow-hidden rounded-lg bg-neutral-800 size-16"
+      >
+        <img
+          src={imageUrl}
+          width={64}
+          height={64}
+          alt=""
+          loading="lazy"
+          className="select-none size-full object-cover"
+        />
+      </a>
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <a
+          href={createLink("store", id.toString())}
+          target="_blank"
+          rel="noreferrer"
+          className="min-w-0"
+        >
+          <Typography className="truncate text-sm font-semibold sm:text-base">{title}</Typography>
+          {description && (
+            <Typography className="line-clamp-1 text-xs text-neutral-400 sm:text-sm">
               {description}
             </Typography>
-          </a>
-          <div className="flex items-center gap-1">
-            <Button
-              background="default"
-              size="headless"
-              aria-label={translate["cart.item.change-recipient"]()}
-              title={translate["cart.item.change-recipient"]()}
-              className="h-11 min-h-11 w-11 aspect-square"
-              onClick={() => changeLocalRecipient.openDialog(ctx, item)}
-            >
-              <Icon name="sprite:gift" className="size-4" />
-            </Button>
-            <CartItemRemoveFromCart id={id} />
-          </div>
+          )}
+        </a>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => changeLocalRecipient.openDialog(ctx, item)}
+            aria-label={translate["cart.item.change-recipient"]()}
+            title={translate["cart.item.change-recipient"]()}
+            className="flex h-7 min-w-0 items-center gap-1.5 rounded-lg
+            bg-neutral-800/70 px-2 text-xs text-neutral-300 duration-150
+            hover:bg-neutral-700 hover:text-neutral-100"
+          >
+            <Avatar url="" nickname={recipient ?? "?"} className="size-4" />
+            <span className="truncate">{recipient || translate["cart.item.self"]()}</span>
+            <Icon name="sprite:gift" className="size-3.5 shrink-0 text-neutral-500" />
+          </button>
+          <Button
+            title={translate["cart.item.remove"]()}
+            aria-label={`${translate["cart.item.remove"]()}: ${title}`}
+            background="default"
+            size="headless"
+            className="h-7 w-7 aspect-square text-neutral-400 hover:text-red"
+            onClick={remove}
+            disabled={pending}
+          >
+            <Icon name="sprite:trash" className="size-4" />
+          </Button>
         </div>
       </div>
-      <div className="flex flex-col min-w-0">
-        <div className="flex items-center gap-1">
-          <Typography className="font-semibold text-nowrap">
-            {price}
-          </Typography>
-          {currencyInfo?.img ? (
-            <img
-              src={currencyInfo.img}
-              draggable={false}
-              alt={currencyInfo.symbol}
-              className="w-5 h-5 inline-block"
-            />
-          ) : (
-            <span className="text-sm text-neutral-400">
-              {currencyInfo?.symbol ?? currency}
-            </span>
-          )}
-        </div>
+      <div className="flex shrink-0 items-center gap-1 self-start pt-1">
+        <Typography className="text-sm font-semibold tabular-nums sm:text-base">{price}</Typography>
+        {currencyInfo?.img ? (
+          <img
+            src={currencyInfo.img}
+            draggable={false}
+            alt={currencyInfo.symbol}
+            className="size-5"
+          />
+        ) : (
+          <span className="text-xs text-neutral-400">{currencyInfo?.symbol ?? currency}</span>
+        )}
       </div>
     </div>
   )

@@ -1,0 +1,30 @@
+import { logRouting } from "@/shared/lib/log"
+import { getIsAuthed } from "@/shared/models/app/utils"
+import { wrapTitle } from "@/shared/lib/helpers"
+import { useConfig } from "vike-react/useConfig"
+import { redirect } from "vike/abort"
+import { type PageContext } from "vike/types"
+import { translate } from "@/shared/locales/helpers"
+import { buildAuthRedirect } from "@/shared/lib/auth-redirect"
+
+function metadata() {
+  const title = wrapTitle(translate["wallet.page.title"]())
+  const description = translate["wallet.page.description"]()
+
+  return {
+    title,
+    description
+  }
+}
+
+export function data(pageCtx: PageContext) {
+  logRouting(pageCtx.urlPathname, "data")
+
+  const isAuth = getIsAuthed(pageCtx.snapshot)
+  if (!isAuth) {
+    throw redirect(buildAuthRedirect(pageCtx.urlParsed.pathname, pageCtx.urlParsed.searchOriginal))
+  }
+
+  const config = useConfig()
+  config(metadata())
+}

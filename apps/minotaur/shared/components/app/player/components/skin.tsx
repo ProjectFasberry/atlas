@@ -284,8 +284,9 @@ const SkinVariantItem = reatomComponent<{ variant: SkinVariant }>(({ ctx, varian
 }, "SkinVariantItem")
 
 const va = tv({
-  base: `flex items-center flex-col py-6 px-4 duration-300 hover:bg-neutral-800/60 cursor-pointer gap-2
-    border-2 border-dashed border-neutral-800 w-full rounded-lg`
+  base: `flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl
+    border-2 border-dashed border-neutral-800 px-4 py-6 text-center duration-150
+    hover:border-neutral-700 hover:bg-neutral-800/40`
 })
 
 const SelectedSkinData = reatomComponent(({ ctx }) => {
@@ -309,30 +310,39 @@ const SelectedSkinData = reatomComponent(({ ctx }) => {
   const data = ctx.spy(skinsState.control.fileData)
   if (!data) return null;
 
+  const size = data.size >= 1024 * 1024
+    ? `${(data.size / 1024 / 1024).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(data.size / 1024))} KB`
+
   return (
-    <div className={va()}>
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-9">
-            <img src={data.url} draggable={false} width={36} height={36} alt="" />
-          </div>
-          <div className='flex flex-col gap-1 min-w-0'>
-            <Typography className='leading-3 truncate font-semibold text-sm'>
-              {data.name}
-            </Typography>
-            <Typography className="text-neutral-400 text-sm">
-              {data.size >= 1024 * 1024
-                ? `${(data.size / 1024 / 1024).toFixed(1)} MB`
-                : `${Math.max(1, Math.round(data.size / 1024))} KB`}
-            </Typography>
-          </div>
-        </div>
-        <Icon
-          name='sprite:x'
-          className="text-neutral-400 size-5"
-          onClick={() => skinsState.control.file.reset(ctx)}
+    <div className="flex items-center justify-between gap-3 rounded-xl
+      border border-neutral-800 bg-neutral-800/40 p-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <img
+          src={data.url}
+          draggable={false}
+          width={48}
+          height={48}
+          alt=""
+          className="size-12 shrink-0 rounded-lg bg-neutral-900 object-contain"
         />
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <Typography className="truncate text-sm font-semibold">
+            {data.name}
+          </Typography>
+          <Typography color="gray" className="text-xs">{size}</Typography>
+        </div>
       </div>
+      <button
+        type="button"
+        onClick={() => skinsState.control.file.reset(ctx)}
+        aria-label={translate["player.skin.upload.remove"]()}
+        title={translate["player.skin.upload.remove"]()}
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg
+          text-neutral-400 duration-150 hover:bg-neutral-800 hover:text-neutral-100"
+      >
+        <Icon name="sprite:x" className="size-4" />
+      </button>
     </div>
   )
 }, "SelectedSkinData")
@@ -374,12 +384,15 @@ const SkinControlInput = reatomComponent(({ ctx }) => {
         onDragLeave={() => skinControlDragAtom(ctx, false)}
         onDrop={onDrop}
         aria-label={translate["player.skin.upload.drop"]()}
-        className={va({ className: `${drag && "bg-neutral-800"}` })}
+        className={va({
+          className: drag ? "border-green-600/60 bg-neutral-800/60" : ""
+        })}
       >
-        <div className='flex items-center justify-center rounded-lg h-10 w-10 border border-neutral-800'>
-          <Icon name="sprite:upload" className="size-6 text-neutral-400" />
+        <div className="flex size-10 items-center justify-center rounded-xl
+          border border-neutral-800 bg-neutral-900">
+          <Icon name="sprite:upload" className="size-5 text-neutral-400" />
         </div>
-        <Typography className="font-semibold tracking-6">
+        <Typography className="text-sm font-semibold">
           {translate["player.skin.upload.drop"]()}
         </Typography>
       </button>
@@ -394,7 +407,10 @@ const SkinControlContent = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-2 w-full">
       {ctx.spy(skinsState.control.file) ? <SelectedSkinData /> : <SkinControlInput />}
       {error && (
-        <Typography role="alert" className="text-sm text-red-400">
+        <Typography
+          role="alert"
+          className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300"
+        >
           {translate["player.skin.errors.invalid-file"]()}
         </Typography>
       )}
@@ -407,8 +423,8 @@ const SkinControlChangeSubmit = reatomComponent(({ ctx }) => {
     <Button
       disabled={ctx.spy(skinSubmitIsDisabledAtom)}
       onClick={() => spawn(ctx, (spawnCtx) => skins.control.change(spawnCtx))}
-      background="default"
-      className="text-sm font-semibold"
+      background="white"
+      className="w-full text-sm font-semibold"
       withSpinner={true}
       isLoading={ctx.spy(skins.control.change.statusesAtom).isPending}
     >
@@ -419,7 +435,7 @@ const SkinControlChangeSubmit = reatomComponent(({ ctx }) => {
 
 const SkinSelectVariant = () => {
   return (
-    <div className="flex gap-2 items-center justify-between w-full">
+    <div className="flex w-full items-center gap-2">
       {SKIN_VARIANTS.map((d) => <SkinVariantItem key={d} variant={d} />)}
     </div>
   )
@@ -459,26 +475,45 @@ const SkinControlChangeSkin = reatomComponent(({ ctx }) => {
       <Portal>
         <Dialog.Backdrop className={dialogVariant.backdrop()} />
         <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content("sm:max-w-1/3 sm:max:h-2/3")}>
-            <DialogTitle className={dialogVariant.title()}>
-              {translate["player.skin.upload.title"]()}
-            </DialogTitle>
-            <div className="flex flex-col gap-6 w-full">
+          <Dialog.Content className={dialogVariant.content(
+            "max-h-[90dvh] items-stretch justify-start p-0 sm:max-w-md"
+          )}>
+            <div className="flex items-start justify-between gap-3
+              border-b border-neutral-800 p-4 pr-12">
+              <DialogTitle className={dialogVariant.title("text-left")}>
+                {translate["player.skin.upload.title"]()}
+              </DialogTitle>
+              <Dialog.CloseTrigger
+                className={dialogVariant.close()}
+                aria-label={translate["player.skin.upload.close"]()}
+              >
+                <Icon name="sprite:x" className="size-4" />
+              </Dialog.CloseTrigger>
+            </div>
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-4">
               {steps.map((step, idx) => (
-                <div key={idx} className='flex flex-col items-start gap-2 w-full'>
-                  <div className="flex flex-col">
-                    <Typography className="font-bold leading-4 tracking-6">
-                      {step.title}
-                    </Typography>
-                    {step.description && (
-                      <Typography color="gray" className="text-sm">
-                        {step.description}
+                <div key={idx} className="flex flex-col gap-3">
+                  <div className="flex items-start gap-3">
+                    <span className="flex size-6 shrink-0 items-center justify-center
+                      rounded-full bg-neutral-800 text-xs font-semibold text-neutral-300">
+                      {idx + 1}
+                    </span>
+                    <div className="flex flex-col gap-0.5">
+                      <Typography className="text-sm font-semibold leading-5">
+                        {step.title}
                       </Typography>
-                    )}
+                      {step.description && (
+                        <Typography color="gray" className="text-xs">
+                          {step.description}
+                        </Typography>
+                      )}
+                    </div>
                   </div>
                   {step.content}
                 </div>
               ))}
+            </div>
+            <div className="border-t border-neutral-800 p-4">
               <SkinControlChangeSubmit />
             </div>
           </Dialog.Content>

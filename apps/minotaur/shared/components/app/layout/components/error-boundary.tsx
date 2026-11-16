@@ -9,6 +9,7 @@ import { Typography } from "@/shared/ui/typography";
 import { usePageContext } from "vike-react/usePageContext";
 import { Link } from "@/shared/components/config/link/link";
 import { translate } from "@/shared/locales/helpers";
+
 const ErrorFallback = reatomComponent<FallbackProps>(({ ctx, error, resetErrorBoundary }) => {
   const stage = maybeSpyOptionAtom(ctx, "state", "stage", "prod")
 

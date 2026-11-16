@@ -23,7 +23,8 @@ import {
 const MEDAL_COLORS = ["text-yellow-400", "text-neutral-300", "text-amber-600"];
 
 const RankCell = ({ idx }: { idx: number }) => (
-  <span className="inline-flex items-center gap-1.5 font-semibold tabular-nums">
+  <span className="inline-flex items-center gap-1.5 font-semibold
+    tabular-nums">
     {idx < 3 && <Icon name="sprite:trophy" className={`size-4 ${MEDAL_COLORS[idx]}`} />}
     <span className={idx < 3 ? "text-neutral-200" : "text-neutral-400"}>{idx + 1}</span>
   </span>
@@ -39,7 +40,8 @@ const UserHead = reatomComponent<{ nickname?: string | null, avatar?: string }>(
       <Avatar nickname={name} url={avatar ?? ""} className="w-7 h-7" />
       <span className="font-medium text-sm truncate">{name}</span>
       {isSelf && (
-        <span className="rounded bg-green-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-green-400">
+        <span className="rounded bg-green-500/15 px-1.5 py-0.5 text-[10px]
+          font-semibold uppercase text-green-400">
           {translate["ratings.you"]()}
         </span>
       )}
@@ -194,6 +196,79 @@ const RATING_TABLE: Record<RatingType, TableConfig> = {
     ],
     rowKey: (row, idx) => `${row.nickname ?? row.player ?? "row"}-${row.area ?? "area"}-${idx}`,
     nickname: (row) => row.nickname
+  },
+  votes: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "votes",
+        label: () => translate["ratings.columns.votes"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.votes} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  wiki: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "revisions",
+        label: () => translate["ratings.columns.revisions"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.revisions} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  referrals: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "referrals",
+        label: () => translate["ratings.columns.referrals"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.referrals} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  purchases: {
+    columns: [
+      rankColumn,
+      playerColumn,
+      {
+        key: "purchases",
+        label: () => translate["ratings.columns.purchases"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.purchases} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
+    nickname: (row) => row.nickname
+  },
+  "lands-members": {
+    columns: [
+      rankColumn,
+      {
+        key: "land",
+        label: () => translate["ratings.columns.land"](),
+        render: (row) => <LandName name={row.name} ulid={row.ulid} />
+      },
+      {
+        key: "members",
+        label: () => translate["ratings.columns.members"](),
+        align: "right",
+        render: (row) => <NumberCell value={row.members_count} />
+      }
+    ],
+    rowKey: (row, idx) => `${row.ulid ?? "land"}-${idx}`
   }
 }
 
@@ -272,6 +347,11 @@ const RatingTableSkeleton = reatomComponent(({ ctx }) => {
   )
 }, "RatingTableSkeleton")
 
+const sortItems = [
+  { label: translate["ratings.sort.best"](), value: "best" },
+  { label: translate["ratings.sort.worst"](), value: "worst" }
+];
+
 const RatingsToolbar = reatomComponent(({ ctx }) => {
   const groups = ctx.spy(rating.fetch.dataAtom) ?? [];
   const currentServer = ctx.spy(ratingsState.filters.server);
@@ -293,10 +373,6 @@ const RatingsToolbar = reatomComponent(({ ctx }) => {
     label: getRatingTypeLabel(child.value, child.title),
     value: child.value
   }));
-  const sortItems = [
-    { label: translate["ratings.sort.best"](), value: "best" },
-    { label: translate["ratings.sort.worst"](), value: "worst" }
-  ];
 
   const pickServer = (key: string) => {
     const next = groups.find((item) => item.key === key);
@@ -361,7 +437,8 @@ const RatingsEmpty = () => (
     </Typography>
     <Link
       href="/"
-      className="mt-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold duration-150 hover:bg-green-500"
+      className="mt-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold
+        duration-150 hover:bg-green-500"
     >
       {translate["ratings.empty.action"]()}
     </Link>
@@ -390,8 +467,8 @@ const RatingsError = reatomComponent(({ ctx }) => {
 
 const LoadMore = reatomComponent(({ ctx }) => {
   const meta = ctx.spy(ratingsState.meta);
-  const isPending = ctx.spy(ratings.update.statusesAtom).isPending;
-  const error = ctx.spy(ratings.update.errorAtom);
+  const isPending = ctx.spy(ratings.fetch.statusesAtom).isPending;
+  const error = ctx.spy(ratings.fetch.errorAtom);
   const hasMore = !!meta?.hasNextPage && !!meta.endCursor;
 
   if (!hasMore && !error) return null;
@@ -407,7 +484,7 @@ const LoadMore = reatomComponent(({ ctx }) => {
       {error && <ErrorBlock title={error.message} />}
       <Button
         background="default"
-        onClick={() => ratings.loadMore(ctx)}
+        onClick={() => ratings.fetch(ctx)}
         disabled={isPending}
         withSpinner
         isLoading={isPending}

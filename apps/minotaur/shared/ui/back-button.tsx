@@ -35,9 +35,9 @@ export const BackButton = ({
       aria-label={translate["shared.back"]()}
       onClick={handle}
       size="headless"
-      className="min-h-11 h-11 sm:min-h-11 sm:h-11 aspect-square w-11"
+      className="size-10 shrink-0"
     >
-      <Icon name={icon} className="size-4 sm:size-5 text-neutral-400" />
+      <Icon name={icon} className="size-4 text-neutral-400" />
     </Button>
   )
 }

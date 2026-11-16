@@ -6,7 +6,9 @@ import {
 import { menuVariant } from "@/shared/ui/menu";
 import { Menu, type MenuItemProps } from "@ark-ui/react/menu";
 import { Avatar } from "@/shared/ui/avatar";
+import { Icon } from "@/shared/ui/icon";
 import { Typography } from "@/shared/ui/typography";
+import { WalletChips } from "../../wallet/components/wallet-chips";
 import { navigate } from "vike/client/router";
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import { clsx } from "cnfast";
@@ -34,7 +36,7 @@ const MenuCurrentUser = reatomComponent<{ variant: ItemVariant }>(({ ctx, varian
   if (!currentUser) return null;
 
   const { Item, itemProps } = defineItem(variant, {
-    className: "flex gap-2 items-center min-h-10 select-none cursor-pointer rounded-lg p-2 bg-neutral-800 w-full overflow-hidden",
+    className: "flex gap-2 items-center min-h-10 select- none cursor - pointer rounded - lg p - 2 bg - neutral - 800 w - full overflow - hidden",
     onClick: () => navigate(createLink("player", currentUser.nickname)),
     value: "current-user"
   })
@@ -57,6 +59,22 @@ const MenuCurrentUser = reatomComponent<{ variant: ItemVariant }>(({ ctx, varian
     </Item>
   )
 }, "MenuCurrentUser")
+
+const MenuWallet = reatomComponent<{ variant: ItemVariant }>(({ ctx, variant }) => {
+  const { Item, itemProps } = defineItem(variant, {
+    className: "flex items-center justify-between gap-2",
+    onClick: () => navigate("/wallet"),
+    value: "wallet",
+    "aria-label": translate["shared.header.menu.wallet"]()
+  })
+
+  return (
+    <Item {...itemProps} data-sound={true}>
+      <WalletChips />
+      <Icon name="sprite:chevron-right" className="size-4 text-neutral-500" />
+    </Item>
+  )
+}, "MenuWallet")
 
 function defineItem<T extends ItemVariant>(variant: T, props: MenuItemProps) {
   const Item = variant === 'drawer' ? "div" : Menu.Item
@@ -93,6 +111,7 @@ export const UserMenuContent = reatomComponent<{ variant: ItemVariant }>(({ ctx,
   return (
     <div className="flex flex-col gap-1 w-full">
       <MenuCurrentUser variant={variant} />
+      <MenuWallet variant={variant} />
       <Separator className="my-2" />
       {ctx.spy(validatedLinksAtom).map((link, idx) => (
         <MenuLinkItem variant={variant} key={link.href} idx={idx} {...link} />)

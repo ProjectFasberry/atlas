@@ -1,7 +1,6 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
 import { navigate } from "vike/client/router"
 import { toast } from "sonner"
-import { tv } from "tailwind-variants"
 import { Typography } from "@/shared/ui/typography"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
@@ -12,10 +11,15 @@ import {
   getItemStatus, relatedItems, storeItem, storeItemState,
   type StoreItem as StoreItemData,
 } from "@/shared/components/app/shop/models/store-item.model"
-import { selectedDonateDataAtom } from "@/shared/components/app/shop/models/store-item-description.model"
-import { ItemPrice, ItemSelectToCart, StoreItem } from "@/shared/components/app/shop/components/items/store-item"
+import {
+  selectedDonateDataAtom
+} from "@/shared/components/app/shop/models/store-item-description.model"
+import {
+  ItemPrice, ItemSelectToCart, StoreItem
+} from "@/shared/components/app/shop/components/items/store-item"
 import { appState } from "@/shared/models/app/index.model"
 import { translate } from "@/shared/locales/helpers"
+import { WalletStrip } from "@/shared/components/app/wallet/components/wallet-strip"
 
 const cardClass = "rounded-xl bg-neutral-900 p-4 sm:p-5"
 
@@ -45,11 +49,13 @@ const Breadcrumbs = reatomComponent(({ ctx }) => {
 
 const ItemGallery = reatomComponent(({ ctx }) => {
   const data = ctx.spy(storeItemState.data)
-
-  if (!data) return <Skeleton className="aspect-square w-full rounded-xl lg:aspect-[4/5]" />
+  if (!data) {
+    return <Skeleton className="aspect-square w-full rounded-xl lg:aspect-4/5" />
+  }
 
   return (
-    <div className={`${cardClass} relative flex items-center justify-center overflow-hidden p-2 sm:p-6`}>
+    <div className={`${cardClass} relative flex items-center
+      justify-center overflow-hidden p-2 sm:p-6`}>
       <img
         src={data.imageUrl}
         alt={data.title}
@@ -57,10 +63,12 @@ const ItemGallery = reatomComponent(({ ctx }) => {
         className="aspect-square w-full max-w-lg select-none object-contain"
       />
       <div className="absolute left-4 top-4 flex items-center gap-2">
-        <span className="rounded-md bg-black/60 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-200">
+        <span className="rounded-md bg-black/60
+          px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-200">
           {itemTypeLabel(data)}
         </span>
-        <span className="rounded-md bg-black/60 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-200">
+        <span className="rounded-md bg-black/60
+          px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-200">
           {data.currency}
         </span>
       </div>
@@ -92,13 +100,17 @@ const ItemShare = reatomComponent(({ ctx }) => {
   const share = () => {
     if (typeof navigator === "undefined") return
 
-    void navigator.clipboard.writeText(`${window.location.origin}${createLink("store", data.id)}`)
+    navigator.clipboard.writeText(`${window.location.origin}${createLink("store", data.id)}`)
       .then(() => toast.success(translate["store.item.link-copied"]()))
       .catch(() => toast.error(translate["store.item.link-copy-error"]()))
   }
 
   return (
-    <Button background="default" className="h-9 w-fit gap-2 text-xs font-semibold" onClick={share}>
+    <Button
+      background="default"
+      className="h-9 w-fit gap-2 text-xs font-semibold"
+      onClick={share}
+    >
       <Icon name="sprite:link" className="size-4" />
       {translate["store.item.share"]()}
     </Button>
@@ -119,26 +131,33 @@ const ItemPurchase = reatomComponent(({ ctx }) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl bg-neutral-900 p-4 sm:p-5 lg:sticky lg:top-24">
+    <div className="flex flex-col gap-4 rounded-xl bg-neutral-900 p-4
+      sm:p-5 lg:sticky lg:top-24">
       <div className="flex flex-col gap-1">
-        <Typography className="text-2xl font-semibold leading-tight">{data.title}</Typography>
+        <Typography className="text-2xl font-semibold leading-tight">
+          {data.title}
+        </Typography>
         {data.description && (
-          <Typography color="gray" className="text-sm">{data.description}</Typography>
+          <Typography color="gray" className="text-sm">
+            {data.description}
+          </Typography>
         )}
       </div>
-
       <div className="flex items-end justify-between gap-2">
-        <ItemPrice currency={data.currency} price={{ value: data.price, variant: { size: "large" } }} />
-        <span className="text-xs text-neutral-500">{translate["store.item.vat-included"]()}</span>
+        <ItemPrice
+          currency={data.currency}
+          price={{ value: data.price, variant: { size: "large" } }}
+        />
+        <span className="text-xs text-neutral-500">
+          {translate["store.item.vat-included"]()}
+        </span>
       </div>
-
       <div className="flex flex-col gap-2">
         <Button background="white" className="h-10 w-full font-semibold" onClick={buyNow}>
           {selected ? translate["store.item.checkout"]() : translate["store.item.buy-now"]()}
         </Button>
         <ItemSelectToCart id={data.id} />
       </div>
-
       <ItemFeatures />
       <ItemShare />
     </div>
@@ -152,7 +171,9 @@ const ItemDescription = reatomComponent(({ ctx }) => {
 
   return (
     <section className={`${cardClass} flex flex-col gap-3`}>
-      <Typography className="text-lg font-semibold">{translate["store.item.about"]()}</Typography>
+      <Typography className="text-lg font-semibold">
+        {translate["store.item.about"]()}
+      </Typography>
       {html ? (
         <div
           className="relative w-full overflow-hidden rounded-xl"
@@ -168,7 +189,8 @@ const ItemDescription = reatomComponent(({ ctx }) => {
           />
           {!isExpanded && (
             <>
-              <div className="absolute inset-x-0 bottom-0 z-2 h-full bg-linear-to-t from-neutral-900 via-neutral-900/90 to-neutral-900/40" />
+              <div className="absolute inset-x-0 bottom-0 z-2 h-full
+              bg-linear-to-t from-neutral-900 via-neutral-900/90 to-neutral-900/40" />
               <div className="absolute inset-x-0 bottom-4 z-3 flex items-center justify-center">
                 <Icon name="sprite:chevron-down" className="size-6 text-neutral-400" />
               </div>
@@ -199,7 +221,9 @@ const RelatedItems = reatomComponent(({ ctx }) => {
 
   return (
     <section className="flex flex-col gap-3">
-      <Typography className="text-lg font-semibold">{translate["store.item.related"]()}</Typography>
+      <Typography className="text-lg font-semibold">
+        {translate["store.item.related"]()}
+      </Typography>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {items.map((item) => <StoreItem key={item.id} {...item} />)}
       </div>
@@ -219,9 +243,14 @@ const MobilePurchaseBar = reatomComponent(({ ctx }) => {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-800 bg-neutral-950/95 px-4 pb-[env(safe-area-inset-bottom)] pt-3 backdrop-blur lg:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t
+      border-neutral-800 bg-neutral-950/95 px-4
+      pb-[env(safe-area-inset-bottom)] pt-3 backdrop-blur lg:hidden">
       <div className="flex items-center justify-between gap-3">
-        <ItemPrice currency={data.currency} price={{ value: data.price, variant: { size: "large" } }} />
+        <ItemPrice
+          currency={data.currency}
+          price={{ value: data.price, variant: { size: "large" } }}
+        />
         <Button background="white" className="h-10 min-w-40 font-semibold" onClick={buyNow}>
           {selected ? translate["store.item.checkout"]() : translate["store.item.buy-now"]()}
         </Button>
@@ -234,6 +263,7 @@ export default function Page() {
   return (
     <div className="flex w-full flex-col gap-6 pb-24 lg:pb-0">
       <Breadcrumbs />
+      <WalletStrip />
       <div className="grid w-full items-start gap-6 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <ItemGallery />

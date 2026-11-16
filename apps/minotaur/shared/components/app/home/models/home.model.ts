@@ -1,4 +1,7 @@
-import { action, atom, reatomAsync, withAssign, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
+import {
+  action, atom, reatomAsync,
+  withAssign, withDataAtom, withErrorAtom, withStatusesAtom
+} from "@reatom/framework";
 import { withLocalStorage } from "@reatom/persist-web-storage";
 import { client } from "@/shared/lib/client-wrapper";
 import { currentUserState } from "@/shared/models/current-user/index.model";

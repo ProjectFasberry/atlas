@@ -23,7 +23,7 @@ export const CartNavigation = () => {
           key={badge.value}
           background={isActive(`/store/cart${badge.value}`) ? "white" : "default"}
           onClick={() => navigate(`/store/cart${badge.value}`)}
-          className="h-8 sm:h-8 text-sm text-nowrap font-semibold"
+          className="h-10 text-sm text-nowrap font-semibold"
         >
           {badge.title}
         </Button>

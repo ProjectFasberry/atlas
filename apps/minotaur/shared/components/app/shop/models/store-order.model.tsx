@@ -1,4 +1,4 @@
-import { reatomAsync, withStatusesAtom } from "@reatom/framework";
+import { reatomAsync, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 import { atom } from "@reatom/framework";
 import { toast } from "sonner";
 import { withAssign } from "@reatom/framework";
@@ -8,7 +8,7 @@ import { navigate } from "vike/client/router";
 import type { CreateOrderRoutePayload } from "@/shared/schemas/payment";
 import { translate } from "@/shared/locales/helpers";
 import { cartState, EMPTY_CART_PRICE } from "./store-cart.model";
-import { balance } from "../../player/models/balance.model";
+import { balance } from "../../wallet/models/balance.model";
 import type { OrderSingleGamePayload } from "@/pages/store/order/@id/+data";
 
 const getOrderErrorMessage = (message: string) => {
@@ -60,7 +60,8 @@ export const order = atom(null, "order").pipe(
         }
       }
     }).pipe(
-      withStatusesAtom()
+      withStatusesAtom(),
+      withErrorAtom(),
     )
   }))
 )

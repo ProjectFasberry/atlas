@@ -1,6 +1,5 @@
 import { PlayerLands } from "@/shared/components/app/player/components/lands"
 import { PlayerSkin } from "@/shared/components/app/player/components/skin"
-import { Balance } from "@/shared/components/app/player/components/balance";
 import { PlayerInfo } from "@/shared/components/app/player/components/info";
 import { PurchasesHistory } from "@/shared/components/app/player/components/details";
 import { reatomComponent, useAtom } from "@reatom/npm-react";
@@ -18,7 +17,6 @@ const PlayerPrivated = reatomComponent(({ ctx }) => {
 
   return (
     <>
-      <Balance />
       <PurchasesHistory />
     </>
   )

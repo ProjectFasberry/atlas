@@ -12,7 +12,8 @@ import { Link } from "@/shared/components/config/link/link";
 import { Avatar } from "@/shared/ui/avatar";
 import { lazy, Suspense } from "react";
 
-const UserMenuContent = lazy(() => import("./header-menu-content").then(m => ({ default: m.UserMenuContent })))
+const UserMenuContent = lazy(() => import("./header-menu-content")
+  .then(m => ({ default: m.UserMenuContent })))
 
 const UserCurrentTrigger = reatomComponent(({ ctx }) => {
   const currentUser = ctx.spy(currentUserState);
@@ -96,7 +97,7 @@ const UserMenuDropdown = reatomComponent(({ ctx }) => {
         <UserMenuTrigger />
       </Menu.Trigger>
       <Menu.Positioner>
-        <Menu.Content className={menuVariant.content("min-w-[240px]")}>
+        <Menu.Content className={menuVariant.content("min-w-60")}>
           <Menu.Arrow className={menuVariant.arrow()}>
             <Menu.ArrowTip className={menuVariant.arrowTip()} />
           </Menu.Arrow>

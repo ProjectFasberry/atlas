@@ -1,4 +1,5 @@
 import { translate } from "@/shared/locales/helpers";
+import type { RatingKind } from "./schema";
 
 const TYPE_KEYS = {
 	playtime: "ratings.types.playtime",
@@ -7,7 +8,12 @@ const TYPE_KEYS = {
 	charism: "ratings.types.charism",
 	belkoin: "ratings.types.belkoin",
 	parkour: "ratings.types.parkour",
-} as const;
+	votes: "ratings.types.votes",
+	wiki: "ratings.types.wiki",
+	referrals: "ratings.types.referrals",
+	purchases: "ratings.types.purchases",
+	"lands-members": "ratings.types.lands-members",
+} as const satisfies Record<RatingKind, string>;
 
 const SERVER_KEYS = {
 	global: "ratings.servers.global",
@@ -15,7 +21,7 @@ const SERVER_KEYS = {
 	muffin: "ratings.servers.muffin",
 } as const;
 
-export type RatingType = keyof typeof TYPE_KEYS;
+export type RatingType = RatingKind;
 export type RatingServer = keyof typeof SERVER_KEYS;
 
 export function isRatingType(value: string | undefined | null): value is RatingType {

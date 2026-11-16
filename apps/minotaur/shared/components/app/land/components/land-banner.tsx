@@ -26,7 +26,10 @@ const bannerVariants = tv({
   }
 })
 
-type DefaultBannerProps = VariantProps<typeof bannerVariants> & { banner: string | null, className?: string }
+type DefaultBannerProps = VariantProps<typeof bannerVariants> & {
+  banner: string | null,
+  className?: string
+}
 
 export const LandBanner = ({ banner, variant, className }: DefaultBannerProps) => {
   return (
@@ -59,7 +62,7 @@ export const LandBannerWithEditing = reatomComponent(({ ctx }) => {
       id="banner"
       data-mode={editIsAllow ? "edit" : "watch"}
       onClick={() => editIsAllow && ctx.get(bannerInputAtom)?.click()}
-      className={bannerVariants({ className: "data-[mode=edit]:cursor-pointer min-w-[144px]" })}
+      className={bannerVariants({ className: "data-[mode=edit]:cursor-pointer min-w-36" })}
     >
       {banner ? (
         <img
@@ -73,14 +76,15 @@ export const LandBannerWithEditing = reatomComponent(({ ctx }) => {
       )}
       {editIsAllow && !pending && (
         <div className="flex items-center justify-center z-1 absolute inset-0 bg-black/60">
-          <Icon name="sprite:color-picker" className="size-[26px]" />
+          <Icon name="sprite:color-picker" className="size-6.5" />
         </div>
       )}
       {editIsAllow && banner && (
         <button
           type="button"
           title={translate["land.remove-banner"]()}
-          className="absolute right-1 top-1 z-10 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
+          className="absolute right-1 top-1 z-10 flex size-7
+          items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
           onClick={(event) => {
             event.stopPropagation()
             landEditing.banner.remove(ctx)

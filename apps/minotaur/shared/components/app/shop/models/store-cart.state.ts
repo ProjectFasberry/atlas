@@ -18,7 +18,8 @@ export const cartState = atom(null, "cartState").pipe(
 	withAssign((_, name) => ({
 		isTriggered: atom(false),
 		price: atom<CartFinalPrice>(EMPTY_CART_PRICE, `${name}.price`).pipe(withSsr(`${name}.price`)),
-		data: atom<CartListPayload["data"]>([], `${name}.data`).pipe(withSsr(`${name}.data`))
+		data: atom<CartListPayload["data"]>([], `${name}.data`).pipe(withSsr(`${name}.data`)),
+		server: atom<Maybe<string>>(undefined, `${name}.server`)
 	}))
 )
 

@@ -46,7 +46,16 @@ is maintained by hand. Match these rules in new and edited files:
 - Long `className` strings wrap inside the attribute with continuation lines
   indented two spaces; do not rebuild them with template literals unless a value
   is interpolated.
-- Tailwind v4 gradient utilities: `bg-linear-to-r`, never `bg-gradient-to-r`.
+- Tailwind utilities follow v4 naming: `bg-linear-to-*`, `size-*`,
+  `shrink-*`/`grow-*`, `text-ellipsis`; never the v3 forms
+  (`bg-gradient-to-*`, `flex-shrink-*`, `flex-grow-*`, `overflow-ellipsis`).
+- A Tailwind class set stays under half of the 120-column line: wrap a long
+  `className` over several lines (continuation indented two spaces) or move the
+  styles into `tailwind-variants` slots. One attribute must not dominate the
+  component visually.
+- No blank lines between sibling elements inside a component's `return (...)`.
+  Keep the JSX one dense block; split a large page into components instead of
+  spacing sections with empty lines.
 - Do not nest ternaries in render. Use an early return, a small local component
   (`*Skeleton`, `*Empty`, `*Error`) or `cond && (...)`, and compute branch values
   above `return` instead of `a ? b : c ? d : e`.

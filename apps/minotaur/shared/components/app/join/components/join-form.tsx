@@ -81,7 +81,8 @@ const RolesPicker = reatomComponent(({ ctx }) => {
               {translate[ROLE_DESCRIPTION[role]]()}
             </Typography>
             {active && (
-              <span className="absolute right-2.5 top-2.5 flex size-4 items-center justify-center rounded-full bg-green-500 text-neutral-950">
+              <span className="absolute right-2.5 top-2.5 flex size-4
+                items-center justify-center rounded-full bg-green-500 text-neutral-950">
                 <Icon name="sprite:check" className="size-3" />
               </span>
             )}
@@ -201,7 +202,6 @@ export const JoinForm = reatomComponent(({ ctx }) => {
         </legend>
         <RolesPicker />
       </fieldset>
-
       <div className="flex flex-col gap-1">
         <label htmlFor="join-about" className="text-sm font-semibold text-neutral-300">
           {translate["team.join.about"]()}
@@ -225,9 +225,7 @@ export const JoinForm = reatomComponent(({ ctx }) => {
           <CharCounter value={about} max={2000} />
         </div>
       </div>
-
       <ContactPicker />
-
       <div className="flex flex-col gap-1">
         <label htmlFor="join-portfolio" className="text-sm font-semibold text-neutral-300">
           {translate["team.join.portfolio"]()}
@@ -248,9 +246,7 @@ export const JoinForm = reatomComponent(({ ctx }) => {
         />
         <CharCounter value={portfolio} max={2000} />
       </div>
-
       <JoinError />
-
       <div className="flex flex-wrap items-center gap-3">
         <Button
           background="positive"

@@ -19,7 +19,9 @@ export const balanceState = atom(null, "balanceState").pipe(
         )
       }))
     ),
-    targetServer: atom("bisquite", "balanceTargetServer")
+    targetServer: atom("bisquite", "balanceTargetServer").pipe(
+      withLocalStorage({ key: "balance-target-server" })
+    )
   }))
 )
 

@@ -1,103 +1,39 @@
 import {
-  withReset, atom, batch, type Ctx, reatomAsync, withAbort, action,
+  withReset, atom, batch, reatomAsync, withAbort, action,
   withAssign, withCache, withDataAtom, withErrorAtom, withStatusesAtom
 } from "@reatom/framework";
-import { withHistory } from "@/shared/lib/reatom/helpers";
 import { logError } from "@/shared/lib/log";
 import {
-  type RatingBelkoin,
-  type RatingCharism,
-  type RatingData,
-  type RatingLands,
-  type RatingParkour,
-  type RatingPlaytime,
-  type RatingReputation,
-  type RatingsPayload,
-} from "@/shared/schemas/rating";
+  type RatingData, type RatingMap, type RatingsPayload,
+} from "../schema";
 import { client } from "@/shared/lib/client-wrapper";
+import { withSsr } from "@/shared/models/ssr";
 import { createViewerModel } from "@/shared/models/shared.model";
 import { type RatingType } from "../labels";
-import {
-  DEFAULT_RATINGS_PREFERENCES, isSamePreferences, syncPreferencesUrl, writePreferencesCookie
-} from "../preferences";
+import { DEFAULT_RATINGS_PREFERENCES, isSamePreferences, syncPreferencesUrl } from "../preferences";
 import { type RatingItem, type RatingsPreferences } from "../types";
 
 export type { RatingItem } from "../types";
-
-type RatingMap = {
-  playtime: RatingPlaytime[];
-  lands: RatingLands[];
-  reputation: RatingReputation[];
-  charism: RatingCharism[];
-  belkoin: RatingBelkoin[];
-  parkour: RatingParkour[];
-};
 
 export const { Component: RatingsViewer, inViewAtom: ratingIsViewAtom } = createViewerModel({
   name: "ratings-list",
 })
 
-let ratingListPromise: Promise<RatingItem[]> | null = null;
-
-/** Shared by the route guard and the category pills. */
-export function fetchRatingList(): Promise<RatingItem[]> {
-  if (!ratingListPromise) {
-    ratingListPromise = client.raw
-      .get<RatingItem[]>("/server/rating/list")
-      .then((items) => items ?? [])
-      .catch((error) => {
-        ratingListPromise = null;
-        throw error;
-      });
-  }
-
-  return ratingListPromise;
-}
-
-function getParams(ctx: Ctx) {
-  const opts = {
-    asc: ctx.get(ratingsState.filters.asc),
-    cursor: ctx.get(ratingsState.filters.endCursor),
-    server: ctx.get(ratingsState.filters.server),
-  };
-
-  const by = ctx.get(ratingsState.filters.by) as keyof RatingMap;
-
-  return { by, opts };
-}
-
-export async function getRatings(
-  by: keyof RatingMap,
-  {
-    endCursor,
-    asc,
-    limit = 50,
-    server,
-  }: {
-    endCursor?: string;
-    asc: boolean;
-    limit?: number;
-    server?: string;
-  },
-  init: RequestInit,
-) {
-  const opts = { limit, endCursor, asc, server };
-
-  return client.get("/server/rating/{by}", {
-    ...init,
-    retry: 1,
-    params: { path: { by }, query: opts }
-  })
+/** Fetched by the route data (SSR) and cached by the `rating` atom (client). */
+export async function fetchRatingList(): Promise<RatingItem[]> {
+  return client.raw
+    .get<RatingItem[]>("/server/rating/list")
+    .then((items) => items ?? [])
 }
 
 export const ratingsState = atom(null, "ratingsState").pipe(
   withAssign((_, name) => ({
-    data: atom<RatingsPayload["data"] | null>(null, `${name}.data`).pipe(withReset()),
-    meta: atom<RatingsPayload["meta"] | null>(null, `${name}.meta`).pipe(withReset()),
-    loaded: atom(false, `${name}.loaded`).pipe(withReset()),
+    data: atom<RatingsPayload["data"] | null>(null, `${name}.data`).pipe(withReset(), withSsr(`${name}.data`)),
+    meta: atom<RatingsPayload["meta"] | null>(null, `${name}.meta`).pipe(withReset(), withSsr(`${name}.meta`)),
+    loaded: atom(false, `${name}.loaded`).pipe(withSsr(`${name}.loaded`)),
     filters: atom(null, `${name}.filters`).pipe(
       withAssign((_, name) => ({
-        by: atom<RatingType>("playtime", `${name}.by`).pipe(withHistory(1)),
+        by: atom<RatingType>(DEFAULT_RATINGS_PREFERENCES.type, `${name}.by`),
         server: atom<Maybe<string>>(undefined, `${name}.server`),
         asc: atom(false, `${name}.asc`),
         endCursor: atom<Maybe<string>>(undefined, `${name}.endCursor`).pipe(withReset())
@@ -106,26 +42,54 @@ export const ratingsState = atom(null, "ratingsState").pipe(
   }))
 )
 
+export async function fetchRatings(
+  by: keyof RatingMap,
+  params: { asc: boolean; server?: string; endCursor?: string; limit?: number },
+  init?: RequestInit,
+) {
+  return client.get("/server/rating/{by}", {
+    ...init,
+    retry: 1,
+    params: {
+      path: { by },
+      query: { ...params, limit: params.limit ?? 50 },
+    },
+  })
+}
+
 export const ratings = atom(null, "ratings").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
-      // The previous category/sort must not flash under the new columns.
-      ratingsState.data.reset(ctx);
-      ratingsState.meta.reset(ctx);
-      ratingsState.loaded(ctx, false);
-      ratingsState.filters.endCursor.reset(ctx);
+      const cursor = ctx.get(ratingsState.filters.endCursor)
+      const isAppend = Boolean(cursor)
 
-      const { opts, by } = getParams(ctx);
+      if (!isAppend) {
+        // The previous category/sort must not flash under the new columns.
+        ratingsState.data.reset(ctx);
+        ratingsState.meta.reset(ctx);
+        ratingsState.loaded(ctx, false);
+      }
 
-      return await ctx.schedule(() =>
-        getRatings(by, opts, { signal: ctx.controller.signal })
-      );
+      return await ctx.schedule(() => fetchRatings(
+        ctx.get(ratingsState.filters.by) as keyof RatingMap,
+        {
+          asc: ctx.get(ratingsState.filters.asc),
+          server: ctx.get(ratingsState.filters.server),
+          endCursor: cursor,
+        },
+        { signal: ctx.controller.signal },
+      ))
     }, {
       name: `${name}.fetch`,
       onFulfill: (ctx, res) => {
+        const isAppend = Boolean(ctx.get(ratingsState.filters.endCursor));
+        const fresh = res.data as RatingData;
+        const previous = ctx.get(ratingsState.data) as RatingData | null;
+
         batch(ctx, () => {
-          const data = res.data as RatingData;
-          ratingsState.data(ctx, data.length === 0 ? null : data);
+          if (isAppend && previous) ratingsState.data(ctx, [...previous, ...fresh] as RatingData)
+          else ratingsState.data(ctx, fresh.length === 0 ? null : fresh)
+
           ratingsState.meta(ctx, res.meta);
           ratingsState.loaded(ctx, true);
         });
@@ -139,73 +103,32 @@ export const ratings = atom(null, "ratings").pipe(
       withErrorAtom(),
       withAbort()
     ),
-    update: reatomAsync(async (ctx) => {
-      const { by, opts } = getParams(ctx);
-
-      return await ctx.schedule(() =>
-        getRatings(by, opts, { signal: ctx.controller.signal })
-      );
-    }, {
-      name: `${name}.update`,
-      onFulfill: (ctx, res) => {
-        batch(ctx, () => {
-          type Row = RatingData[number];
-
-          const prev = ctx.get(ratingsState.data) as Row[] | null;
-          const fresh = res.data as Row[];
-
-          const next: Row[] | null = fresh.length === 0
-            ? prev
-            : prev
-              ? [...prev, ...fresh]
-              : fresh;
-
-          ratingsState.data(ctx, next as RatingData);
-          ratingsState.meta(ctx, res.meta);
-        });
-      },
-      onReject: (_, e) => {
-        logError(e);
-      },
-    }).pipe(
-      withStatusesAtom(),
-      withErrorAtom(),
-      withAbort()
-    ),
     loadMore: action((ctx) => {
-      if (ctx.get(ratings.update.statusesAtom).isPending) return;
+      if (ctx.get(ratings.fetch.statusesAtom).isPending) return;
 
       const meta = ctx.get(ratingsState.meta);
       if (!meta?.hasNextPage || !meta.endCursor) return;
 
       ratingsState.filters.endCursor(ctx, meta.endCursor);
-      ratings.update(ctx);
+      ratings.fetch(ctx);
     }, `${name}.loadMore`),
-    applyFilters: action((ctx, next: Partial<RatingsPreferences>, options: { persist?: boolean, force?: boolean } = {}) => {
+    applyFilters: action((ctx, next: Partial<RatingsPreferences>) => {
       const current: RatingsPreferences = {
         server: ctx.get(ratingsState.filters.server) ?? DEFAULT_RATINGS_PREFERENCES.server,
         type: ctx.get(ratingsState.filters.by),
         asc: ctx.get(ratingsState.filters.asc),
       };
-      const merged = { ...current, ...next };
+      const merged: RatingsPreferences = { ...current, ...next };
 
-      if (!options.force && isSamePreferences(current, merged)) return;
+      if (isSamePreferences(merged, current) && ctx.get(ratingsState.loaded)) return;
 
-      ratings.update.abort(ctx);
+      ratings.fetch.abort(ctx);
       ratingsState.filters.server(ctx, merged.server);
       ratingsState.filters.by(ctx, merged.type);
       ratingsState.filters.asc(ctx, merged.asc);
       ratingsState.filters.endCursor.reset(ctx);
 
-      if (options.persist !== false) {
-        try {
-          writePreferencesCookie(merged);
-          syncPreferencesUrl(merged);
-        } catch (error) {
-          logError(error);
-        }
-      }
-
+      syncPreferencesUrl(merged);
       ratings.fetch(ctx);
     }, `${name}.applyFilters`)
   }))

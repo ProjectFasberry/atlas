@@ -66,13 +66,15 @@ export const AuthBrand = reatomComponent(({ ctx }) => {
       <div className="relative z-10 flex flex-wrap items-center gap-2">
         <Link
           href="/report"
-          className="rounded-xl bg-neutral-800/80 px-3 py-2 text-sm font-semibold duration-150 hover:bg-neutral-700"
+          className="rounded-xl bg-neutral-800/80 px-3 py-2
+          text-sm font-semibold duration-150 hover:bg-neutral-700"
         >
           {translate["auth.page.support"]()}
         </Link>
         <a
           href={`${env.VITE_LANDING_URL}/rules`}
-          className="rounded-xl bg-neutral-800/80 px-3 py-2 text-sm font-semibold duration-150 hover:bg-neutral-700"
+          className="rounded-xl bg-neutral-800/80 px-3 py-2
+          text-sm font-semibold duration-150 hover:bg-neutral-700"
         >
           {translate["auth.page.rules"]()}
         </a>
@@ -81,7 +83,8 @@ export const AuthBrand = reatomComponent(({ ctx }) => {
             href={telegram}
             target="_blank"
             rel="noreferrer"
-            className="rounded-xl bg-neutral-800/80 px-3 py-2 text-sm font-semibold duration-150 hover:bg-neutral-700"
+            className="rounded-xl bg-neutral-800/80 px-3 py-2
+            text-sm font-semibold duration-150 hover:bg-neutral-700"
           >
             Telegram
           </a>
@@ -91,7 +94,8 @@ export const AuthBrand = reatomComponent(({ ctx }) => {
             href={discord}
             target="_blank"
             rel="noreferrer"
-            className="rounded-xl bg-neutral-800/80 px-3 py-2 text-sm font-semibold duration-150 hover:bg-neutral-700"
+            className="rounded-xl bg-neutral-800/80 px-3 py-2
+            text-sm font-semibold duration-150 hover:bg-neutral-700"
           >
             Discord
           </a>

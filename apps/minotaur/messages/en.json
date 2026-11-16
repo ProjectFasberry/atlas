@@ -80,7 +80,8 @@
         "referrals": "Referrals",
         "private": "Control panel",
         "settings": "Settings",
-        "logout": "Log out"
+        "logout": "Log out",
+        "wallet": "Wallet"
       },
       "authorizeTitle": "Login",
       "logotype": "Go to homepage"
@@ -313,7 +314,12 @@
       "charism": "Charisma",
       "belkoin": "Belkoin",
       "map": "Map",
-      "score": "Score"
+      "score": "Score",
+      "votes": "Votes",
+      "revisions": "Edits",
+      "referrals": "Invited",
+      "purchases": "Purchases",
+      "members": "Members"
     },
     "types": {
       "playtime": "Playtime",
@@ -321,7 +327,12 @@
       "reputation": "Reputation",
       "charism": "Charisma",
       "belkoin": "Belkoin",
-      "parkour": "Parkour"
+      "parkour": "Parkour",
+      "votes": "Votes",
+      "wiki": "Wiki",
+      "referrals": "Referrals",
+      "purchases": "Purchases",
+      "lands-members": "Land teams"
     },
     "servers": {
       "global": "Global",
@@ -350,7 +361,12 @@
     "rates": {
       "empty": "empty",
       "voters": "Rated by {nickname}"
-    }
+    },
+    "meta": {
+      "title": "{type} rating — {server}",
+      "description": "Fasberry rating: {type} — {server}. The top players, scores and stats update automatically."
+    },
+    "intro": "Playtime, economy, lands, parkour, votes, wiki and referrals - every Fasberry rating in one place."
   },
   "land": {
     "not-found": "It seems this region no longer exists",
@@ -417,7 +433,6 @@
       "location": "Player location"
     },
     "balance": {
-      "title": "Balance",
       "settings": {
         "title": "Settings",
         "variants": {
@@ -442,7 +457,9 @@
         "step-file": "Upload a skin file (.png)",
         "step-file-desc": "PNG 64x64 or 64x32, up to 1 MB",
         "step-variant": "Choose the skin type",
-        "submit": "Upload"
+        "submit": "Upload",
+        "close": "Close",
+        "remove": "Remove file"
       },
       "variants": {
         "classic": "Classic",
@@ -682,7 +699,9 @@
     "item": {
       "remove": "Remove",
       "change-recipient": "Change the recipient",
-      "select": "Select the item"
+      "select": "Select the item",
+      "recipient": "Recipient",
+      "self": "Yourself"
     },
     "nav": {
       "cart": "Cart",
@@ -690,7 +709,45 @@
       "top-up": "Top up balance"
     },
     "loading": "Preparing your order",
-    "title": "Storage"
+    "title": "Storage",
+    "actions": {
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "clear": "Clear the cart",
+      "cleared": "Cart cleared",
+      "removed": "Item removed",
+      "undo": "Undo"
+    },
+    "status": {
+      "unavailable": "The server is unavailable",
+      "insufficient": "Insufficient funds",
+      "topUp": "Top up"
+    },
+    "server": {
+      "title": "Server"
+    },
+    "summary": {
+      "title": "Total",
+      "selected": "Selected: {count} of {total}"
+    },
+    "trust": {
+      "delivery": "Automatic delivery",
+      "support": "Support in Telegram",
+      "refund": "Refunds follow the rules"
+    },
+    "suggestions": {
+      "title": "Often bought together"
+    },
+    "empty": {
+      "suggestions": "You may like"
+    },
+    "confirm": {
+      "clear": "Remove every item from the cart?"
+    },
+    "error": "Could not place the order",
+    "count": {
+      "items": "{count} items"
+    }
   },
   "map": {
     "page": {
@@ -1342,7 +1399,7 @@
     "delete-this-event": "Delete this event?",
     "pick-a-wallet-to-prepare-an-operation-right-away": "Pick a wallet to prepare an operation right away.",
     "the-selected-object-was-not-found": "The selected object was not found",
-    "selected": "Selected:&nbsp;",
+    "selected": "Selected: ",
     "select": "Select",
     "select-uploaded": "Select uploaded",
     "select-a-file": "Select a file",
@@ -1375,7 +1432,7 @@
     "title": "Title",
     "link-title": "Link title",
     "loaded": "Loaded:",
-    "loaded-2": "Loaded:&nbsp;",
+    "loaded-2": "Loaded: ",
     "loading": "Loading...",
     "loading-2": "Loading…",
     "loader": "Loader",
@@ -1711,5 +1768,20 @@
     "refund-description": "{orderId}: {refundable} of {total} BELKOIN is refundable to {nickname}. The spent part of the top-up is not refunded; purchased items stay.",
     "roles-added": "Added {count} roles to {role}",
     "permissions-removed": "Removed {count} permissions from {role}"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "description": "Belkoin and charism: what you have and on which server.",
+    "page": {
+      "title": "Wallet",
+      "description": "Belkoin and charism balances, server selection and a shortcut to the store."
+    },
+    "label": "Your balance",
+    "charism_server": "Charism on {server}",
+    "hint": {
+      "belkoin": "Belkoin is shared across all servers.",
+      "charism": "Charism is tracked separately on each server."
+    },
+    "global": "Global"
   }
 }

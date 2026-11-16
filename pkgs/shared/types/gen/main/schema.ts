@@ -9616,7 +9616,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                by: "belkoin" | "charism" | "lands" | "reputation" | "playtime" | "parkour";
+                by: "belkoin" | "charism" | "lands" | "lands-members" | "reputation" | "playtime" | "parkour" | "votes" | "wiki" | "referrals" | "purchases";
             };
             cookie?: never;
         };
@@ -9631,6 +9631,8 @@ export interface operations {
                     "application/json": {
                         data: {
                             data: {
+                                /** @constant */
+                                kind: "belkoin";
                                 nickname: string;
                                 balance: number;
                                 avatar: string;
@@ -9643,6 +9645,8 @@ export interface operations {
                             };
                         } | {
                             data: {
+                                /** @constant */
+                                kind: "parkour";
                                 player: string;
                                 area: (string | null) | null;
                                 score: number;
@@ -9658,6 +9662,8 @@ export interface operations {
                             };
                         } | {
                             data: {
+                                /** @constant */
+                                kind: "playtime";
                                 nickname: string;
                                 avatar: string;
                                 total: number;
@@ -9670,6 +9676,8 @@ export interface operations {
                             };
                         } | {
                             data: {
+                                /** @constant */
+                                kind: "reputation";
                                 reputation: number;
                                 uuid: (string | null) | null;
                                 avatar: string;
@@ -9683,6 +9691,8 @@ export interface operations {
                             };
                         } | {
                             data: {
+                                /** @constant */
+                                kind: "charism";
                                 nickname: string;
                                 balance: number;
                                 avatar: string;
@@ -9695,6 +9705,8 @@ export interface operations {
                             };
                         } | {
                             data: {
+                                /** @constant */
+                                kind: "lands";
                                 land: string;
                                 ulid: string;
                                 chunks_amount: number;
@@ -9708,6 +9720,76 @@ export interface operations {
                                 };
                                 blocks: unknown;
                                 type: string;
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                hasPrevPage: boolean;
+                                startCursor?: string;
+                                endCursor?: string;
+                            };
+                        } | {
+                            data: {
+                                /** @constant */
+                                kind: "lands-members";
+                                ulid: string;
+                                name: string;
+                                members_count: number;
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                hasPrevPage: boolean;
+                                startCursor?: string;
+                                endCursor?: string;
+                            };
+                        } | {
+                            data: {
+                                /** @constant */
+                                kind: "votes";
+                                nickname: string;
+                                votes: number;
+                                avatar: string;
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                hasPrevPage: boolean;
+                                startCursor?: string;
+                                endCursor?: string;
+                            };
+                        } | {
+                            data: {
+                                /** @constant */
+                                kind: "wiki";
+                                nickname: string;
+                                revisions: number;
+                                avatar: string;
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                hasPrevPage: boolean;
+                                startCursor?: string;
+                                endCursor?: string;
+                            };
+                        } | {
+                            data: {
+                                /** @constant */
+                                kind: "referrals";
+                                nickname: string;
+                                referrals: number;
+                                avatar: string;
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                hasPrevPage: boolean;
+                                startCursor?: string;
+                                endCursor?: string;
+                            };
+                        } | {
+                            data: {
+                                /** @constant */
+                                kind: "purchases";
+                                nickname: string;
+                                purchases: number;
+                                avatar: string;
                             }[];
                             meta: {
                                 hasNextPage: boolean;

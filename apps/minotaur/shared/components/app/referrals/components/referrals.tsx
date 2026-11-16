@@ -59,14 +59,16 @@ export const ReferralsLink = reatomComponent(({ ctx }) => {
         </div>
         <div className="flex shrink-0 items-baseline gap-1 sm:flex-col sm:items-end sm:gap-0">
           <span className="text-3xl font-semibold">{remaining}</span>
-          <span className="text-xs text-neutral-500">{translate["referrals.stats"]({ left: remaining, limit })}</span>
+          <span className="text-xs text-neutral-500">
+            {translate["referrals.stats"]({ left: remaining, limit })}</span>
         </div>
       </div>
-
       <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-800">
-        <div className="h-full rounded-full bg-green-500 transition-[width]" style={{ width: `${progress}%` }} />
+        <div
+          className="h-full rounded-full bg-green-500 transition-[width]"
+          style={{ width: `${progress}%` }}
+        />
       </div>
-
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Button
           background="positive"
@@ -81,14 +83,15 @@ export const ReferralsLink = reatomComponent(({ ctx }) => {
           href={WIKI_REFERRALS_URL}
           target="_blank"
           rel="noreferrer"
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-neutral-800 px-4 text-sm font-semibold text-neutral-200 transition-colors hover:bg-neutral-700 sm:w-fit"
+          className="flex h-10 w-full items-center justify-center
+          gap-2 rounded-xl bg-neutral-800 px-4 text-sm font-semibold text-neutral-200
+          transition-colors hover:bg-neutral-700 sm:w-fit"
         >
           <Icon name="sprite:book" className="size-5" />
           {translate["referrals.how-it-works"]()}
         </a>
       </div>
-
-      {link ? (
+      {link && (
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1">
             <Input
@@ -110,13 +113,12 @@ export const ReferralsLink = reatomComponent(({ ctx }) => {
             {translate["referrals.link-hint"]()}
           </span>
         </div>
-      ) : null}
-
-      {remaining === 0 ? (
+      )}
+      {remaining === 0 && (
         <Typography className="text-xs text-red-400">
           {translate["referrals.limit-reached"]()}
         </Typography>
-      ) : null}
+      )}
     </section>
   );
 }, "ReferralsLink");

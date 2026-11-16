@@ -45,7 +45,8 @@ const LandGallery = reatomComponent(({ ctx }) => {
               <button
                 type="button"
                 title={translate["land.gallery.remove"]()}
-                className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
+                className="absolute right-1 top-1 flex size-7
+                items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
                 onClick={() => landEditing.gallery.removeExisting(ctx, url)}
               >
                 <Icon name="sprite:x" className="size-4" />
@@ -58,7 +59,8 @@ const LandGallery = reatomComponent(({ ctx }) => {
               <button
                 type="button"
                 title={translate["land.gallery.remove-pending"]()}
-                className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
+                className="absolute right-1 top-1 flex size-7 items-center
+                justify-center rounded-lg bg-black/70 text-neutral-200 hover:text-white"
                 onClick={() => landEditing.gallery.removePending(ctx, idx)}
               >
                 <Icon name="sprite:x" className="size-4" />
@@ -66,7 +68,8 @@ const LandGallery = reatomComponent(({ ctx }) => {
             </div>
           ))}
           {canAdd && (
-            <label className="flex aspect-video items-center justify-center rounded-lg border border-dashed border-neutral-700 text-neutral-500 cursor-pointer hover:border-neutral-500">
+            <label className="flex aspect-video items-center justify-center
+              rounded-lg border border-dashed border-neutral-700 text-neutral-500 cursor-pointer hover:border-neutral-500">
               <input
               type="file"
               accept="image/png,image/jpeg,image/webp"

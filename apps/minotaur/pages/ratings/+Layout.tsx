@@ -10,9 +10,14 @@ export default function Layout({ children }: PropsWithChildren) {
     <div className="flex flex-col gap-6 w-full h-full pb-24 sm:pb-20">
       <PageHeaderImage img={ratingsImage} />
       <div className="flex flex-col gap-4 h-full w-full">
-        <h1 className="font-semibold text-3xl">
-          {translate["ratings.title"]()}
-        </h1>
+        <div className="flex flex-col gap-2">
+          <h1 className="font-semibold text-3xl">
+            {translate["ratings.title"]()}
+          </h1>
+          <p className="max-w-3xl text-sm text-neutral-400">
+            {translate["ratings.intro"]()}
+          </p>
+        </div>
         {children}
       </div>
     </div>

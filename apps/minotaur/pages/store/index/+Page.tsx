@@ -6,6 +6,7 @@ import { appState } from "@/shared/models/app/index.model";
 import { PageHeaderImage } from "@/shared/ui/header-image";
 import { reatomComponent } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
+import { WalletStrip } from "@/shared/components/app/wallet/components/wallet-strip";
 
 const storeImage = getStaticImage("images/marketplace_art.webp")
 
@@ -38,6 +39,7 @@ export default function Page() {
       <PageHeaderImage img={storeImage} />
       <div className="flex flex-col gap-4 h-full w-full">
         <Typography className="text-3xl font-semibold">{translate["store.title"]()}</Typography>
+        <WalletStrip />
         <Store />
       </div>
     </div>

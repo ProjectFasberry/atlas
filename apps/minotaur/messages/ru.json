@@ -80,7 +80,8 @@
         "referrals": "Рефералы",
         "private": "Системная панель",
         "settings": "Настройки",
-        "logout": "Выйти"
+        "logout": "Выйти",
+        "wallet": "Кошелёк"
       },
       "authorizeTitle": "Вход",
       "logotype": "Перейти на главную"
@@ -313,7 +314,12 @@
       "charism": "Харизма",
       "belkoin": "Белкоин",
       "map": "Карта",
-      "score": "Счёт"
+      "score": "Счёт",
+      "votes": "Голоса",
+      "revisions": "Правки",
+      "referrals": "Приглашено",
+      "purchases": "Покупок",
+      "members": "Участники"
     },
     "types": {
       "playtime": "Время игры",
@@ -321,7 +327,12 @@
       "reputation": "Репутация",
       "charism": "Харизма",
       "belkoin": "Белкоин",
-      "parkour": "Паркур"
+      "parkour": "Паркур",
+      "votes": "Голоса",
+      "wiki": "Вики",
+      "referrals": "Рефералы",
+      "purchases": "Покупки",
+      "lands-members": "Команды земель"
     },
     "servers": {
       "global": "Глобальные",
@@ -350,7 +361,12 @@
     "rates": {
       "empty": "пусто",
       "voters": "Оценившие {nickname}"
-    }
+    },
+    "meta": {
+      "title": "Рейтинг «{type}» — {server}",
+      "description": "Рейтинг Fasberry: {type} — {server}. Топ игроков, очки и статистика обновляются автоматически."
+    },
+    "intro": "Время игры, экономика, земли, паркур, голоса, вики и рефералы - все рейтинги проекта Fasberry в одном месте."
   },
   "land": {
     "not-found": "Похоже этого региона уже нет",
@@ -417,7 +433,6 @@
       "location": "Локация игрока"
     },
     "balance": {
-      "title": "Баланс",
       "settings": {
         "title": "Настройки",
         "variants": {
@@ -442,7 +457,9 @@
         "step-file": "Загрузи файл скина (в формате .png)",
         "step-file-desc": "PNG 64x64 или 64x32, не больше 1 МБ",
         "step-variant": "Выбери тип скина",
-        "submit": "Загрузить"
+        "submit": "Загрузить",
+        "close": "Закрыть",
+        "remove": "Убрать файл"
       },
       "variants": {
         "classic": "Классический",
@@ -682,7 +699,9 @@
     "item": {
       "remove": "Удалить",
       "change-recipient": "Изменить получателя",
-      "select": "Выбрать товар"
+      "select": "Выбрать товар",
+      "recipient": "Получатель",
+      "self": "Себе"
     },
     "nav": {
       "cart": "Корзина",
@@ -690,7 +709,45 @@
       "top-up": "Пополнить счет"
     },
     "loading": "Готовим заказ",
-    "title": "Хранилище"
+    "title": "Хранилище",
+    "actions": {
+      "selectAll": "Выбрать все",
+      "deselectAll": "Снять выбор",
+      "clear": "Очистить корзину",
+      "cleared": "Корзина очищена",
+      "removed": "Товар удалён",
+      "undo": "Вернуть"
+    },
+    "status": {
+      "unavailable": "Сервер недоступен",
+      "insufficient": "Недостаточно средств",
+      "topUp": "Пополнить"
+    },
+    "server": {
+      "title": "Сервер"
+    },
+    "summary": {
+      "title": "Итого",
+      "selected": "Выбрано: {count} из {total}"
+    },
+    "trust": {
+      "delivery": "Автоматическая выдача",
+      "support": "Поддержка в Telegram",
+      "refund": "Возврат по правилам"
+    },
+    "suggestions": {
+      "title": "С этим покупают"
+    },
+    "empty": {
+      "suggestions": "Может пригодиться"
+    },
+    "confirm": {
+      "clear": "Удалить все товары из корзины?"
+    },
+    "error": "Не удалось оформить заказ",
+    "count": {
+      "items": "{count} товаров"
+    }
   },
   "map": {
     "page": {
@@ -1342,7 +1399,7 @@
     "delete-this-event": "Вы уверены, что хотите удалить это событие?",
     "pick-a-wallet-to-prepare-an-operation-right-away": "Выберите кошелёк, чтобы сразу подготовить операцию.",
     "the-selected-object-was-not-found": "Выбранный объект не найден",
-    "selected": "Выбрано:&nbsp;",
+    "selected": "Выбрано: ",
     "select": "Выбрать",
     "select-uploaded": "Выбрать загруженных",
     "select-a-file": "Выбрать файл",
@@ -1375,7 +1432,7 @@
     "title": "Заголовок",
     "link-title": "Заголовок ссылки",
     "loaded": "Загружено:",
-    "loaded-2": "Загружено:&nbsp;",
+    "loaded-2": "Загружено: ",
     "loading": "Загрузка...",
     "loading-2": "Загрузка…",
     "loader": "Загрузчик",
@@ -1711,5 +1768,20 @@
     "refund-description": "{orderId}: к возврату {refundable} из {total} BELKOIN игроку {nickname}. Потраченная часть пополнения не возвращается; купленные товары остаются.",
     "roles-added": "Добавлено {count} ролей для роли {role}",
     "permissions-removed": "Удалено {count} разрешений для роли {role}"
+  },
+  "wallet": {
+    "title": "Кошелёк",
+    "description": "Белкоин и харизма: сколько на счету и на каком сервере.",
+    "page": {
+      "title": "Кошелёк",
+      "description": "Баланс белкоина и харизмы, выбор сервера и переход в магазин."
+    },
+    "label": "Ваш баланс",
+    "charism_server": "Харизма на сервере {server}",
+    "hint": {
+      "belkoin": "Белкоин общий для всех серверов.",
+      "charism": "Харизма начисляется отдельно на каждом сервере."
+    },
+    "global": "Глобально"
   }
 }

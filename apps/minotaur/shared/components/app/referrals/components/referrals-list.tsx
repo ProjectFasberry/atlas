@@ -9,7 +9,9 @@ import { createLink } from "@/shared/components/config/link/link.model";
 import { dayjs } from "@/shared/lib/dayjs";
 import { translate } from "@/shared/locales/helpers"
 
-const ReferralCard = reatomComponent<Referral>(({ ctx, completed, created_at, referral }) => {
+const ReferralCard = reatomComponent<Referral>(({
+  ctx, completed, created_at, referral
+}) => {
   return (
     <div className="flex min-w-0 items-center gap-3 rounded-xl bg-neutral-900 p-3">
       <Link href={createLink("player", referral.nickname)} className="shrink-0">
@@ -33,7 +35,8 @@ const ReferralCard = reatomComponent<Referral>(({ ctx, completed, created_at, re
       >
         {completed
           ? translate["referrals.list.completed"]()
-          : translate["referrals.list.in-progress"]()}
+          : translate["referrals.list.in-progress"]()
+        }
       </span>
     </div>
   )
@@ -50,7 +53,9 @@ const ReferralsSkeleton = () => (
 export const ReferralsList = reatomComponent(({ ctx }) => {
   useUpdate(referrals.fetch, [])
 
-  if (ctx.spy(referrals.fetch.statusesAtom).isPending) return <ReferralsSkeleton />
+  if (ctx.spy(referrals.fetch.statusesAtom).isPending) {
+    return <ReferralsSkeleton />
+  }
 
   const error = ctx.spy(referrals.fetch.errorAtom)
   if (error) return <ErrorBlock title={error.message} />
@@ -58,8 +63,11 @@ export const ReferralsList = reatomComponent(({ ctx }) => {
   const data = ctx.spy(referrals.fetch.dataAtom)
   if (!data) {
     return (
-      <div className="flex w-full flex-col items-center gap-2 rounded-xl bg-neutral-900 p-6 text-center">
-        <Typography className="text-sm font-semibold">{translate["referrals.list.empty"]()}</Typography>
+      <div className="flex w-full flex-col items-center
+        gap-2 rounded-xl bg-neutral-900 p-6 text-center">
+        <Typography className="text-sm font-semibold">
+          {translate["referrals.list.empty"]()}
+        </Typography>
         <Typography className="max-w-sm text-xs text-neutral-400">
           {translate["referrals.list.empty-hint"]()}
         </Typography>
