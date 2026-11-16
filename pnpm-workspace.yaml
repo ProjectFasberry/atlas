@@ -2,6 +2,7 @@ packages:
   - "apps/*"
   - "pkgs/*"
 allowBuilds:
+  "@projectfasberry/storage@https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93": true
   "@tailwindcss/oxide": false
   esbuild: false
   lefthook: false

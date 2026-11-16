@@ -79,7 +79,7 @@
 		"@repo/config-biome": "workspace:*",
 		"@repo/config-typescript": "workspace:*",
 		"@repo/shared": "workspace:*",
-		"@repo/storage": "workspace:*",
+		"@projectfasberry/storage": "github:ProjectFasberry/storage#b0a0930",
 		"@tailwindcss/vite": "4.3.3",
 		"@tweakpane/core": "2.0.5",
 		"@types/react": "19.3.0",

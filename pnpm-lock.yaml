@@ -189,6 +189,9 @@ importers:
       '@neodx/svg':
         specifier: 0.8.0
         version: 0.8.0(prettier@3.8.4)
+      '@projectfasberry/storage':
+        specifier: github:ProjectFasberry/storage#b0a0930
+        version: https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)
       '@repo/config-biome':
         specifier: workspace:*
         version: link:../../pkgs/config-biome
@@ -198,9 +201,6 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../pkgs/shared
-      '@repo/storage':
-        specifier: workspace:*
-        version: link:../../pkgs/storage
       '@repo/ui':
         specifier: workspace:*
         version: link:../../pkgs/ui
@@ -525,12 +525,6 @@ importers:
       openapi-typescript:
         specifier: 7.13.0
         version: 7.13.0(typescript@5.8.3)
-
-  pkgs/storage:
-    devDependencies:
-      '@reatom/framework':
-        specifier: 3.4.68
-        version: 3.4.68
 
   pkgs/ui:
     dependencies:
@@ -2178,6 +2172,19 @@ packages:
 
   '@poppinss/exception@1.2.3':
     resolution: {integrity: sha512-dCED+QRChTVatE9ibtoaxc+WkdzOSjYTKi/+uacHWIsfodVfpsueo3+DKpgU5Px8qXjgmXkSvhXvSCz3fnP9lw==}
+
+  '@projectfasberry/storage@https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93':
+    resolution: {gitHosted: true, integrity: sha512-XFcAPglIxOYxrM6IJw1XppDtvCut79IMNy0cTYbNay1kzPUAOjO9coMcyNyhRskhHnDksT3E30emEBAN+E9xQQ==, tarball: https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93}
+    version: 0.1.0
+    peerDependencies:
+      '@reatom/framework': '>=3.4'
+      '@reatom/npm-react': '>=3.10'
+      react: '>=18'
+    peerDependenciesMeta:
+      '@reatom/npm-react':
+        optional: true
+      react:
+        optional: true
 
   '@reatom/async@3.16.10':
     resolution: {integrity: sha512-HxZwS7EydTcBKoKd3Z2VIi0O8YjJrkYWLSH0wxEPUhZcuWILjyuYSFBSAq4wFFkvQlbh9L7g6T4hr7lhQDhkbA==}
@@ -7931,6 +7938,13 @@ snapshots:
       supports-color: 10.2.2
 
   '@poppinss/exception@1.2.3': {}
+
+  '@projectfasberry/storage@https://codeload.github.com/ProjectFasberry/storage/tar.gz/b0a0930c34be31e636ccb0eb7f3c3372d3de8a93(@reatom/framework@3.4.68)(@reatom/npm-react@3.10.6(react@19.3.1))(react@19.3.1)':
+    dependencies:
+      '@reatom/framework': 3.4.68
+    optionalDependencies:
+      '@reatom/npm-react': 3.10.6(react@19.3.1)
+      react: 19.3.1
 
   '@reatom/async@3.16.10':
     dependencies:

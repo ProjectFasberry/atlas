@@ -1,4 +1,4 @@
-import type { StorageApi, StorageBucket, StorageObjectPage } from "@repo/storage"
+import type { StorageApi, StorageBucket, StorageObjectPage } from "@projectfasberry/storage"
 import { client } from "@/shared/lib/client-wrapper"
 
 /**
