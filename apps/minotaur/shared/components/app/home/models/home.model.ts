@@ -41,7 +41,7 @@ export const home = atom(null, "home").pipe(
   withAssign((_, name) => ({
     topPlayers: reatomAsync(async () => {
       const data = await client.get("/server/rating/{by}", {
-        params: { path: { by: "playtime" }, query: { limit: 5 } }
+        params: { path: { by: "playtime" }, query: { limit: 5, server: "bisquite" } }
       })
 
       return (data.data ?? []) as HomeTopPlayer[]
