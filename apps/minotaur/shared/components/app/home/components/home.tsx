@@ -3,6 +3,7 @@ import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { spawn } from "@reatom/framework";
 import { toast } from "sonner";
 import { env } from "@/shared/env";
+import { belkoinImage, charismImage } from "@/shared/consts/images";
 import { getStaticImage } from "@/shared/lib/helpers";
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import { balance, balanceState } from "@/shared/components/app/player/models/balance.model";
@@ -24,7 +25,7 @@ import { home } from "../models/home.model";
 const HERO_IMAGE = getStaticImage("images/village_pillage.webp");
 
 const Card = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
-  <div className={`flex flex-col gap-2 rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 ${className}`}>
+  <div className={`flex flex-col gap-2 rounded-xl bg-neutral-900/40 p-4 ${className}`}>
     {children}
   </div>
 );
@@ -89,11 +90,13 @@ export const HomeHero = reatomComponent(({ ctx }) => {
               <span className="rounded-lg bg-black/40 px-2 py-1 text-xs text-neutral-300">
                 {user.meta.role.name}
               </span>
-              <span className="rounded-lg bg-black/40 px-2 py-1 text-sm">
-                {formatNumber(balanceData.belkoin)} BELKOIN
+              <span className="flex items-center gap-1.5 rounded-lg bg-black/40 px-2 py-1 text-sm">
+                <img src={belkoinImage} alt="BELKOIN" className="size-4" />
+                {formatNumber(balanceData.belkoin)}
               </span>
-              <span className="rounded-lg bg-black/40 px-2 py-1 text-sm">
-                {formatNumber(balanceData.charism)} CHARISM
+              <span className="flex items-center gap-1.5 rounded-lg bg-black/40 px-2 py-1 text-sm">
+                <img src={charismImage} alt="CHARISM" className="size-4" />
+                {formatNumber(balanceData.charism)}
               </span>
               <a href={`${env.VITE_LANDING_URL}/start`} target="_blank" rel="noreferrer">
                 <Button background="white" className="h-8 text-sm font-semibold">
@@ -132,11 +135,15 @@ const PlayerBalance = reatomComponent(({ ctx }) => {
       {pending ? (
         <Skeleton className="h-8 w-32" />
       ) : (
-        <div className="flex flex-wrap items-baseline gap-3">
-          <span className="text-2xl font-semibold">{formatNumber(ctx.spy(balanceState.belkoinBalance))}</span>
-          <span className="text-xs text-neutral-500">BELKOIN</span>
-          <span className="text-2xl font-semibold">{formatNumber(ctx.spy(balanceState.charismBalance))}</span>
-          <span className="text-xs text-neutral-500">CHARISM</span>
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <img src={belkoinImage} alt="BELKOIN" className="size-6" />
+            <span className="text-2xl font-semibold">{formatNumber(ctx.spy(balanceState.belkoinBalance))}</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <img src={charismImage} alt="CHARISM" className="size-6" />
+            <span className="text-2xl font-semibold">{formatNumber(ctx.spy(balanceState.charismBalance))}</span>
+          </span>
         </div>
       )}
       <Link href="/store" className="text-xs text-green-400 hover:text-green-300">
@@ -164,8 +171,13 @@ const PlayerTasks = reatomComponent(({ ctx }) => {
           {data.data.slice(0, 3).map((task) => (
             <li key={task.id} className="flex items-center justify-between gap-2 text-sm">
               <span className="truncate text-neutral-200">{task.title}</span>
-              <span className="shrink-0 text-xs text-green-300">
-                +{task.reward_value} {task.reward_currency}
+              <span className="flex shrink-0 items-center gap-1 text-xs text-green-300">
+                <img
+                  src={task.reward_currency === "CHARISM" ? charismImage : belkoinImage}
+                  alt={task.reward_currency}
+                  className="size-3.5"
+                />
+                +{task.reward_value}
               </span>
             </li>
           ))}
@@ -333,8 +345,13 @@ const GuestStore = reatomComponent(({ ctx }) => {
               <Link href={`/store/i/${item.id}`} className="flex items-center gap-2 text-sm hover:text-neutral-100">
                 <img src={item.imageUrl} alt="" className="size-8 rounded object-cover" loading="lazy" />
                 <span className="truncate">{item.title}</span>
-                <span className="ms-auto shrink-0 text-xs text-green-300">
-                  {formatNumber(item.price)} {item.currency}
+                <span className="ms-auto flex shrink-0 items-center gap-1 text-xs text-green-300">
+                  <img
+                    src={item.currency === "CHARISM" ? charismImage : belkoinImage}
+                    alt={item.currency}
+                    className="size-3.5"
+                  />
+                  {formatNumber(item.price)}
                 </span>
               </Link>
             </li>
