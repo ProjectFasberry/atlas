@@ -21,7 +21,7 @@ timer is not installed. Staging bakes the `*.alpha.fasberry.fun` URLs.
 
 ## Development
 
-- `bun run dev` - dev API through Infisical.
+- `bun run dev` - dev API; public `VITE_*` values come from `apps/minotaur/.env`.
 - `bun run dev:prod` - production API; browser calls go through the Vite proxy
   (`/api`, `/panel-api`) to avoid CORS.
 - Checks: `bun run type-check`, `bun run lint`, `bun run circular-check`.

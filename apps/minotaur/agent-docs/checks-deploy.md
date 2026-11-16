@@ -5,7 +5,7 @@
 Run from the repo root or with the package filter:
 
 ```bash
-pnpm --filter minotaur dev            # local dev (Infisical env)
+pnpm --filter minotaur dev            # local dev (apps/minotaur/.env)
 pnpm --filter minotaur type-check     # sprite patch + tsc --build
 pnpm --filter minotaur lint           # biome
 pnpm --filter minotaur circular-check # dpdm on the server entry
@@ -33,10 +33,9 @@ bun run gen:icons                     # regenerate the SVG sprite
 
 ## Local setup
 
-- `infisical login`; build/dev scripts run `infisical run --path=/minotaur`.
-- `.env.local` holds `INFISICAL_CLIENT_ID`, `INFISICAL_CLIENT_SECRET`,
-  `INFISICAL_PROJECT_ID`, `INFISICAL_API_URL` for local runs.
-- Never print or commit secrets; runtime values come from Infisical.
+- Build/dev read public `VITE_*` values from `apps/minotaur/.env`; CI resolves
+  them from repository variables with prod defaults.
+- Never print or commit secrets; runtime values live in the host env files.
 
 ## Deploy
 
@@ -50,7 +49,8 @@ bun run gen:icons                     # regenerate the SVG sprite
 - Deploy only on an explicit request, from a clean tree, and report the image
   digest plus a health check.
 - Local `bun --bun run vike build` needs the production `VITE_*` env
-  (`VITE_API_URL`, `VITE_APP_URL`, `VITE_PANEL_API_URL`, `VITE_APP_PORT`, ...);
+  (`VITE_API_URL`, `VITE_APP_URL`, `VITE_PANEL_API_URL`, `VITE_APP_PORT`, ...) in
+  `apps/minotaur/.env`;
   a missing `VITE_APP_PORT` makes the server start with `NaN`.
 
 ## Git hygiene

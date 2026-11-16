@@ -61,16 +61,41 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Load Infisical build env
-        uses: Infisical/secrets-action@v1.0.18
-        with:
-          method: "universal"
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
-          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-id: ${{ secrets.INFISICAL_PROJECT_ID }}
-          domain: ${{ secrets.INFISICAL_DOMAIN }}
-          env-slug: ${{ steps.stage.outputs.stage }}
-          secret-path: /minotaur
+      # Public build-time config for the client bundle: Vite inlines VITE_* at
+      # build time. Defaults below are the live prod values; staging and dev use
+      # the alpha hosts. Repository variables of the same name override them.
+      - name: Resolve build env
+        env:
+          STAGE: ${{ steps.stage.outputs.stage }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_APP_URL: ${{ vars.VITE_APP_URL }}
+          VITE_PANEL_API_URL: ${{ vars.VITE_PANEL_API_URL }}
+          VITE_APP_PORT: ${{ vars.VITE_APP_PORT }}
+          VITE_LANDING_URL: ${{ vars.VITE_LANDING_URL }}
+          VITE_MAIN_DOMAIN: ${{ vars.VITE_MAIN_DOMAIN }}
+          VITE_VOLUME_URL: ${{ vars.VITE_VOLUME_URL }}
+          VITE_CAP_URL: ${{ vars.VITE_CAP_URL }}
+          VITE_CAP_SITE_KEY: ${{ vars.VITE_CAP_SITE_KEY }}
+          VITE_APAY_TAG: ${{ vars.VITE_APAY_TAG }}
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+        run: |
+          case "$STAGE" in
+            prod) suffix="" ;;
+            *) suffix=".alpha" ;;
+          esac
+          {
+            echo "VITE_API_URL=${VITE_API_URL:-https://api$suffix.fasberry.fun}"
+            echo "VITE_APP_URL=${VITE_APP_URL:-https://app$suffix.fasberry.fun}"
+            echo "VITE_PANEL_API_URL=${VITE_PANEL_API_URL:-https://panel$suffix.fasberry.fun}"
+            echo "VITE_APP_PORT=${VITE_APP_PORT:-3003}"
+            echo "VITE_LANDING_URL=${VITE_LANDING_URL:-https://fasberry.fun}"
+            echo "VITE_MAIN_DOMAIN=${VITE_MAIN_DOMAIN:-fasberry.fun}"
+            echo "VITE_VOLUME_URL=${VITE_VOLUME_URL:-https://volume.fasberry.fun}"
+            echo "VITE_CAP_URL=${VITE_CAP_URL:-https://cap.fasberry.fun}"
+            echo "VITE_CAP_SITE_KEY=${VITE_CAP_SITE_KEY:-4162fef8d7}"
+            echo "VITE_APAY_TAG=${VITE_APAY_TAG:-JPL64OYWY72V7HGNB2I44C5TCCVBKXQM}"
+            echo "VITE_SENTRY_DSN=${VITE_SENTRY_DSN-}"
+          } >> "$GITHUB_ENV"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter minotaur... --ignore-scripts
@@ -79,7 +104,7 @@ jobs:
         run: pnpm --filter minotaur test
 
       # The image only contains the runtime; the client bundle is built here,
-      # on native amd64. Vite reads the VITE_* values injected by Infisical.
+      # on native amd64. Vite reads the VITE_* values resolved above.
       - name: Build client bundle
         working-directory: apps/minotaur
         run: bun --bun run vike build

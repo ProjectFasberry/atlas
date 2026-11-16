@@ -16,9 +16,10 @@ scripts.
 - **One package manager.** The workspace uses `pnpm` and `pnpm-lock.yaml`; never
   add npm/yarn lockfiles. Apps whose scripts call `bun` run them with bun - use
   what the app's `package.json` declares.
-- **Secrets stay out of the repo, logs and images.** Environment secrets come
-  from Infisical; private packages need a token passed as a BuildKit secret or a
-  local env var, never as `ARG`/`ENV` and never committed.
+- **Secrets stay out of the repo, logs and images.** Runtime secrets live in the
+  host env files; public build-time `VITE_*` values come from repo variables and
+  workflow defaults. Private packages need a token passed as a BuildKit secret or
+  a local env var, never as `ARG`/`ENV` and never committed.
 - **No direct host access.** Never ssh/scp/rsync/docker or docker compose into
   `i-m` or the production host, and do not add such a step. Container deploys are
   CI-built images pulled by the host; host, registry and compose changes belong

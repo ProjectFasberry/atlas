@@ -5,20 +5,21 @@ Run from `apps/taurus` or with the package filter.
 ## Commands
 
 ```bash
-pnpm --filter taurus dev          # Infisical /taurus; Vike on :3005
+pnpm --filter taurus dev          # apps/taurus/.env; Vike on :3005
 pnpm --filter taurus type-check   # tsc --build
 pnpm --filter taurus test:e2e     # Playwright + mock API on :3101
 pnpm --filter taurus test:e2e:install
-pnpm --filter taurus build:prod   # Infisical /taurus; Cloudflare Worker build
+pnpm --filter taurus build:prod   # prod build (self-hosted Node server)
 pnpm --filter taurus size         # local size report
 pnpm --filter taurus deploy:all   # type-check + build + size:prod + deploy
 ```
 
-- `dev` and `build:prod` require an Infisical session. Without it, use
-  `e2e/serve.mjs` for a mocked SSR check.
+- `dev` and `build:prod` read public `VITE_*` values from `apps/taurus/.env`;
+  CI resolves them from repository variables. Without them, use `e2e/serve.mjs`
+  for a mocked SSR check.
 - `lint` is not a gate: the root Biome config excludes `apps/taurus`. Do not
   claim a lint pass; rely on `type-check`, e2e and review.
-- `size:prod` runs under Infisical `/glaux`; `deploy:all` tolerates its failure.
+- `size:prod` uses the prod `STAGE`; `deploy:all` tolerates its failure.
 
 ## E2E
 
