@@ -1,11 +1,15 @@
-import { Typography } from "@/shared/ui/typography";
-import { Intro } from "@/shared/components/app/intro/components/intro";
-import { EventsList } from "@/shared/components/app/events/components/events";
 import { reatomComponent } from "@reatom/npm-react";
+import { Typography } from "@/shared/ui/typography";
+import { EventsList } from "@/shared/components/app/events/components/events";
+import { eventsState } from "@/shared/components/app/events/models/events.model";
 import { LandsListShorted } from "@/shared/components/app/lands/components/lands-list";
 import { NewsList } from "@/shared/components/app/news/components/news-main-list";
+import { newsState } from "@/shared/components/app/news/models/news.model";
+import { GuestPanel, HomeHero, PlayerPanel } from "@/shared/components/app/home/components/home";
+import { home, homeState } from "@/shared/components/app/home/models/home.model";
+import { currentUserState } from "@/shared/models/current-user/index.model";
 import { translate } from "@/shared/locales/helpers";
-import { Icon } from "@/shared/ui/icon"
+import { Icon } from "@/shared/ui/icon";
 import { socialsAtom } from "@/shared/models/shared.model";
 
 const Socials = reatomComponent(({ ctx }) => {
@@ -41,22 +45,60 @@ const Socials = reatomComponent(({ ctx }) => {
   )
 }, "Socials")
 
+const HomeBranch = reatomComponent(({ ctx }) => {
+  return ctx.spy(currentUserState) ? <PlayerPanel /> : <GuestPanel />
+}, "HomeBranch")
+
+const MarkRead = reatomComponent<{ kind: "news" | "events" }>(({ ctx, kind }) => {
+  const news = ctx.spy(newsState.data)
+  const events = ctx.spy(eventsState.data)
+  const readNews = ctx.spy(homeState.readNews)
+  const readEvents = ctx.spy(homeState.readEvents)
+
+  const items = kind === "news" ? news : events
+  const read = kind === "news" ? readNews : readEvents
+  const unread = items.filter((item) => !read.includes(String(item.id)))
+
+  if (unread.length === 0) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const ids = items.map((item) => String(item.id))
+        if (kind === "news") home.markNewsRead(ctx, ids)
+        else home.markEventsRead(ctx, ids)
+      }}
+      className="text-xs text-green-400 hover:text-green-300"
+    >
+      {unread.length} новых · отметить прочитанными
+    </button>
+  )
+}, "MarkRead")
+
 export default function Page() {
   return (
     <div className='flex flex-col gap-8 w-full h-full'>
-      <Intro />
+      <HomeHero />
+      <HomeBranch />
       <div id="news" className="flex flex-col gap-4 w-full h-full">
-        <Typography variant="title">
-          {translate["index.news"]()}
-        </Typography>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Typography variant="title">
+            {translate["index.news"]()}
+          </Typography>
+          <MarkRead kind="news" />
+        </div>
         <div className="flex flex-col sm:flex-row scrollbar-h-2 overflow-x-auto gap-4 pb-2">
           <NewsList />
         </div>
       </div>
       <div id="last-events" className="flex flex-col gap-4 w-full h-full">
-        <Typography variant="title">
-          {translate["index.latest-events"]()}
-        </Typography>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Typography variant="title">
+            {translate["index.latest-events"]()}
+          </Typography>
+          <MarkRead kind="events" />
+        </div>
         <div className="flex flex-col sm:flex-row scrollbar-h-2 overflow-x-auto gap-4 pb-2">
           <EventsList />
         </div>
