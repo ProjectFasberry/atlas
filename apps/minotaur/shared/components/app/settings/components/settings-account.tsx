@@ -16,6 +16,8 @@ import { settingsAccountModel } from "../models/settings-account.model"
 import { Input } from "@/shared/ui/input"
 import { toast } from "sonner"
 import { action } from "@reatom/framework"
+import { useState } from "react"
+import { passwordSchema } from "@/shared/schemas/auth"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { translate } from "@/shared/locales/helpers"
 
@@ -35,29 +37,97 @@ const SettingsMainDeleteAccount = reatomComponent(({ ctx }) => {
   )
 }, "DeleteAccount")
 
-const CHANGE_PASSWORD_FIELDS = [
-  {
-    type: "password",
-    autoComplete: "current-password",
-    placeholder: translate["settings.account.sections.password-and-authentication.current-password"](),
-    value: changePassState.currentPass
-  },
-  {
-    type: "password",
-    autoComplete: "new-password",
-    placeholder: translate["settings.account.sections.password-and-authentication.new-password"](),
-    value: changePassState.newPass
-  },
-  {
-    type: "password",
-    autoComplete: "new-password",
-    placeholder: translate["settings.account.sections.password-and-authentication.repeat-password"](),
-    value: changePassState.newPassRepeat
-  }
-]
+type PasswordFieldProps = {
+  id: string
+  label: string
+  autoComplete: string
+  value: string
+  onChange: (value: string) => void
+  minLength?: number
+  error?: string | null
+  autoFocus?: boolean
+}
+
+const PasswordField = ({
+  id, label, autoComplete, value, onChange, minLength, error, autoFocus = false
+}: PasswordFieldProps) => {
+  const [isVisible, setIsVisible] = useState(false)
+
+  return (
+    <div className="flex flex-col gap-1">
+      <label htmlFor={id} className="text-sm font-medium text-neutral-300">{label}</label>
+      <div className="relative">
+        <Input
+          id={id}
+          type={isVisible ? "text" : "password"}
+          autoComplete={autoComplete}
+          minLength={minLength}
+          maxLength={72}
+          required
+          autoFocus={autoFocus}
+          variant={error ? "danger" : "default"}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
+          className="w-full pr-11"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+        <button
+          type="button"
+          onClick={() => setIsVisible((state) => !state)}
+          aria-label={isVisible
+            ? translate["settings.account.hide-password"]()
+            : translate["settings.account.show-password"]()}
+          className="absolute right-1 top-1 flex size-8 items-center justify-center
+            rounded-lg text-neutral-400 duration-150 hover:bg-neutral-700 hover:text-neutral-100"
+        >
+          <Icon name={isVisible ? "sprite:eye-off" : "sprite:eye"} className="size-4" />
+        </button>
+      </div>
+      {error && (
+        <span id={`${id}-error`} className="text-xs text-red-300">{error}</span>
+      )}
+    </div>
+  )
+}
 
 const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
-  const error = ctx.spy(changePass.submit.errorAtom);
+  const isOpen = ctx.spy(changePassState.isOpen)
+  const isPending = ctx.spy(changePass.submit.statusesAtom).isPending
+  const serverError = ctx.spy(changePass.submit.errorAtom)
+  const currentPass = ctx.spy(changePassState.currentPass)
+  const newPass = ctx.spy(changePassState.newPass)
+  const repeatPass = ctx.spy(changePassState.newPassRepeat)
+
+  const parsed = passwordSchema.safeParse(newPass)
+  const newPassError = newPass && !parsed.success
+    ? parsed.error.issues[0]?.message ?? null
+    : null
+  const repeatError = repeatPass && repeatPass !== newPass
+    ? translate["settings.account.passwords-mismatch"]()
+    : null
+  const submitDisabled = isPending || !currentPass || !newPass || !repeatPass
+    || Boolean(newPassError) || Boolean(repeatError)
+
+  const resetError = () => changePass.submit.errorAtom.reset(ctx)
+  const changeCurrentPass = (value: string) => {
+    resetError()
+    changePassState.currentPass(ctx, value)
+  }
+  const changeNewPass = (value: string) => {
+    resetError()
+    changePassState.newPass(ctx, value)
+  }
+  const changeRepeatPass = (value: string) => {
+    resetError()
+    changePassState.newPassRepeat(ctx, value)
+  }
+
+  const handleOpenChange = ({ open }: { open: boolean }) => {
+    if (!open && isPending) return
+
+    changePassState.isOpen(ctx, open)
+  }
 
   return (
     <>
@@ -68,53 +138,73 @@ const SettingsMainChangePassword = reatomComponent(({ ctx }) => {
       >
         {translate["settings.account.sections.password-and-authentication.change-password"]()}
       </Button>
-      <Dialog.Root
-        open={ctx.spy(changePassState.isOpen)}
-        onOpenChange={({ open }) => changePassState.isOpen(ctx, open)}
-      >
+      <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
         <Portal>
           <Dialog.Backdrop className={dialogVariant.backdrop()} />
           <DialogPositioner className={dialogVariant.positioner()}>
-            <Dialog.Content className={dialogVariant.content()}>
-              <Dialog.Title className={dialogVariant.title()}>{translate["settings.account.change-password-title"]()}</Dialog.Title>
+            <Dialog.Content className={dialogVariant.content(
+              "max-h-[90dvh] items-stretch justify-start p-0 sm:max-w-md"
+            )}>
+              <DialogClose />
+              <div className="flex w-full flex-col gap-1 border-b border-neutral-800 p-4 pr-12">
+                <Dialog.Title className={dialogVariant.title("text-left")}>
+                  {translate["settings.account.change-password-title"]()}
+                </Dialog.Title>
+              </div>
               <form
-                className="flex flex-col gap-6 w-full inert:opacity-60 inert:pointer-events-none"
+                className="flex w-full flex-col gap-4 overflow-y-auto p-4"
                 onSubmit={e => changePass.handle(ctx, e)}
-                inert={ctx.spy(changePass.submit.statusesAtom).isPending}
               >
-                <div className="flex flex-col gap-2 w-full">
-                  {CHANGE_PASSWORD_FIELDS.map((field, idx) => (
-                    <Input
-                      key={idx}
-                      type={field.type}
-                      autoComplete={field.autoComplete}
-                      placeholder={field.placeholder}
-                      minLength={8}
-                      maxLength={72}
-                      required
-                      value={ctx.spy(field.value)}
-                      onChange={e => field.value(ctx, e.target.value)}
-                    />
-                  ))}
-                  <span className="text-xs text-neutral-400">
-                    {translate["settings.account.password-hint"]()}
-                  </span>
+                <div className="flex flex-col gap-3">
+                  <PasswordField
+                    id="change-password-current"
+                    label={translate["settings.account.sections.password-and-authentication.current-password"]()}
+                    autoComplete="current-password"
+                    value={currentPass}
+                    onChange={changeCurrentPass}
+                    autoFocus
+                  />
+                  <PasswordField
+                    id="change-password-new"
+                    label={translate["settings.account.sections.password-and-authentication.new-password"]()}
+                    autoComplete="new-password"
+                    minLength={8}
+                    value={newPass}
+                    onChange={changeNewPass}
+                    error={newPassError}
+                  />
+                  <PasswordField
+                    id="change-password-repeat"
+                    label={translate["settings.account.sections.password-and-authentication.repeat-password"]()}
+                    autoComplete="new-password"
+                    minLength={8}
+                    value={repeatPass}
+                    onChange={changeRepeatPass}
+                    error={repeatError}
+                  />
                 </div>
-                {error && (
-                  <ErrorBlock title={error?.message} />
-                )}
-                <div className="flex items-center w-full *:w-full gap-2">
+                <Typography color="gray" className="text-xs">
+                  {translate["settings.account.password-hint"]()}
+                </Typography>
+                {serverError && <ErrorBlock title={serverError.message} raw />}
+                <div className="flex items-center justify-end gap-2 border-t border-neutral-800 pt-4">
                   <Dialog.CloseTrigger asChild>
-                    <Button type="button" background="default" className="font-semibold">
-                      {translate["shared.back"]()}
+                    <Button type="button" background="default" className="font-semibold" disabled={isPending}>
+                      {translate["settings.account.change-password-cancel"]()}
                     </Button>
                   </Dialog.CloseTrigger>
-                  <Button type="submit" background="white" className="font-semibold">
+                  <Button
+                    type="submit"
+                    background="white"
+                    className="font-semibold"
+                    withSpinner={true}
+                    isLoading={isPending}
+                    disabled={submitDisabled}
+                  >
                     {translate["settings.account.sections.password-and-authentication.confirm"]()}
                   </Button>
                 </div>
               </form>
-              <DialogClose />
             </Dialog.Content>
           </DialogPositioner>
         </Portal>

@@ -886,13 +886,18 @@
       "delete": {
         "title": "Delete account",
         "confirm": "Confirm",
-        "description": "Account deletion is permanent; all game data will be deleted"
+        "description": "Account deletion is permanent; all game data will be deleted",
+        "error": "Could not delete the account"
       },
       "password-changed": "Password changed",
       "password-differs": "The new password must be different",
       "passwords-mismatch": "Passwords do not match",
       "invalid-password": "Invalid password",
-      "password-hint": "At least 8 characters, no spaces"
+      "password-hint": "At least 8 characters, no spaces",
+      "change-password-cancel": "Cancel",
+      "show-password": "Show password",
+      "hide-password": "Hide password",
+      "password-error": "Could not change the password"
     },
     "devices": {
       "title": "Devices",
@@ -943,7 +948,37 @@
       "discord-warning": "You will be redirected to the Discord connection page",
       "continue-confirm": "Continue?",
       "go": "Continue",
-      "remove-error": "Failed to remove the social connection."
+      "remove-error": "Failed to remove the social connection.",
+      "description": "Link Discord or Telegram to your profile.",
+      "socials": {
+        "discord": "Discord",
+        "telegram": "Telegram"
+      },
+      "connected-at": "Connected {date}",
+      "connected": "Account connected",
+      "not-connected": "Not connected yet - send the code to the bot and check again",
+      "remove-confirm": "Unlink the account?",
+      "remove-description": "The social account will be removed from your profile. Continue?",
+      "remove": "Unlink",
+      "popup-blocked": "The browser blocked the window. Allow pop-ups for this site.",
+      "all-connected": "All available accounts are connected",
+      "empty": "Nothing connected yet",
+      "load-error": "Could not load connections",
+      "errors": {
+        "exists": "This account is already linked",
+        "request-exists": "A code already exists, wait or check the connection",
+        "not-found": "This social network is unavailable right now",
+        "generic": "Could not connect the account"
+      },
+      "dialog": {
+        "title": "Connecting {social}",
+        "subtitle": "Confirm the account in the social network",
+        "waiting": "Creating a code...",
+        "send-code": "Send this code to the bot",
+        "expires": "The code is valid for 5 minutes",
+        "copy": "Copy code",
+        "check": "Check"
+      }
     },
     "store": {
       "title": "Store",

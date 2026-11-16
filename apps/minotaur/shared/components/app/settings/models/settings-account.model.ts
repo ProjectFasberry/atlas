@@ -17,7 +17,7 @@ const getChangePasswordError = (message: string) => {
     case "NOT_FOUND":
       return translate["auth.shared.errors.not-exists"]()
     default:
-      return message
+      return translate["settings.account.password-error"]()
   }
 }
 
@@ -60,7 +60,7 @@ export const settingsAccountModel = () => {
         },
         onReject: (_, e) => {
           if (isError(e)) {
-            toast.error(getChangePasswordError(e.message))
+            toast.error(translate["settings.account.delete.error"]())
           }
         }
       }).pipe(
@@ -90,6 +90,7 @@ export const settingsAccountModel = () => {
   const changePass = atom(null, "changePass").pipe(
     withAssign((_, name) => ({
       before: action((ctx) => {
+        changePass.submit.errorAtom.reset(ctx)
         changePassState.isOpen(ctx, true)
       }, `${name}.before`),
       submit: reatomAsync(async (ctx, json: { currentPass: string, newPass: string }) => {
@@ -147,7 +148,7 @@ export const settingsAccountModel = () => {
         }
 
         changePass.submit(ctx, json)
-      }, `${name}.before`)
+      }, `${name}.handle`)
     }))
   )
 

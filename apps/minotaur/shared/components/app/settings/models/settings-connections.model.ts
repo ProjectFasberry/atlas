@@ -1,8 +1,8 @@
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import {
   action, atom, reatomAsync, reatomMap, spawn, withAssign,
-  withCache, withDataAtom, withReset, withStatusesAtom,
-  type Action, type AsyncAction
+  withCache, withDataAtom, withErrorAtom, withReset, withStatusesAtom,
+  type AsyncCtx,
 } from "@reatom/framework";
 import { isEmptyArray } from "@/shared/lib/utils";
 import { client } from "@/shared/lib/client-wrapper";
@@ -16,27 +16,26 @@ const connectionsStatusAtom = reatomMap<string, boolean>()
 const getConnectionStatusAtom = (type: string) => atom((ctx) => ctx.spy(connectionsStatusAtom).get(type) ?? false)
 
 export type ConnectionsAvailablePayload = ExtractApiData<"getServerSocialsAvailable">["data"]
-type ConnectionAddPayload = ExtractApiData<"postServerSocialsAdd">;
-type ConnectionsPayload = | ConnectionAddPayload | undefined;
-type ConnectionAction<T> = Action<[social: string], T> | AsyncAction<[social: string], T>;
+type ConnectionAddPayload = ExtractApiData<"postServerSocialsAdd">["data"]
+type AddWrapperResult = { social: string, payload: ConnectionAddPayload } | undefined
+type ConnectionFlow = "link" | "dialog"
 
-interface ConnectionEventConfig<T> {
-  as: "dialog" | "link";
-  cb: () => ConnectionAction<T>;
+const CONNECTION_FLOWS: Record<string, ConnectionFlow> = {
+  discord: "link",
+  telegram: "dialog",
 }
 
-const CONNECTIONS_EVENTS: Record<string, ConnectionEventConfig<ConnectionsPayload>> = {
-  "discord": {
-    as: "link",
-    cb: () => action((ctx, social): undefined => {
-      window.open(`${env.VITE_API_URL}/server/socials/add/${social}`);
-    }),
-  },
-  telegram: {
-    as: "dialog",
-    cb: () => connectionsControl.add as any
-  }
-};
+const ADD_ERROR_MESSAGES: Record<string, () => string> = {
+  SAVED_SOCIAL_EXISTS: () => translate["settings.connections.errors.exists"](),
+  SOCIAL_REQUEST_EXISTS: () => translate["settings.connections.errors.request-exists"](),
+  SOCIAL_NOT_FOUND: () => translate["settings.connections.errors.not-found"](),
+}
+
+const getAddErrorMessage = (error: unknown) => {
+  const code = error instanceof Error ? error.message : ""
+
+  return ADD_ERROR_MESSAGES[code]?.() ?? translate["settings.connections.errors.generic"]()
+}
 
 const connectionsState = atom(null, "connectionsState").pipe(
   withAssign((_, name) => ({
@@ -52,131 +51,145 @@ const connectionIsProcessingAtom = (social: string) => atom((ctx) =>
   (ctx.spy(connectionsState.processingSocial) === social) && ctx.spy(connectionsState.isProcessing)
 )
 
+const addSocial = reatomAsync(async (ctx, social: string) => {
+  return await ctx.schedule(() => client
+    .post("/server/socials/add", { json: { social } })
+  )
+}, "connections.add")
+
+const addWrapper = reatomAsync<[AsyncCtx, social: string], AddWrapperResult>(async (ctx, social) => {
+  const flow = CONNECTION_FLOWS[social]
+  if (!flow) return;
+
+  const processingSocial = ctx.get(connectionsState.processingSocial)
+  const isProcessing = ctx.get(connectionsState.isProcessing)
+
+  if (isProcessing && processingSocial !== social) return
+
+  const warningIsConfirmed = ctx.get(connectionsState.warningIsConfirmed)
+
+  if (!warningIsConfirmed) {
+    alertDialog.open(ctx, {
+      title: flow === "link"
+        ? translate["settings.connections.discord-warning"]()
+        : translate["settings.connections.continue-confirm"](),
+      onConfirm: action((ctx) => {
+        connectionsState.warningIsConfirmed(ctx, true)
+        addWrapper(ctx, social)
+      }),
+      confirmLabel: translate["settings.connections.go"]()
+    })
+
+    return
+  }
+
+  if (flow === "link") {
+    const opened = window.open(`${env.VITE_API_URL}/server/socials/add/${social}`)
+
+    connectionsState.warningIsConfirmed.reset(ctx)
+
+    if (!opened) toast.error(translate["settings.connections.popup-blocked"]())
+    return
+  }
+
+  connectionsState.isOpen(ctx, true)
+  connectionsState.isProcessing(ctx, true)
+  connectionsState.processingSocial(ctx, social)
+
+  return {
+    social,
+    payload: await addSocial(ctx, social),
+  }
+}, {
+  name: "connections.addWrapper",
+  onFulfill: (ctx, res) => {
+    if (!res) return
+
+    connectionsState.isProcessing(ctx, false)
+    connectionsState.warningIsConfirmed.reset(ctx)
+    connectionsState.payload(ctx, res.payload)
+
+    spawn(ctx, (spawnCtx) => {
+      connections.fetchList.cacheAtom.reset(spawnCtx)
+      connections.fetchList(spawnCtx)
+      connections.fetchAvailable.cacheAtom.reset(spawnCtx)
+      connections.fetchAvailable(spawnCtx)
+    })
+  },
+  onReject: (ctx, e) => {
+    connectionsState.isProcessing(ctx, false)
+
+    const message = getAddErrorMessage(e)
+    addWrapper.errorAtom(ctx, new Error(message))
+
+    if (!ctx.get(connectionsState.isOpen)) toast.error(message)
+  },
+}).pipe(
+  withStatusesAtom(),
+  withErrorAtom()
+)
+
+const removeSocial = reatomAsync(async (ctx, type: string) => {
+  connectionsStatusAtom.getOrCreate(ctx, type, () => true)
+
+  try {
+    await ctx.schedule(() => client.delete("/server/socials/{social}", {
+      params: { path: { social: type } },
+    }))
+
+    return { social: type }
+  } catch {
+    connectionsStatusAtom.delete(ctx, type)
+    toast.error(translate["settings.connections.remove-error"]())
+
+    return null
+  }
+}, {
+  name: "connections.remove",
+  onFulfill: (ctx, res) => {
+    if (!res) return
+
+    connectionsStatusAtom.delete(ctx, res.social)
+    connections.fetchList.cacheAtom.reset(ctx)
+    connections.fetchList.dataAtom(ctx, (state) => state.filter(t => t.social !== res.social))
+
+    spawn(ctx, (spawnCtx) => {
+      connections.fetchAvailable.cacheAtom.reset(spawnCtx)
+      connections.fetchAvailable(spawnCtx)
+    })
+  },
+}).pipe(
+  withStatusesAtom()
+)
+
+const removeBefore = reatomAsync(async (ctx, type: string) => {
+  alertDialog.open(ctx, {
+    title: translate["settings.connections.remove-confirm"](),
+    description: translate["settings.connections.remove-description"](),
+    confirmLabel: translate["settings.connections.remove"](),
+    onConfirm: action((ctx) => {
+      spawn(ctx, (spawnCtx) => removeSocial(spawnCtx, type))
+    }),
+    withPending: false,
+  })
+}, "connections.removeBefore")
+
+const onClose = action((ctx) => {
+  if (ctx.get(connectionsState.isProcessing)) return
+
+  connectionsState.warningIsConfirmed.reset(ctx)
+  connectionsState.processingSocial.reset(ctx)
+  connectionsState.payload.reset(ctx)
+  addWrapper.errorAtom.reset(ctx)
+}, "connections.onClose")
+
 const connectionsControl = atom(null, "connectionsControl").pipe(
-  withAssign((_, name) => ({
-    addWrapper: reatomAsync(async (ctx, social: string) => {
-      const event = CONNECTIONS_EVENTS[social]
-      if (!event) return;
-
-      const processingSocial = ctx.get(connectionsState.processingSocial)
-      const isProcessing = ctx.get(connectionsState.isProcessing);
-
-      if (isProcessing && processingSocial !== social) {
-        return;
-      }
-
-      if (event.as === 'link') {
-        const warningIsConfirmed = ctx.get(connectionsState.warningIsConfirmed);
-
-        if (!warningIsConfirmed) {
-          alertDialog.open(ctx, {
-            title: translate["settings.connections.discord-warning"](),
-            onConfirm: action((ctx) => {
-              connectionsState.warningIsConfirmed(ctx, true);
-              connectionsControl.addWrapper(ctx, social);
-            }),
-            confirmLabel: translate["settings.connections.go"]()
-          })
-        }
-
-        return
-      }
-
-      if (event.as === 'dialog') {
-        if (isProcessing) {
-          connectionsState.isOpen(ctx, true);
-          return;
-        }
-
-        const warningIsConfirmed = ctx.get(connectionsState.warningIsConfirmed);
-
-        if (!warningIsConfirmed) {
-          alertDialog.open(ctx, {
-            title: translate["settings.connections.continue-confirm"](),
-            onConfirm: action((ctx) => {
-              connectionsState.warningIsConfirmed(ctx, true);
-              connectionsControl.addWrapper(ctx, social);
-            }),
-            confirmLabel: translate["settings.connections.go"]()
-          })
-
-          return;
-        } else {
-          connectionsState.isOpen(ctx, true);
-          connectionsState.isProcessing(ctx, true);
-          connectionsState.processingSocial(ctx, social);
-
-          return await event.cb()(ctx, social)
-        }
-      }
-    }, {
-      name: `${name}.addWrapper`,
-      onFulfill: (ctx, res) => {
-        if (!res) return;
-
-        connectionsState.payload(ctx, res);
-      },
-    }).pipe(
-      withStatusesAtom()
-    ),
-    add: reatomAsync(async (ctx, social: string) => {
-      const result = await client
-        .post("/server/socials/add", { json: { social } })
-
-      return { result, social }
-    }, `${name}.add`),
-    removeBefore: reatomAsync(async (ctx, type: string) => {
-      connectionsStatusAtom.getOrCreate(ctx, type, () => true)
-
-      const removeSubmit = reatomAsync(async (ctx, type: string) => {
-        const result = await ctx.schedule(() =>
-          client.delete("/server/socials/{social}", { params: { path: { social: type } } })
-        )
-
-        return { result, type }
-      }, {
-        name: `${name}.removeSubmit`,
-        onFulfill: (ctx, res) => {
-          connections.fetchList.cacheAtom.reset(ctx)
-          connections.fetchList.dataAtom(ctx, (state) => state.filter(t => t.social !== res.type))
-        },
-        onReject: (ctx, e) => {
-          toast.error(translate["settings.connections.remove-error"]())
-        }
-      })
-
-      try {
-        const result = await removeSubmit(ctx, type)
-        return { result, type }
-      } catch (e) {
-        return { type }
-      }
-    }, {
-      name: `${name}.removeBefore`,
-      onFulfill: (ctx, { type, result }) => {
-        if (!result) {
-          connectionsStatusAtom.delete(ctx, type)
-          return;
-        }
-
-        if (result.type === type) {
-          connectionsStatusAtom.delete(ctx, type)
-        }
-
-        spawn(ctx, (spawnCtx) => {
-          connections.fetchAvailable.cacheAtom.reset(spawnCtx)
-          connections.fetchAvailable(spawnCtx)
-        })
-      }
-    }).pipe(
-      withStatusesAtom()
-    ),
-    onClose: action((ctx) => {
-      const isProcessing = ctx.get(connectionsState.isProcessing);
-      if (isProcessing) return;
-
-      connectionsState.warningIsConfirmed.reset(ctx)
-    }, `${name}.onClose`),
+  withAssign(() => ({
+    addWrapper,
+    add: addSocial,
+    remove: removeSocial,
+    removeBefore,
+    onClose,
   }))
 )
 
@@ -200,7 +213,8 @@ const connections = atom(null, "connections").pipe(
     }).pipe(
       withDataAtom([]),
       withCache({ swr: false }),
-      withStatusesAtom()
+      withStatusesAtom(),
+      withErrorAtom()
     ),
     fetchAvailable: reatomAsync(async (ctx) => {
       return await ctx.schedule(() => client
@@ -213,7 +227,8 @@ const connections = atom(null, "connections").pipe(
     }).pipe(
       withDataAtom([], (_, data) => isEmptyArray(data) ? null : data),
       withCache({ swr: false }),
-      withStatusesAtom()
+      withStatusesAtom(),
+      withErrorAtom()
     ),
   }))
 )
