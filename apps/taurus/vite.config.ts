@@ -23,7 +23,33 @@ export default defineConfig(({ mode }) => {
 
   let isSSR = false;
 
+  const appOrigin = "https://app.fasberry.fun"
+  const apiTarget = env.PUBLIC_ENV__API_URL || "https://api.fasberry.fun"
+
+  /** Secure cookies cannot be read over plain http, so drop the flag in dev. */
+  const stripSecureCookie = (proxy: any) => {
+    proxy.on("proxyRes", (proxyRes: any) => {
+      const cookies = proxyRes.headers["set-cookie"]
+      if (!cookies) return
+      proxyRes.headers["set-cookie"] = cookies.map((cookie: string) =>
+        cookie.replace(/;\s*secure/gi, ""))
+    })
+  }
+
   return {
+    server: {
+      proxy: {
+        // Browser calls go through the Vite server: no CORS, cookies stay first-party.
+        "/api": {
+          target: apiTarget,
+          changeOrigin: true,
+          headers: { origin: appOrigin },
+          cookieDomainRewrite: { "*": "" },
+          configure: stripSecureCookie,
+          rewrite: (path: string) => path.replace(/^\/api/, ""),
+        },
+      },
+    },
     define: {
       __STAGE__: JSON.stringify(stage ?? "dev")
     },

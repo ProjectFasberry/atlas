@@ -49,19 +49,38 @@ export default defineConfig(({ mode }) => {
     allowedHosts: true
   }
 
+  // The API checks the Origin header of cookie-authenticated mutations (CSRF),
+  // so proxied calls pretend to come from the production web app.
+  const appOrigin = "https://app.fasberry.fun"
+  const panelOrigin = "https://panel.fasberry.fun"
+
+  /** Secure cookies cannot be read over plain http, so drop the flag in dev. */
+  const stripSecureCookie = (proxy: any) => {
+    proxy.on("proxyRes", (proxyRes: any) => {
+      const cookies = proxyRes.headers["set-cookie"]
+      if (!cookies) return
+      proxyRes.headers["set-cookie"] = cookies.map((cookie: string) =>
+        cookie.replace(/;\s*secure/gi, ""))
+    })
+  }
+
   const apiProxy = {
     // Browser calls in dev hit the Vite server, which forwards them to the real API.
     "/api": {
       target: env.VITE_API_URL,
       changeOrigin: true,
+      headers: { origin: appOrigin },
       cookieDomainRewrite: { "*": "" },
+      configure: stripSecureCookie,
       rewrite: (path: string) => path.replace(/^\/api/, ""),
     },
     ...(env.VITE_PANEL_API_URL ? {
       "/panel-api": {
         target: env.VITE_PANEL_API_URL,
         changeOrigin: true,
+        headers: { origin: panelOrigin },
         cookieDomainRewrite: { "*": "" },
+        configure: stripSecureCookie,
         rewrite: (path: string) => path.replace(/^\/panel-api/, ""),
       },
     } : {}),

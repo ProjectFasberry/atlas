@@ -80,6 +80,23 @@ Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:
 - `apps/taurus` is a Cloudflare Worker and still deploys manually with
   `wrangler deploy`; it is not part of the pull-based image path.
 
+## Local frontends against the production API
+
+Every frontend dev server proxies browser API calls through itself:
+
+- minotaur: `/api` and `/panel-api` in `apps/minotaur/vite.config.ts`;
+- taurus: `/api` in `apps/taurus/vite.config.ts`;
+- wiki: no browser calls, its API access is server-side and needs no proxy.
+
+The proxy targets the real API, rewrites `Origin` to the production web app
+(the API rejects cookie-authenticated mutations from unknown origins), drops the
+cookie `Domain` attribute and the `Secure` flag, so the session stays a
+first-party `localhost` cookie. The browser only talks to the dev origin: no
+CORS, no extra proxy process, no hosts entries or certificates.
+
+Run the usual `pnpm --filter <app> dev` with `VITE_API_URL` /
+`PUBLIC_ENV__API_URL` pointing at `https://api.fasberry.fun`.
+
 ## Environment & Secrets
 
 Runtime secrets live in the host-only `/opt/main/env/prod/<service>.env` files.
