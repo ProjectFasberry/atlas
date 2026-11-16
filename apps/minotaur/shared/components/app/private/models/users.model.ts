@@ -13,6 +13,7 @@ import { DEFAULT_SOFT_DELAY } from "@/shared/consts"
 import { invariant } from "@/shared/lib/utils"
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
 import { createViewerModel } from "@/shared/models/shared.model"
+import { env } from "@/shared/env"
 
 export type PrivatedUser = PrivatedUsersPayload["data"][number]
 export type PrivatedUsersPayload = ExtractApiData<"getPrivatedUserList">["data"]
@@ -403,6 +404,13 @@ export const usersAuthState = atom(null, "usersAuthState").pipe(
         nickname: atom("", `${name}.nickname`).pipe(withReset()),
         password: atom("", `${name}.password`).pipe(withReset()),
       }))
+    ),
+    invite: atom(null, `${name}.invite`).pipe(
+      withAssign((_, name) => ({
+        isOpen: atom(false, `${name}.isOpen`),
+        nickname: atom("", `${name}.nickname`).pipe(withReset()),
+        link: atom<Nullable<string>>(null, `${name}.link`).pipe(withReset()),
+      }))
     )
   }))
 )
@@ -471,6 +479,27 @@ export const usersAuth = atom(null, "usersAuth").pipe(
           withErrorAtom()
         )
       }))
+    ),
+    invite: reatomAsync(async (ctx, e: React.FormEvent) => {
+      e.preventDefault()
+
+      const nickname = ctx.get(usersAuthState.invite.nickname)
+
+      return await client.raw.post<{ token: string }>("/privated/user/auth/invite", {
+        json: { nickname },
+      })
+    }, {
+      name: `${name}.invite`,
+      onFulfill: (ctx, res) => {
+        if (!res) return
+
+        usersAuthState.invite.link(ctx, `${env.VITE_APP_URL}/auth?callback_query=${res.token}`)
+        users.refetchAll(ctx)
+      },
+      onReject: (_, e) => logError(e, { type: "combined" })
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom()
     ),
     handleEvent: action((ctx, type: string) => {
       spawn(ctx, (spawnCtx) => {

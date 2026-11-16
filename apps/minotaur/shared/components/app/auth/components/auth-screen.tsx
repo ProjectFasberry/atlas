@@ -1,9 +1,14 @@
+import { reatomComponent } from "@reatom/npm-react";
 import { Link } from "@/shared/components/config/link/link";
 import { translate } from "@/shared/locales/helpers";
+import { authState } from "../models/auth.model";
 import { Auth } from "./auth";
 import { AuthBrand } from "./auth-brand";
+import { LinkAccept } from "./link";
 
-export const AuthScreen = () => {
+export const AuthScreen = reatomComponent(({ ctx }) => {
+  const token = ctx.spy(authState.searchParams)["callback_query"];
+
   return (
     <div className="grid w-full max-w-6xl gap-6 px-2 py-6 sm:py-10 lg:grid-cols-[1fr_28rem] lg:gap-10 lg:items-start">
       <AuthBrand />
@@ -16,7 +21,7 @@ export const AuthScreen = () => {
             {translate["auth.page.subheading"]()}
           </p>
         </div>
-        <Auth />
+        {token ? <LinkAccept token={token} /> : <Auth />}
         <p className="text-sm text-neutral-500">
           {translate["auth.page.support"]()}:{" "}
           <Link
@@ -29,4 +34,4 @@ export const AuthScreen = () => {
       </div>
     </div>
   )
-}
+}, "AuthScreen")

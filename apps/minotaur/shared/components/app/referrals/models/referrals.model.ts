@@ -1,11 +1,23 @@
 import { env } from "@/shared/env";
 import { client } from "@/shared/lib/client-wrapper";
-import { atom, withErrorAtom } from "@reatom/framework";
-import { reatomAsync, withAssign, withCache, withDataAtom, withStatusesAtom } from "@reatom/framework";
+import { atom, reatomAsync, withAssign, withCache, withDataAtom, withErrorAtom, withStatusesAtom } from "@reatom/framework";
 
 type ReferralListPayload = ExtractApiData<"getServerReferralsList">["data"]
 
 export type Referral = ReferralListPayload[number]
+
+export type ReferralStats = {
+  used: number;
+  remaining: number;
+  limit: number;
+}
+
+export type ReferralLink = ReferralStats & {
+  token: string;
+  expires_at: string;
+}
+
+export const referralLinkUrl = (token: string) => `${env.VITE_APP_URL}/auth?callback_query=${token}`
 
 export const referrals = atom(null, "referrals").pipe(
   withAssign((_, name) => ({
@@ -19,6 +31,19 @@ export const referrals = atom(null, "referrals").pipe(
       withStatusesAtom(),
       withErrorAtom()
     ),
-    getReferralIp: (nickname: string) => `${env.VITE_APP_URL}/auth?type=register&referrer=${nickname}`
+    stats: reatomAsync(async () => {
+      return await client.raw.get<ReferralStats>("/server/referrals/me")
+    }, `${name}.stats`).pipe(
+      withDataAtom(null),
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
+    createLink: reatomAsync(async () => {
+      return await client.raw.post<ReferralLink>("/server/referrals/link")
+    }, `${name}.createLink`).pipe(
+      withDataAtom(null),
+      withStatusesAtom(),
+      withErrorAtom()
+    ),
   }))
 )

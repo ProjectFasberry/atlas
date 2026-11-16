@@ -45,7 +45,6 @@ export const register = atom(null, "register").pipe(
         nickname,
         password,
         findout: findoutAnswer(ctx.get(authState.fields.findout)),
-        findoutType: ctx.get(authState.fields.findoutType),
         acceptRules: ctx.get(authState.fields.acceptRules)
       })
 
@@ -85,7 +84,6 @@ export const register = atom(null, "register").pipe(
         nickname: parsed.data.nickname,
         password: parsed.data.password,
         findout: parsed.data.findout,
-        findoutType: parsed.data.findoutType,
       }
 
       await client

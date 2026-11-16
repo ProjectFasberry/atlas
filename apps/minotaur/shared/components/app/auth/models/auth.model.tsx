@@ -26,8 +26,6 @@ export const authState = atom(null, "authState").pipe(
         passwordRepeat: atom<string>("", `${name}.passwordRepeat`).pipe(withReset()),
         // Optional answer to "How did you hear about us?"
         findout: atom<Maybe<string>>(undefined, `${name}.findout`).pipe(withReset()),
-        // Hidden: a link with ?referrer= keeps the attribution type.
-        findoutType: atom<"custom" | "referrer">("custom", `${name}.findoutType`).pipe(withReset()),
         acceptRules: atom(false, `${name}.acceptRules`).pipe(withReset())
       }))
     ),
@@ -43,15 +41,6 @@ export const authState = atom(null, "authState").pipe(
     token: atom<Nullable<string>>(null, `${name}.token`).pipe(withReset()),
   }))
 )
-
-authState.searchParams.onChange((ctx, state) => {
-  const isReferrer = "referrer" in state;
-
-  if (isReferrer) {
-    authState.fields.findout(ctx, state.referrer);
-    authState.fields.findoutType(ctx, "referrer");
-  }
-});
 
 authState.type.onChange((ctx) => auth.resetErrors(ctx));
 
@@ -73,7 +62,6 @@ export const auth = atom(null, "auth").pipe(
       authState.fields.password.reset(ctx);
       authState.fields.passwordRepeat.reset(ctx);
       authState.fields.findout.reset(ctx);
-      authState.fields.findoutType.reset(ctx);
       authState.fields.acceptRules.reset(ctx);
       authState.globalError.reset(ctx);
       authState.errorsType.reset(ctx);

@@ -30,7 +30,6 @@ const FindoutInput = reatomComponent(({ ctx }) => (
     value={ctx.spy(authState.fields.findout) ?? ""}
     onClick={() => auth.resetError(ctx)}
     onChange={e => {
-      authState.fields.findoutType(ctx, "custom")
       authState.fields.findout(ctx, e.target.value)
     }}
     maxLength={128}

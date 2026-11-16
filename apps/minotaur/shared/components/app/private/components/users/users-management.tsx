@@ -7,6 +7,7 @@ import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { Input } from "@/shared/ui/input"
 import { Typography } from "@/shared/ui/typography"
+import { toast } from "sonner"
 import { usersAuth, usersAuthState } from "../../models/users.model"
 
 type FieldProps = {
@@ -22,83 +23,6 @@ const Field = ({ label, hint, children }: FieldProps) => (
     {hint ? <span className="text-[11px] text-neutral-500">{hint}</span> : null}
   </label>
 )
-
-const CreateUser = reatomComponent(({ ctx }) => {
-  const error = ctx.spy(usersAuth.createUser.submit.errorAtom)
-  const isPending = ctx.spy(usersAuth.createUser.submit.statusesAtom).isPending
-
-  return (
-    <Dialog.Root
-      open={ctx.spy(usersAuthState.createUser.isOpen)}
-      onOpenChange={({ open }) => usersAuthState.createUser.isOpen(ctx, open)}
-    >
-      <Dialog.Trigger asChild>
-        <Button background="white" className="h-8 text-sm font-semibold">
-          Создать
-        </Button>
-      </Dialog.Trigger>
-      <Portal>
-        <Dialog.Backdrop className={dialogVariant.backdrop()} />
-        <Dialog.Positioner className={dialogVariant.positioner()}>
-          <Dialog.Content className={dialogVariant.content("w-full max-w-md")}>
-            <DialogTitle className={dialogVariant.title()}>Новый пользователь</DialogTitle>
-            <form
-              onSubmit={(event) => usersAuth.createUser.submit(ctx, event)}
-              className="flex w-full flex-col gap-3"
-            >
-              <Field label="Никнейм" hint="От 3 до 32 символов, латиница и цифры">
-                <Input
-                  value={ctx.spy(usersAuthState.createUser.nickname)}
-                  onChange={(event) => usersAuthState.createUser.nickname(ctx, event.target.value)}
-                  placeholder="Steve"
-                  minLength={3}
-                  maxLength={32}
-                  required
-                  autoFocus
-                />
-              </Field>
-              <Field label="Пароль" hint="Пароль для входа на сайте и в игре">
-                <Input
-                  type="password"
-                  value={ctx.spy(usersAuthState.createUser.password)}
-                  onChange={(event) => usersAuthState.createUser.password(ctx, event.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
-              </Field>
-              <Typography className="rounded-lg border border-neutral-800 bg-neutral-800/40 p-2 text-xs text-neutral-400">
-                Аккаунт создаётся сразу во всех базах: игровой и сайтовой. Роль выдаётся
-                отдельно уже в списке - после создания.
-              </Typography>
-              {error ? <ErrorBlock title={error.message} /> : null}
-              <div className="flex items-center justify-end gap-2">
-                <Button
-                  type="button"
-                  background="default"
-                  className="h-8 text-sm font-semibold"
-                  onClick={() => usersAuthState.createUser.isOpen(ctx, false)}
-                >
-                  Отмена
-                </Button>
-                <Button
-                  type="submit"
-                  background="white"
-                  className="h-8 text-sm font-semibold"
-                  withSpinner
-                  isLoading={isPending}
-                  disabled={isPending}
-                >
-                  Создать
-                </Button>
-              </div>
-            </form>
-            <DialogClose />
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Portal>
-    </Dialog.Root>
-  )
-}, "CreateUser")
 
 const DeleteUser = reatomComponent(({ ctx }) => {
   const error = ctx.spy(usersAuth.deleteUser.submit.errorAtom)
@@ -168,10 +92,102 @@ const DeleteUser = reatomComponent(({ ctx }) => {
   )
 }, "DeleteUser")
 
+const InviteUser = reatomComponent(({ ctx }) => {
+  const open = ctx.spy(usersAuthState.invite.isOpen)
+  const link = ctx.spy(usersAuthState.invite.link)
+  const error = ctx.spy(usersAuth.invite.errorAtom)
+  const isPending = ctx.spy(usersAuth.invite.statusesAtom).isPending
+
+  const close = () => {
+    usersAuthState.invite.isOpen(ctx, false)
+    usersAuthState.invite.link.reset(ctx)
+    usersAuthState.invite.nickname.reset(ctx)
+  }
+
+  return (
+    <Dialog.Root
+      open={open}
+      onOpenChange={({ open: next }) => (next ? usersAuthState.invite.isOpen(ctx, true) : close())}
+    >
+      <Dialog.Trigger asChild>
+        <Button background="positive" className="h-8 text-sm font-semibold">
+          Пригласить
+        </Button>
+      </Dialog.Trigger>
+      <Portal>
+        <Dialog.Backdrop className={dialogVariant.backdrop()} />
+        <Dialog.Positioner className={dialogVariant.positioner()}>
+          <Dialog.Content className={dialogVariant.content("w-full max-w-md")}>
+            <DialogTitle className={dialogVariant.title()}>Приглашение игрока</DialogTitle>
+            {link ? (
+              <div className="flex w-full flex-col gap-3">
+                <Typography className="text-xs text-neutral-400">
+                  Ссылка действует 7 дней. Аккаунт уже создан во всех базах, пароль игрок задаст сам.
+                </Typography>
+                <Input readOnly value={link} onFocus={(event) => event.currentTarget.select()} />
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    type="button"
+                    background="white"
+                    className="h-8 text-sm font-semibold"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(link)
+                      toast.success("Ссылка скопирована")
+                    }}
+                  >
+                    Скопировать
+                  </Button>
+                  <Button type="button" background="default" className="h-8 text-sm font-semibold" onClick={close}>
+                    Готово
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={(event) => usersAuth.invite(ctx, event)}
+                className="flex w-full flex-col gap-3"
+              >
+                <Field label="Никнейм" hint="Аккаунт создаётся сразу, пароль игрок задаст по ссылке">
+                  <Input
+                    value={ctx.spy(usersAuthState.invite.nickname)}
+                    onChange={(event) => usersAuthState.invite.nickname(ctx, event.target.value)}
+                    placeholder="Steve"
+                    minLength={3}
+                    maxLength={16}
+                    required
+                    autoFocus
+                  />
+                </Field>
+                {error ? <ErrorBlock title={error.message} /> : null}
+                <div className="flex items-center justify-end gap-2">
+                  <Button type="button" background="default" className="h-8 text-sm font-semibold" onClick={close}>
+                    Отмена
+                  </Button>
+                  <Button
+                    type="submit"
+                    background="white"
+                    className="h-8 text-sm font-semibold"
+                    withSpinner
+                    isLoading={isPending}
+                    disabled={isPending}
+                  >
+                    Создать ссылку
+                  </Button>
+                </div>
+              </form>
+            )}
+            <DialogClose />
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
+  )
+}, "InviteUser")
+
 export const UsersManagement = () => {
   return (
     <div className="flex shrink-0 items-center gap-2">
-      <CreateUser />
+      <InviteUser />
       <DeleteUser />
     </div>
   )
