@@ -1,6 +1,5 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
 import { usersState } from "../../models/users.model"
-import { UsersManagement } from "./users-management"
 import { UsersFilters, UsersFiltersViewer } from "./users.filters"
 
 const UsersFiltersScrollTop = reatomComponent(({ ctx }) => {
@@ -23,7 +22,6 @@ export const UsersHeader = () => {
       <UsersFiltersScrollTop />
       <UsersFiltersViewer />
       <UsersFilters />
-      <UsersManagement />
     </>
   )
 }

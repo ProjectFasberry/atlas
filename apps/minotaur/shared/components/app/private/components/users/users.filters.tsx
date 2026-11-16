@@ -11,6 +11,7 @@ import { menuVariant } from "@/shared/ui/menu";
 import { createViewerModel } from "@/shared/models/shared.model";
 import { Checkbox } from "@ark-ui/react/checkbox";
 import { checkboxVariant } from "@/shared/ui/checkbox";
+import { UsersManagement } from "./users-management";
 
 const UsersGlobalActions = reatomComponent(({ ctx }) => {
   const isSelectedOver = ctx.spy(usersSelectedOverAtom);
@@ -180,7 +181,10 @@ export const UsersFilters = reatomComponent(({ ctx }) => {
         return () => un()
       }}
     >
-      <UsersFiltersLength />
+      <div className="flex w-full items-center justify-between gap-2">
+        <UsersFiltersLength />
+        <UsersManagement />
+      </div>
       <div
         className="
           flex duration-100 ease-in opacity-100 flex-col min-w-0 sm:flex-row sm:items-center justify-between w-full gap-2 h-full

@@ -1,7 +1,7 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import {
   isCheckedAtom, type PrivatedUser, users, usersListInView, usersRestrict,
-  usersRestrictState, usersState, usersDataArrAtom, usersRoles
+  usersRestrictState, usersState, usersDataArrAtom, usersRoles, usersAuth
 } from "../../models/users.model";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { currentUser } from "@/shared/models/current-user/index.model";
@@ -118,6 +118,16 @@ const UsersItemMenuBody = reatomComponent<{
             {nickname && roleId ? <UserMenuRoles nickname={nickname} currentRoleId={roleId} /> : null}
             {nickname ? <div className="my-1 h-px bg-neutral-800" /> : null}
             {nickname ? <UserActionsWrapper nickname={nickname} type="single" /> : null}
+            {nickname ? <div className="my-1 h-px bg-neutral-800" /> : null}
+            {nickname ? (
+              <Menu.Item
+                value="delete-user"
+                className={`${menuVariant.item()} text-red`}
+                onClick={() => usersAuth.requestDelete(ctx, nickname)}
+              >
+                Удалить пользователя
+              </Menu.Item>
+            ) : null}
           </div>
         </Menu.Content>
       </Menu.Positioner>
