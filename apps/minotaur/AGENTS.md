@@ -32,6 +32,27 @@ adds only minotaur specifics.
   permission and mirror the same permission in the sidebar. The client guard is
   UX only; the API enforces access.
 
+## Formatting
+
+Biome's formatter is disabled for this app (`biome.json` override), so the style
+is maintained by hand. Match these rules in new and edited files:
+
+- New code: no semicolons at the end of statements, double quotes, 2-space
+  indent, trailing commas in multi-line literals and arrays. Older files still
+  carry semicolons; keep each file internally consistent instead of reformatting
+  unrelated lines.
+- JSX: a short element stays on one line; a longer one puts every prop on its own
+  line and closes `>` or `/>` on its own line.
+- Long `className` strings wrap inside the attribute with continuation lines
+  indented two spaces; do not rebuild them with template literals unless a value
+  is interpolated.
+- Tailwind v4 gradient utilities: `bg-linear-to-r`, never `bg-gradient-to-r`.
+- Do not nest ternaries in render. Use an early return, a small local component
+  (`*Skeleton`, `*Empty`, `*Error`) or `cond && (...)`, and compute branch values
+  above `return` instead of `a ? b : c ? d : e`.
+- Every user-facing string goes through `translate[...]`; hardcoded Russian or
+  English text in components is a bug.
+
 ## Docs
 
 Topic guides live in [`agent-docs/`](./agent-docs/README.md): views, models,

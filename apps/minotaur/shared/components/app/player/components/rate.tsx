@@ -33,13 +33,22 @@ type RateButtonProps = PlayerRatePayload & {
   self?: boolean
 }
 
+type RateButtonState = "self" | "rated" | "unrated"
+
+const rateButtonState = ({ self, isRated }: { self?: boolean, isRated?: boolean }): RateButtonState => {
+  if (self) return "self"
+  if (isRated) return "rated"
+  return "unrated"
+}
+
 const RateButton = reatomComponent<RateButtonProps>(({ ctx, count, nickname, isRated, self }) => {
-  const state = self ? "self" : isRated ? "rated" : "unrated"
+  const state = rateButtonState({ self, isRated })
+  const dataState = self ? "filled" : state
   const { base, child } = rateButtonVariant({ state })
 
   return (
     <Button
-      data-state={self ? "filled" : isRated ? "rated" : "unrated"}
+      data-state={dataState}
       disabled={ctx.spy(player.rate.submit.statusesAtom).isPending}
       onClick={() =>
         self

@@ -165,6 +165,12 @@ const WalletBalances = reatomComponent(({ ctx }) => {
   );
 }, "EconomyWallet");
 
+const projectedColor = ({ insufficient, isCredit }: { insufficient: boolean, isCredit: boolean }) => {
+  if (insufficient) return "text-red"
+  if (isCredit) return "text-green-500"
+  return "text-neutral-50"
+}
+
 const AdjustForm = reatomComponent(({ ctx }) => {
   const wallet = ctx.spy(economyState.wallet);
   const currency = ctx.spy(economyState.form.currency);
@@ -278,10 +284,7 @@ const AdjustForm = reatomComponent(({ ctx }) => {
           <span className="text-sm font-semibold text-neutral-400">{number.format(currentBalance)}</span>
           <Icon name="sprite:arrow-right" className="size-4 text-neutral-500" />
           <span
-            className={clsx(
-              "text-base font-semibold",
-              insufficient ? "text-red" : isCredit ? "text-green-500" : "text-neutral-50"
-            )}
+            className={clsx("text-base font-semibold", projectedColor({ insufficient, isCredit }))}
           >
             {number.format(projected)}
           </span>

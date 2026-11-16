@@ -385,7 +385,8 @@
         "variants": {
           "animation": "Show animation"
         }
-      }
+      },
+      "server_unavailable": "the server is unavailable"
     },
     "purchases": {
       "title": "Purchases",
@@ -629,7 +630,18 @@
       "description": "List of available web maps for Fasberry game servers"
     },
     "title": "Choose a server",
-    "goTo": "Go to"
+    "goTo": "Open map",
+    "online": "online",
+    "offline": "offline",
+    "players": "Playing now: {count}",
+    "description": "Web map of the world with lands and builds.",
+    "summary": "{count} players on the project right now",
+    "sort": {
+      "label": "Sorting",
+      "online": "Online first",
+      "name": "By name"
+    },
+    "empty": "The map is not available yet"
   },
   "news": {
     "page": {
@@ -884,5 +896,106 @@
     "include-3": "Screenshots or video",
     "include-4": "Payment receipt if the issue is about a purchase",
     "tip": "The more details, the faster we can look into it."
+  },
+  "home": {
+    "hero": {
+      "welcome": "Welcome back, {nickname}",
+      "brand": "Fasberry",
+      "title_user": "Your adventure continues",
+      "title_guest": "A world you build yourself",
+      "text_user": "Tasks, referrals and your land - all in one place. Join the game or catch up on the news.",
+      "text_guest": "Survival, lands, events and a friendly community. Start in a couple of minutes - all you need is a nickname and a password.",
+      "online": "{count} online",
+      "play": "How to play",
+      "register": "Create an account",
+      "download": "Download the launcher"
+    },
+    "balance": {
+      "title": "Balance",
+      "to_store": "Open the store"
+    },
+    "tasks": {
+      "title": "Tasks",
+      "all": "All",
+      "empty": "No active tasks yet"
+    },
+    "referrals": {
+      "title": "Referrals",
+      "more": "Details",
+      "left": "left in 12 months",
+      "copy": "Copy the link",
+      "copied": "Link copied",
+      "failed": "Can't issue a link right now"
+    },
+    "land": {
+      "title": "Your land",
+      "all": "Lands",
+      "level": "Level {level}",
+      "empty": "You have no land yet",
+      "create": "Create land"
+    },
+    "steps": {
+      "title": "Start in 3 steps",
+      "action": "Create an account",
+      "one_title": "Create an account",
+      "one_text": "A nickname and a password are all you need.",
+      "two_title": "Install the launcher",
+      "two_text": "Version 1.20.x, client mods are optional.",
+      "three_title": "Open the launcher",
+      "three_text": "Sign in with your account and pick a server."
+    },
+    "top": {
+      "title": "Top by playtime",
+      "all": "Rating",
+      "empty": "The rating is empty"
+    },
+    "store": {
+      "title": "Support the project",
+      "all": "Store",
+      "empty": "The storefront is coming soon"
+    },
+    "faq": {
+      "title": "FAQ",
+      "q1": "Do I need a Minecraft license?",
+      "a1": "No, the server runs in offline mode: a nickname is enough.",
+      "q2": "Which versions are supported?",
+      "a2": "Java Edition 1.20.1-1.20.4, joined through our launcher.",
+      "q3": "Is the server paid?",
+      "a3": "Playing is free. Donating speeds up progress but gives no combat advantage.",
+      "q4": "What are lands?",
+      "a4": "Your own protected territory with members and stats - the core of survival."
+    },
+    "season": {
+      "title": "What's happening",
+      "latest": "Latest news",
+      "all": "All news"
+    }
+  },
+  "private": {
+    "tasks": {
+      "title": "Tasks",
+      "created": "Task created",
+      "updated": "Task updated",
+      "deleted": "Task deleted",
+      "deleteTitle": "Delete the task \"{title}\"?",
+      "empty": "No tasks yet",
+      "expires": "until {date}",
+      "noExpires": "no deadline",
+      "expired": "expired",
+      "form": {
+        "createTitle": "New task",
+        "editTitle": "Edit task",
+        "title": "Title",
+        "description": "Description",
+        "link": "Link",
+        "linkHint": "Where the \"Complete\" button leads",
+        "reward": "Reward",
+        "currency": "Currency",
+        "expires": "Expires",
+        "expiresHint": "Empty means no deadline",
+        "submit": "Save",
+        "cancel": "Cancel"
+      }
+    }
   }
 }

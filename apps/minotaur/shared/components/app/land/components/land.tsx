@@ -299,7 +299,7 @@ const LandHead = reatomComponent(({ ctx }) => {
       <Typography className="text-2xl xl:text-3xl font-semibold">
         {land.name}
       </Typography>
-      {editing ? (
+      {editing && (
         <div className="flex flex-col gap-1 w-full">
           <textarea
             value={title}
@@ -317,9 +317,8 @@ const LandHead = reatomComponent(({ ctx }) => {
           </span>
           {title && <FormattedText as="span" text={title} />}
         </div>
-      ) : land.title ? (
-        <FormattedText as="span" text={land.title} />
-      ) : null}
+      )}
+      {!editing && land.title && <FormattedText as="span" text={land.title} />}
     </>
   )
 }, "LandHead")

@@ -527,6 +527,12 @@ const SKIN_ANIMATIONS: { animation: SkinAnimationType; icon: IconName }[] = [
   { animation: "flying", icon: "sprite:butterfly" },
 ];
 
+const SKIN_ANIMATION_LABELS = {
+  idle: "player.skin.controls.idle",
+  run: "player.skin.controls.run",
+  flying: "player.skin.controls.flying",
+} as const
+
 const SkinControlsListItem = reatomComponent<typeof SKIN_ANIMATIONS[number]>(({ ctx, animation, icon }) => {
   const variant = (animation: typeof SKIN_ANIMATIONS[number]["animation"]) => ctx.spy(skin.animation.type) === animation
     ? "active" : "default"
@@ -535,13 +541,7 @@ const SkinControlsListItem = reatomComponent<typeof SKIN_ANIMATIONS[number]>(({ 
     <button
       type="button"
       onClick={() => skin.animation.type(ctx, animation)}
-      aria-label={translate[
-        animation === "idle"
-          ? "player.skin.controls.idle"
-          : animation === "run"
-            ? "player.skin.controls.run"
-            : "player.skin.controls.flying"
-      ]()}
+      aria-label={translate[SKIN_ANIMATION_LABELS[animation]]()}
       className={skinControlVariants({ variant: variant(animation) })}
     >
       <Icon name={icon} className="size-4" />

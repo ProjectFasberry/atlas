@@ -328,23 +328,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/privated/user/permission": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Change player permission */
-        post: operations["postPrivatedUserPermission"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/privated/user/auth/register": {
         parameters: {
             query?: never;
@@ -373,6 +356,23 @@ export interface paths {
         put?: never;
         /** Unregister player */
         post: operations["postPrivatedUserAuthUnregister"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/user/auth/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite player */
+        post: operations["postPrivatedUserAuthInvite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1130,6 +1130,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/tasks/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tasks for the panel */
+        get: operations["getPrivatedTasksList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/tasks/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a task */
+        post: operations["postPrivatedTasksCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/tasks/{id}/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update a task */
+        post: operations["postPrivatedTasksByIdEdit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a task */
+        delete: operations["deletePrivatedTasksById"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/api/keys/create": {
         parameters: {
             query?: never;
@@ -1599,6 +1667,40 @@ export interface paths {
         put?: never;
         /** Verify a reconnect pass for the proxy gate */
         post: operations["postLauncherSessionReconnect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/launcher/session/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check the 24h game session for the proxy gate */
+        post: operations["postLauncherSessionCheck"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/launcher/session/limbo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Authenticate a player from the auth limbo */
+        post: operations["postLauncherSessionLimbo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2315,6 +2417,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/link/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check registration link */
+        get: operations["getAuthLinkCheck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/link/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept registration link */
+        post: operations["postAuthLinkAccept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/validate-session": {
         parameters: {
             query?: never;
@@ -2763,6 +2899,40 @@ export interface paths {
         get: operations["getServerReferralsList"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/server/referrals/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get referral stats */
+        get: operations["getServerReferralsMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/server/referrals/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create referral link */
+        post: operations["postServerReferralsLink"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4024,7 +4194,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             ok: boolean;
-                            type: "unlogin" | ("ban" | "unban" | "unmute" | "mute" | "kick") | ("change_role" | "reset") | ("add" | "remove");
+                            type: "unlogin" | ("ban" | "unban" | "unmute" | "mute" | "kick") | ("change_role" | "reset");
                             payload: string[];
                         };
                     };
@@ -4089,7 +4259,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             ok: boolean;
-                            type: "unlogin" | ("ban" | "unban" | "unmute" | "mute" | "kick") | ("change_role" | "reset") | ("add" | "remove");
+                            type: "unlogin" | ("ban" | "unban" | "unmute" | "mute" | "kick") | ("change_role" | "reset");
                             payload: string[];
                         };
                     };
@@ -4145,61 +4315,31 @@ export interface operations {
                     "application/json": {
                         data: {
                             ok: boolean;
-                            type: "unlogin" | ("ban" | "unban" | "unmute" | "mute" | "kick") | ("change_role" | "reset") | ("add" | "remove");
+                            type: "unlogin" | ("ban" | "unban" | "unmute" | "mute" | "kick") | ("change_role" | "reset");
                             payload: string[];
                         };
                     };
                 };
             };
-        };
-    };
-    postPrivatedUserPermission: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /**
-                     * @default add
-                     * @enum {string}
-                     */
-                    type: "add" | "remove";
-                    target: number;
-                    nicknames: string[];
-                };
-                "application/x-www-form-urlencoded": {
-                    /**
-                     * @default add
-                     * @enum {string}
-                     */
-                    type: "add" | "remove";
-                    target: number;
-                    nicknames: string[];
-                };
-                "multipart/form-data": {
-                    /**
-                     * @default add
-                     * @enum {string}
-                     */
-                    type: "add" | "remove";
-                    target: number;
-                    nicknames: string[];
-                };
-            };
-        };
-        responses: {
-            /** @description Response for status 200 */
-            200: {
+            /** @description Response for status 400 */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: Record<string, never>;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
@@ -4286,6 +4426,88 @@ export interface operations {
                         data: {
                             nickname: string;
                         };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedUserAuthInvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    nickname: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    nickname: string;
+                };
+                "multipart/form-data": {
+                    nickname: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            token: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
@@ -6178,6 +6400,213 @@ export interface operations {
             };
         };
     };
+    getPrivatedTasksList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            title: string;
+                            description: string;
+                            action_type: string;
+                            action_value: (string | null) | null;
+                            reward_currency: string;
+                            reward_value: number;
+                            /** Format: date-time */
+                            created_at: string;
+                            expires: (string | null) | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedTasksCreate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string;
+                    description: string;
+                    /**
+                     * @default link
+                     * @enum {string}
+                     */
+                    action_type: "link";
+                    action_value?: (string | null) | null;
+                    /**
+                     * @default BELKOIN
+                     * @enum {string}
+                     */
+                    reward_currency: "BELKOIN" | "CHARISM";
+                    reward_value: number;
+                    expires?: ((string | (Record<string, never> | string | number)) | null) | null;
+                };
+                "application/x-www-form-urlencoded": {
+                    title: string;
+                    description: string;
+                    /**
+                     * @default link
+                     * @enum {string}
+                     */
+                    action_type: "link";
+                    action_value?: (string | null) | null;
+                    /**
+                     * @default BELKOIN
+                     * @enum {string}
+                     */
+                    reward_currency: "BELKOIN" | "CHARISM";
+                    reward_value: number;
+                    expires?: ((string | (Record<string, never> | string | number)) | null) | null;
+                };
+                "multipart/form-data": {
+                    title: string;
+                    description: string;
+                    /**
+                     * @default link
+                     * @enum {string}
+                     */
+                    action_type: "link";
+                    action_value?: (string | null) | null;
+                    /**
+                     * @default BELKOIN
+                     * @enum {string}
+                     */
+                    reward_currency: "BELKOIN" | "CHARISM";
+                    reward_value: number;
+                    expires?: ((string | (Record<string, never> | string | number)) | null) | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            title: string;
+                            description: string;
+                            action_type: string;
+                            action_value: (string | null) | null;
+                            reward_currency: string;
+                            reward_value: number;
+                            /** Format: date-time */
+                            created_at: string;
+                            expires: (string | null) | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedTasksByIdEdit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default title
+                     * @enum {string}
+                     */
+                    field: "title" | "description" | "action_type" | "action_value" | "reward_currency" | "reward_value" | "expires";
+                    value: string | number | null;
+                }[];
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default title
+                     * @enum {string}
+                     */
+                    field: "title" | "description" | "action_type" | "action_value" | "reward_currency" | "reward_value" | "expires";
+                    value: string | number | null;
+                }[];
+                "multipart/form-data": {
+                    /**
+                     * @default title
+                     * @enum {string}
+                     */
+                    field: "title" | "description" | "action_type" | "action_value" | "reward_currency" | "reward_value" | "expires";
+                    value: string | number | null;
+                }[];
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            title: string;
+                            description: string;
+                            action_type: string;
+                            action_value: (string | null) | null;
+                            reward_currency: string;
+                            reward_value: number;
+                            /** Format: date-time */
+                            created_at: string;
+                            expires: (string | null) | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    deletePrivatedTasksById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+        };
+    };
     postPrivatedApiKeysCreate: {
         parameters: {
             query?: never;
@@ -7276,6 +7705,155 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postLauncherSessionCheck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    nickname: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    nickname: string;
+                };
+                "multipart/form-data": {
+                    nickname: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postLauncherSessionLimbo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    nickname: string;
+                    password: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    nickname: string;
+                    password: string;
+                };
+                "multipart/form-data": {
+                    nickname: string;
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default PASSWORD_OR_LOGIN_INCORRECT
+                         * @enum {string}
+                         */
+                        error: "PASSWORD_OR_LOGIN_INCORRECT";
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TOO_MANY_REQUESTS
+                         * @enum {string}
+                         */
+                        error: "TOO_MANY_REQUESTS";
                     };
                 };
             };
@@ -8534,22 +9112,16 @@ export interface operations {
                     nickname: string;
                     password: string;
                     findout: string;
-                    /** @enum {string} */
-                    findoutType: "custom" | "referrer";
                 };
                 "application/x-www-form-urlencoded": {
                     nickname: string;
                     password: string;
                     findout: string;
-                    /** @enum {string} */
-                    findoutType: "custom" | "referrer";
                 };
                 "multipart/form-data": {
                     nickname: string;
                     password: string;
                     findout: string;
-                    /** @enum {string} */
-                    findoutType: "custom" | "referrer";
                 };
             };
         };
@@ -8579,6 +9151,189 @@ export interface operations {
                          * @enum {string}
                          */
                         error: "USER_EXISTS" | "PASSWORD_IS_UNSAFE" | "AUTHORIZATION_DISABLED" | "IP_RESTRICTIONS" | "TOKEN_IS_NOT_PROVIDED" | "TOKEN_NOT_FOUND" | "CAP_UNAVAILABLE";
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    getAuthLinkCheck: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /**
+                             * @default invite
+                             * @enum {string}
+                             */
+                            kind: "invite" | "referral";
+                            nickname: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 410 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postAuthLinkAccept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                    password: string;
+                    nickname?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    token: string;
+                    password: string;
+                    nickname?: string;
+                };
+                "multipart/form-data": {
+                    token: string;
+                    password: string;
+                    nickname?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 410 */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
@@ -10075,6 +10830,83 @@ export interface operations {
                                 avatar: string;
                             };
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    getServerReferralsMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            used: number;
+                            remaining: number;
+                            limit: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postServerReferralsLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            token: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                            used: number;
+                            remaining: number;
+                            limit: number;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };

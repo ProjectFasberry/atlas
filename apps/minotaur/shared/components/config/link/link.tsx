@@ -10,18 +10,16 @@ type LinkProps = ComponentPropsWithRef<"a"> & {
 
 const normalize = (p: string) => (p || "/").replace(/\/+$/, "") || "/";
 
+const withLocale = (href: string, locale?: string) => {
+  if (!locale) return href.startsWith("/") ? href : `/${href}`;
+  return href.startsWith("/") ? `/${locale}${href}` : `/${locale}/${href}`;
+};
+
 export const Link = ({ href, locale, className, active, ...props }: LinkProps) => {
   const pageCtx = usePageContext();
   const pathname = pageCtx.urlPathname ?? "/";
 
-  const finalHref =
-    href.startsWith("/")
-      ? locale
-        ? `/${locale}${href}`
-        : href
-      : locale
-        ? `/${locale}/${href}`
-        : `/${href}`;
+  const finalHref = withLocale(href, locale);
 
   const normalizedPathname = normalize(pathname);
   const normalizedHref = normalize(finalHref);

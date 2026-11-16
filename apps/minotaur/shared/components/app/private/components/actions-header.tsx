@@ -9,6 +9,7 @@ import { eventsSection } from "./events"
 import { modpackSection } from "./modpack"
 import { landsSection } from "./lands"
 import { apiKeysSection } from "./api"
+import { tasksSection } from "./tasks"
 
 type ComponentType = Nullable<() => ReactNode>;
 
@@ -47,6 +48,11 @@ const COMPONENTS: Record<string, Partial<Record<ActionType, ComponentType>>> = {
     "create": apiKeysSection.Header.Create,
     "edit": apiKeysSection.Header.Edit,
     "view": apiKeysSection.Header.View
+  },
+  "task": {
+    "create": tasksSection.Header.Create,
+    "edit": tasksSection.Header.Edit,
+    "view": tasksSection.Header.View
   }
 }
 

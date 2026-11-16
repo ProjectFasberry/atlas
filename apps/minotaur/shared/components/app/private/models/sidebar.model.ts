@@ -65,7 +65,7 @@ const NAMESPACE_TITLES: Record<string, string> = {
 const NAMESPACE_ORDER = [
   "players", "store", "economy", "lands", "skins", "news", "events",
   "team", "servers", "releases", "modpacks", "banners", "dictionaries",
-  "roles", "permissions", "metrics", "history", "options", "api", "volume",
+  "roles", "permissions", "metrics", "history", "options", "api", "tasks", "volume",
 ]
 
 const PERMISSION_TITLES: Record<string, string> = {
@@ -111,6 +111,10 @@ const PERMISSION_TITLES: Record<string, string> = {
   "store.item.update": "Изменение товаров",
   "store.methods.read": "Просмотр методов оплаты",
   "store.methods.update": "Изменение методов оплаты",
+  "tasks.create": "Создание заданий",
+  "tasks.delete": "Удаление заданий",
+  "tasks.read": "Просмотр заданий",
+  "tasks.update": "Изменение заданий",
   "team.applications.read": "Просмотр заявок",
   "team.applications.update": "Обработка заявок",
   "volume.control": "Управление файлами",
@@ -205,7 +209,7 @@ export type SidebarLink = { title: string, value: string, permissions: string[],
 
 export const sidebarLinks: SidebarLink[] = [
   { title: "Конфигурация", value: "/private/", permissions: [CONFIG_PANEL_READ_PERMISSION], icon: "sprite:settings" },
-  { title: "Контент", value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "modpacks.create", "modpacks.delete", LANDS_READ_PERMISSION], icon: "sprite:category" },
+  { title: "Контент", value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "modpacks.create", "modpacks.delete", "tasks.create", "tasks.update", "tasks.delete", LANDS_READ_PERMISSION], icon: "sprite:category" },
   { title: "Магазин", value: "/private/store", permissions: [STORE_ITEM_READ_PERMISSION], icon: "sprite:building-store" },
   { title: "Игрок", value: "/private/users", permissions: [PLAYERS_READ_PERMISSION], icon: "sprite:user-circle" },
   { title: "Модерация", value: "/private/moderation", permissions: [TEAM_APPLICATIONS_READ_PERMISSION, HISTORY_READ_PERMISSION], icon: "sprite:shield-half" },

@@ -114,11 +114,13 @@ const BalanceCardContent = reatomComponent<BalanceCardProps>(({ ctx, value, wall
               draggable={false}
               className='select-none'
             />
-            {isLoading
-              ? <Skeleton className="h-8 w-24" />
-              : wallet === "CHARISM" && !serverAvailable
-                ? <Typography className="text-sm text-neutral-400">сервер недоступен</Typography>
-                : <CardValue value={value} />}
+            {isLoading && <Skeleton className="h-8 w-24" />}
+            {!isLoading && wallet === "CHARISM" && !serverAvailable && (
+              <Typography className="text-sm text-neutral-400">
+                {translate["player.balance.server_unavailable"]()}
+              </Typography>
+            )}
+            {!isLoading && !(wallet === "CHARISM" && !serverAvailable) && <CardValue value={value} />}
           </div>
 
         </div>

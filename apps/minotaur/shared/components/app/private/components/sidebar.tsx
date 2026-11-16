@@ -3,6 +3,7 @@ import { tv } from "tailwind-variants"
 import { getFromDictionary } from "@/shared/models/app/utils";
 import { currentUserState } from "@/shared/models/current-user/index.model";
 import { reatomComponent } from "@reatom/npm-react";
+import { type AtomState } from "@reatom/framework";
 import { clsx } from "cnfast";
 import { Typography } from "@/shared/ui/typography"
 import { Icon } from "@/shared/ui/icon"
@@ -26,6 +27,57 @@ const InfoCell = ({ label, value }: { label: string, value: string }) => (
     <span className="truncate text-sm font-semibold">{value}</span>
   </div>
 )
+
+type PermissionGroups = AtomState<typeof permissionGroupsAtom>
+
+const PermissionsGrid = ({ groups }: { groups: PermissionGroups }) => (
+  <div className="grid w-full gap-2 sm:grid-cols-2">
+    {groups.map((group) => (
+      <div
+        key={group.key}
+        className="flex flex-col gap-1.5 rounded-xl border border-neutral-800 p-2"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <Typography className="text-sm font-semibold">
+            {group.title}
+          </Typography>
+          <span className="rounded-lg bg-neutral-800 px-1.5 py-0.5
+            text-[11px] font-medium text-neutral-400">
+            {group.items.length}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          {group.items.map((item) => (
+            <div
+              key={item.name}
+              className="flex items-start gap-1.5 rounded-lg bg-neutral-800/60 px-2 py-1"
+            >
+              <Icon
+                name={item.danger ? "sprite:shield-half" : "sprite:check"}
+                className={`size-3 shrink-0 mt-0.5 ${item.danger ? "text-red" : "text-green-500"}`}
+              />
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-[12px] text-neutral-200" title={item.name}>
+                  {item.title}
+                </span>
+                <span className="truncate font-mono text-[10px] text-neutral-500" title={item.name}>
+                  {item.name}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+)
+
+const PermissionsBody = ({ groups, permissionsCount }: { groups: PermissionGroups, permissionsCount: number }) => {
+  if (permissionsCount === 0) return <Noop title="Права не назначены" />
+  if (groups.length === 0) return <Noop title="Ничего не найдено" />
+
+  return <PermissionsGrid groups={groups} />
+}
 
 const UserInfo = reatomComponent(({ ctx }) => {
   const open = ctx.spy(sidebar.infoIsOpened)
@@ -160,51 +212,7 @@ const UserInfo = reatomComponent(({ ctx }) => {
                 className: "flex min-h-0 w-full flex-1 flex-col gap-2 overflow-y-auto pr-1"
               })}
             >
-              {permissionsCount === 0
-                ? <Noop title="Права не назначены" />
-                : groups.length === 0
-                  ? <Noop title="Ничего не найдено" />
-                  : (
-                    <div className="grid w-full gap-2 sm:grid-cols-2">
-                      {groups.map((group) => (
-                        <div
-                          key={group.key}
-                          className="flex flex-col gap-1.5 rounded-xl border border-neutral-800 p-2"
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <Typography className="text-sm font-semibold">
-                              {group.title}
-                            </Typography>
-                            <span className="rounded-lg bg-neutral-800 px-1.5 py-0.5
-                              text-[11px] font-medium text-neutral-400">
-                              {group.items.length}
-                            </span>
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            {group.items.map((item) => (
-                              <div
-                                key={item.name}
-                                className="flex items-start gap-1.5 rounded-lg bg-neutral-800/60 px-2 py-1"
-                              >
-                                <Icon
-                                  name={item.danger ? "sprite:shield-half" : "sprite:check"}
-                                  className={`size-3 shrink-0 mt-0.5 ${item.danger ? "text-red" : "text-green-500"}`}
-                                />
-                                <div className="flex min-w-0 flex-col">
-                                  <span className="truncate text-[12px] text-neutral-200" title={item.name}>
-                                    {item.title}
-                                  </span>
-                                  <span className="truncate font-mono text-[10px] text-neutral-500" title={item.name}>
-                                    {item.name}
-                                  </span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              <PermissionsBody groups={groups} permissionsCount={permissionsCount} />
             </div>
             <DialogClose />
           </Dialog.Content>

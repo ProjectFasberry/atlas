@@ -7,6 +7,22 @@ import { type Data, type OrderSingleGamePayload } from "@/pages/store/order/@id/
 import { createLink } from "@/shared/components/config/link/link.model";
 import { translate } from "@/shared/locales/helpers";
 
+const OrderStatus = ({ status, finishedAt }: { status: string, finishedAt?: Date | null }) => {
+  if (status === "refunded") {
+    return <span className="text-red">{translate["store.orders.status.refunded"]()}</span>
+  }
+
+  if (finishedAt) {
+    return (
+      <span className="text-green-600" title={dayjs(finishedAt).format("DD MMM YYYY, HH:mm")}>
+        {translate["store.order.completed"]()}
+      </span>
+    )
+  }
+
+  return <span className="text-neutral-400">{translate["store.order.in-progress"]()}</span>
+}
+
 export const GameOrder = reatomComponent(({ ctx }) => {
   const data = useData<Data>().data as OrderSingleGamePayload
 
@@ -31,12 +47,7 @@ export const GameOrder = reatomComponent(({ ctx }) => {
           </span>
         </Typography>
         <Typography className="text-neutral-50 text-lg">
-          {translate["store.order.status"]()}: {data.status === "refunded"
-            ? <span className="text-red">{translate["store.orders.status.refunded"]()}</span>
-            : data.finished_at
-              ? <span className="text-green-600" title={dayjs(data.finished_at).format("DD MMM YYYY, HH:mm")}>{translate["store.order.completed"]()}</span>
-              : <span className="text-neutral-400">{translate["store.order.in-progress"]()}</span>
-          }
+          {translate["store.order.status"]()}: <OrderStatus status={data.status} finishedAt={data.finished_at} />
         </Typography>
       </header>
       <section className="flex flex-col h-full gap-2 w-full">

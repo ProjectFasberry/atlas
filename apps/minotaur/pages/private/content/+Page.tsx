@@ -9,10 +9,11 @@ import { bannersSection } from "@/shared/components/app/private/components/banne
 import { eventsSection } from "@/shared/components/app/private/components/events"
 import { modpackSection } from "@/shared/components/app/private/components/modpack"
 import { landsSection } from "@/shared/components/app/private/components/lands"
+import { tasksSection } from "@/shared/components/app/private/components/tasks"
 import { createTabAtom, hasTabAccess, type PanelTab } from "@/shared/components/app/private/models/tabs.model"
 import { type ActionParent } from "@/shared/components/app/private/models/actions.model"
 
-type ContentTab = Extract<ActionParent, "news" | "banner" | "event" | "modpack" | "lands">
+type ContentTab = Extract<ActionParent, "news" | "banner" | "event" | "modpack" | "lands" | "task">
 
 const CONTENT_TABS: PanelTab<ContentTab>[] = [
   { value: "news", title: "Новости", permissions: ["news.create", "news.update", "news.delete"] },
@@ -20,6 +21,7 @@ const CONTENT_TABS: PanelTab<ContentTab>[] = [
   { value: "event", title: "Ивенты", permissions: ["events.create", "events.delete"] },
   { value: "modpack", title: "Модпаки", permissions: ["modpacks.create", "modpacks.delete"] },
   { value: "lands", title: "Регионы", permissions: ["lands.read"] },
+  { value: "task", title: "Задания", permissions: ["tasks.create", "tasks.update", "tasks.delete"] },
 ]
 
 const contentTab = createTabAtom("contentTab", CONTENT_TABS, "news")
@@ -48,6 +50,8 @@ const ContentSection = reatomComponent(({ ctx }) => {
         return { title: "Модпаки", wrapper: <modpackSection.Wrapper /> }
       case "lands":
         return { title: "Регионы", wrapper: <landsSection.Wrapper /> }
+      case "task":
+        return { title: "Задания", wrapper: <tasksSection.Wrapper /> }
     }
   })()
 

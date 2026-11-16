@@ -59,13 +59,16 @@ const Field = ({ label, required, hint, error, children }: PropsWithChildren<{
       {required && <span className="text-red"> *</span>}
     </span>
     {children}
-    {error
-      ? <span className="text-[11px] text-red">{error}</span>
-      : hint
-        ? <span className="text-[11px] text-neutral-500">{hint}</span>
-        : null}
+    {error && <span className="text-[11px] text-red">{error}</span>}
+    {!error && hint && <span className="text-[11px] text-neutral-500">{hint}</span>}
   </div>
 )
+
+const uploadLabel = ({ imageUploading, imgUrl }: { imageUploading: boolean, imgUrl?: string | null }) => {
+  if (imageUploading) return "Загрузка…"
+  if (imgUrl) return "Заменить"
+  return "Выбрать файл"
+}
 
 const fieldError = (ctx: CtxSpy, field: string, errors: Record<string, string>) => {
   if (!ctx.spy(createAttemptedAtom) && !ctx.spy(createTouchedAtom).has(field)) return undefined
@@ -255,7 +258,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
                 disabled={imageUploading}
                 onChange={e => onFile(e.target.files?.[0])}
               />
-              {imageUploading ? "Загрузка…" : imgUrl ? "Заменить" : "Выбрать файл"}
+              {uploadLabel({ imageUploading, imgUrl })}
             </label>
             {imgUrl && (
               <>
