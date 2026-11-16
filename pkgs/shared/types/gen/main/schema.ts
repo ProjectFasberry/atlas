@@ -753,6 +753,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/socials/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List linkable socials */
+        get: operations["getPrivatedSocialsList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/socials/{value}/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Toggle a linkable social */
+        post: operations["postPrivatedSocialsByValueEdit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/lands/list": {
         parameters: {
             query?: never;
@@ -5329,6 +5363,98 @@ export interface operations {
                     "application/json": {
                         /** @constant */
                         data: "OK";
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedSocialsList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            value: string;
+                            title: string;
+                            isAvailable: boolean;
+                        }[];
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedSocialsByValueEdit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                value: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    isAvailable: boolean;
+                };
+                "application/x-www-form-urlencoded": {
+                    isAvailable: boolean;
+                };
+                "multipart/form-data": {
+                    isAvailable: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            value: string;
+                            title: string;
+                            isAvailable: boolean;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SOCIAL_NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "SOCIAL_NOT_FOUND";
                     };
                 };
             };

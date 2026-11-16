@@ -15,6 +15,7 @@ import {
   STORE_ITEM_READ_PERMISSION,
   API_KEYS_LIST_PERMISSION,
   LANDS_READ_PERMISSION,
+  OPTIONS_READ_PERMISSION,
 } from "@/shared/consts/permissions";
 
 export const sidebar = atom(null).pipe(
@@ -221,6 +222,7 @@ export const sidebarLinks: SidebarLink[] = [
   { title: translate["panel.moderation"](), value: "/private/moderation", permissions: [TEAM_APPLICATIONS_READ_PERMISSION, HISTORY_READ_PERMISSION], icon: "sprite:shield-half" },
   { title: translate["panel.releases"](), value: "/private/releases", permissions: [RELEASES_READ_PERMISSION], icon: "sprite:download" },
   { title: translate["panel.analytics"](), value: "/private/analytics", permissions: [METRICS_READ_PERMISSION], icon: "sprite:aspect-ratio" },
+  { title: translate["panel.socials"](), value: "/private/socials", permissions: [OPTIONS_READ_PERMISSION], icon: "sprite:language" },
   { title: translate["panel.economy"](), value: "/private/economy", permissions: [ECONOMY_READ_PERMISSION], icon: "sprite:credit-card-pay" },
   { title: translate["panel.api-keys"](), value: "/private/api-keys", permissions: [API_KEYS_LIST_PERMISSION], icon: "sprite:lock" },
 ]

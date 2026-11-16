@@ -961,7 +961,7 @@
       "remove-description": "The social account will be removed from your profile. Continue?",
       "remove": "Unlink",
       "popup-blocked": "The browser blocked the window. Allow pop-ups for this site.",
-      "all-connected": "All available accounts are connected",
+      "all-connected": "No socials available to connect",
       "empty": "Nothing connected yet",
       "load-error": "Could not load connections",
       "errors": {
@@ -1850,7 +1850,12 @@
     "copy-suffix": "{title} (copy)",
     "refund-description": "{orderId}: {refundable} of {total} BELKOIN is refundable to {nickname}. The spent part of the top-up is not refunded; purchased items stay.",
     "roles-added": "Added {count} roles to {role}",
-    "permissions-removed": "Removed {count} permissions from {role}"
+    "permissions-removed": "Removed {count} permissions from {role}",
+    "socials": "Socials",
+    "socials-description": "Control which socials players can link. A disabled social disappears from the available list and rejects new links; already linked accounts stay.",
+    "socials-empty": "No socials found",
+    "socials-updated": "Social settings updated",
+    "socials-update-error": "Could not update the social"
   },
   "wallet": {
     "title": "Wallet",

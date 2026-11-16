@@ -4,6 +4,8 @@
  */
 export const CONFIG_PANEL_READ_PERMISSION = "config.panel.read"
 export const API_KEYS_LIST_PERMISSION = "api.keys.list"
+export const OPTIONS_READ_PERMISSION = "options.read"
+export const OPTIONS_UPDATE_PERMISSION = "options.update"
 export const API_KEYS_CONTROL_PERMISSION = "api.keys.control"
 export const ROLES_READ_PERMISSION = "roles.read"
 export const DICTIONARIES_READ_PERMISSION = "dictionaries.read"
