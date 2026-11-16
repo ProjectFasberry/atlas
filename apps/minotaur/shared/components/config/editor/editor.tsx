@@ -36,6 +36,8 @@ const ToolbarButton = ({ label, title, active, disabled, onClick, children }: To
     title={title ?? label}
     disabled={disabled}
     data-state={active ? "active" : "inactive"}
+    // Keep the editor selection alive while a toolbar button is pressed.
+    onMouseDown={(event) => event.preventDefault()}
     onClick={onClick}
     className={controlVariant()}
   >

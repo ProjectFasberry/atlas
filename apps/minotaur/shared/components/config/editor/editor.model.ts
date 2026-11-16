@@ -138,6 +138,11 @@ export function applyLink(editor: Editor, raw: string): LinkValidation {
   if (!result.ok) return result;
 
   if (editor.state.selection.empty) {
+    if (editor.isActive("link")) {
+      editor.chain().focus().extendMarkRange("link").setLink({ href: result.url }).run();
+      return result;
+    }
+
     editor
       .chain()
       .focus()
@@ -147,14 +152,20 @@ export function applyLink(editor: Editor, raw: string): LinkValidation {
     return result;
   }
 
-  editor.chain().focus().extendMarkRange("link").setLink({ href: result.url }).run();
+  // A non-empty selection keeps its bounds: only the highlighted text is
+  // linked, never the whole existing link around it.
+  editor.chain().focus().setLink({ href: result.url }).run();
 
   return result;
 }
 
-/** Removes the link mark from the whole link under the cursor, not one character. */
+/**
+ * `unsetLink` already extends an empty range to the whole link, so a plain
+ * cursor removes the link and a real selection removes only its own text.
+ * Calling `extendMarkRange` here would eat the whole link on any selection.
+ */
 export function removeLink(editor: Editor) {
-  return editor.chain().focus().extendMarkRange("link").unsetLink().run();
+  return editor.chain().focus().unsetLink().run();
 }
 
 /** Fresh instances: Tiptap binds an extension to its editor, so tests and each

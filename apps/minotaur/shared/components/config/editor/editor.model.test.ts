@@ -88,6 +88,35 @@ describe("applyLink", () => {
 	});
 });
 
+describe("link selection", () => {
+	it("unlinks only the selected part of a link", () => {
+		const editor = createEditor("<p>hello world</p>");
+		editor.commands.selectAll();
+		applyLink(editor, "https://fasberry.su/wiki");
+
+		editor.commands.setTextSelection({ from: 1, to: 6 });
+		removeLink(editor);
+
+		const html = editor.getHTML();
+		expect(html).toContain("hello");
+		expect(html.match(/<a /g)).toHaveLength(1);
+		expect(html).toMatch(/<a [^>]*> world<\/a>/);
+	});
+
+	it("relinks only the selected part when a new url is applied", () => {
+		const editor = createEditor("<p>hello world</p>");
+		editor.commands.selectAll();
+		applyLink(editor, "https://fasberry.su/wiki");
+
+		editor.commands.setTextSelection({ from: 1, to: 6 });
+		applyLink(editor, "https://discord.gg/X4x6Unj89g");
+
+		const html = editor.getHTML();
+		expect(html).toContain('href="https://discord.gg/X4x6Unj89g"');
+		expect(html).toContain('href="https://fasberry.su/wiki"');
+	});
+});
+
 describe("removeLink", () => {
 	it("removes the whole link under the cursor", () => {
 		const editor = createEditor();

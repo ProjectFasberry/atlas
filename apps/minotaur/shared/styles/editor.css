@@ -105,6 +105,11 @@
   color: var(--color-green-400);
 }
 
+/* Inside the editor a link is text to select, not a clickable target. */
+.tiptap .ProseMirror a {
+  cursor: text;
+}
+
 .tiptap table {
   border-collapse: collapse;
   margin: 0;
