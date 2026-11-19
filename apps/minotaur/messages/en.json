@@ -363,7 +363,7 @@
       "voters": "Rated by {nickname}",
       "rated-at": "Rated {date}",
       "you": "you",
-      "auth": "Sign in to see who rated you",
+      "auth": "Sign in to see who rated {nickname}",
       "auth-action": "Sign in",
       "load-error": "Could not load ratings"
     },

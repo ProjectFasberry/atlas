@@ -68,7 +68,13 @@ export const createMenuActions = (): MenuActionItem[] => [
 ]
 
 export const showCurrentUserMenuAtom = atom((ctx) => ctx.spy(userState.isAuthed) && ctx.spy(pageState.urlPathname) !== "/auth")
-export const showCartIconAtom = atom((ctx) => ctx.spy(userState.isAuthed) && ctx.spy(pageState.urlPathname)?.includes("/store"))
+export const showCartIconAtom = atom((ctx) => {
+  if (!ctx.spy(userState.isAuthed)) return false
+
+  const pathname = ctx.spy(pageState.urlPathname) ?? ""
+
+  return pathname !== "/auth" && pathname !== "/banned"
+})
 export const showAuthorizeButtonAtom = atom((ctx) => !ctx.spy(userState.isAuthed) && ctx.spy(pageState.urlPathname) !== "/auth");
 
 export const headerUserMenuIsOpenAtom = atom(false, "headerUserMenuIsOpen")

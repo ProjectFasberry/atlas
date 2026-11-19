@@ -62,11 +62,11 @@ const RatesSkeleton = () => Array.from({ length: 6 }).map((_, idx) => (
   <Skeleton key={idx} className="h-[70px] w-full" />
 ))
 
-const RatesGuest = () => (
+const RatesGuest = ({ nickname }: { nickname: string }) => (
   <div className="flex flex-col items-center gap-3 rounded-xl bg-neutral-900 p-6 text-center">
     <Icon name="sprite:heart" className="size-8 text-red-400" />
     <Typography color="gray" className="text-sm">
-      {translate["ratings.rates.auth"]()}
+      {translate["ratings.rates.auth"]({ nickname })}
     </Typography>
     <Link
       href="/auth"
@@ -97,7 +97,7 @@ const RateList = reatomComponent<{ nickname: string }>(({ ctx, nickname }) => {
 
   if (!isClientside) return <RatesSkeleton />
 
-  if (!isAuthed) return <RatesGuest />
+  if (!isAuthed) return <RatesGuest nickname={nickname} />
 
   if (ctx.spy(player.rate.fetchList.statusesAtom).isPending) return <RatesSkeleton />
 

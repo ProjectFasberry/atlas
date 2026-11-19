@@ -19,6 +19,7 @@ import { locale, localeState } from "@/shared/models/shared.model";
 import { createListCollection, Select } from "@ark-ui/react/select";
 import { SelectItemIndicator, selectVariant } from "@/shared/ui/select";
 import { UserMenu } from "./header-menu";
+import { clsx } from "cnfast";
 
 const AuthorizeButton = () => {
   return (
@@ -62,9 +63,11 @@ const CartTrigger = reatomComponent(({ ctx }) => {
       ref={syncCartTrigger(ctx)}
     >
       <Icon
-        name="sprite:building-store"
-        className="size-6 group-data-[trigger=true]:text-green-500
-        group-data-[trigger=false]:text-neutral-400"
+        name="sprite:basket"
+        className={clsx(
+          "size-6 duration-150 group-data-[trigger=true]:text-green-500",
+          cartItemsLength > 0 ? "text-green-400" : "text-neutral-500",
+        )}
       />
       {cartItemsLength > 0 && (
         <div
