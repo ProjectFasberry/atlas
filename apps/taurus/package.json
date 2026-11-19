@@ -17,7 +17,6 @@
     "size": "node ../../scripts/build-size.mjs --app taurus",
     "size:prod": "cross-env STAGE=prod sh ./scripts/size-prod.sh",
     "-------------------": "",
-    "prepare": "pnpm dlx tailwindcss-patch install",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium"
   },
@@ -62,10 +61,8 @@
     "@tailwindcss/vite": "4.3.3",
     "tailwind-scrollbar": "4.0.2",
     "tailwindcss": "4.3.3",
-    "tailwindcss-patch": "^9.5.0",
     "tw-animate-css": "1.3.4",
     "typescript": "5.8.3",
-    "unplugin-tailwindcss-mangle": "5.1.4",
     "vite": "8.0.14",
     "vite-bundle-analyzer": "1.3.8",
     "wrangler": "4.103.0",

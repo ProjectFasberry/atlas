@@ -7,7 +7,6 @@ import svg from '@neodx/svg/vite';
 import { cloudflare } from '@cloudflare/vite-plugin'
 import { analyzer, unstableRolldownAdapter } from 'vite-bundle-analyzer'
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
-import utwm from 'unplugin-tailwindcss-mangle/vite'
 
 type Stage = "prod" | "staging";
 
@@ -62,7 +61,6 @@ export default defineConfig(({ mode }) => {
         }
       })]),
       tailwindcss(),
-      utwm(),
       svg({
         inputRoot: 'assets/svg',
         output: 'public/sprites',
