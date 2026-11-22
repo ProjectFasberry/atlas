@@ -44,11 +44,10 @@ and the server bundle; Docker image size is not tracked). It writes the payload
 consumed by `POST /metrics/build` on glaux, which stores rows in the
 `build_metrics` database on the general Postgres server.
 
-- `minotaur` and `wiki` upload after the production build on `main`
+- `minotaur`, `taurus` and `wiki` upload after the production build on `main`
   (`build-*.yml`) when `BUILD_METRICS_TOKEN` is set.
-- `taurus` deploys manually with `wrangler`: `pnpm --filter taurus size` prints
-  a local report, `pnpm --filter taurus size:prod` uploads it, and `deploy:all`
-  calls `size:prod`.
+- Locally, `pnpm --filter taurus size` prints a report and
+  `pnpm --filter taurus size:prod` uploads it.
 - Repo secret `BUILD_METRICS_TOKEN` must match the same value in the host
   `glaux` env; glaux also needs `BUILD_METRICS_POSTGRES_URI` pointing at the
   `build_metrics` database.
@@ -57,7 +56,7 @@ consumed by `POST /metrics/build` on glaux, which stores rows in the
 
 ## Build and deploy
 
-Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:
+Container apps (`minotaur`, `taurus`, `wiki`) are built by GitHub Actions only:
 
 - `.github/workflows/build-<app>.yml` runs on `ubuntu-latest` for push to `main`
   and for manual dispatch; the stage is always `prod`.
@@ -77,8 +76,9 @@ Container apps (`minotaur`, `wiki`) are built by GitHub Actions only:
 - There is no ssh/scp/docker path to the host from this repo. Host-side changes
   (Traefik, Zot, compose files, cron install) belong to the infra repo.
 - Rollback pins `:sha-<commit>` in the host compose file.
-- `apps/taurus` is a Cloudflare Worker and still deploys manually with
-  `wrangler deploy`; it is not part of the pull-based image path.
+- `apps/taurus` ships the same way: CI builds `prod/taurus:latest` from
+  `apps/taurus/Dockerfile` with `DEPLOY_TARGET=node`, and the host rolls it out.
+  `wrangler` remains only a rollback path for the old Worker.
 
 ## Local frontends against the production API
 

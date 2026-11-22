@@ -1,8 +1,9 @@
 # Agent-readable docs — taurus
 
 Taurus is the public Fasberry landing and content site: Vike + Solid + Reatom,
-deployed as a Cloudflare Worker (`landing`). Read the root
-[`AGENTS.md`](../../../AGENTS.md) first; its rules win over this folder.
+shipped as the `taurus` container image built in CI and rolled out on the host.
+Read the root [`AGENTS.md`](../../../AGENTS.md) first; its rules win over this
+folder.
 
 | File | Read it when |
 | --- | --- |

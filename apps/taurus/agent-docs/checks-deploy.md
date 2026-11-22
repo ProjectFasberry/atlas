@@ -11,7 +11,7 @@ pnpm --filter taurus test:e2e     # Playwright + mock API on :3101
 pnpm --filter taurus test:e2e:install
 pnpm --filter taurus build:prod   # prod build (self-hosted Node server)
 pnpm --filter taurus size         # local size report
-pnpm --filter taurus deploy:all   # type-check + build + size:prod + deploy
+pnpm --filter taurus size:prod    # build + upload the size report
 ```
 
 - `dev` and `build:prod` read public `VITE_*` values from `apps/taurus/.env`;
@@ -19,7 +19,7 @@ pnpm --filter taurus deploy:all   # type-check + build + size:prod + deploy
   for a mocked SSR check.
 - `lint` is not a gate: the root Biome config excludes `apps/taurus`. Do not
   claim a lint pass; rely on `type-check`, e2e and review.
-- `size:prod` uses the prod `STAGE`; `deploy:all` tolerates its failure.
+- `size:prod` uses the prod `STAGE`; CI uploads the same report on `main`.
 
 ## E2E
 
@@ -42,27 +42,26 @@ pnpm --filter taurus deploy:all   # type-check + build + size:prod + deploy
 
 ## Deploy
 
-Taurus deploys manually to Cloudflare; there is no taurus GitHub workflow.
+Taurus ships as a container image, like the other container apps.
 
-```bash
-pnpm --filter taurus build:prod
-pnpm exec wrangler deploy
-```
-
-- Worker name: `landing`; custom domain: `fasberry.fun`.
-- `wrangler` reads `.wrangler/deploy/config.json`, which points at
-  `dist/server/wrangler.json`; build first.
-- Auth: `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit) and
-  `CLOUDFLARE_ACCOUNT_ID` in the environment. A local `.env` may hold the token
-  under `CLOUDFLARE_API_KEY`; map it for the command, never print or commit it.
-- `wrangler whoami` before deploy. Run `--dry-run` if unsure.
-- `deploy:all` is the canonical chain; `pnpm exec wrangler deploy` alone is valid after a
-  successful build.
+- Push to `main` runs `.github/workflows/build-taurus.yml`: it builds the client
+  bundle on the runner (`vike build`, `DEPLOY_TARGET=node`, node rather than bun)
+  and pushes `registry.fasberry.fun/<stage>/taurus:latest` plus
+  `:sha-<commit>` (`linux/amd64`, `apps/taurus/Dockerfile`).
+- The image carries only `dist/`; `entrypoint.sh` runs
+  `bun run ./dist/server/index.mjs`.
+- Rollout is manual on the host and belongs to the infra repo:
+  `ssh i-m '/opt/main/fasberry deploy prod taurus'`.
+- Rollback pins `prod/taurus:sha-<commit>` in the host compose file, not a rebuild.
 - Deploy only on an explicit request, from a tree whose changes are understood.
   Other apps may be dirty; do not include them.
-- After deploy verify `/`, `/rules`, `/support`, `/gallery`, `/modpack`:
-  HTTP 200, expected copy, no console errors, no horizontal overflow.
-- Rollback is a redeploy of the previous worker version; report the version ID.
+- After rollout verify `/`, `/rules`, `/support`, `/gallery`, `/modpack`:
+  HTTP 200, expected copy, no console errors, no horizontal overflow. Report the
+  image digest, not just "deployed".
+- The Cloudflare Worker (`wrangler.jsonc`, `@cloudflare/vite-plugin`) is only a
+  rollback path: the default build target is still Cloudflare, so
+  `pnpm --filter taurus build:prod && pnpm --filter taurus deploy:worker` still
+  produces a Worker. Do not treat that as the normal deploy.
 
 ## Git
 

@@ -101,7 +101,7 @@ filter for one app.
 
 ## Deploy
 
-Container apps (`minotaur`, `wiki`) deploy by push to `main`.
+Container apps (`minotaur`, `taurus`, `wiki`) deploy by push to `main`.
 `.github/workflows/build-<app>.yml` builds a `linux/amd64` image and pushes
 `registry.fasberry.fun/prod/<app>:latest` plus `:sha-<commit>`. Rollout is
 manual: `ssh i-m '/opt/main/fasberry deploy prod <app>'`.
@@ -109,8 +109,9 @@ manual: `ssh i-m '/opt/main/fasberry deploy prod <app>'`.
 - Required repo secrets: `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`; add
   `NODE_AUTH_TOKEN` only when the build installs private packages.
 - Rollback is a compose change to `:sha-<commit>` on the host, not a rebuild.
-- `taurus` is a Cloudflare Worker and still deploys manually with `wrangler`;
-  it has no container in this pull path.
+- `taurus` builds with `DEPLOY_TARGET=node` and ships as a container image; the
+  Cloudflare Worker config (`wrangler.jsonc`, `@cloudflare/vite-plugin`) is kept
+  only as a rollback path and is not part of the normal deploy.
 - Verify the public health/status endpoint after a rollout and report the image
   digest, not just "deployed".
 
