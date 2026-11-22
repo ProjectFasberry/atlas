@@ -1,13 +1,11 @@
 import { reatomComponent } from "@reatom/npm-react"
-import { spawn } from "@reatom/framework"
-import { toast } from "sonner"
 import { Button } from "@/shared/ui/button"
 import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
 import { Avatar } from "@/shared/ui/avatar"
 import { createLink } from "@/shared/components/config/link/link.model"
-import { getItemStatus, storeItem } from "../../models/store-item.model"
 import { cart, cartDataItemIsSelectAtom, type CartItem as CartItemProps } from "../../models/store-cart.model"
+import { storeItemsState } from "../../models/store.model"
 import { changeLocalRecipient } from "../../../settings/models/settings-store.model"
 import { getCurrencies } from "@/shared/models/shared.model"
 import { Checkbox } from "@ark-ui/react/checkbox"
@@ -22,9 +20,9 @@ const CartItemSelect = reatomComponent<Pick<CartItemProps, "id" | "title">>(({ c
       id={String(id)}
       aria-label={`${translate["cart.item.select"]()}: ${title}`}
       checked={checked}
-      onCheckedChange={() => storeItem.updateSelectedStatus(ctx, id)}
+      onCheckedChange={() => cart.setSelected(ctx, id)}
       className={checkboxVariant.root()}
-      disabled={ctx.spy(storeItem.updateSelectedStatus.statusesAtom).isPending}
+      disabled={ctx.spy(storeItemsState.pending).includes(id)}
     >
       <Checkbox.Control className={checkboxVariant.control({ variant: "filled", size: "medium" })}>
         <Checkbox.Indicator className={checkboxVariant.indicator()}>
@@ -43,24 +41,7 @@ export const CartItem = reatomComponent<CartItemProps>(({
 
   const currencies = getCurrencies(ctx);
   const currencyInfo = currencies[currency];
-  const pending = ctx.spy(getItemStatus(id))?.isLoading ?? false;
-
-  const remove = () => {
-    spawn(ctx, async (spawnCtx) => {
-      try {
-        await cart.removeItem(spawnCtx, id);
-
-        toast(translate["cart.actions.removed"](), {
-          action: {
-            label: translate["cart.actions.undo"](),
-            onClick: () => { void cart.restoreItem(spawnCtx, { id, recipient }) },
-          },
-        })
-      } catch {
-        // the model already logs and toasts the failure
-      }
-    })
-  }
+  const pending = ctx.spy(storeItemsState.pending).includes(id);
 
   return (
     <div
@@ -120,7 +101,7 @@ export const CartItem = reatomComponent<CartItemProps>(({
             background="default"
             size="headless"
             className="h-7 w-7 aspect-square text-neutral-400 hover:text-red"
-            onClick={remove}
+            onClick={() => cart.removeWithUndo(ctx, { id, recipient })}
             disabled={pending}
           >
             <Icon name="sprite:trash" className="size-4" />

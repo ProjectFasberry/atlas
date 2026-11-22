@@ -5,23 +5,7 @@ import { getOrder } from "@/shared/components/app/shop/models/store-order.model"
 import { render } from "vike/abort";
 import { getNotExistUrlByEntity } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers"
-
-export type OrderSingleGamePayload = {
-	unique_id: string;
-	initiator: string;
-	created_at: Date;
-	finished_at: Date | null;
-	status: "pending" | "succeeded" | "refunded";
-	price: Record<string, number>;
-	items: {
-		id: number;
-		store_item_id: number;
-		name: string;
-		recipient: string;
-		delivery_status?: string;
-		revoked_at?: Date | null;
-	}[];
-};
+import type { OrderSingleGamePayload } from "@/shared/schemas/payment"
 
 export type Data = Awaited<ReturnType<typeof data>>;
 

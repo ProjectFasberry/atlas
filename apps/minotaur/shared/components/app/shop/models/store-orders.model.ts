@@ -2,9 +2,7 @@ import { client } from "@/shared/lib/client-wrapper";
 import { logError } from "@/shared/lib/log";
 import { action, atom, reatomAsync, withAssign, withStatusesAtom } from "@reatom/framework";
 import { withSearchParamsPersist } from "@reatom/url";
-import { translate } from "@/shared/locales/helpers";
 
-export type OrdersFilterOption = { title: string; value: string };
 export type OrdersStatus = "all" | "pending" | "succeeded" | "refunded";
 export type OrdersSort = "date" | "amount";
 export type OrdersDirection = "asc" | "desc";
@@ -39,20 +37,6 @@ export const cartOrdersState = atom(null, "cartOrdersState").pipe(
     ),
     data: atom<GameOrder[]>([], `${name}.data`),
     meta: atom<Nullable<GameOrdersPage["meta"]>>(null, `${name}.meta`),
-    get STATUS_OPTIONS(): OrdersFilterOption[] {
-      return [
-        { title: translate["store.orders.filters.all"](), value: "all" },
-        { title: translate["store.orders.status.pending"](), value: "pending" },
-        { title: translate["store.orders.status.succeeded"](), value: "succeeded" },
-        { title: translate["store.orders.status.refunded"](), value: "refunded" },
-      ];
-    },
-    get SORT_OPTIONS(): OrdersFilterOption[] {
-      return [
-        { title: translate["store.orders.sort.date"](), value: "date" },
-        { title: translate["store.orders.sort.amount"](), value: "amount" },
-      ];
-    },
   }))
 );
 

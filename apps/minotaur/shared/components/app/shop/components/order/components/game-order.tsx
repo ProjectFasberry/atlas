@@ -3,7 +3,8 @@ import { reatomComponent } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
 import { dayjs } from "@/shared/lib/dayjs";
 import { useData } from "vike-react/useData";
-import { type Data, type OrderSingleGamePayload } from "@/pages/store/order/@id/+data";
+import type { Data } from "@/pages/store/order/@id/+data";
+import type { OrderSingleGamePayload } from "@/shared/schemas/payment";
 import { createLink } from "@/shared/components/config/link/link.model";
 import { translate } from "@/shared/locales/helpers";
 

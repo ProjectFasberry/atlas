@@ -1,7 +1,8 @@
 import { Icon } from "@/shared/ui/icon"
 import { Link } from '@/shared/components/config/link/link';
-import { reatomComponent } from "@reatom/npm-react";
+import { reatomComponent, useUpdate } from "@reatom/npm-react";
 import { cartDataSelectedItemsLengthAtom, cartState } from "../../shop/models/store-cart.state";
+import { cart } from "../../shop/models/store-cart.model";
 import { Logotype } from "./logotype";
 import {
   createHeaderLinks, type HeaderLink,
@@ -45,6 +46,8 @@ const syncCartTrigger = action((ctx) => (el: Nullable<HTMLAnchorElement>) => {
 })
 
 const CartTrigger = reatomComponent(({ ctx }) => {
+  useUpdate((innerCtx) => cart.sync(innerCtx), [])
+
   const showCartIcon = ctx.spy(showCartIconAtom)
   if (!showCartIcon) return null;
 

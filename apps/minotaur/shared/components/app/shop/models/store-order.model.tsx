@@ -5,11 +5,10 @@ import { withAssign } from "@reatom/framework";
 import { logError } from "@/shared/lib/log";
 import { client } from "@/shared/lib/client-wrapper";
 import { navigate } from "vike/client/router";
-import type { CreateOrderRoutePayload } from "@/shared/schemas/payment";
+import type { CreateOrderRoutePayload, OrderSingleGamePayload } from "@/shared/schemas/payment";
 import { translate } from "@/shared/locales/helpers";
 import { cartState, EMPTY_CART_PRICE } from "./store-cart.model";
 import { balance } from "../../wallet/models/balance.model";
-import type { OrderSingleGamePayload } from "@/pages/store/order/@id/+data";
 
 const getOrderErrorMessage = (message: string) => {
   switch (message.toLowerCase()) {

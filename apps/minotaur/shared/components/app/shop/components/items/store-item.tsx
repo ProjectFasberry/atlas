@@ -1,9 +1,9 @@
 import { Link } from "@/shared/components/config/link/link"
 import { getStaticImage } from "@/shared/lib/helpers"
 import { Typography } from "@/shared/ui/typography"
-import { getItemStatus, type StoreItem as StoreItemProps, storeItem } from "../../models/store-item.model"
-import { Skeleton } from "@/shared/ui/skeleton"
-import { pageState } from "@/shared/models/page-context.model"
+import { type StoreItem as StoreItemProps } from "../../models/store-item.model"
+import { storeItemsState } from "../../models/store.model"
+import { cart, cartContainsItemAtom } from "../../models/store-cart.model"
 import { reatomComponent } from "@reatom/npm-react"
 import { tv, type VariantProps } from "tailwind-variants"
 import { Button } from "@/shared/ui/button"
@@ -15,13 +15,12 @@ const buyButtonVariants = tv({
   base: `group gap-2 duration-150 h-10 *:duration-150 px-6 w-full rounded-xl`,
   variants: {
     variant: {
-      default: "bg-neutral-700",
-      active: "bg-neutral-50 hover:bg-neutral-200",
-      inactive: "bg-green-500/80"
+      inCart: "bg-neutral-50 hover:bg-neutral-200",
+      add: "bg-green-500/80"
     }
   },
   defaultVariants: {
-    variant: "inactive"
+    variant: "add"
   }
 })
 
@@ -29,12 +28,12 @@ const buyButtonTypographyVariants = tv({
   base: `font-semibold text-base text-nowrap`,
   variants: {
     variant: {
-      active: "text-neutral-900",
-      inactive: "text-neutral-50"
+      inCart: "text-neutral-900",
+      add: "text-neutral-50"
     }
   },
   defaultVariants: {
-    variant: "inactive"
+    variant: "add"
   }
 })
 
@@ -105,27 +104,22 @@ export const ItemPrice = reatomComponent<ItemPriceProps>(({ ctx, price, currency
 }, "ItemPrice")
 
 export const ItemSelectToCart = reatomComponent<Pick<StoreItemProps, "id">>(({ ctx, id }) => {
-  if (!ctx.spy(pageState.isClientside)) {
-    return <Skeleton className={buyButtonVariants({ variant: "default" })} />
-  }
-
-  const state = ctx.spy(getItemStatus(id))
-
-  const isLoading = state?.isLoading ?? false
-  const isSelected = state?.isSelected ?? false;
-
-  const variant: "active" | "inactive" = isSelected ? "active" : "inactive"
+  // The cart list arrives in the SSR snapshot, so the real state renders before
+  // hydration instead of a placeholder; `pending` only drives the spinner.
+  const isInCart = ctx.spy(cartContainsItemAtom(id))
+  const isLoading = ctx.spy(storeItemsState.pending).includes(id)
+  const variant: "inCart" | "add" = isInCart ? "inCart" : "add"
 
   return (
     <Button
       className={buyButtonVariants({ variant })}
       disabled={isLoading}
-      onClick={() => storeItem.add(ctx, id)}
+      onClick={() => cart.toggle(ctx, id)}
       withSpinner={true}
       isLoading={isLoading}
     >
       <Typography className={buyButtonTypographyVariants({ variant })}>
-        {isSelected ? translate["store.inCart"]() : translate["store.buy"]()}
+        {isInCart ? translate["store.inCart"]() : translate["store.buy"]()}
       </Typography>
     </Button>
   )

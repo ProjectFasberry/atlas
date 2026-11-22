@@ -1,4 +1,4 @@
-import { action, atom, type AtomMut, withAssign } from "@reatom/framework";
+import { action, atom, type AtomMut, withAssign, type Ctx } from "@reatom/framework";
 import type { PageContextServer } from "vike/types";
 import { createMemStorage, reatomPersist } from "@reatom/persist";
 import { LOGGING } from "./devtools/debug";
@@ -32,6 +32,11 @@ export const createSsrModel = ({ name, ...opts }: SSRModelParams): CreateSsrMode
     withSsr: reatomPersist(ssrStorage)
   }
 };
+
+/** Writes the context state into the page snapshot; server data hooks end with it. */
+export function finalizeSsr(ctx: Ctx, pageCtx: PageContextServer) {
+  pageCtx.snapshot = snapshots.merge(ctx, pageCtx);
+}
 
 /* Default ssr model: snapshot atom and extension */
 export const { snapshotAtom, withSsr } = createSsrModel({

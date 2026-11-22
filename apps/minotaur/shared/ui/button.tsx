@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from "react"
 import { tv, type VariantProps } from "tailwind-variants"
 import { Icon } from "./icon"
 
-const buttonVariants = tv({
+export const buttonVariants = tv({
   base: `inline-flex active:scale-[0.98] rounded-xl duration-150 ease-in cursor-pointer items-center justify-center
     focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400
     disabled:select-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-70

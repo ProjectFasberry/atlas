@@ -1,14 +1,26 @@
 import { reatomComponent, useUpdate } from "@reatom/npm-react"
 import { Typography } from "@/shared/ui/typography"
-import { type OrdersFilterOption, type OrdersSort, type OrdersStatus, cartOrders, cartOrdersState } from "../../models/store-orders.model"
+import { cartOrders, cartOrdersState } from "../../models/store-orders.model"
 import { Link } from "@/shared/components/config/link/link"
 import { Button } from "@/shared/ui/button"
 import { PageLoader } from "@/shared/ui/page-loader"
-import { type AtomMut, type Ctx } from "@reatom/framework"
+import { type AtomMut } from "@reatom/framework"
 import { Menu } from '@ark-ui/react/menu'
 import { menuVariant } from "@/shared/ui/menu"
 import { dayjs } from "@/shared/lib/dayjs"
 import { translate } from "@/shared/locales/helpers"
+
+const STATUS_OPTIONS = [
+  { value: "all", label: "store.orders.filters.all" },
+  { value: "pending", label: "store.orders.status.pending" },
+  { value: "succeeded", label: "store.orders.status.succeeded" },
+  { value: "refunded", label: "store.orders.status.refunded" },
+] as const
+
+const SORT_OPTIONS = [
+  { value: "date", label: "store.orders.sort.date" },
+  { value: "amount", label: "store.orders.sort.amount" },
+] as const
 
 const getStatusTitle = (status: string) => {
   switch (status) {
@@ -41,11 +53,12 @@ const CartOrdersEmpty = () => {
   )
 }
 
+type FilterOption = { title: string; value: string };
+
 type OrdersFilterDropdownProps = {
   label: string;
-  options: OrdersFilterOption[];
+  options: FilterOption[];
   currentValue: AtomMut<any>;
-  onSelect: (ctx: Ctx, value: string) => void;
 }
 
 const OrdersFilterDropdown = reatomComponent<OrdersFilterDropdownProps>(({ ctx, label, options, currentValue }) => {
@@ -95,15 +108,19 @@ export const CartOrdersFilters = reatomComponent(({ ctx }) => {
     <div id="filters" className="flex flex-wrap items-center gap-2 w-full">
       <OrdersFilterDropdown
         label={translate["store.orders.filters.status"]()}
-        options={cartOrdersState.STATUS_OPTIONS}
+        options={STATUS_OPTIONS.map((option) => ({
+          value: option.value,
+          title: translate[option.label](),
+        }))}
         currentValue={cartOrdersState.status}
-        onSelect={(innerCtx, val) => cartOrdersState.status(innerCtx, val as OrdersStatus)}
       />
       <OrdersFilterDropdown
         label={translate["store.orders.sort.label"]()}
-        options={cartOrdersState.SORT_OPTIONS}
+        options={SORT_OPTIONS.map((option) => ({
+          value: option.value,
+          title: translate[option.label](),
+        }))}
         currentValue={cartOrdersState.sort}
-        onSelect={(innerCtx, val) => cartOrdersState.sort(innerCtx, val as OrdersSort)}
       />
       <Button
         background="default"

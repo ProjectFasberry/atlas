@@ -71,6 +71,23 @@ export type CreateOrderSkippedItem = {
 	reason: "PERMISSION_ALREADY_PRESENT";
 };
 
+export type OrderSingleGamePayload = {
+	unique_id: string;
+	initiator: string;
+	created_at: Date;
+	finished_at: Date | null;
+	status: "pending" | "succeeded" | "refunded";
+	price: Record<string, number>;
+	items: {
+		id: number;
+		store_item_id: number;
+		name: string;
+		recipient: string;
+		delivery_status?: string;
+		revoked_at?: Date | null;
+	}[];
+};
+
 export type CreateOrderRoutePayload = {
 	purchase: {
 		uniqueId: string;

@@ -16,6 +16,7 @@ vi.mock("@/shared/components/app/settings/models/settings-store.model", () => ({
 	getRecipient: () => "steve",
 }));
 
+import { appState } from "@/shared/models/app/index.model";
 import { cart, cartState, EMPTY_CART_PRICE, type CartItem } from "./store-cart.model";
 
 const item = (id: number, overrides: Partial<CartItem> = {}) => ({
@@ -84,6 +85,58 @@ describe("setServer", () => {
 			params: { query: { server: "muffin" } },
 		}));
 		expect(ctx.get(cartState.price).BELKOIN).toBe(3);
+	});
+});
+
+const auth = (ctx: Ctx) => {
+	appState.options(ctx, { flags: { isAuthed: true } } as never);
+};
+
+describe("toggle", () => {
+	it("adds an item that is missing from the cart", () => {
+		const ctx = createCtx();
+		reset(ctx);
+		auth(ctx);
+		post.mockResolvedValue({ ok: true });
+
+		cart.toggle(ctx, 1);
+
+		expect(post).toHaveBeenCalledWith("/store/cart/add/{id}", expect.objectContaining({
+			json: { recipient: "steve" },
+			params: { path: { id: 1 } },
+		}));
+	});
+
+	it("removes an item that is already in the cart", () => {
+		const ctx = createCtx();
+		reset(ctx);
+		auth(ctx);
+		cartState.data(ctx, [item(2)]);
+		del.mockResolvedValue({ ok: true });
+
+		cart.toggle(ctx, 2);
+
+		expect(del).toHaveBeenCalledWith("/store/cart/remove/{id}", { params: { path: { id: 2 } } });
+	});
+});
+
+describe("setSelected", () => {
+	it("flips the selected flag of a single item", async () => {
+		const ctx = createCtx();
+		reset(ctx);
+		auth(ctx);
+		cartState.data(ctx, [item(3, { selected: true })]);
+		post.mockResolvedValue({ ok: true });
+		get.mockImplementation((path: string) => Promise.resolve(
+			path === "/store/cart/price" ? price() : { data: [item(3, { selected: false })] },
+		));
+
+		await cart.setSelected(ctx, 3);
+
+		expect(post).toHaveBeenCalledWith("/store/cart/edit/{id}", {
+			json: { key: "selected", value: false },
+			params: { path: { id: 3 } },
+		});
 	});
 });
 

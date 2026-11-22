@@ -1,4 +1,4 @@
-import { atom, withAssign, withInit } from "@reatom/framework"
+import { atom, withAssign } from "@reatom/framework"
 import { withSsr } from "@/shared/models/ssr"
 
 export type CartListPayload = ExtractApiData<"getStoreCartList">["data"]
@@ -19,15 +19,20 @@ export const cartState = atom(null, "cartState").pipe(
 		isTriggered: atom(false),
 		price: atom<CartFinalPrice>(EMPTY_CART_PRICE, `${name}.price`).pipe(withSsr(`${name}.price`)),
 		data: atom<CartListPayload["data"]>([], `${name}.data`).pipe(withSsr(`${name}.data`)),
-		server: atom<Maybe<string>>(undefined, `${name}.server`)
+		server: atom<Maybe<string>>(undefined, `${name}.server`),
+		/** The cart has been fetched for this session (SSR snapshot or a client sync). */
+		isLoaded: atom(false, `${name}.isLoaded`).pipe(withSsr(`${name}.isLoaded`))
 	}))
 )
 
 export const cartDataSelectedAtom = atom<CartItem[]>((ctx) =>
 	ctx.spy(cartState.data).filter((t) => t.selected)
-).pipe(
-	withInit((ctx) => ctx.get(cartState.data).filter((t) => t.selected)),
 )
+
+/** Whether the product is in the cart; the only source of truth for the badge and buttons. */
+export const cartContainsItemAtom = (id: number) => atom((ctx) => {
+	return ctx.spy(cartState.data).some((item) => item.id === id)
+}, `cart.contains.${id}`)
 
 export const cartDataIsEmptyAtom = atom((ctx) => ctx.spy(cartState.data).length === 0)
 

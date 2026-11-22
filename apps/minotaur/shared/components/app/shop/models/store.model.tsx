@@ -1,21 +1,15 @@
 import { reatomAsync, withStatusesAtom } from "@reatom/framework"
-import { action, atom, type AtomMut, createCtx, type Ctx } from "@reatom/framework"
-import { reatomMap, sleep, withAssign, withConcurrency, withInit, withReset } from "@reatom/framework"
+import { action, atom, createCtx } from "@reatom/framework"
+import { reatomMap, sleep, withAssign, withConcurrency, withReset } from "@reatom/framework"
 import { logError } from '@/shared/lib/log';
-import { snapshots } from '@/shared/models/ssr';
+import { finalizeSsr } from '@/shared/models/ssr';
 import { type PageContextServer } from 'vike/types';
 import { client } from '@/shared/lib/client-wrapper';
 import { mainClient } from "@/shared/api/client"
 import { DEFAULT_SOFT_DELAY } from '@/shared/consts/index';
 import { withSearchParamsPersist } from '@reatom/url';
 import { withSsr } from "@/shared/models/ssr"
-import { cartState } from "./store-cart.model"
-import { parseBoolean } from "@/shared/lib/utils"
 import { pageState } from "@/shared/models/page-context.model"
-import { translate } from "@/shared/locales/helpers"
-
-// TODO: replace any assertion
-export type Payment = any
 
 type StoreCategory = "donate" | "event" | "all"
 type StoreWallet = "CHARISM" | "BELKOIN" | "ALL"
@@ -33,13 +27,6 @@ export async function getStoreItems(params: StoreItemsParams, init?: RequestInit
   return client
     .get("/store/items", { ...init, params: { query: params }})
 }
-
-export type SelectItemToCartOptions = {
-  isSelected: boolean,
-  isLoading: boolean
-}
-
-type SelectItemToCartStatus = Record<number, SelectItemToCartOptions>
 
 export const storeItemsState = atom(null, "storeItemsState").pipe(
   withAssign((_, name) => ({
@@ -60,23 +47,8 @@ export const storeItemsState = atom(null, "storeItemsState").pipe(
         all: reatomMap<string, string>(new Map(), `${name}.all`).pipe(withSsr(`${name}.all`))
       }))
     ),
-    statuses: atom<SelectItemToCartStatus | null>(null, `itemStatuses`).pipe(
-      withInit((ctx) => {
-        const target = ctx.get(cartState.data)
-
-        const record = target.reduce<SelectItemToCartStatus>((acc, item) => {
-          acc[item.id] = {
-            isLoading: false,
-            isSelected: true
-          };
-
-          return acc;
-        }, {});
-
-        return record
-      }),
-      withReset()
-    )
+    /** Ids whose cart mutation is in flight. */
+    pending: atom<number[]>([], `${name}.pending`)
   }))
 )
 
@@ -126,8 +98,7 @@ export const storeItems = atom(null, "storeItems").pipe(
       storeItemsState.data(ctx, payload.data);
       storeItemsState.meta(ctx, payload.meta);
 
-      const newSnapshot = snapshots.merge(ctx, pageCtx)
-      pageCtx.snapshot = newSnapshot
+      finalizeSsr(ctx, pageCtx)
     },
     fetch: reatomAsync(async (ctx) => {
       const params: StoreItemsParams = {
@@ -147,6 +118,14 @@ export const storeItems = atom(null, "storeItems").pipe(
     }).pipe(
       withStatusesAtom()
     ),
+    setFilter: action((ctx, key: StoreFilterKey, value: string) => {
+      if (key === "category") {
+        storeItemsState.filters.category(ctx, value as StoreCategory)
+        return
+      }
+
+      storeItemsState.filters.wallet(ctx, value as StoreWallet)
+    }, `${name}.setFilter`),
     onChangeEvent: action(async (ctx, e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
       storeItemsState.filters.searchQuery(ctx, value)
@@ -157,100 +136,47 @@ export const storeItems = atom(null, "storeItems").pipe(
     }).pipe(
       withConcurrency()
     ),
-    simulate: action((ctx, id: number, type: "load" | "select" | "unload" | "unselect") => {
-      storeItemsState.statuses(ctx, (state) => {
-        const prev = state?.[id] ?? { isLoading: false, isSelected: false };
-        const next = { ...prev };
+    setPending: action((ctx, id: number, value: boolean) => {
+      storeItemsState.pending(ctx, (state) => {
+        if (state.includes(id) === value) return state
 
-        switch (type) {
-          case "load":
-            next.isLoading = true;
-            break;
-          case "unload":
-            next.isLoading = false;
-            break;
-          case "select":
-            next.isSelected = true;
-            break;
-          case "unselect":
-            next.isSelected = false;
-            break;
-        }
-
-        return {
-          ...state,
-          [id]: next,
-        };
+        return value ? [...state, id] : state.filter((target) => target !== id)
       })
-    })
+    }, `${name}.setPending`),
+    clearPending: action((ctx) => {
+      if (ctx.get(storeItemsState.pending).length === 0) return
+
+      storeItemsState.pending(ctx, [])
+    }, `${name}.clearPending`)
   }))
 )
 
-export type Filter = {
-  title: string,
-  origin: string,
-  atom: AtomMut<any>,
-  updater: <T>(ctx: Ctx, val: T) => void,
-  filters: Array<{
-    name: string,
-    value: string,
-  }>
-}
+export type StoreFilterKey = "category" | "wallet"
 
-export const filtersState = atom(null, "filters").pipe(
-  withAssign((_, name) => ({
-    data: atom<Filter[]>((ctx) => {
-      return [
-        {
-          title: translate["store.filters.type.label"](),
-          origin: "category",
-          atom: storeItemsState.filters.category,
-          updater: (ctx, v) => storeItemsState.filters.category(ctx, v as StoreCategory),
-          filters: [
-            { name: translate["store.filters.type.variants.all"](), value: "all" },
-            { name: translate["store.filters.type.variants.donate"](), value: "donate", },
-            { name: translate["store.filters.type.variants.event"](), value: "event" },
-          ]
-        },
-        {
-          title: translate["store.filters.wallet.label"](),
-          origin: "wallet",
-          atom: storeItemsState.filters.wallet,
-          updater: (ctx, v) => storeItemsState.filters.wallet(ctx, v as StoreWallet),
-          filters: [
-            { name: translate["store.filters.wallet.variants.all"](), value: "ALL", },
-            { name: translate["store.filters.wallet.variants.charism"](), value: "CHARISM" },
-            { name: translate["store.filters.wallet.variants.belkoin"](), value: "BELKOIN", }
-          ]
-        }
-      ]
-    }, `${name}.data`)
-  }))
-)
+const FILTER_DEFAULTS = {
+  category: "all",
+  wallet: "ALL",
+  searchQuery: "",
+} as const
 
-export const filterIsAppliedAtom = ({
-  origin, currValue }: Pick<Filter, "origin"> & { currValue: string }
-) => atom((ctx) => {
-  const isClient = ctx.spy(pageState.isClientside)
-
-  if (isClient) {
-    const atom = ctx.get(filtersState.data).find(d => d.origin === origin)?.atom
-
-    if (atom) {
-      const spyedResult = ctx.spy(atom)
-      return spyedResult === currValue
+/**
+ * Single view of the filters for both server and client: the client reads the
+ * URL-persisted atoms, the server reads the values `init` stored in the snapshot.
+ */
+export const storeFiltersAtom = atom((ctx) => {
+  if (ctx.spy(pageState.isClientside)) {
+    return {
+      category: ctx.spy(storeItemsState.filters.category),
+      wallet: ctx.spy(storeItemsState.filters.wallet),
+      searchQuery: ctx.spy(storeItemsState.filters.searchQuery),
     }
-
-    return false
   }
 
-  // server only
-  const valueByParsedFilter = storeItemsState.filters.all.get(ctx, origin)
-  if (typeof valueByParsedFilter === 'undefined') return false;
+  const all = storeItemsState.filters.all
 
-  if (["false", "true"].includes(valueByParsedFilter)) {
-    return parseBoolean(valueByParsedFilter) === parseBoolean(currValue)
+  return {
+    category: (all.get(ctx, "category") ?? FILTER_DEFAULTS.category) as StoreCategory,
+    wallet: (all.get(ctx, "wallet") ?? FILTER_DEFAULTS.wallet) as StoreWallet,
+    searchQuery: all.get(ctx, "searchQuery") ?? FILTER_DEFAULTS.searchQuery,
   }
-
-  return valueByParsedFilter === currValue
-})
+}, "storeFilters")

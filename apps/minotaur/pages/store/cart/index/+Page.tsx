@@ -1,15 +1,10 @@
 import { WithLoader } from "@/shared/components/app/layout/components/with-loader";
-import { CartActions, CartListContent, CartSuggestions } from "@/shared/components/app/shop/components/cart/cart-content";
+import { CartListContent } from "@/shared/components/app/shop/components/cart/cart-list";
+import { CartActions } from "@/shared/components/app/shop/components/cart/cart-summary";
+import { CartSuggestions } from "@/shared/components/app/shop/components/cart/cart-suggestions";
 import { loaderIsActiveAtom } from "@/shared/components/app/shop/models/store-order.model";
 import { Typography } from "@/shared/ui/typography"
 import { translate } from "@/shared/locales/helpers"
-import { cartDataIsEmptyAtom } from "@/shared/components/app/shop/models/store-cart.model"
-import { reatomComponent } from "@reatom/npm-react"
-
-const CartCrossSell = reatomComponent(({ ctx }) => {
-  if (ctx.spy(cartDataIsEmptyAtom)) return null
-  return <CartSuggestions />
-}, "CartCrossSell")
 
 export default function Page() {
   return (
@@ -22,7 +17,7 @@ export default function Page() {
           <CartListContent />
           <CartActions />
         </div>
-        <CartCrossSell />
+        <CartSuggestions />
       </div>
     </WithLoader>
   )

@@ -1,19 +1,40 @@
 import { reatomComponent } from "@reatom/npm-react";
 import { Typography } from "@/shared/ui/typography"
-import { atom, type Ctx } from "@reatom/framework";
-import { type Filter, filterIsAppliedAtom, filtersState, storeItems, storeItemsState } from "../../models/store.model";
+import { atom } from "@reatom/framework";
+import { storeFiltersAtom, storeItems } from "../../models/store.model";
 import { Icon } from "@/shared/ui/icon"
-import { pageState } from "@/shared/models/page-context.model";
 import { Input } from "@/shared/ui/input";
 import { Vaul, VaulContent, VaulHeader, VaulTrigger } from "@/shared/ui/vaul";
 import { translate } from "@/shared/locales/helpers";
 import { CheckboxIndicatorIcon, checkboxVariant } from "@/shared/ui/checkbox";
 import { Checkbox } from "@ark-ui/react/checkbox";
 
+/** Filter values and the defaults they fall back to when unchecked. */
+const FILTERS = [
+  {
+    key: "category",
+    defaultValue: "all",
+    title: "store.filters.type.label",
+    options: [
+      { value: "all", label: "store.filters.type.variants.all" },
+      { value: "donate", label: "store.filters.type.variants.donate" },
+      { value: "event", label: "store.filters.type.variants.event" },
+    ],
+  },
+  {
+    key: "wallet",
+    defaultValue: "ALL",
+    title: "store.filters.wallet.label",
+    options: [
+      { value: "ALL", label: "store.filters.wallet.variants.all" },
+      { value: "CHARISM", label: "store.filters.wallet.variants.charism" },
+      { value: "BELKOIN", label: "store.filters.wallet.variants.belkoin" },
+    ],
+  },
+] as const
+
 export const StoreSearch = reatomComponent(({ ctx }) => {
-  const searchQuery = ctx.spy(pageState.isClientside)
-    ? ctx.spy(storeItemsState.filters.searchQuery)
-    : storeItemsState.filters.all.get(ctx, "searchQuery")
+  const { searchQuery } = ctx.spy(storeFiltersAtom)
 
   return (
     <div className="flex h-10 items-center justify-start w-full relative">
@@ -32,39 +53,28 @@ export const StoreSearch = reatomComponent(({ ctx }) => {
   )
 }, "StoreSearch")
 
-const StoreFilterItem = reatomComponent<Omit<Filter, "atom">>(({
-  ctx, title, filters, updater, origin
-}) => {
-  const defaultFilterValue = origin === "wallet" ? "ALL" : "all";
-
-  const handle = (
-    updater: (ctx: Ctx, value: string) => void,
-    isChecked: string | boolean,
-    target: string
-  ) => {
-    if (typeof isChecked !== 'boolean') return;
-    updater(ctx, isChecked ? target : defaultFilterValue);
-  }
-
-  const getUniqueFilterId = (v1: string, v2: string) => `${v1}${v2}`
+const StoreFilterItem = reatomComponent<{ filter: typeof FILTERS[number] }>(({ ctx, filter }) => {
+  const current = ctx.spy(storeFiltersAtom)[filter.key]
 
   return (
     <div className="flex flex-col gap-2">
       <Typography className="text-neutral-400 text-lg">
-        {title}
+        {translate[filter.title]()}
       </Typography>
       <div className='flex flex-col gap-2 w-full'>
-        {filters.map((filter, idx) => (
+        {filter.options.map((option) => (
           <Checkbox.Root
-            key={idx}
-            id={getUniqueFilterId(origin, filter.value)}
+            key={option.value}
+            id={`${filter.key}-${option.value}`}
             className={checkboxVariant.root("bg-neutral-800 px-2 h-8 rounded-lg w-full")}
-            checked={ctx.spy(filterIsAppliedAtom({ origin, currValue: filter.value }))}
-            onCheckedChange={(e) => handle(updater, e.checked, filter.value)}
+            checked={current === option.value}
+            onCheckedChange={(e) => {
+              storeItems.setFilter(ctx, filter.key, e.checked ? option.value : filter.defaultValue)
+            }}
           >
             <Checkbox.Control className={checkboxVariant.control({ variant: "filled" })} />
             <Checkbox.Label className={checkboxVariant.label()}>
-              {filter.name}
+              {translate[option.label]()}
             </Checkbox.Label>
             <Checkbox.HiddenInput />
           </Checkbox.Root>
@@ -74,10 +84,11 @@ const StoreFilterItem = reatomComponent<Omit<Filter, "atom">>(({
   )
 }, "StoreFilterItem")
 
-export const StoreFilterList = reatomComponent(({ ctx }) =>
-  ctx.spy(filtersState.data).map((item) => <StoreFilterItem key={item.origin} {...item} />),
-  "StoreFilterList"
-)
+export const StoreFilterList = reatomComponent(() => (
+  <>
+    {FILTERS.map((filter) => <StoreFilterItem key={filter.key} filter={filter} />)}
+  </>
+), "StoreFilterList")
 
 const storeFiltersIsOpenAtom = atom(false)
 
