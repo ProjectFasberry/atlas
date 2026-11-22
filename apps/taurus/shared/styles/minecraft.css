@@ -314,3 +314,13 @@
   border-image-slice: 45.5% 45.5% fill;
   border-image-repeat: stretch;
 }
+
+/* Global settings bobber: leans towards the cursor. */
+.layout-settings-bobber {
+  --rod-x: 0;
+  --rod-y: 0;
+  transform: translate3d(calc(var(--rod-x) * 10px), calc(var(--rod-y) * 8px), 0)
+    rotate(calc(var(--rod-x) * 14deg));
+  transform-origin: 50% 85%;
+  will-change: transform;
+}

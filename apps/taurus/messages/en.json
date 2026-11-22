@@ -366,7 +366,8 @@
     }
   },
   "settings": {
-    "title": "Settings"
+    "title": "Settings",
+    "trigger": "Open site settings"
   },
   "join": {
     "eyebrow": "Getting in",

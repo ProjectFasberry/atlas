@@ -7,6 +7,7 @@ import { usePageContext } from "vike-solid/usePageContext";
 import { pageState } from '@/shared/models/page.model';
 import { Footer } from '@/shared/components/footer';
 import { Header } from '@/shared/components/header/header';
+import { LayoutSettings } from '@/shared/components/settings/settings';
 import { createEffect, type JSXElement } from 'solid-js';
 import { useCtx } from '@reatom/npm-solid-js';
 import { snapshotAtom } from '@/shared/models/ssr'
@@ -63,6 +64,7 @@ const LayoutContent = (props: { children: JSXElement }) => {
       <div id="page-content">
         {props.children}
       </div>
+      <LayoutSettings />
       <Footer />
     </main>
   )

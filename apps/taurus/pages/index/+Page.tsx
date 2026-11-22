@@ -8,7 +8,6 @@ import { SpawnCarousel } from "./(components)/spawn-carousel";
 import { IdeaPreviewCard, IdeasList } from "./(components)/gameplay";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
-import { LayoutSettings } from "@/shared/components/settings/settings";
 import { appState } from "@/shared/models/app.model";
 import { OnlineBadge } from "./(components)/online-badge";
 import { JoinSection } from "./(components)/join";
@@ -33,7 +32,6 @@ const Weather = () => {
 export default function Page() {
   return (
     <MainWrapperPage variant="with_section" class="landing-page">
-      <LayoutSettings />
       <div id="title" class={sectionVariant()}>
         <div class="absolute top-0 right-0 left-0 overflow-hidden h-full">
           <img
