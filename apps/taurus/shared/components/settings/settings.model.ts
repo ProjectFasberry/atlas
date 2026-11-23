@@ -3,6 +3,7 @@ import { createListCollection } from "@ark-ui/solid/select";
 import { setLocale, type Locale } from "@/paraglide/runtime";
 import { translate } from "@/shared/locales/helpers";
 import { appState } from "@/shared/models/app.model";
+import { getStaticObject } from "@/shared/lib/helpers";
 
 export type Weather = {
   title: string;
@@ -29,18 +30,20 @@ export const settingsListAtom = atom((ctx) => {
   return {
     weather: {
       title: translate["weathers.title"](),
+      icon: getStaticObject("minecraft", "icons/experience_big.webp"),
       list: weathers,
       collection: createListCollection({ items: weathers }),
-      onChange: (value: unknown) => layoutSettings.wrap(ctx, () => appState.selectedWeather(ctx, value as string)),
+      onChange: (value: unknown) => layoutSettings.apply(ctx, () => appState.selectedWeather(ctx, value as string)),
       current: atom((ctx) =>
         weathers.find(d => d.value === ctx.spy(appState.selectedWeather)) ?? weathers[0]
       )
     },
     language: {
       title: translate["languages.title"](),
+      icon: getStaticObject("minecraft", "items/compass.webp"),
       list: languages,
       collection: createListCollection({ items: languages }),
-      onChange: (value: unknown) => layoutSettings.wrap(ctx, () => setLocale(value as Locale)),
+      onChange: (value: unknown) => layoutSettings.apply(ctx, () => setLocale(value as Locale)),
       current: atom((ctx) =>
         languages.find(d => d.value === ctx.spy(appState.locale)) ?? languages[0]
       )
@@ -55,8 +58,8 @@ export const layoutSettings = atom(null, "layoutSettings").pipe(
     }, `${name}.open`).pipe(
       withConcurrency()
     ),
-    wrap: action((ctx, cb: () => void) => {
-      layoutSettingsState.isOpen(ctx, false);
+    /** Options apply immediately; the dialog stays open until "Done". */
+    apply: action((ctx, cb: () => void) => {
       cb();
     })
   }))

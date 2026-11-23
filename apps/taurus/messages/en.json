@@ -456,7 +456,10 @@
   },
   "settings": {
     "title": "Settings",
-    "trigger": "Open site settings"
+    "trigger": "Open site settings",
+    "done": "Done",
+    "previous": "Previous option",
+    "next": "Next option"
   },
   "join": {
     "eyebrow": "Getting in",

@@ -57,14 +57,19 @@ const LayoutSettingsDialog = () => {
       <Portal>
         <Dialog.Backdrop class={dialogVariant.backdrop()} />
         <Dialog.Positioner class={dialogVariant.positioner()}>
-          <Dialog.Content class={dialogVariant.content({ class: "sm:w-1/3" })}>
-            <Dialog.Title class={dialogVariant.title()}>
+          <Dialog.Content class={dialogVariant.content({ class: "w-full max-w-[440px]!" })}>
+            <Dialog.Title class={`${dialogVariant.title()} text-shadow-lg text-xl sm:text-2xl`}>
               {translate["settings.title"]()}
             </Dialog.Title>
-            <div class="flex flex-col gap-2 w-full">
+            <div class="flex w-full flex-col px-1">
               <Suspense>
                 <SettingsList />
               </Suspense>
+            </div>
+            <div class="flex w-full justify-end pt-1">
+              <Dialog.CloseTrigger class="button px-6 py-1 text-sm text-white">
+                {translate["settings.done"]()}
+              </Dialog.CloseTrigger>
             </div>
             <DialogClose />
           </Dialog.Content>
