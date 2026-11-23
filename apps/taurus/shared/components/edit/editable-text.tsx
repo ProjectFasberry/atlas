@@ -1,4 +1,4 @@
-import { Show } from "solid-js"
+import { Show, createEffect } from "solid-js"
 
 type EditableTextProps = {
   value: string
@@ -28,12 +28,29 @@ export const EditableText = (props: EditableTextProps) => (
       />
     }
   >
+    <MultilineField {...props} />
+  </Show>
+)
+
+/**
+ * `value` on a hydrated `<textarea>` is not applied when the SSR attribute is
+ * present, so the property is synced explicitly.
+ */
+const MultilineField = (props: EditableTextProps) => {
+  let element: HTMLTextAreaElement | undefined
+
+  createEffect(() => {
+    const value = props.value
+    if (element && element.value !== value) element.value = value
+  })
+
+  return (
     <textarea
-      value={props.value}
+      ref={element}
       placeholder={props.placeholder}
       rows={Math.min(10, Math.max(2, Math.ceil((props.value.length || 1) / 70)))}
       onInput={(event) => props.onInput(event.currentTarget.value)}
       class={`${base} resize-y leading-inherit ${props.class ?? ""}`}
     />
-  </Show>
-)
+  )
+}
