@@ -10,11 +10,13 @@ import { eventsSection } from "@/shared/components/app/private/components/events
 import { modpackSection } from "@/shared/components/app/private/components/modpack"
 import { landsSection } from "@/shared/components/app/private/components/lands"
 import { tasksSection } from "@/shared/components/app/private/components/tasks"
+import { RulesPanel } from "@/shared/components/app/private/components/rules"
 import { createTabAtom, hasTabAccess, type PanelTab } from "@/shared/components/app/private/models/tabs.model"
 import { type ActionParent } from "@/shared/components/app/private/models/actions.model"
+import { RULES_READ_PERMISSION } from "@/shared/consts/permissions"
 import { translate } from "@/shared/locales/helpers"
 
-type ContentTab = Extract<ActionParent, "news" | "banner" | "event" | "modpack" | "lands" | "task">
+type ContentTab = Extract<ActionParent, "news" | "banner" | "event" | "modpack" | "lands" | "task"> | "rules"
 
 const CONTENT_TABS: PanelTab<ContentTab>[] = [
   { value: "news", title: translate["panel.news"](), permissions: ["news.create", "news.update", "news.delete"] },
@@ -23,6 +25,7 @@ const CONTENT_TABS: PanelTab<ContentTab>[] = [
   { value: "modpack", title: translate["panel.modpacks"](), permissions: ["modpacks.create", "modpacks.delete"] },
   { value: "lands", title: translate["panel.lands"](), permissions: ["lands.read"] },
   { value: "task", title: translate["panel.tasks"](), permissions: ["tasks.create", "tasks.update", "tasks.delete"] },
+  { value: "rules", title: translate["panel.rules"](), permissions: [RULES_READ_PERMISSION] },
 ]
 
 const contentTab = createTabAtom("contentTab", CONTENT_TABS, "news")
@@ -53,14 +56,16 @@ const ContentSection = reatomComponent(({ ctx }) => {
         return { title: translate["panel.lands"](), wrapper: <landsSection.Wrapper /> }
       case "task":
         return { title: translate["panel.tasks"](), wrapper: <tasksSection.Wrapper /> }
+      case "rules":
+        return { title: translate["panel.rules"](), wrapper: <RulesPanel /> }
     }
   })()
 
   return (
     <PanelSection
       title={section.title}
-      parent={active}
-      action={<ActionsHeaderSlot parent={active} />}
+      parent={active === "rules" ? undefined : active as ActionParent}
+      action={active === "rules" ? undefined : <ActionsHeaderSlot parent={active as ActionParent} />}
     >
       {section.wrapper}
     </PanelSection>
