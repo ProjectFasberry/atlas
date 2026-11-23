@@ -13,6 +13,7 @@ import { currentUserState } from "@/shared/models/current-user/index.model"
 import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
 import { patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
 import { translate } from "@/shared/locales/helpers"
+import { Link } from "@/shared/components/config/link/link"
 
 const Flag = ({ active, label }: { active: boolean, label: string }) => (
   <span
@@ -154,14 +155,22 @@ export const Servers = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
         <Typography color="gray" className="text-sm">
-          {translate["panel.available-blocks-the-login-until-connected-no-se"]()}</Typography>
-        <Button
-          background="default"
-          className="h-8 text-sm"
-          disabled={status.isPending}
-          onClick={() => servers.fetch(ctx)}
-        >
-          {translate["panel.refresh"]()}</Button>
+          {translate["panel.servers-flags-hint"]()}</Typography>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/private/site"
+            className="flex h-8 items-center rounded-xl bg-neutral-800 px-3 text-sm
+              text-neutral-50 duration-150 hover:bg-neutral-700"
+          >
+            {translate["panel.servers-content"]()}</Link>
+          <Button
+            background="default"
+            className="h-8 text-sm"
+            disabled={status.isPending}
+            onClick={() => servers.fetch(ctx)}
+          >
+            {translate["panel.refresh"]()}</Button>
+        </div>
       </div>
       <ServersDialog />
       <Table>
@@ -199,7 +208,12 @@ export const Servers = reatomComponent(({ ctx }) => {
                     label={s.available ? translate["panel.available"]() : translate["panel.closed"]()}
                   />
                   {s.is_default && <Flag active label="default" />}
-                  {s.excluded && <Flag active={false} label={translate["panel.hidden"]()} />}
+                  <Flag
+                    active={!s.excluded}
+                    label={s.excluded
+                      ? translate["panel.hidden-from-lists"]()
+                      : translate["panel.visible-in-lists"]()}
+                  />
                 </div>
               </TableCell>
               <TableCell>
@@ -210,8 +224,17 @@ export const Servers = reatomComponent(({ ctx }) => {
                     disabled={!canEdit || isSaving}
                     onClick={() => handlePatch(s, { available: !s.available })}
                   >
-                    {s.available ? translate["panel.close-the-login"]() : translate["panel.open-the-login"]()}
+                    {s.available ? translate["panel.close-for-play"]() : translate["panel.open-for-play"]()}
                   </Button>
+                  <Button
+                    background="default"
+                    className="h-8 text-xs"
+                    disabled={!canEdit || isSaving}
+                    onClick={() => handlePatch(s, { excluded: !s.excluded })}
+                  >
+                    {s.excluded
+                      ? translate["panel.show-in-lists"]()
+                      : translate["panel.hide-from-lists"]()}</Button>
                   <Button
                     background="default"
                     className="h-8 text-xs"

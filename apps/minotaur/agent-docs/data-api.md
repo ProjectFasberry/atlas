@@ -50,6 +50,12 @@ const wallet = await client.raw.get<EconomyWallet>("/privated/economy/wallet", {
 
 Everything else uses the typed methods, including path params with `{placeholders}`.
 
+**Live but untyped routes.** When the API already serves a route while the
+checked-in contract is stale (for example `shared/api/site.ts`), declare the
+missing `paths`/`operations` members with `declare module
+"@/shared/types/gen/api/main.schema"` and keep using the typed `client`. Delete
+the block after `pnpm openapi:*`; the calls then type-check unchanged.
+
 ## Types
 
 The API contract is generated from the backend OpenAPI spec:

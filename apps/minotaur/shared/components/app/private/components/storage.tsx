@@ -106,5 +106,7 @@ export const storageModel = ({
 
   return {
     Storage: StorageWrapper,
+    /** Lets a screen open the browser for its own field without a trigger. */
+    storageState,
   }
 }
