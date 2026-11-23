@@ -8,10 +8,11 @@ import { env } from "@/shared/env";
 import { translate } from "@/shared/locales/helpers";
 import { reatomComponent } from "@/shared/lib/reatom";
 import { siteEdit } from "@/shared/models/site-edit.model";
-import { asSectionsContent } from "@/shared/api/site";
+import { asBlocks, asSectionsContent } from "@/shared/api/site";
 import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
 import { EditEntry } from "@/shared/components/edit/edit-entry";
+import { BlockControls, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 import type { Data } from "./+data";
 
 const APP_URL = env.VITE_APP_URL
@@ -42,22 +43,35 @@ export default reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
   const edit = pageData?.edit
 
+  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.content))
+
+  const heroHidden = useBlockHidden("start-hero")
+
   if (edit?.active) {
     siteEdit.init(ctx, {
       page: "start",
       locale: edit.locale,
       version: edit.version,
       canPublish: edit.canPublish,
-      content: { kind: "sections", sections: asSectionsContent(pageData.content) },
+      content: {
+        kind: "sections",
+        sections: asSectionsContent(pageData.content),
+        blocks: asBlocks(pageData.content),
+      },
     })
   }
 
   return (
     <MainWrapperPage class={edit?.active ? "pb-24" : undefined}>
+      <Show when={!heroHidden()}>
       <div class="flex flex-col items-center w-full gap-12 h-full">
-        <h1 class="text-white text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl">
-          {translate["start.template.steps.title"]()}
-        </h1>
+        <BlockTitle
+          id="start-hero"
+          fallback={translate["start.template.steps.title"]()}
+          as="h1"
+          class="text-white text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl"
+        />
+        <BlockControls id="start-hero" />
         <div class="flex flex-col gap-16 w-full h-full">
           <div class={stepVariant()}>
             <div class={stepContentVariant()}>
@@ -155,6 +169,7 @@ export default reatomComponent(({ ctx }) => {
           </div>
         </div>
       </div>
+      </Show>
       <EditableSections
         sections={edit?.active && ctx.get(siteEdit.content)?.kind === "sections"
           ? ctx.get(siteEdit.content)!.sections

@@ -5,20 +5,28 @@ import { translate } from "@/shared/locales/helpers";
 import { createFaqItems, faqOpenAtom, setFaqOpen } from "../(models)/faq.model";
 import { useAtomAccessor } from "@/shared/lib/utils";
 import { reatomComponent } from "@/shared/lib/reatom";
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 
 export const FaqSection = reatomComponent(({ ctx }) => {
   const open = useAtomAccessor(faqOpenAtom)
+  const hidden = useBlockHidden("faq")
+  if (hidden()) return null
 
   return (
     <div id="faq" class="section-edge relative flex w-full flex-col items-center py-16 sm:py-20 lg:py-28">
       <div class="responsive z-1 grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:gap-12">
         <div class="flex flex-col gap-1">
-          <Typography color="white" class="text-2xl sm:text-3xl lg:text-4xl">
-            {translate["faq.title"]()}
-          </Typography>
-          <Typography color="gray" class="text-sm sm:text-base">
-            {translate["faq.subtitle"]()}
-          </Typography>
+          <BlockTitle
+            id="faq"
+            fallback={translate["faq.title"]()}
+            class="text-2xl sm:text-3xl lg:text-4xl"
+          />
+          <BlockSubtitle
+            id="faq"
+            fallback={translate["faq.subtitle"]()}
+            class="text-sm sm:text-base"
+          />
+          <BlockControls id="faq" />
         </div>
         <Accordion.Root
           multiple

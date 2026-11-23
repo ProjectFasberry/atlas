@@ -24,6 +24,7 @@ export type { SiteLocale, SitePageId }
 export type SlideDraft = { image: string; alt: string }
 export type FeatureDraft = { icon: string; title: string; description: string }
 export type SectionDraft = { id: string; title: string; body: string; hidden: boolean }
+export type BlockDraft = { title: string; description: string; hidden: boolean }
 
 export type ServerDraft = {
   name: string
@@ -38,9 +39,38 @@ export type ServerDraft = {
 }
 
 export type SiteDraft =
-  | { kind: "home"; carousel: SlideDraft[]; sections: SectionDraft[] }
-  | { kind: "servers"; title: string; description: string; items: Record<string, ServerDraft>; sections: SectionDraft[] }
-  | { kind: "sections"; sections: SectionDraft[] }
+  | { kind: "home"; carousel: SlideDraft[]; sections: SectionDraft[]; blocks: Record<string, BlockDraft> }
+  | { kind: "servers"; title: string; description: string; items: Record<string, ServerDraft>; sections: SectionDraft[]; blocks: Record<string, BlockDraft> }
+  | { kind: "sections"; sections: SectionDraft[]; blocks: Record<string, BlockDraft> }
+
+/** Built-in sections available on each page; ids match the site's block ids. */
+export const PAGE_BLOCKS: Record<SitePageId, { id: string, label: () => string }[]> = {
+  home: [
+    { id: "hero", label: translate["panel.block-hero"] },
+    { id: "join", label: translate["panel.block-join"] },
+    { id: "features", label: translate["panel.block-features"] },
+    { id: "news", label: translate["panel.block-news"] },
+    { id: "spawn", label: translate["panel.block-spawn"] },
+    { id: "community", label: translate["panel.block-community"] },
+    { id: "faq", label: translate["panel.block-faq"] },
+    { id: "share", label: translate["panel.block-share"] },
+  ],
+  servers: [],
+  start: [{ id: "start-hero", label: translate["panel.block-start-hero"] }],
+  support: [
+    { id: "support-hero", label: translate["panel.block-support-hero"] },
+    { id: "support-help", label: translate["panel.block-support-help"] },
+    { id: "support-where", label: translate["panel.block-support-where"] },
+    { id: "support-thanks", label: translate["panel.block-support-thanks"] },
+    { id: "support-faq", label: translate["panel.block-support-faq"] },
+    { id: "support-cta", label: translate["panel.block-support-cta"] },
+  ],
+  modpack: [
+    { id: "modpack-hero", label: translate["panel.block-modpack-hero"] },
+    { id: "modpack-manual", label: translate["panel.block-modpack-manual"] },
+    { id: "modpack-faq", label: translate["panel.block-modpack-faq"] },
+  ],
+}
 
 export const createSectionId = () => `s${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
 
@@ -74,6 +104,7 @@ const asString = (value: unknown) => typeof value === "string" ? value : ""
 export function normalizeDraft(page: SitePageId, content: unknown): SiteDraft {
   const doc = asRecord(content)
   const sections = normalizeSections(doc.sections)
+  const blocks = normalizeBlocks(doc.blocks)
 
   if (page === "home") {
     const carousel = Array.isArray(doc.carousel) ? doc.carousel : []
@@ -88,10 +119,11 @@ export function normalizeDraft(page: SitePageId, content: unknown): SiteDraft {
         return [{ image, alt: asString(slide.alt) }]
       }),
       sections,
+      blocks,
     }
   }
 
-  if (page !== "servers") return { kind: "sections", sections }
+  if (page !== "servers") return { kind: "sections", sections, blocks }
 
   const items = asRecord(doc.items)
   const normalized: Record<string, ServerDraft> = {}
@@ -106,7 +138,24 @@ export function normalizeDraft(page: SitePageId, content: unknown): SiteDraft {
     description: asString(doc.description),
     items: normalized,
     sections,
+    blocks,
   }
+}
+
+function normalizeBlocks(value: unknown): Record<string, BlockDraft> {
+  const source = asRecord(value)
+  const result: Record<string, BlockDraft> = {}
+
+  for (const [id, item] of Object.entries(source)) {
+    const entry = asRecord(item)
+    result[id] = {
+      title: asString(entry.title),
+      description: asString(entry.description),
+      hidden: entry.hidden === true,
+    }
+  }
+
+  return result
 }
 
 function normalizeSections(value: unknown): SectionDraft[] {
@@ -191,6 +240,24 @@ export function serializeDraft(draft: SiteDraft): unknown {
 
   const sections = serializeSections(draft.sections)
   if (sections.length) result.sections = sections
+
+  const blocks = serializeBlocks(draft.blocks)
+  if (Object.keys(blocks).length) result.blocks = blocks
+
+  return result
+}
+
+function serializeBlocks(blocks: Record<string, BlockDraft>) {
+  const result: Record<string, { title?: string, description?: string, hidden?: boolean }> = {}
+
+  for (const [id, block] of Object.entries(blocks)) {
+    const value: { title?: string, description?: string, hidden?: boolean } = {}
+    if (block.title.trim()) value.title = block.title
+    if (block.description.trim()) value.description = block.description
+    if (block.hidden) value.hidden = true
+
+    if (Object.keys(value).length) result[id] = value
+  }
 
   return result
 }
@@ -423,6 +490,28 @@ const removeFeature = action((ctx, id: string, index: number) => {
   })
 }, "siteEditor.removeFeature")
 
+const setBlock = action((ctx, id: string, patch: Partial<Omit<BlockDraft, never>>) => {
+  const draft = currentDraft(ctx)
+  if (!draft) return
+
+  const current = draft.blocks[id] ?? { title: "", description: "", hidden: false }
+  patchDraft(ctx, draft, (value) => ({
+    ...value,
+    blocks: { ...value.blocks, [id]: { ...current, ...patch } },
+  }))
+}, "siteEditor.setBlock")
+
+const toggleBlock = action((ctx, id: string) => {
+  const draft = currentDraft(ctx)
+  if (!draft) return
+
+  const current = draft.blocks[id] ?? { title: "", description: "", hidden: false }
+  patchDraft(ctx, draft, (value) => ({
+    ...value,
+    blocks: { ...value.blocks, [id]: { ...current, hidden: !current.hidden } },
+  }))
+}, "siteEditor.toggleBlock")
+
 const patchSections = action((ctx, update: (sections: SectionDraft[]) => SectionDraft[]) => {
   const draft = currentDraft(ctx)
   if (!draft) return
@@ -614,6 +703,8 @@ export const siteEditor = {
   addFeature,
   setFeature,
   removeFeature,
+  setBlock,
+  toggleBlock,
   addSection,
   setSection,
   removeSection,

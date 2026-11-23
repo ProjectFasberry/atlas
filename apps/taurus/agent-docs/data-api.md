@@ -53,6 +53,11 @@ The draft is rendered as the usual page, adds `noindex`, and initializes
 `shared/models/site-edit.model.ts` with the effective values (defaults merged with
 the draft).
 
+Every editable page also carries `blocks` - overrides for its built-in sections
+(`{ title?, description?, hidden? }` keyed by ids such as `hero`, `news`,
+`support-faq`). Components render `BlockTitle`/`BlockSubtitle`/`BlockControls`,
+which fall back to their own translated copy; the panel lists the same ids.
+
 Every editable page also carries ordered `sections` (`{ id, title, body, hidden }`):
 `EditableSections` renders them at the end of the page and, in edit mode, adds
 add/remove/reorder/hide controls. `/start` and `/support` are not prerendered

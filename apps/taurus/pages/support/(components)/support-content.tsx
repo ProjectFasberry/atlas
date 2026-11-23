@@ -1,5 +1,5 @@
 import { Accordion } from "@ark-ui/solid/accordion";
-import { For, type JSX } from "solid-js";
+import { For, Show, type JSX } from "solid-js";
 import { Link } from "@/shared/components/link";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { Typography } from "@/shared/ui/typography";
@@ -14,6 +14,7 @@ import {
 } from "../(models)/support.model";
 import { useAtomAccessor } from "@/shared/lib/utils";
 import { reatomComponent } from "@/shared/lib/reatom";
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 
 const voteUrl = "https://hotmc.ru/vote-259308"
 const voteIcon = getStaticObject("minecraft", "icons/experience_big.webp")
@@ -88,19 +89,30 @@ const ActionButton = (props: { children: JSX.Element; onClick?: () => void; href
 
 export const SupportContent = reatomComponent(({ ctx }) => {
   const faqOpen = useAtomAccessor(supportState.faqOpen)
+  const helpHidden = useBlockHidden("support-help")
+  const whereHidden = useBlockHidden("support-where")
+  const thanksHidden = useBlockHidden("support-thanks")
+  const faqHidden = useBlockHidden("support-faq")
+  const ctaHidden = useBlockHidden("support-cta")
 
   return (
     <div class="responsive mx-auto flex flex-col gap-10 sm:gap-12">
+      <Show when={!helpHidden()}>
       <header class="flex max-w-3xl flex-col gap-2">
         <Typography class="text-xs uppercase tracking-[0.2em] text-gold">
           {translate["support.eyebrow"]()}
         </Typography>
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl">
-          {translate["support.heading"]()}
-        </h2>
-        <Typography color="gray" class="text-sm leading-6 sm:text-base">
-          {translate["support.description"]()}
-        </Typography>
+        <BlockTitle
+          id="support-help"
+          fallback={translate["support.heading"]()}
+          class="text-2xl sm:text-3xl lg:text-4xl"
+        />
+        <BlockSubtitle
+          id="support-help"
+          fallback={translate["support.description"]()}
+          class="text-sm leading-6 sm:text-base"
+        />
+        <BlockControls id="support-help" />
       </header>
       <div class="grid gap-3 lg:grid-cols-3">
         <SupportCard
@@ -148,11 +160,16 @@ export const SupportContent = reatomComponent(({ ctx }) => {
           </a>
         </SupportCard>
       </div>
+      </Show>
       <div class="grid gap-3 lg:grid-cols-[1.1fr_.9fr]">
+        <Show when={!whereHidden()}>
         <section class="transparent-achievement-panel flex flex-col gap-4 p-4 sm:p-5">
-          <h3 class="text-xl sm:text-2xl">
-            {translate["support.where.title"]()}
-          </h3>
+          <BlockTitle
+            id="support-where"
+            fallback={translate["support.where.title"]()}
+            class="text-xl sm:text-2xl"
+          />
+          <BlockControls id="support-where" />
           <div class="flex flex-col gap-4">
             <For each={whereItems()}>
               {(item, index) => (
@@ -173,10 +190,15 @@ export const SupportContent = reatomComponent(({ ctx }) => {
             </For>
           </div>
         </section>
+        </Show>
+        <Show when={!thanksHidden()}>
         <section class="transparent-achievement-panel flex flex-col gap-4 p-4 sm:p-5">
-          <h3 class="text-xl sm:text-2xl">
-            {translate["support.thanks.title"]()}
-          </h3>
+          <BlockTitle
+            id="support-thanks"
+            fallback={translate["support.thanks.title"]()}
+            class="text-xl sm:text-2xl"
+          />
+          <BlockControls id="support-thanks" />
           <div class="flex items-center gap-2">
             <img
               src={steveImage}
@@ -200,24 +222,33 @@ export const SupportContent = reatomComponent(({ ctx }) => {
               {translate["support.thanks.caption"]()}
             </Typography>
           </div>
-          <Typography color="gray" class="text-sm leading-6">
-            {translate["support.thanks.description"]()}
-          </Typography>
+          <BlockSubtitle
+            id="support-thanks"
+            fallback={translate["support.thanks.description"]()}
+            class="text-sm leading-6"
+          />
           <div class="mt-auto">
             <ActionButton href="/discord">
               {translate["support.thanks.action"]()}
             </ActionButton>
           </div>
         </section>
+        </Show>
       </div>
+      <Show when={!faqHidden()}>
       <section class="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:gap-10">
         <div class="flex flex-col gap-1">
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl">
-            {translate["support.faq.title"]()}
-          </h2>
-          <Typography color="gray" class="text-sm sm:text-base">
-            {translate["support.faq.subtitle"]()}
-          </Typography>
+          <BlockTitle
+            id="support-faq"
+            fallback={translate["support.faq.title"]()}
+            class="text-2xl sm:text-3xl lg:text-4xl"
+          />
+          <BlockSubtitle
+            id="support-faq"
+            fallback={translate["support.faq.subtitle"]()}
+            class="text-sm sm:text-base"
+          />
+          <BlockControls id="support-faq" />
         </div>
         <Accordion.Root
           multiple
@@ -248,14 +279,21 @@ export const SupportContent = reatomComponent(({ ctx }) => {
           </For>
         </Accordion.Root>
       </section>
+      </Show>
+      <Show when={!ctaHidden()}>
       <section class="transparent-achievement-panel flex flex-col items-center justify-between gap-4 p-4 sm:flex-row sm:p-5">
         <div class="flex flex-col gap-1">
-          <h2 class="text-xl">
-            {translate["support.cta.title"]()}
-          </h2>
-          <Typography color="gray" class="text-sm">
-            {translate["support.cta.description"]()}
-          </Typography>
+          <BlockTitle
+            id="support-cta"
+            fallback={translate["support.cta.title"]()}
+            class="text-xl"
+          />
+          <BlockSubtitle
+            id="support-cta"
+            fallback={translate["support.cta.description"]()}
+            class="text-sm"
+          />
+          <BlockControls id="support-cta" />
         </div>
         <div class="flex w-full gap-2 sm:w-auto">
           <Link href="/discord" class="flex-1 sm:flex-none">
@@ -274,6 +312,7 @@ export const SupportContent = reatomComponent(({ ctx }) => {
           </Link>
         </div>
       </section>
+      </Show>
     </div>
   )
 }, "SupportContent")

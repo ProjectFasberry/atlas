@@ -12,10 +12,11 @@ import { getLauncherDownloadUrl, getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import type { Data } from "./+data";
 import { siteEdit } from "@/shared/models/site-edit.model";
-import { asSectionsContent } from "@/shared/api/site";
+import { asBlocks, asSectionsContent } from "@/shared/api/site";
 import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
 import { EditEntry } from "@/shared/components/edit/edit-entry";
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 import { ModpackList } from "./(components)/modpack-list";
 import { modpackFaqItems, modpackState, setModpackFaq } from "./(models)/modpack.model";
 import { reatomComponent } from "@/shared/lib/reatom";
@@ -80,18 +81,29 @@ export default reatomComponent(({ ctx }) => {
   const failed = pageData?.failed
   const edit = pageData?.edit
 
+  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.sections))
+
+  const heroHidden = useBlockHidden("modpack-hero")
+  const manualHidden = useBlockHidden("modpack-manual")
+  const faqHidden = useBlockHidden("modpack-faq")
+
   if (edit?.active) {
     siteEdit.init(ctx, {
       page: "modpack",
       locale: edit.locale,
       version: edit.version,
       canPublish: edit.canPublish,
-      content: { kind: "sections", sections: asSectionsContent(pageData.sections) },
+      content: {
+        kind: "sections",
+        sections: asSectionsContent(pageData.sections),
+        blocks: asBlocks(pageData.sections),
+      },
     })
   }
 
   return (
     <MainWrapperPage variant="with_section" class={edit?.active ? "pb-24" : undefined}>
+      <Show when={!heroHidden()}>
       <div
         class={sectionVariant({ className: "bg-bottom md:bg-center bg-cover" })}
         style={{ "background-image": `url(${bgImage})` }}
@@ -100,12 +112,18 @@ export default reatomComponent(({ ctx }) => {
         <WrapperTitle>
           <div class="flex flex-col gap-6 w-full lg:max-w-3xl items-start justify-start">
             <div class="flex flex-col gap-2 lg:max-w-3xl">
-              <h1 class={sectionVariantChild().title({ className: "text-gold" })}>
-                {translate["modpack.title"]()}
-              </h1>
-              <Typography color="white" class={sectionVariantChild().subtitle()}>
-                {translate["modpack.subtitle"]()}
-              </Typography>
+              <BlockTitle
+                id="modpack-hero"
+                fallback={translate["modpack.title"]()}
+                as="h1"
+                class={sectionVariantChild().title({ className: "text-gold" })}
+              />
+              <BlockSubtitle
+                id="modpack-hero"
+                fallback={translate["modpack.subtitle"]()}
+                class={sectionVariantChild().subtitle()}
+              />
+              <BlockControls id="modpack-hero" />
             </div>
             <Link href="#launcher" class={sectionVariantChild().action()}>
               <Button class="w-full px-6 py-0.5 gap-2">
@@ -117,6 +135,7 @@ export default reatomComponent(({ ctx }) => {
           </div>
         </WrapperTitle>
       </div>
+      </Show>
       <div class="full-screen-section py-16 lg:py-24">
         <div class="responsive mx-auto flex flex-col gap-10 sm:gap-12">
           <section id="launcher" class="scroll-mt-24 transparent-achievement-panel flex flex-col gap-5 p-4 sm:p-6">
@@ -175,15 +194,21 @@ export default reatomComponent(({ ctx }) => {
               </Link>
             </div>
           </section>
+          <Show when={!manualHidden()}>
           <section id="modpacks" class="flex scroll-mt-24 flex-col gap-3">
             <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
               <div class="flex flex-col gap-1">
-                <h2 class="text-2xl sm:text-3xl">
-                  {translate["modpack.manual.title"]()}
-                </h2>
-                <Typography color="gray" class="text-sm sm:text-base">
-                  {translate["modpack.manual.description"]()}
-                </Typography>
+                <BlockTitle
+                  id="modpack-manual"
+                  fallback={translate["modpack.manual.title"]()}
+                  class="text-2xl sm:text-3xl"
+                />
+                <BlockSubtitle
+                  id="modpack-manual"
+                  fallback={translate["modpack.manual.description"]()}
+                  class="text-sm sm:text-base"
+                />
+                <BlockControls id="modpack-manual" />
               </div>
               <Show when={(data?.length ?? 0) > 0}>
                 <span class="text-xs text-neutral-500 sm:text-sm">
@@ -193,17 +218,25 @@ export default reatomComponent(({ ctx }) => {
             </div>
             <ModpackList data={data} failed={failed} />
           </section>
+          </Show>
+          <Show when={!faqHidden()}>
           <section class="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:gap-10">
             <div class="flex flex-col gap-1">
-              <h2 class="text-2xl sm:text-3xl lg:text-4xl">
-                {translate["modpack.faq.title"]()}
-              </h2>
-              <Typography color="gray" class="text-sm sm:text-base">
-                {translate["modpack.faq.subtitle"]()}
-              </Typography>
+              <BlockTitle
+                id="modpack-faq"
+                fallback={translate["modpack.faq.title"]()}
+                class="text-2xl sm:text-3xl lg:text-4xl"
+              />
+              <BlockSubtitle
+                id="modpack-faq"
+                fallback={translate["modpack.faq.subtitle"]()}
+                class="text-sm sm:text-base"
+              />
+              <BlockControls id="modpack-faq" />
             </div>
             <ModpackFaq />
           </section>
+          </Show>
         </div>
       </div>
       <EditableSections

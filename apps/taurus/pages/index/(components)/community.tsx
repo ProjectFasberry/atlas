@@ -3,18 +3,27 @@ import { Link } from "@/shared/components/link";
 import { Typography } from "@/shared/ui/typography";
 import { translate } from "@/shared/locales/helpers";
 import { createCommunityItems } from "../(models)/community.model";
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 
 export const CommunitySection = () => {
+  const hidden = useBlockHidden("community")
+  if (hidden()) return null
+
   return (
     <div id="community" class="section-edge relative flex w-full flex-col items-center py-16 sm:py-20 lg:py-28">
       <div class="responsive z-1 flex flex-col gap-6 sm:gap-8">
         <div class="flex flex-col gap-1">
-          <Typography color="white" class="text-2xl sm:text-3xl lg:text-4xl">
-            {translate["community.title"]()}
-          </Typography>
-          <Typography color="gray" class="text-sm sm:text-base">
-            {translate["community.subtitle"]()}
-          </Typography>
+          <BlockTitle
+            id="community"
+            fallback={translate["community.title"]()}
+            class="text-2xl sm:text-3xl lg:text-4xl"
+          />
+          <BlockSubtitle
+            id="community"
+            fallback={translate["community.subtitle"]()}
+            class="text-sm sm:text-base"
+          />
+          <BlockControls id="community" />
         </div>
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <For each={createCommunityItems()}>

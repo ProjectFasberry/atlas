@@ -14,7 +14,7 @@ import { EditToolbar } from "@/shared/components/edit/edit-toolbar"
 import { EditEntry } from "@/shared/components/edit/edit-entry"
 import { EditableSections } from "@/shared/components/edit/editable-sections"
 import { getStaticAsset, toStaticKey } from "@/shared/lib/helpers"
-import { asSectionsContent } from "@/shared/api/site"
+import { asBlocks, asSectionsContent } from "@/shared/api/site"
 import type { Data } from "../+data"
 
 const ServerStatus = reatomComponent<{ id: string }>(({ ctx, id }) => {
@@ -223,6 +223,8 @@ export const ServersPage = reatomComponent(({ ctx }) => {
   const edit = pageData?.edit
   const profiles = () => createServerProfiles(pageData?.content)
 
+  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData?.content))
+
   if (edit?.active) {
     siteEdit.init(ctx, {
       page: "servers",
@@ -235,6 +237,7 @@ export const ServersPage = reatomComponent(({ ctx }) => {
         description: pageData.content?.description ?? translate["servers.page.description"](),
         servers: toEditServers(profiles()),
         sections: asSectionsContent(pageData.content),
+        blocks: asBlocks(pageData.content),
       },
     })
   }

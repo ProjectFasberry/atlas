@@ -16,7 +16,7 @@ import { dayjs } from "@/shared/lib/dayjs"
 import { env } from "@/shared/env"
 import { getStaticImage } from "@/shared/lib/helpers"
 import {
-  serverDraftOf, siteEditor,
+  PAGE_BLOCKS, serverDraftOf, siteEditor,
   type ImageTarget, type ServerDraft, type SiteDraft, type SiteLocale,
   type SitePageId, type SiteTarget,
 } from "../models/site.model"
@@ -354,6 +354,60 @@ const ServersEditor = reatomComponent<{ draft: Extract<SiteDraft, { kind: "serve
   "SiteServersEditor",
 )
 
+const BlocksEditor = reatomComponent<{ page: SitePageId, draft: SiteDraft, canEdit: boolean }>(
+  ({ ctx, page, draft, canEdit }) => {
+    const blocks = PAGE_BLOCKS[page]
+
+    if (!blocks.length) return null
+
+    return (
+      <div className="flex flex-col gap-2 rounded-xl border border-neutral-800 p-2">
+        <Typography className="text-sm font-semibold">
+          {translate["panel.site-blocks"]()}
+        </Typography>
+        <Typography color="gray" className="text-xs">
+          {translate["panel.site-blocks-hint"]()}
+        </Typography>
+        {blocks.map(({ id, label }) => {
+          const value = draft.blocks[id] ?? { title: "", description: "", hidden: false }
+
+          return (
+            <div key={id} className="flex flex-col gap-2 rounded-lg border border-neutral-800 p-2">
+              <div className="flex items-center justify-between gap-2">
+                <Typography className="text-xs font-semibold text-neutral-400">
+                  {label()}
+                </Typography>
+                <label className="flex items-center gap-2 text-[11px] text-neutral-400">
+                  <input
+                    type="checkbox"
+                    checked={value.hidden}
+                    disabled={!canEdit}
+                    onChange={() => siteEditor.toggleBlock(ctx, id)}
+                  />
+                  {translate["panel.site-hide-section"]()}
+                </label>
+              </div>
+              <TextField
+                label={translate["panel.title"]()}
+                value={value.title}
+                disabled={!canEdit}
+                onChange={(next) => siteEditor.setBlock(ctx, id, { title: next })}
+              />
+              <TextArea
+                label={translate["panel.description"]()}
+                value={value.description}
+                disabled={!canEdit}
+                onChange={(next) => siteEditor.setBlock(ctx, id, { description: next })}
+              />
+            </div>
+          )
+        })}
+      </div>
+    )
+  },
+  "SiteBlocksEditor",
+)
+
 const SectionsEditor = reatomComponent<{ draft: SiteDraft, canEdit: boolean }>(({ ctx, draft, canEdit }) => (
   <div className="flex flex-col gap-2 rounded-xl border border-neutral-800 p-2">
     <Typography className="text-sm font-semibold">
@@ -548,6 +602,7 @@ export const SitePanel = reatomComponent(({ ctx }) => {
           </div>
           {draft.kind === "home" && <CarouselEditor draft={draft} canEdit={canEdit} />}
           {draft.kind === "servers" && <ServersEditor draft={draft} canEdit={canEdit} />}
+          <BlocksEditor page={page} draft={draft} canEdit={canEdit} />
           <SectionsEditor draft={draft} canEdit={canEdit} />
           <div className="flex flex-wrap items-center gap-2">
             <Button

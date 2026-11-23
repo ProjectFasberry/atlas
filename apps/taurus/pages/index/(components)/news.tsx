@@ -8,6 +8,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { Typography } from "@/shared/ui/typography";
 import { newsList, type NewsItem } from "../(models)/news.model";
 import { useAtomAccessor } from "@/shared/lib/utils";
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 import { reatomComponent } from "@/shared/lib/reatom";
 
 const APP_URL = env.VITE_APP_URL
@@ -92,17 +93,25 @@ export const NewsSection = reatomComponent(({ ctx }) => {
   const isLoading = () => statuses().isPending || !statuses().isEverPending
   const isEmpty = () => !isLoading() && !error() && items().length === 0
 
+  const hidden = useBlockHidden("news")
+  if (hidden()) return null
+
   return (
     <div id="news" class="section-edge relative flex w-full flex-col items-center py-16 sm:py-20 lg:py-28">
       <div class="responsive z-1 flex flex-col gap-6 sm:gap-8">
         <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div class="flex flex-col gap-1">
-            <Typography color="white" class="text-2xl sm:text-3xl lg:text-4xl">
-              {translate["news.title"]()}
-            </Typography>
-            <Typography color="gray" class="text-sm sm:text-base">
-              {translate["news.subtitle"]()}
-            </Typography>
+            <BlockTitle
+              id="news"
+              fallback={translate["news.title"]()}
+              class="text-2xl sm:text-3xl lg:text-4xl"
+            />
+            <BlockSubtitle
+              id="news"
+              fallback={translate["news.subtitle"]()}
+              class="text-sm sm:text-base"
+            />
+            <BlockControls id="news" />
           </div>
           <Link
             href={`${APP_URL}/news`}

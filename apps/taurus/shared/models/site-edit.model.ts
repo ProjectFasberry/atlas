@@ -2,7 +2,7 @@ import { action, atom, reatomAsync, withStatusesAtom, type Ctx } from "@reatom/f
 import { toast } from "solid-sonner"
 import {
   discardSiteDraft, publishSiteDraft, saveSiteDraft,
-  type SiteAdminPayload, type SiteLocale,
+  type BlockContent, type SiteAdminPayload, type SiteLocale,
 } from "@/shared/api/site"
 import { translate } from "@/shared/locales/helpers"
 
@@ -19,6 +19,7 @@ export type EditPage = "home" | "servers" | "start" | "support" | "modpack"
 export type EditSlide = { imageKey: string; alt: string }
 export type EditFeature = { iconKey: string; title: string; description: string }
 export type EditSection = { id: string; title: string; body: string; hidden: boolean }
+export type EditBlock = BlockContent
 
 export type EditServer = {
   id: string
@@ -30,9 +31,9 @@ export type EditServer = {
 }
 
 export type EditContent =
-  | { kind: "home"; slides: EditSlide[]; sections: EditSection[] }
-  | { kind: "servers"; title: string; description: string; servers: EditServer[]; sections: EditSection[] }
-  | { kind: "sections"; sections: EditSection[] }
+  | { kind: "home"; slides: EditSlide[]; sections: EditSection[]; blocks: Record<string, EditBlock> }
+  | { kind: "servers"; title: string; description: string; servers: EditServer[]; sections: EditSection[]; blocks: Record<string, EditBlock> }
+  | { kind: "sections"; sections: EditSection[]; blocks: Record<string, EditBlock> }
 
 export type EditInit = {
   page: EditPage
@@ -49,6 +50,8 @@ const versionAtom = atom(0, "siteEdit.version")
 const canPublishAtom = atom(false, "siteEdit.canPublish")
 const contentAtom = atom<EditContent | null>(null, "siteEdit.content")
 const dirtyAtom = atom(false, "siteEdit.dirty")
+/** Published overrides, used by the built-in sections outside edit mode. */
+const publishedBlocksAtom = atom<Record<string, EditBlock>>({}, "siteEdit.publishedBlocks")
 
 const init = action((ctx, input: EditInit) => {
   const initialized = ctx.get(activeAtom)
@@ -70,6 +73,25 @@ const patch = (ctx: Parameters<typeof init>[0], content: EditContent) => {
   contentAtom(ctx, content)
   dirtyAtom(ctx, true)
 }
+
+const setPublishedBlocks = action((ctx, blocks: Record<string, EditBlock>) => {
+  publishedBlocksAtom(ctx, blocks)
+}, "siteEdit.setPublishedBlocks")
+
+const setBlock = action((ctx, id: string, value: Partial<EditBlock>) => {
+  const content = ctx.get(contentAtom)
+  if (!content) return
+
+  patch(ctx, { ...content, blocks: { ...content.blocks, [id]: { ...content.blocks[id], ...value } } })
+}, "siteEdit.setBlock")
+
+const toggleBlock = action((ctx, id: string) => {
+  const content = ctx.get(contentAtom)
+  if (!content) return
+
+  const hidden = Boolean(content.blocks[id]?.hidden)
+  patch(ctx, { ...content, blocks: { ...content.blocks, [id]: { ...content.blocks[id], hidden: !hidden } } })
+}, "siteEdit.toggleBlock")
 
 const setHomeSlide = action((ctx, index: number, value: Partial<EditSlide>) => {
   const content = ctx.get(contentAtom)
@@ -202,11 +224,11 @@ function serialize(content: EditContent): unknown {
           : { image: slide.imageKey.trim() }
       })
 
-    return { carousel, sections: serializeSections(content.sections) }
+    return { carousel, sections: serializeSections(content.sections), blocks: serializeBlocks(content.blocks) }
   }
 
   if (content.kind === "sections") {
-    return { sections: serializeSections(content.sections) }
+    return { sections: serializeSections(content.sections), blocks: serializeBlocks(content.blocks) }
   }
 
   const items: Record<string, unknown> = {}
@@ -244,6 +266,22 @@ function serialize(content: EditContent): unknown {
   if (description) result.description = description
 
   result.sections = serializeSections(content.sections)
+  result.blocks = serializeBlocks(content.blocks)
+
+  return result
+}
+
+function serializeBlocks(blocks: Record<string, EditBlock>) {
+  const result: Record<string, EditBlock> = {}
+
+  for (const [id, block] of Object.entries(blocks)) {
+    const value: EditBlock = {}
+    if (typeof block.title === "string") value.title = block.title
+    if (typeof block.description === "string") value.description = block.description
+    if (block.hidden) value.hidden = true
+
+    if (Object.keys(value).length) result[id] = value
+  }
 
   return result
 }
@@ -372,6 +410,10 @@ export const siteEdit = {
   addFeature,
   setFeature,
   removeFeature,
+  setPublishedBlocks,
+  setBlock,
+  toggleBlock,
+  publishedBlocks: publishedBlocksAtom,
   addSection,
   setSection,
   removeSection,

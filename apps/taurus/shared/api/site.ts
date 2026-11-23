@@ -12,6 +12,7 @@ export type SiteLocale = "ru" | "en"
 export type SitePage = "home" | "servers" | "start" | "support" | "modpack"
 
 export type SiteSection = { id: string; title: string; body: string; hidden: boolean }
+export type BlockContent = { title?: string; description?: string; hidden?: boolean }
 export type SectionsContent = { sections?: SiteSection[] }
 
 export type SiteContentPayload = {
@@ -35,6 +36,8 @@ export type SiteAdminPayload = {
 
 export type HomeContent = {
   carousel?: { image: string; alt?: string }[]
+  sections?: SiteSection[]
+  blocks?: Record<string, BlockContent>
 }
 
 export type ServerContentItem = {
@@ -50,6 +53,8 @@ export type ServersContent = {
   title?: string
   description?: string
   items?: Record<string, ServerContentItem>
+  sections?: SiteSection[]
+  blocks?: Record<string, BlockContent>
 }
 
 /** The API document is untyped JSON; keep a malformed value from crashing a page. */
@@ -57,7 +62,9 @@ export function asHomeContent(value: unknown): HomeContent | null {
   if (!isObject(value)) return null
 
   const carousel = value.carousel
-  if (carousel === undefined) return {}
+  if (carousel === undefined) {
+    return { sections: asSectionsContent(value), blocks: asBlocks(value) }
+  }
 
   if (!Array.isArray(carousel)) return null
 
@@ -70,7 +77,7 @@ export function asHomeContent(value: unknown): HomeContent | null {
     }]
   })
 
-  return { carousel: items }
+  return { carousel: items, sections: asSectionsContent(value), blocks: asBlocks(value) }
 }
 
 export function asServersContent(value: unknown): ServersContent | null {
@@ -99,7 +106,7 @@ export function asServersContent(value: unknown): ServersContent | null {
     }
   }
 
-  return { title, description, items: result }
+  return { title, description, items: result, sections: asSectionsContent(value), blocks: asBlocks(value) }
 }
 
 function asFeatures(value: unknown): ServerContentItem["features"] {
@@ -286,4 +293,29 @@ export async function resolvePageContent(
   }
 
   return { content: await fetchPageContent(page, locale, headers), edit: null, canEdit }
+}
+
+/** Overrides for the page's built-in sections. */
+export function asBlocks(value: unknown): Record<string, BlockContent> {
+  const doc = typeof value === "object" && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {}
+
+  if (typeof doc.blocks !== "object" || doc.blocks === null || Array.isArray(doc.blocks)) return {}
+
+  const result: Record<string, BlockContent> = {}
+
+  for (const [id, item] of Object.entries(doc.blocks)) {
+    if (typeof item !== "object" || item === null || Array.isArray(item)) continue
+
+    const entry = item as Record<string, unknown>
+    const block: BlockContent = {}
+    if (typeof entry.title === "string") block.title = entry.title
+    if (typeof entry.description === "string") block.description = entry.description
+    if (entry.hidden === true) block.hidden = true
+
+    if (Object.keys(block).length) result[id] = block
+  }
+
+  return result
 }

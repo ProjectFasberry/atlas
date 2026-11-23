@@ -12,10 +12,11 @@ import { translate } from "@/shared/locales/helpers";
 import { SupportContent } from "./(components)/support-content";
 import { reatomComponent } from "@/shared/lib/reatom";
 import { siteEdit } from "@/shared/models/site-edit.model";
-import { asSectionsContent } from "@/shared/api/site";
+import { asBlocks, asSectionsContent } from "@/shared/api/site";
 import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
 import { EditEntry } from "@/shared/components/edit/edit-entry";
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 import type { Data } from "./+data";
 
 const bgImage = getStaticObject("backgrounds", "support_background.png");
@@ -24,18 +25,27 @@ export default reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
   const edit = pageData?.edit
 
+  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.content))
+
+  const heroHidden = useBlockHidden("support-hero")
+
   if (edit?.active) {
     siteEdit.init(ctx, {
       page: "support",
       locale: edit.locale,
       version: edit.version,
       canPublish: edit.canPublish,
-      content: { kind: "sections", sections: asSectionsContent(pageData.content) },
+      content: {
+        kind: "sections",
+        sections: asSectionsContent(pageData.content),
+        blocks: asBlocks(pageData.content),
+      },
     })
   }
 
   return (
     <MainWrapperPage variant="with_section" class={edit?.active ? "pb-24" : undefined}>
+      <Show when={!heroHidden()}>
       <div
         class={sectionVariant()}
         style={{ "background-image": `url(${bgImage})` }}
@@ -44,12 +54,18 @@ export default reatomComponent(({ ctx }) => {
         <WrapperTitle>
           <div class="flex flex-col gap-6 w-full lg:max-w-3xl items-start justify-start">
             <div class="flex flex-col gap-2 w-full lg:max-w-3xl">
-              <h1 class={sectionVariantChild().title({ className: "text-gold" })}>
-                {translate["support.title"]()}
-              </h1>
-              <Typography class={sectionVariantChild().subtitle()}>
-                {translate["support.subtitle"]()}
-              </Typography>
+              <BlockTitle
+                id="support-hero"
+                fallback={translate["support.title"]()}
+                as="h1"
+                class={sectionVariantChild().title({ className: "text-gold" })}
+              />
+              <BlockSubtitle
+                id="support-hero"
+                fallback={translate["support.subtitle"]()}
+                class={sectionVariantChild().subtitle()}
+              />
+              <BlockControls id="support-hero" />
             </div>
             <Link href="#support-list" class={sectionVariantChild().action()}>
               <Button class="w-full px-6 py-0.5 gap-2">
@@ -61,6 +77,7 @@ export default reatomComponent(({ ctx }) => {
           </div>
         </WrapperTitle>
       </div>
+      </Show>
       <div id="support-list" class="full-screen-section py-16 lg:py-24">
         <SupportContent />
       </div>

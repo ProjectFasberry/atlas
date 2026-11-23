@@ -10,6 +10,7 @@ import { translate } from "@/shared/locales/helpers";
 import { serverStatus } from "@/shared/models/server-status.model";
 import { reatomComponent } from "@/shared/lib/reatom";
 import { useAtomAccessor } from "@/shared/lib/utils";
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 
 const APP_URL = env.VITE_APP_URL
 const WINDOWS_URL = getLauncherDownloadUrl("windows-x86_64")
@@ -60,6 +61,9 @@ export const JoinSection = reatomComponent(({ ctx }) => {
     return Math.min(100, Math.max(0, ((players() ?? 0) / max) * 100))
   }
 
+  const hidden = useBlockHidden("join")
+  if (hidden()) return null
+
   return (
     <div id="join" class={joinSection()}>
       <div class="responsive z-1 grid items-center gap-5 lg:grid-cols-[1.05fr_.95fr] lg:gap-3">
@@ -68,12 +72,17 @@ export const JoinSection = reatomComponent(({ ctx }) => {
             {translate["join.eyebrow"]()}
           </Typography>
           <div class="flex flex-col gap-2">
-            <h2 class={sectionVariantChild().title({ className: "mb-0" })}>
-              {translate["join.title"]()}
-            </h2>
-            <Typography color="gray" class="text-sm sm:text-base leading-6">
-              {translate["join.description"]()}
-            </Typography>
+            <BlockTitle
+              id="join"
+              fallback={translate["join.title"]()}
+              class={sectionVariantChild().title({ className: "mb-0" })}
+            />
+            <BlockSubtitle
+              id="join"
+              fallback={translate["join.description"]()}
+              class="text-sm sm:text-base leading-6"
+            />
+            <BlockControls id="join" />
           </div>
           <ol class="flex flex-col gap-2">
             <For each={getSteps()}>
