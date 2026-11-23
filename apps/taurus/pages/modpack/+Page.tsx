@@ -52,8 +52,9 @@ const ModpackFaq = reatomComponent(({ ctx }) => {
               <Typography color="white" class="text-sm sm:text-base">
                 {item.question}
               </Typography>
-              <Accordion.ItemIndicator class="shrink-0 text-lg text-green-400 transition-transform duration-200 data-[state=open]:rotate-45">
-                +
+              <Accordion.ItemIndicator class="group shrink-0 text-lg text-green-400">
+                <span class="group-data-[state=open]:hidden">+</span>
+                <span class="hidden group-data-[state=open]:inline">−</span>
               </Accordion.ItemIndicator>
             </Accordion.ItemTrigger>
             <Accordion.ItemContent class="px-3 pb-3 sm:px-4 sm:pb-4">

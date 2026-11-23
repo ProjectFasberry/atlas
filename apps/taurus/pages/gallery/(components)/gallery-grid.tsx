@@ -62,7 +62,7 @@ export const GalleryGrid = reatomComponent(({ ctx }) => {
                 class={`${filter() === item.value
                   ? "raised-slot-active text-neutral-100"
                   : "raised-slot text-neutral-800"} cursor-pointer px-3 py-1.5 text-xs
-                  transition-all duration-150 hover:brightness-110 sm:text-sm`
+                  sm:text-sm`
                 }
               >
                 {item.label()} · {countFor(item.value)}
@@ -93,7 +93,7 @@ export const GalleryGrid = reatomComponent(({ ctx }) => {
                     width={1920}
                     height={1080}
                     loading={index() === 0 ? "eager" : "lazy"}
-                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    class="h-full w-full object-cover"
                   />
                   <div
                     class="absolute inset-0 bg-linear-to-t

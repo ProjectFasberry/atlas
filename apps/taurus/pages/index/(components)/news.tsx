@@ -31,7 +31,7 @@ const NewsCard = (props: { item: NewsItem }) => {
       href={`${APP_URL}/news/${props.item.id}`}
       target="_blank"
       rel="noreferrer"
-      class="group flex flex-col overflow-hidden transparent-achievement-panel duration-300 hover:-translate-y-1 hover:brightness-110"
+      class="group flex flex-col overflow-hidden transparent-achievement-panel"
     >
       <div class="relative aspect-video w-full overflow-hidden bg-neutral-900">
         <Show when={props.item.imageUrl}>
@@ -42,7 +42,7 @@ const NewsCard = (props: { item: NewsItem }) => {
               loading="lazy"
               width={640}
               height={360}
-              class="h-full w-full object-cover brightness-75 duration-500 group-hover:scale-[1.03] group-hover:brightness-100"
+              class="h-full w-full object-cover brightness-75"
             />
           )}
         </Show>

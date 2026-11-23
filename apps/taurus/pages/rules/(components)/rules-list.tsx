@@ -299,9 +299,9 @@ export const RulesContent = reatomComponent(({ ctx }) => {
                           </span>
                         </span>
                         <Show when={!isSearching()}>
-                          <Accordion.ItemIndicator class="ml-auto shrink-0
-                            text-xl text-green-400 transition-transform duration-200 data-[state=open]:rotate-45">
-                            +
+                          <Accordion.ItemIndicator class="group ml-auto shrink-0 text-xl text-green-400">
+                            <span class="group-data-[state=open]:hidden">+</span>
+                            <span class="hidden group-data-[state=open]:inline">−</span>
                           </Accordion.ItemIndicator>
                         </Show>
                       </Accordion.ItemTrigger>

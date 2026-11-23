@@ -16,7 +16,6 @@ export const SpawnCarousel = reatomComponent(({ ctx }) => {
       allowMouseDrag={true}
       onPageChange={(details) => setSpawnPage(ctx, details.page)}
       loop
-      autoplay
       slidesPerPage={1.4}
       snapType="proximity"
       spacing={"16px"}

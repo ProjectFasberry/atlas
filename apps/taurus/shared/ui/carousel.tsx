@@ -2,7 +2,7 @@ import { tv } from "tailwind-variants";
 
 const root = tv({
   base: `
-    flex flex-col gap-4 relative w-full duration-150 ease-in
+    flex flex-col gap-4 relative w-full
     data-[orientation=vertical]:flex-row data-[orientation=vertical]:max-w-max data-[orientation=vertical]:h-[320px]
   `,
 })

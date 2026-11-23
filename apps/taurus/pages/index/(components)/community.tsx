@@ -23,7 +23,7 @@ export const CommunitySection = () => {
                 href={item.href}
                 target={item.external ? "_blank" : undefined}
                 rel={item.external ? "noreferrer" : undefined}
-                class="group flex flex-col gap-3 transparent-achievement-panel p-4 duration-300 hover:-translate-y-1 hover:brightness-110"
+                class="group flex flex-col gap-3 transparent-achievement-panel p-4"
               >
                 <div class="flex items-start justify-between">
                   <span class="raised-slot flex h-11 w-11 items-center justify-center">
@@ -36,7 +36,7 @@ export const CommunitySection = () => {
                       draggable={false}
                     />
                   </span>
-                  <span class="text-neutral-500 transition-colors group-hover:text-green-400">
+                  <span class="text-neutral-500 group-hover:text-green-400">
                     ↗
                   </span>
                 </div>

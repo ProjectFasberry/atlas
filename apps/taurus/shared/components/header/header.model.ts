@@ -17,6 +17,7 @@ export type MainHeaderLink = {
 
 export const createMainHeaderLinks = () => ([
   { name: translate["header.links.home"](), href: "/", },
+  { name: translate["header.links.servers"](), href: "/servers", },
   { name: translate["header.links.rules"](), href: "/rules", },
   { name: translate["header.links.support"](), href: "/support", class: "text-gold" },
   { name: translate["header.links.gallery"](), href: "/gallery", },

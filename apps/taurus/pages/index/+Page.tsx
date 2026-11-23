@@ -5,7 +5,7 @@ import { Typography } from "@/shared/ui/typography";
 import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import { For } from "solid-js";
 import { SpawnCarousel } from "./(components)/spawn-carousel";
-import { IdeaPreviewCard, IdeasList } from "./(components)/gameplay";
+import { IdeaPreviewCard, IdeasNav } from "./(components)/gameplay";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { appState } from "@/shared/models/app.model";
@@ -91,20 +91,17 @@ export default function Page() {
       </div>
       <JoinSection />
       <div id="features" class={sectionVariant()}>
-        <div class="flex flex-col items-center mx-auto responsive gap-6 justify-center select-none relative">
+        <div class="flex flex-col items-center mx-auto responsive gap-6 justify-center relative">
           <Typography color="white" class="text-xl text-center sm:text-3xl lg:text-4xl">
             {translate["features.title"]()}
           </Typography>
-          <div class="flex items-center justify-center w-full gap-1 sm:gap-6 md:gap-4">
-            <div
-              class="flex rounded-md overflow-x-auto items-center justify-start w-fit
-								scrollbar scrollbar-thumb-rounded-xl scrollbar-h-0 scrollbar-thumb-neutral-900
-							"
-            >
-              <IdeasList />
-            </div>
-          </div>
+          <IdeasNav />
           <IdeaPreviewCard />
+          <Link href="/servers" class="w-fit">
+            <span class="button inline-flex items-center px-4 py-2 text-sm font-semibold text-white">
+              {translate["features.more"]()}
+            </span>
+          </Link>
         </div>
       </div>
       <NewsSection />
@@ -157,13 +154,13 @@ export default function Page() {
                   target="_blank"
                   rel="noreferrer"
                   class="group flex flex-col gap-3 transparent-achievement-panel bg-black/40 p-4
-                    backdrop-blur-sm duration-300 hover:-translate-y-1 hover:brightness-110"
+                    backdrop-blur-sm"
                 >
                   <div class="flex items-start justify-between gap-4">
                     <Typography color="white" class="text-xl sm:text-2xl">
                       {item.name}
                     </Typography>
-                    <span class="text-neutral-500 transition-colors group-hover:text-green-400">
+                    <span class="text-neutral-500 group-hover:text-green-400">
                       ↗
                     </span>
                   </div>

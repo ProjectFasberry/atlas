@@ -17,8 +17,8 @@ export default function Page() {
             target="_blank"
             class="flex items-end justify-center relative group rounded-lg h-full overflow-hidden"
           >
-            <div class="absolute inset-0 backdrop-blur-none group-hover:backdrop-blur-md duration-150" />
-            <div class="flex flex-col z-1 justify-center items-center duration-150 absolute group-hover:-translate-y-4 translate-y-64 gap-2">
+            <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+            <div class="absolute inset-x-0 bottom-0 z-1 flex flex-col items-center justify-center gap-2 p-4">
               <p class="text-2xl font-semibold">{translate["credits.sections.images.title"]()}</p>
               <p class="text-lg text-fuchsia-300">{translate["credits.sections.images.description"]()}</p>
             </div>

@@ -145,7 +145,7 @@ export const JoinSection = reatomComponent(({ ctx }) => {
                 classList={{
                   "bg-green-500": isOnline(),
                   "bg-red-500": !!status() && !isOnline(),
-                  "bg-neutral-500 animate-pulse": !status()
+                  "bg-neutral-500": !status()
                 }}
               />
               <Typography class="text-xs uppercase tracking-wide text-neutral-300 sm:text-sm">
@@ -171,7 +171,7 @@ export const JoinSection = reatomComponent(({ ctx }) => {
             </div>
             <div class="mt-1 h-2 w-full border border-black/50 bg-neutral-900/80">
               <div
-                class="h-full bg-green-500/80 duration-500"
+                class="h-full bg-green-500/80"
                 style={{ width: `${fillPercent()}%` }}
               />
             </div>

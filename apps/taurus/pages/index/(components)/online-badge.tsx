@@ -16,7 +16,7 @@ export const OnlineBadge = () => {
         classList={{
           "bg-green-500": isOnline(),
           "bg-red-500": !!status() && !isOnline(),
-          "bg-neutral-500 animate-pulse": !status()
+          "bg-neutral-500": !status()
         }}
       />
       <Typography class="text-xs sm:text-sm text-neutral-200">

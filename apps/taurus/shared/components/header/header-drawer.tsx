@@ -1,4 +1,8 @@
 import { pageState } from "@/shared/models/page.model";
+import { getStaticObject } from "@/shared/lib/helpers";
+import { layoutSettings } from "../settings/settings.model";
+import { getLocale, setLocale, type Locale } from "@/paraglide/runtime";
+import { translate } from "@/shared/locales/helpers";
 import { tv } from "tailwind-variants";
 import { For, Show } from "solid-js";
 import { Accordion } from "@ark-ui/solid/accordion";
@@ -25,6 +29,9 @@ const itemVariant = tv({
   base: `flex border-2 border-neutral-600 hover:bg-neutral-600 group bg-neutral-800 rounded-md gap-6 py-2 px-2 w-full`
 })
 
+const compassImage = getStaticObject("minecraft", "items/compass.webp")
+const LANGUAGES = ["ru", "en"] as const
+
 export const HeaderDrawerContent = reatomComponent(({ ctx }) => {
   const urlParsed = useAtomAccessor(pageState.urlParsed)
   const pathname = () => urlParsed()?.pathname;
@@ -33,6 +40,16 @@ export const HeaderDrawerContent = reatomComponent(({ ctx }) => {
     if (!href) return;
     headerDrawerState.isOpen(ctx, state => !state);
   };
+
+  const openSettings = () => {
+    headerDrawerState.isOpen(ctx, false)
+    layoutSettings.open(ctx)
+  }
+
+  const changeLocale = (locale: Locale) => {
+    setLocale(locale)
+    headerDrawerState.isOpen(ctx, false)
+  }
 
   return (
     <div class="flex flex-col items-center justify-center w-full gap-2">
@@ -102,6 +119,33 @@ export const HeaderDrawerContent = reatomComponent(({ ctx }) => {
           </Show>
         )}
       </For>
+      <div
+        class="mt-2 flex w-full items-center justify-between gap-4 border-2
+          border-neutral-600 bg-neutral-800 px-2 py-2"
+      >
+        <Typography>{translate["languages.title"]()}</Typography>
+        <div class="flex gap-1">
+          <For each={LANGUAGES}>
+            {(code) => (
+              <button
+                type="button"
+                aria-pressed={getLocale() === code}
+                class={`raised-slot cursor-pointer px-2 py-0.5 text-sm uppercase
+                  ${getLocale() === code ? "font-semibold text-neutral-950" : "text-neutral-700"}`}
+                onClick={() => changeLocale(code)}
+              >
+                {code}
+              </button>
+            )}
+          </For>
+        </div>
+      </div>
+      <button type="button" class={itemVariant()} onClick={openSettings}>
+        <div class="flex items-center gap-2">
+          <img src={compassImage} alt="" width={24} height={24} class="size-6" />
+          <Typography>{translate["settings.title"]()}</Typography>
+        </div>
+      </button>
     </div>
   )
 }, "HeaderDrawerContent")

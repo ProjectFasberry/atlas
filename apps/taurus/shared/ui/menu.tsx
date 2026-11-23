@@ -9,7 +9,7 @@ const trigger = tv({
 const content = tv({
   base: `
     flex flex-col relative bg-neutral-900 shadow-md shadow-black/20 outline-none z-[calc(70+var(--layer-index,0))]
-    p-2 data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out
+    p-2
   `
 })
 const item = tv({

@@ -27,10 +27,9 @@ export const SettingsTrigger = reatomComponent(({ ctx }) => {
       name="open-settings"
       aria-label={translate["settings.trigger"]()}
       onClick={() => layoutSettings.open(ctx)}
-      class={`group relative block size-9 shrink-0 cursor-pointer p-1
-        outline-none transition duration-150 hover:scale-110 hover:brightness-125
+      class={`group relative block size-11 shrink-0 cursor-pointer p-1 opacity-90
+        outline-none hover:opacity-100
         focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white
-        motion-reduce:transition-none sm:size-10
         ${isOpen() ? "pointer-events-none opacity-0" : ""}
       `}
     >

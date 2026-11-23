@@ -32,8 +32,7 @@ const indicator = tv({
 const content = tv({
   base: `
     flex flex-col bg-neutral-900 z-62 min-w-full
-    data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in
-    duration-300 ease-out overflow-y-auto outline-none
+    overflow-y-auto outline-none
   `
 })
 const item = tv({

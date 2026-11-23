@@ -15,6 +15,7 @@ import {
 import { tv } from "tailwind-variants";
 import { menuVariant } from "../../ui/menu";
 import { cn, useAtomAccessor } from "../../lib/utils";
+import { translate } from "../../locales/helpers";
 import { SettingsTrigger } from "../settings/settings";
 
 const bellImg = getStaticObject("minecraft/icons", "bell.webp");
@@ -37,12 +38,18 @@ const HeaderDrawer = () => {
       modal
     >
       <DrawerTrigger
-        aria-label={isOpenAtom() ? "Открыто" : "Закрыто"}
-        class="xl:hidden absolute top-2.5 right-2 z-3000"
+        aria-label={translate["header.menu"]()}
+        aria-expanded={isOpenAtom()}
+        aria-controls="header-menu"
+        class="xl:hidden absolute top-2 right-2 z-60 flex cursor-pointer items-center gap-1.5"
       >
-        <img src={chestStatusImage} alt="" width={48} height={48} />
+        <img src={chestStatusImage} alt="" width={44} height={44} />
+        <span class="select-none text-sm text-neutral-200">{translate["header.menu"]()}</span>
       </DrawerTrigger>
-      <DrawerContent class="xl:hidden flex flex-col items-start justify-between w-full">
+      <DrawerContent
+        id="header-menu"
+        class="xl:hidden flex flex-col items-start justify-between w-full"
+      >
         <ClientOnly>
           <HeaderDrawerContent />
         </ClientOnly>
@@ -150,7 +157,7 @@ const HeaderItemMenu = (props: MainHeaderLink) => {
 export const Header = () => {
   return (
     <div
-      class={`header flex items-center justify-between absolute top-0 transition w-full bg-repeat-x z-50`}
+      class={`header flex items-center justify-between fixed top-0 w-full bg-repeat-x z-50 xl:absolute`}
       style={{ "background-size": '160px', "background-image": `url(${bgImage})` }}
     >
       <Link href="/" class="bg-transparent cursor-pointer relative md:-right-10 top-3 xl:-right-15">
@@ -162,7 +169,7 @@ export const Header = () => {
           {(item) => <HeaderItemMenu {...item} />}
         </For>
       </div>
-      <div class="absolute top-3 right-16 z-3000">
+      <div class="absolute top-3 right-16 z-60 hidden xl:block">
         <SettingsTrigger />
       </div>
       <HeaderDrawer />
