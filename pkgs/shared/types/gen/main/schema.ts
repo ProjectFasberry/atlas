@@ -1232,6 +1232,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/rules/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the editable project rules */
+        get: operations["getPrivatedRulesList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/rules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a project rules category */
+        put: operations["putPrivatedRulesById"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/tasks/list": {
         parameters: {
             query?: never;
@@ -6904,6 +6938,103 @@ export interface operations {
                             version: number;
                             updatedAt: (string | null) | null;
                             updatedBy: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedRulesList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            /** Format: date-time */
+                            created_at: string;
+                            updated_at: (string | null) | null;
+                            content: unknown;
+                            category: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    putPrivatedRulesById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    category?: string;
+                    content?: unknown;
+                };
+                "application/x-www-form-urlencoded": {
+                    category?: string;
+                    content?: unknown;
+                };
+                "multipart/form-data": {
+                    category?: string;
+                    content?: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            /** Format: date-time */
+                            created_at: string;
+                            updated_at: (string | null) | null;
+                            content: unknown;
+                            category: string;
                         };
                     };
                 };
