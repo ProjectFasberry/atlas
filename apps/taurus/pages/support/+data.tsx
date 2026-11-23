@@ -8,12 +8,12 @@ import { getLocale } from '@/paraglide/runtime';
 
 const image = getStaticObject("community", "dragon_dead.webp")
 
-export type Data = { content: unknown; edit: SiteEditMeta | null }
+export type Data = { content: unknown; edit: SiteEditMeta | null; canEdit: boolean }
 
 export async function data(pageCtx: PageContextServer): Promise<Data> {
   const config = useConfig();
 
-  const { content, edit } = await resolvePageContent(
+  const { content, edit, canEdit } = await resolvePageContent(
     "support",
     getLocale(),
     apiRequestHeaders(pageCtx),
@@ -49,5 +49,5 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
     )
   })
 
-  return { content, edit }
+  return { content, edit, canEdit }
 }

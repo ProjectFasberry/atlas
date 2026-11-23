@@ -550,7 +550,7 @@
     "mode": "Editing",
     "dirty": "Unsaved",
     "save": "Save",
-    "publish": "Publish",
+    "publish": "Apply",
     "discard": "Discard",
     "exit": "Exit",
     "saved": "Draft saved",
@@ -573,6 +573,7 @@
     "show-section": "Show",
     "section-hidden": "hidden",
     "up": "Up",
-    "down": "Down"
+    "down": "Down",
+    "enter": "Edit page"
   }
 }

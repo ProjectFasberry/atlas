@@ -1164,6 +1164,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/content/{page}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the draft and published site content */
+        get: operations["getPrivatedContentByPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/content/{page}/{locale}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save a draft of site content */
+        put: operations["putPrivatedContentByPageByLocale"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/content/{page}/{locale}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish the site content draft */
+        post: operations["postPrivatedContentByPageByLocalePublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/content/{page}/{locale}/discard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Discard the site content draft */
+        post: operations["postPrivatedContentByPageByLocaleDiscard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/tasks/list": {
         parameters: {
             query?: never;
@@ -2191,6 +2259,57 @@ export interface paths {
         put?: never;
         /** Bulk profile lookup */
         post: operations["postYggdrasilApiProfilesMinecraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/site/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get published site content for pages */
+        get: operations["getSiteContent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/site/content/{page}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get published content for one site page */
+        get: operations["getSiteContentByPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/site/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who may edit site content */
+        get: operations["getSiteAccess"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -6526,6 +6645,293 @@ export interface operations {
             };
         };
     };
+    getPrivatedContentByPage: {
+        parameters: {
+            query?: {
+                locale?: "ru" | "en";
+            };
+            header?: never;
+            path: {
+                page: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            page: string;
+                            /**
+                             * @default ru
+                             * @enum {string}
+                             */
+                            locale: "ru" | "en";
+                            draft: unknown;
+                            published: unknown;
+                            version: number;
+                            updatedAt: (string | null) | null;
+                            updatedBy: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    putPrivatedContentByPageByLocale: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                page: string;
+                locale: "ru" | "en";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    version: string | number;
+                    content: unknown;
+                };
+                "application/x-www-form-urlencoded": {
+                    version: string | number;
+                    content: unknown;
+                };
+                "multipart/form-data": {
+                    version: string | number;
+                    content: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            page: string;
+                            /**
+                             * @default ru
+                             * @enum {string}
+                             */
+                            locale: "ru" | "en";
+                            draft: unknown;
+                            published: unknown;
+                            version: number;
+                            updatedAt: (string | null) | null;
+                            updatedBy: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedContentByPageByLocalePublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                page: string;
+                locale: "ru" | "en";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    version: string | number;
+                };
+                "application/x-www-form-urlencoded": {
+                    version: string | number;
+                };
+                "multipart/form-data": {
+                    version: string | number;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            page: string;
+                            /**
+                             * @default ru
+                             * @enum {string}
+                             */
+                            locale: "ru" | "en";
+                            draft: unknown;
+                            published: unknown;
+                            version: number;
+                            updatedAt: (string | null) | null;
+                            updatedBy: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedContentByPageByLocaleDiscard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                page: string;
+                locale: "ru" | "en";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    version: string | number;
+                };
+                "application/x-www-form-urlencoded": {
+                    version: string | number;
+                };
+                "multipart/form-data": {
+                    version: string | number;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            page: string;
+                            /**
+                             * @default ru
+                             * @enum {string}
+                             */
+                            locale: "ru" | "en";
+                            draft: unknown;
+                            published: unknown;
+                            version: number;
+                            updatedAt: (string | null) | null;
+                            updatedBy: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     getPrivatedTasksList: {
         parameters: {
             query?: never;
@@ -8621,6 +9027,128 @@ export interface operations {
             };
         };
         responses: never;
+    };
+    getSiteContent: {
+        parameters: {
+            query?: {
+                locale?: "ru" | "en";
+                pages?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            [key: string]: {
+                                page: string;
+                                /**
+                                 * @default ru
+                                 * @enum {string}
+                                 */
+                                locale: "ru" | "en";
+                                content: unknown;
+                                version: number;
+                                updatedAt: (string | null) | null;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getSiteContentByPage: {
+        parameters: {
+            query?: {
+                locale?: "ru" | "en";
+                draft?: string;
+            };
+            header?: never;
+            path: {
+                page: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            page: string;
+                            /**
+                             * @default ru
+                             * @enum {string}
+                             */
+                            locale: "ru" | "en";
+                            content: unknown;
+                            version: number;
+                            updatedAt: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    getSiteAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: (string | null) | null;
+                            canEdit: boolean;
+                            canPublish: boolean;
+                        };
+                    };
+                };
+            };
+        };
     };
     postAuthLoginBasic: {
         parameters: {

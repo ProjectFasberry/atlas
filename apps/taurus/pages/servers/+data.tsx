@@ -4,7 +4,7 @@ import type { PageContextServer } from "vike/types"
 import { translate } from "@/shared/locales/helpers"
 import { apiRequestHeaders } from "@/shared/api/server"
 import {
-  asServersContent, fetchServersContent, fetchSiteAccess, fetchSiteDraft,
+  asServersContent, resolvePageContent,
   type ServersContent, type SiteEditMeta,
 } from "@/shared/api/site"
 import { getLocale } from "@/paraglide/runtime"
@@ -12,6 +12,7 @@ import { getLocale } from "@/paraglide/runtime"
 export type Data = {
   content: ServersContent | null
   edit: SiteEditMeta | null
+  canEdit: boolean
 }
 
 export async function data(pageCtx: PageContextServer): Promise<Data> {
@@ -21,27 +22,9 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
   const headers = apiRequestHeaders(pageCtx)
   const wantsEdit = pageCtx.urlParsed.search.edit === "1"
 
-  let content: ServersContent | null = null
-  let edit: SiteEditMeta | null = null
-
-  if (wantsEdit) {
-    const access = await fetchSiteAccess(headers)
-
-    if (access?.canEdit) {
-      const draft = await fetchSiteDraft("servers", locale, headers)
-
-      content = asServersContent(draft?.content ?? null)
-      edit = {
-        active: true,
-        canPublish: access.canPublish,
-        version: draft?.version ?? 0,
-        updatedAt: draft?.updatedAt ?? null,
-        locale: draft?.locale ?? locale,
-      }
-    }
-  }
-
-  if (!edit) content = await fetchServersContent(locale, headers)
+  const pageContent = await resolvePageContent("servers", locale, headers, wantsEdit)
+  const content = asServersContent(pageContent.content)
+  const edit = pageContent.edit
 
   const title = wrapTitle(translate["servers.page.title"]())
   const description = translate["servers.page.description"]()
@@ -63,5 +46,5 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
     ),
   })
 
-  return { content, edit }
+  return { content, edit, canEdit: pageContent.canEdit }
 }

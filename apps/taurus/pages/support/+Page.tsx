@@ -15,6 +15,7 @@ import { siteEdit } from "@/shared/models/site-edit.model";
 import { asSectionsContent } from "@/shared/api/site";
 import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
+import { EditEntry } from "@/shared/components/edit/edit-entry";
 import type { Data } from "./+data";
 
 const bgImage = getStaticObject("backgrounds", "support_background.png");
@@ -69,6 +70,7 @@ export default reatomComponent(({ ctx }) => {
           : asSectionsContent(pageData.content)}
         editing={Boolean(edit?.active)}
       />
+      <EditEntry active={Boolean(edit?.active)} canEdit={Boolean(pageData?.canEdit)} />
       <Show when={edit?.active}>
         <EditToolbar />
       </Show>

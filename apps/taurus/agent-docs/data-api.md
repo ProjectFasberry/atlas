@@ -63,6 +63,11 @@ Editors save cross-origin with cookies, so `https://fasberry.fun` must be listed
 the API `cors-origins` runtime config (`getUrlConfig("cors-origins")`); without it
 the browser blocks the write requests.
 
+`resolvePageContent` asks `/site/access` on every render, so staff see a fixed
+"Edit page" button (`EditEntry`) even outside edit mode. The button does a full
+reload into `?edit=1`: the draft depends on request data, and a client-side
+navigation would render the published copy.
+
 ## Errors
 
 - Server data: catch and return `null` plus a `failed` flag; the page renders a

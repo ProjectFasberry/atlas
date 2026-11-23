@@ -1887,6 +1887,7 @@
     "site-add-feature": "Add a feature",
     "site-page-copy": "Page title and description",
     "site-open-page": "Open the page",
+    "site-edit": "Edit on the site",
     "site-load-error": "Could not load the content",
     "site-version": "Version {version}",
     "site-updated-at": "Updated {date}",

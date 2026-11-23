@@ -11,6 +11,7 @@ import { createServerProfiles, type ServerProfile } from "../(models)/servers.mo
 import { siteEdit, type EditFeature, type EditServer } from "@/shared/models/site-edit.model"
 import { EditableText } from "@/shared/components/edit/editable-text"
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar"
+import { EditEntry } from "@/shared/components/edit/edit-entry"
 import { EditableSections } from "@/shared/components/edit/editable-sections"
 import { getStaticAsset, toStaticKey } from "@/shared/lib/helpers"
 import { asSectionsContent } from "@/shared/api/site"
@@ -285,6 +286,7 @@ export const ServersPage = reatomComponent(({ ctx }) => {
         sections={editing() && editContent() ? editContent()!.sections : asSectionsContent(pageData.content)}
         editing={editing()}
       />
+      <EditEntry active={editing()} canEdit={Boolean(pageData?.canEdit)} />
       <Show when={editing()}>
         <EditToolbar />
       </Show>

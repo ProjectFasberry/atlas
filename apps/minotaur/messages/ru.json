@@ -1887,6 +1887,7 @@
     "site-add-feature": "Добавить фичу",
     "site-page-copy": "Заголовок и описание страницы",
     "site-open-page": "Открыть страницу",
+    "site-edit": "Редактировать на сайте",
     "site-load-error": "Не удалось загрузить контент",
     "site-version": "Версия {version}",
     "site-updated-at": "Обновлено {date}",

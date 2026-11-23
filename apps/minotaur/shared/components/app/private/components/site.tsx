@@ -493,6 +493,18 @@ export const SitePanel = reatomComponent(({ ctx }) => {
             <Icon name="sprite:external-link" className="size-4" />
             {translate["panel.site-open-page"]()}
           </a>
+          {canEdit && (
+            <a
+              href={`${env.VITE_LANDING_URL}${currentPage.path}?edit=1`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-7 items-center gap-1 rounded-lg bg-emerald-600/20 px-2 text-xs
+                text-emerald-300 duration-150 hover:bg-emerald-600/30"
+            >
+              <Icon name="sprite:pencil" className="size-4" />
+              {translate["panel.site-edit"]()}
+            </a>
+          )}
         </div>
       </WithHeader>
       <Typography color="gray" className="text-xs">

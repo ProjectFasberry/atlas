@@ -2,7 +2,7 @@ import { action, atom, reatomAsync, withStatusesAtom, type Ctx } from "@reatom/f
 import { toast } from "solid-sonner"
 import {
   discardSiteDraft, publishSiteDraft, saveSiteDraft,
-  type SiteContentPayload, type SiteLocale,
+  type SiteAdminPayload, type SiteLocale,
 } from "@/shared/api/site"
 import { translate } from "@/shared/locales/helpers"
 
@@ -292,7 +292,7 @@ const save = reatomAsync(async (ctx) => {
   return result.data.data
 }, {
   name: "siteEdit.save",
-  onFulfill: (ctx, payload: SiteContentPayload | null) => {
+  onFulfill: (ctx, payload: SiteAdminPayload | null) => {
     if (!payload) return
 
     versionAtom(ctx, payload.version)
@@ -317,7 +317,7 @@ const publish = reatomAsync(async (ctx) => {
   return result.data.data
 }, {
   name: "siteEdit.publish",
-  onFulfill: (ctx, payload: SiteContentPayload | null) => {
+  onFulfill: (ctx, payload: SiteAdminPayload | null) => {
     if (!payload) return
 
     versionAtom(ctx, payload.version)
@@ -344,7 +344,7 @@ const discard = reatomAsync(async (ctx) => {
   return result.data.data
 }, {
   name: "siteEdit.discard",
-  onFulfill: (ctx, payload: SiteContentPayload | null) => {
+  onFulfill: (ctx, payload: SiteAdminPayload | null) => {
     if (!payload) return
 
     versionAtom(ctx, payload.version)

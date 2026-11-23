@@ -48,5 +48,6 @@ export async function data(pageCtx: PageContext) {
     failed: data === null,
     sections: pageContent.content,
     edit: pageContent.edit as SiteEditMeta | null,
+    canEdit: pageContent.canEdit,
   }
 }

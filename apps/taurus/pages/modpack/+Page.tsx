@@ -15,6 +15,7 @@ import { siteEdit } from "@/shared/models/site-edit.model";
 import { asSectionsContent } from "@/shared/api/site";
 import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
+import { EditEntry } from "@/shared/components/edit/edit-entry";
 import { ModpackList } from "./(components)/modpack-list";
 import { modpackFaqItems, modpackState, setModpackFaq } from "./(models)/modpack.model";
 import { reatomComponent } from "@/shared/lib/reatom";
@@ -211,6 +212,7 @@ export default reatomComponent(({ ctx }) => {
           : asSectionsContent(pageData.sections)}
         editing={Boolean(edit?.active)}
       />
+      <EditEntry active={Boolean(edit?.active)} canEdit={Boolean(pageData?.canEdit)} />
       <Show when={edit?.active}>
         <EditToolbar />
       </Show>

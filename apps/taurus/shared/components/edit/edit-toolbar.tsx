@@ -53,12 +53,15 @@ export const EditToolbar = reatomComponent(({ ctx }) => {
             >
               {translate["edit.discard"]()}
             </Button>
-            <a
-              href={pageCtx.urlPathname}
+            <button
+              type="button"
               class="button px-3 py-1.5 text-xs text-neutral-50"
+              onClick={() => {
+                window.location.href = pageCtx.urlPathname
+              }}
             >
               {translate["edit.exit"]()}
-            </a>
+            </button>
           </div>
         </div>
       </div>

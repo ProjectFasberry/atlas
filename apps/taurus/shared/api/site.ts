@@ -22,6 +22,17 @@ export type SiteContentPayload = {
   updatedAt: string | null
 }
 
+/** Admin responses carry the draft and the published copy, not `content`. */
+export type SiteAdminPayload = {
+  page: string
+  locale: SiteLocale
+  draft: unknown
+  published: unknown
+  version: number
+  updatedAt: string | null
+  updatedBy: string | null
+}
+
 export type HomeContent = {
   carousel?: { image: string; alt?: string }[]
 }
@@ -39,214 +50,6 @@ export type ServersContent = {
   title?: string
   description?: string
   items?: Record<string, ServerContentItem>
-}
-
-declare module "@repo/shared/types/gen/main/schema" {
-  interface paths {
-    "/site/content/{page}": {
-      parameters: {
-        query?: never
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      get: operations["getSiteContent"]
-      put?: never
-      post?: never
-      delete?: never
-      options?: never
-      head?: never
-      patch?: never
-      trace?: never
-    }
-    "/site/content": {
-      parameters: {
-        query?: never
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      get: operations["getSiteContentBatch"]
-      put?: never
-      post?: never
-      delete?: never
-      options?: never
-      head?: never
-      patch?: never
-      trace?: never
-    }
-    "/site/access": {
-      parameters: {
-        query?: never
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      get: operations["getSiteAccess"]
-      put?: never
-      post?: never
-      delete?: never
-      options?: never
-      head?: never
-      patch?: never
-      trace?: never
-    }
-    "/privated/content/{page}/{locale}": {
-      parameters: {
-        query?: never
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      get?: never
-      put: operations["putPrivatedContentByPageByLocale"]
-      post?: never
-      delete?: never
-      options?: never
-      head?: never
-      patch?: never
-      trace?: never
-    }
-    "/privated/content/{page}/{locale}/publish": {
-      parameters: {
-        query?: never
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      get?: never
-      put?: never
-      post: operations["postPrivatedContentByPageByLocalePublish"]
-      delete?: never
-      options?: never
-      head?: never
-      patch?: never
-      trace?: never
-    }
-    "/privated/content/{page}/{locale}/discard": {
-      parameters: {
-        query?: never
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      get?: never
-      put?: never
-      post: operations["postPrivatedContentByPageByLocaleDiscard"]
-      delete?: never
-      options?: never
-      head?: never
-      patch?: never
-      trace?: never
-    }
-  }
-
-  interface operations {
-    getSiteContent: {
-      parameters: {
-        query?: { locale?: SiteLocale; draft?: string }
-        header?: never
-        path: { page: string }
-        cookie?: never
-      }
-      requestBody?: never
-      responses: {
-        200: {
-          headers: { [name: string]: unknown }
-          content: { "application/json": { data: SiteContentPayload } }
-        }
-        404: {
-          headers: { [name: string]: unknown }
-          content: { "application/json": { error: string } }
-        }
-      }
-    }
-    getSiteAccess: {
-      parameters: {
-        query?: never
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      requestBody?: never
-      responses: {
-        200: {
-          headers: { [name: string]: unknown }
-          content: {
-            "application/json": {
-              data: { nickname: string | null; canEdit: boolean; canPublish: boolean }
-            }
-          }
-        }
-      }
-    }
-    putPrivatedContentByPageByLocale: {
-      parameters: {
-        query?: never
-        header?: never
-        path: { page: string; locale: SiteLocale }
-        cookie?: never
-      }
-      requestBody: {
-        content: { "application/json": { version: number; content: unknown } }
-      }
-      responses: {
-        200: {
-          headers: { [name: string]: unknown }
-          content: { "application/json": { data: SiteContentPayload } }
-        }
-      }
-    }
-    postPrivatedContentByPageByLocalePublish: {
-      parameters: {
-        query?: never
-        header?: never
-        path: { page: string; locale: SiteLocale }
-        cookie?: never
-      }
-      requestBody: {
-        content: { "application/json": { version: number } }
-      }
-      responses: {
-        200: {
-          headers: { [name: string]: unknown }
-          content: { "application/json": { data: SiteContentPayload } }
-        }
-      }
-    }
-    postPrivatedContentByPageByLocaleDiscard: {
-      parameters: {
-        query?: never
-        header?: never
-        path: { page: string; locale: SiteLocale }
-        cookie?: never
-      }
-      requestBody: {
-        content: { "application/json": { version: number } }
-      }
-      responses: {
-        200: {
-          headers: { [name: string]: unknown }
-          content: { "application/json": { data: SiteContentPayload } }
-        }
-      }
-    }
-    getSiteContentBatch: {
-      parameters: {
-        query?: { locale?: SiteLocale; pages?: string }
-        header?: never
-        path?: never
-        cookie?: never
-      }
-      requestBody?: never
-      responses: {
-        200: {
-          headers: { [name: string]: unknown }
-          content: { "application/json": { data: Record<string, SiteContentPayload> } }
-        }
-      }
-    }
-  }
 }
 
 /** The API document is untyped JSON; keep a malformed value from crashing a page. */
@@ -460,25 +263,27 @@ export async function resolvePageContent(
   locale: SiteLocale,
   headers: ContentHeaders,
   wantsEdit: boolean,
-): Promise<{ content: unknown; edit: SiteEditMeta | null }> {
-  if (wantsEdit) {
-    const access = await fetchSiteAccess(headers)
+): Promise<{ content: unknown; edit: SiteEditMeta | null; canEdit: boolean }> {
+  // The access check runs for every render: it is what shows the "Edit page"
+  // entry to staff without putting a token or a flag in the URL.
+  const access = await fetchSiteAccess(headers)
+  const canEdit = Boolean(access?.canEdit)
 
-    if (access?.canEdit) {
-      const draft = await fetchSiteDraft(page, locale, headers)
+  if (wantsEdit && access?.canEdit) {
+    const draft = await fetchSiteDraft(page, locale, headers)
 
-      return {
-        content: draft?.content ?? null,
-        edit: {
-          active: true,
-          canPublish: access.canPublish,
-          version: draft?.version ?? 0,
-          updatedAt: draft?.updatedAt ?? null,
-          locale: draft?.locale ?? locale,
-        },
-      }
+    return {
+      content: draft?.content ?? null,
+      canEdit,
+      edit: {
+        active: true,
+        canPublish: access.canPublish,
+        version: draft?.version ?? 0,
+        updatedAt: draft?.updatedAt ?? null,
+        locale: draft?.locale ?? locale,
+      },
     }
   }
 
-  return { content: await fetchPageContent(page, locale, headers), edit: null }
+  return { content: await fetchPageContent(page, locale, headers), edit: null, canEdit }
 }
