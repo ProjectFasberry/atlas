@@ -12,7 +12,16 @@
   },
   "contacts": {
     "title": "Project Socials",
-    "item-title": "Go to"
+    "subtitle": "Announcements, events and live chat - pick the place that suits you.",
+    "item-title": "Go to",
+    "items": {
+      "discord": {
+        "description": "Events, voice channels and looking for a team."
+      },
+      "telegram": {
+        "description": "Announcements, releases and maintenance without the noise."
+      }
+    }
   },
   "header": {
     "links": {

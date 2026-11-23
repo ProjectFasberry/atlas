@@ -1,4 +1,4 @@
-import { action, atom, sleep, withAssign, withConcurrency, withReset, type Ctx } from "@reatom/framework";
+import { action, atom, withAssign, withConcurrency, type Ctx } from "@reatom/framework";
 import { createListCollection } from "@ark-ui/solid/select";
 import { setLocale, type Locale } from "@/paraglide/runtime";
 import { translate } from "@/shared/locales/helpers";
@@ -50,13 +50,8 @@ export const settingsListAtom = atom((ctx) => {
 
 export const layoutSettings = atom(null, "layoutSettings").pipe(
   withAssign((_, name) => ({
-    open: action(async (ctx) => {
-      layoutSettingsState.isTriggered(ctx, true);
-
-      await ctx.schedule(() => sleep(150));
-
+    open: action((ctx) => {
       layoutSettingsState.isOpen(ctx, true);
-      layoutSettingsState.isTriggered.reset(ctx);
     }, `${name}.open`).pipe(
       withConcurrency()
     ),
@@ -70,6 +65,5 @@ export const layoutSettings = atom(null, "layoutSettings").pipe(
 export const layoutSettingsState = atom(null, "layoutSettingsState").pipe(
   withAssign((_, name) => ({
     isOpen: atom(false, `${name}.isOpen`),
-    isTriggered: atom(false, `${name}.isTriggered`).pipe(withReset()),
   }))
 )

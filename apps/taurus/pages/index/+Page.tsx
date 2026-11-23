@@ -19,9 +19,19 @@ import { useAtomAccessor } from "@/shared/lib/utils";
 const introImage = getStaticObject("arts", "server-status-widget.webp")
 const shareImage = getStaticObject("arts", "bzzvanet-.jpg")
 
-const CONTACTS_LIST = [
-  { name: "Discord", href: "/discord" },
-  { name: "Telegram", href: "/telegram" },
+const socialsImage = getStaticObject("arts", "bzzvanet-newyork.webp")
+
+const createSocialItems = () => [
+  {
+    name: "Discord",
+    href: "/discord",
+    description: translate["contacts.items.discord.description"](),
+  },
+  {
+    name: "Telegram",
+    href: "/telegram",
+    description: translate["contacts.items.telegram.description"](),
+  },
 ];
 
 const Weather = () => {
@@ -121,26 +131,51 @@ export default function Page() {
       <FaqSection />
       <div id="share" class={sectionVariant()}>
         <div class="absolute top-0 right-0 left-0 overflow-hidden h-full">
-          <div
-            class="w-full h-full absolute top-0 right-0 brightness-55 left-0 bg-no-repeat bg-center bg-cover"
-            style={{ "background-image": `url()` }}
+          <img
+            src={socialsImage}
+            alt=""
+            loading="lazy"
+            class="w-full h-full object-cover object-center brightness-70"
           />
+          <div class="absolute inset-0
+            bg-[linear-gradient(180deg,rgba(13,13,13,.72)_0%,rgba(13,13,13,.35)_45%,rgba(13,13,13,.88)_100%)]" />
         </div>
-        <div class="flex flex-col items-center z-1 responsive gap-12 justify-center select-none relative">
-          <Typography color="white" class="text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl">
-            {translate["contacts.title"]()}
-          </Typography>
-          <div class="flex flex-col gap-4 justify-center items-center lg:w-1/4 *:w-full w-full h-full">
-            <For each={CONTACTS_LIST}>
-              {(item) =>
-                <Link href={item.href} target="_blank">
-                  <Button class="w-full py-0.5">
-                    <Typography class="text-lg">
-                      {translate["contacts.item-title"]()} {item.name}
+        <div class="responsive z-1 flex flex-col gap-6 sm:gap-8">
+          <div class="flex flex-col gap-1">
+            <Typography color="white" class="text-2xl sm:text-3xl lg:text-4xl">
+              {translate["contacts.title"]()}
+            </Typography>
+            <Typography color="gray" class="text-sm sm:text-base">
+              {translate["contacts.subtitle"]()}
+            </Typography>
+          </div>
+          <div class="grid w-full gap-3 sm:grid-cols-2 lg:max-w-3xl">
+            <For each={createSocialItems()}>
+              {(item) => (
+                <Link
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  class="group flex flex-col gap-3 transparent-achievement-panel bg-black/40 p-4
+                    backdrop-blur-sm duration-300 hover:-translate-y-1 hover:brightness-110"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <Typography color="white" class="text-xl sm:text-2xl">
+                      {item.name}
                     </Typography>
-                  </Button>
+                    <span class="text-neutral-500 transition-colors group-hover:text-green-400">
+                      ↗
+                    </span>
+                  </div>
+                  <Typography color="gray" class="text-sm leading-5 sm:text-base">
+                    {item.description}
+                  </Typography>
+                  <span class="button mt-auto inline-flex w-fit items-center px-4 py-2
+                    text-sm font-semibold text-white">
+                    {translate["contacts.item-title"]()} {item.name}
+                  </span>
                 </Link>
-              }
+              )}
             </For>
           </div>
         </div>

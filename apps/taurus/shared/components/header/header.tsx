@@ -15,6 +15,7 @@ import {
 import { tv } from "tailwind-variants";
 import { menuVariant } from "../../ui/menu";
 import { cn, useAtomAccessor } from "../../lib/utils";
+import { SettingsTrigger } from "../settings/settings";
 
 const bellImg = getStaticObject("minecraft/icons", "bell.webp");
 const bgImage = getStaticObject("minecraft/static", "cracked_polished_blacked.webp")
@@ -160,6 +161,9 @@ export const Header = () => {
           {/* @ts-expect-error */}
           {(item) => <HeaderItemMenu {...item} />}
         </For>
+      </div>
+      <div class="absolute top-3 right-16 z-3000">
+        <SettingsTrigger />
       </div>
       <HeaderDrawer />
     </div>

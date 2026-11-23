@@ -12,84 +12,43 @@ import { reatomComponent } from "@/shared/lib/reatom";
 const SettingsList = lazy(() => import("./list")
   .then(m => ({ default: m.SettingsList })))
 
-const spyglassImg = getStaticObject("minecraft", "icons/fishing_bobber.webp")
+const settingsItemImg = getStaticObject("minecraft", "items/compass.webp")
 
-const LayoutSettingsTrigger = reatomComponent(({ ctx }) => {
-  const isTriggered = useAtomAccessor(layoutSettingsState.isTriggered)
+/**
+ * Settings live in the header like a Minecraft menu item: a slot-sized button
+ * with the usual tooltip, never floating over the page content.
+ */
+export const SettingsTrigger = reatomComponent(({ ctx }) => {
   const isOpen = useAtomAccessor(layoutSettingsState.isOpen)
-  let image!: HTMLImageElement
-
-  onMount(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
-    if (reduceMotion.matches) return
-
-    let frame = 0
-    let targetX = 0
-    let targetY = 0
-    let currentX = 0
-    let currentY = 0
-    let rect = image.getBoundingClientRect()
-
-    const measure = () => {
-      rect = image.getBoundingClientRect()
-    }
-
-    const tick = () => {
-      currentX += (targetX - currentX) * 0.12
-      currentY += (targetY - currentY) * 0.12
-
-      image.style.setProperty("--rod-x", currentX.toFixed(4))
-      image.style.setProperty("--rod-y", currentY.toFixed(4))
-
-      const settled = Math.abs(targetX - currentX) < 0.001
-        && Math.abs(targetY - currentY) < 0.001
-
-      frame = settled ? 0 : requestAnimationFrame(tick)
-    }
-
-    const onPointerMove = (event: PointerEvent) => {
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-
-      targetX = Math.max(-1, Math.min(1, (event.clientX - centerX) / 140))
-      targetY = Math.max(-1, Math.min(1, (event.clientY - centerY) / 120))
-
-      if (!frame) frame = requestAnimationFrame(tick)
-    }
-
-    window.addEventListener("pointermove", onPointerMove, { passive: true })
-    window.addEventListener("resize", measure)
-
-    onCleanup(() => {
-      window.removeEventListener("pointermove", onPointerMove)
-      window.removeEventListener("resize", measure)
-      cancelAnimationFrame(frame)
-    })
-  })
 
   return (
     <button
-      aria-label={translate["settings.trigger"]()}
+      type="button"
       name="open-settings"
+      aria-label={translate["settings.trigger"]()}
       onClick={() => layoutSettings.open(ctx)}
-      class={`top-2/3 group -translate-y-1/4 focus:scale-[1.1]
-        cursor-pointer fixed right-4 w-12 h-12 z-11 duration-500 ease-in-out
-        ${isTriggered() ? "-translate-y-[9999px]" : "translate-y-0"}
-        ${isOpen() ? "hidden" : "block"}
+      class={`group relative block size-9 shrink-0 cursor-pointer p-1
+        outline-none transition duration-150 hover:scale-110 hover:brightness-125
+        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white
+        motion-reduce:transition-none sm:size-10
+        ${isOpen() ? "pointer-events-none opacity-0" : ""}
       `}
     >
       <img
-        ref={image}
-        src={spyglassImg}
+        src={settingsItemImg}
         alt=""
         draggable={false}
-        width={46}
-        height={46}
-        class="layout-settings-bobber"
+        width={36}
+        height={36}
+        class="size-full object-contain drop-shadow-[0_2px_2px_rgb(0_0_0/0.55)]"
+        style={{ "image-rendering": "pixelated" }}
       />
+      <span aria-hidden="true" class="layout-settings-tip">
+        {translate["settings.trigger"]()}
+      </span>
     </button>
   )
-}, "LayoutSettingsTrigger")
+}, "SettingsTrigger")
 
 const LayoutSettingsDialog = () => {
   const [isOpenAtom, setIsOpenAtom] = useAtom(layoutSettingsState.isOpen);
@@ -116,11 +75,22 @@ const LayoutSettingsDialog = () => {
   )
 }
 
-export const LayoutSettings = () => {
-  return (
-    <>
-      <LayoutSettingsTrigger />
-      <LayoutSettingsDialog />
-    </>
-  )
-}
+export const LayoutSettings = reatomComponent(({ ctx }) => {
+  const isOpen = useAtomAccessor(layoutSettingsState.isOpen)
+
+  onMount(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.metaKey || event.ctrlKey || event.altKey) return
+      // The dialog closes itself on Escape; only open it when it is closed.
+      if (event.defaultPrevented || isOpen()) return
+
+      event.preventDefault()
+      layoutSettings.open(ctx)
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+    onCleanup(() => window.removeEventListener("keydown", onKeyDown))
+  })
+
+  return <LayoutSettingsDialog />
+}, "LayoutSettings")

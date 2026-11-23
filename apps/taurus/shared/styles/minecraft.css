@@ -315,12 +315,40 @@
   border-image-repeat: stretch;
 }
 
-/* Global settings bobber: leans towards the cursor. */
-.layout-settings-bobber {
-  --rod-x: 0;
-  --rod-y: 0;
-  transform: translate3d(calc(var(--rod-x) * 10px), calc(var(--rod-y) * 8px), 0)
-    rotate(calc(var(--rod-x) * 14deg));
-  transform-origin: 50% 85%;
-  will-change: transform;
+/* Settings trigger in the header: the tooltip opens below the item. */
+.layout-settings-tip {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 1000;
+  padding: 5px 8px 6px;
+  border: 2px solid #2d0b4e;
+  background: rgb(18 2 28 / 0.95);
+  color: #f5edff;
+  font-size: 14px;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-shadow: 1px 1px #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.layout-settings-tip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(160 110 220 / 0.45);
+  pointer-events: none;
+}
+
+.group:hover .layout-settings-tip,
+.group:focus-visible .layout-settings-tip {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-settings-tip {
+    transition: none;
+  }
 }
