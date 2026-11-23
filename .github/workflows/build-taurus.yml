@@ -102,6 +102,12 @@ jobs:
           # Self-hosted runtime: no Cloudflare plugin, plain Node server entry.
           DEPLOY_TARGET: node
 
+      - name: Generate sitemap
+        working-directory: apps/taurus
+        run: bun run seo
+        env:
+          STAGE: ${{ steps.stage.outputs.stage }}
+
       - name: Measure build size
         if: github.ref_name == github.event.repository.default_branch
         continue-on-error: true
