@@ -19,5 +19,13 @@ This repository contains three primary apps:
 - Minotaur - [app](https://app.fasberry.fun)
 - Wiki - [wiki](https://wiki.fasberry.fun)
 
+## Preview
+
+| Landing | Web app |
+| --- | --- |
+| ![](/.github/assets/preview-landing.webp) | ![](/.github/assets/preview-app.webp) |
+
+![](/.github/assets/preview-wiki.webp)
+
 ## License
 Distributed under the GPL-3.0 License. See [LICENSE](./LICENSE) for details.
