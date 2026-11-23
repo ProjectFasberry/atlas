@@ -1,5 +1,6 @@
-import { getStaticObject } from "@/shared/lib/helpers"
+import { getStaticAsset, getStaticObject } from "@/shared/lib/helpers"
 import { translate } from "@/shared/locales/helpers"
+import type { ServersContent } from "@/shared/api/site"
 
 export type ServerFeatureKey =
   | "survival"
@@ -71,10 +72,12 @@ export type ServerProfile = {
   tagline: string
   description: string
   image: string
+  icon?: string
   features: ServerFeature[]
 }
 
-export const createServerProfiles = (): ServerProfile[] => [
+/** Server keys match the catalog `origin`, lowercased. */
+const createDefaultProfiles = (): ServerProfile[] => [
   {
     id: "bisquite",
     name: translate["servers.items.bisquite.name"](),
@@ -100,3 +103,36 @@ export const createServerProfiles = (): ServerProfile[] => [
     features: (["anarchy", "survival", "economy"] as const).map(createFeature),
   },
 ]
+
+/**
+ * Defaults merged with the editable document. An absent field keeps the shipped
+ * copy; an empty string clears it on purpose (the muffin page hides its panel).
+ */
+export const createServerProfiles = (content?: ServersContent | null): ServerProfile[] => {
+  const profiles = createDefaultProfiles()
+  const items = content?.items
+
+  if (!items) return profiles
+
+  return profiles.map((profile) => {
+    const override = items[profile.id]
+
+    if (!override) return profile
+
+    return {
+      ...profile,
+      name: override.name ?? profile.name,
+      tagline: override.tagline ?? profile.tagline,
+      description: override.description ?? profile.description,
+      image: override.image ? getStaticAsset(override.image) : profile.image,
+      icon: override.icon ? getStaticAsset(override.icon) : profile.icon,
+      features: override.features
+        ? override.features.map((feature) => ({
+            title: feature.title,
+            description: feature.description,
+            icon: getStaticAsset(feature.icon),
+          }))
+        : profile.features,
+    }
+  })
+}

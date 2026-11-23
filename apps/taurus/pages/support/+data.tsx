@@ -2,11 +2,23 @@ import { useConfig } from 'vike-solid/useConfig';
 import type { PageContextServer } from 'vike/types';
 import { getStaticObject, getUrl, wrapTitle } from '@/shared/lib/helpers';
 import { translate } from '@/shared/locales/helpers';
+import { apiRequestHeaders } from '@/shared/api/server';
+import { resolvePageContent, type SiteEditMeta } from '@/shared/api/site';
+import { getLocale } from '@/paraglide/runtime';
 
 const image = getStaticObject("community", "dragon_dead.webp")
 
-export async function data(pageCtx: PageContextServer) {
+export type Data = { content: unknown; edit: SiteEditMeta | null }
+
+export async function data(pageCtx: PageContextServer): Promise<Data> {
   const config = useConfig();
+
+  const { content, edit } = await resolvePageContent(
+    "support",
+    getLocale(),
+    apiRequestHeaders(pageCtx),
+    pageCtx.urlParsed.search.edit === "1",
+  );
 
   const title = wrapTitle(translate["pages.support.title"]());
   const description = translate["pages.support.description"]()
@@ -32,7 +44,10 @@ export async function data(pageCtx: PageContextServer) {
         <meta property="twitter:image:type" content="image/jpeg" />
         <meta property="twitter:image:width" content="1200" />
         <meta property="twitter:image:height" content="630" />
+        {edit && <meta name="robots" content="noindex, nofollow" />}
       </>
     )
   })
+
+  return { content, edit }
 }

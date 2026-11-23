@@ -4,6 +4,8 @@ import type { PageContext } from "vike/types"
 import { translate } from "@/shared/locales/helpers"
 import { mainClient } from "@/shared/api/client"
 import { apiRequestHeaders } from "@/shared/api/server"
+import { resolvePageContent, type SiteEditMeta } from "@/shared/api/site"
+import { getLocale } from "@/paraglide/runtime"
 
 export type Data = Awaited<ReturnType<typeof data>>
 
@@ -11,6 +13,13 @@ export async function data(pageCtx: PageContext) {
   const config = useConfig()
 
   const headers = apiRequestHeaders(pageCtx);
+
+  const pageContent = await resolvePageContent(
+    "modpack",
+    getLocale(),
+    headers,
+    pageCtx.urlParsed.search.edit === "1",
+  );
 
   const title = wrapTitle(translate["pages.modpack.title"]())
   const description = translate["pages.modpack.description"]()
@@ -29,6 +38,7 @@ export async function data(pageCtx: PageContext) {
         <meta property="og:title" content={title} />
         <meta property="og:site_name" content={title} />
         <meta name="twitter:title" content={title} />
+        {pageContent.edit && <meta name="robots" content="noindex, nofollow" />}
       </>
     )
   })
@@ -36,5 +46,7 @@ export async function data(pageCtx: PageContext) {
   return {
     data: data ?? [],
     failed: data === null,
+    sections: pageContent.content,
+    edit: pageContent.edit as SiteEditMeta | null,
   }
 }

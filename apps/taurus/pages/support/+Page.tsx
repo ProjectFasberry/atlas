@@ -1,3 +1,5 @@
+import { Show } from "solid-js";
+import { useData } from "vike-solid/useData";
 import { Link } from "@/shared/components/link";
 import { Button } from "@/shared/ui/button";
 import { MainWrapperPage } from "@/shared/ui/main-wrapper";
@@ -8,12 +10,31 @@ import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { SupportContent } from "./(components)/support-content";
+import { reatomComponent } from "@/shared/lib/reatom";
+import { siteEdit } from "@/shared/models/site-edit.model";
+import { asSectionsContent } from "@/shared/api/site";
+import { EditableSections } from "@/shared/components/edit/editable-sections";
+import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
+import type { Data } from "./+data";
 
 const bgImage = getStaticObject("backgrounds", "support_background.png");
 
-export default function Page() {
+export default reatomComponent(({ ctx }) => {
+  const pageData = useData<Data>()
+  const edit = pageData?.edit
+
+  if (edit?.active) {
+    siteEdit.init(ctx, {
+      page: "support",
+      locale: edit.locale,
+      version: edit.version,
+      canPublish: edit.canPublish,
+      content: { kind: "sections", sections: asSectionsContent(pageData.content) },
+    })
+  }
+
   return (
-    <MainWrapperPage variant="with_section">
+    <MainWrapperPage variant="with_section" class={edit?.active ? "pb-24" : undefined}>
       <div
         class={sectionVariant()}
         style={{ "background-image": `url(${bgImage})` }}
@@ -42,6 +63,15 @@ export default function Page() {
       <div id="support-list" class="full-screen-section py-16 lg:py-24">
         <SupportContent />
       </div>
+      <EditableSections
+        sections={edit?.active && ctx.get(siteEdit.content)?.kind === "sections"
+          ? ctx.get(siteEdit.content)!.sections
+          : asSectionsContent(pageData.content)}
+        editing={Boolean(edit?.active)}
+      />
+      <Show when={edit?.active}>
+        <EditToolbar />
+      </Show>
     </MainWrapperPage>
   )
-}
+}, "SupportPage")

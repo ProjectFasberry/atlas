@@ -11,6 +11,10 @@ import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import { getLauncherDownloadUrl, getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import type { Data } from "./+data";
+import { siteEdit } from "@/shared/models/site-edit.model";
+import { asSectionsContent } from "@/shared/api/site";
+import { EditableSections } from "@/shared/components/edit/editable-sections";
+import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
 import { ModpackList } from "./(components)/modpack-list";
 import { modpackFaqItems, modpackState, setModpackFaq } from "./(models)/modpack.model";
 import { reatomComponent } from "@/shared/lib/reatom";
@@ -69,13 +73,24 @@ const ModpackFaq = reatomComponent(({ ctx }) => {
   )
 }, "ModpackFaq")
 
-export default function Page() {
+export default reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
   const data = pageData?.data
   const failed = pageData?.failed
+  const edit = pageData?.edit
+
+  if (edit?.active) {
+    siteEdit.init(ctx, {
+      page: "modpack",
+      locale: edit.locale,
+      version: edit.version,
+      canPublish: edit.canPublish,
+      content: { kind: "sections", sections: asSectionsContent(pageData.sections) },
+    })
+  }
 
   return (
-    <MainWrapperPage variant="with_section">
+    <MainWrapperPage variant="with_section" class={edit?.active ? "pb-24" : undefined}>
       <div
         class={sectionVariant({ className: "bg-bottom md:bg-center bg-cover" })}
         style={{ "background-image": `url(${bgImage})` }}
@@ -190,6 +205,15 @@ export default function Page() {
           </section>
         </div>
       </div>
+      <EditableSections
+        sections={edit?.active && ctx.get(siteEdit.content)?.kind === "sections"
+          ? ctx.get(siteEdit.content)!.sections
+          : asSectionsContent(pageData.sections)}
+        editing={Boolean(edit?.active)}
+      />
+      <Show when={edit?.active}>
+        <EditToolbar />
+      </Show>
     </MainWrapperPage>
   )
-}
+}, "ModpackPage")

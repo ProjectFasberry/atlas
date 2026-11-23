@@ -3,6 +3,11 @@ import { env } from "../env";
 
 export const getUrl = (pageCtx: PageContext) => `${env.VITE_LANDING_ENDPOINT}${pageCtx.urlPathname}`
 export const getStaticObject = (path: string, target: string) => `${env.VITE_VOLUME_URL}/static/${path}/${target}`
+/** A key that already contains the folder, e.g. `images/offenburg-1.webp`. */
+export const getStaticAsset = (key: string) => `${env.VITE_VOLUME_URL}/static/${key.replace(/^\/+/, "")}`
+/** The reverse for edit mode: an absolute static URL back to its bucket key. */
+export const toStaticKey = (url: string) =>
+  url.replace(`${env.VITE_VOLUME_URL}/static/`, "").replace(/^\/+/, "")
 
 export type LauncherPlatform = "windows-x86_64" | "darwin-aarch64"
 

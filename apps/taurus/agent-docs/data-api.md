@@ -32,9 +32,36 @@ const items = response.data?.data?.data ?? []
 | `/news/list` | landing news |
 | `/modpack/list` | `/modpack` (SSR) |
 | `/server/status` | landing join panel, `/status` |
+| `/site/content/{page}` | editable copy for `/` (carousel) and `/servers` |
 | `/server/player/{nickname}` | `/status` avatars |
 
 `/modpack/list` may return `[]`; render an empty state, not a blank page.
+
+## Editable content
+
+`shared/api/site.ts` declares the `/site/content/*` and `/privated/content/*`
+operations until the checked-in OpenAPI schema is regenerated. A page merges the returned document over its
+bundled translations: a missing or `null` field keeps the shipped copy, an empty
+string clears it. Image values are keys inside the `static` bucket and are
+resolved with `getStaticAsset`; `toStaticKey` reverses it for edit mode.
+
+## Edit mode
+
+`?edit=1` is handled on the server: the page forwards the session cookie to
+`/site/access`, and when `canEdit` is true it reads `/site/content/{page}?draft=1`.
+The draft is rendered as the usual page, adds `noindex`, and initializes
+`shared/models/site-edit.model.ts` with the effective values (defaults merged with
+the draft).
+
+Every editable page also carries ordered `sections` (`{ id, title, body, hidden }`):
+`EditableSections` renders them at the end of the page and, in edit mode, adds
+add/remove/reorder/hide controls. `/start` and `/support` are not prerendered
+(`prerender: false`) because the draft depends on the request cookie. The fixed toolbar saves the draft through `/privated/content/*`, where
+the API re-checks the permission; publish and discard reload the page.
+
+Editors save cross-origin with cookies, so `https://fasberry.fun` must be listed in
+the API `cors-origins` runtime config (`getUrlConfig("cors-origins")`); without it
+the browser blocks the write requests.
 
 ## Errors
 

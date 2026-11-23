@@ -1,3 +1,5 @@
+import { Show } from "solid-js";
+import { useData } from "vike-solid/useData";
 import { Link } from "@/shared/components/link"
 import { MainWrapperPage } from "@/shared/ui/main-wrapper";
 import { Button } from "@/shared/ui/button";
@@ -15,6 +17,13 @@ import { NewsSection } from "./(components)/news";
 import { CommunitySection } from "./(components)/community";
 import { FaqSection } from "./(components)/faq";
 import { useAtomAccessor } from "@/shared/lib/utils";
+import { reatomComponent } from "@/shared/lib/reatom";
+import { siteEdit } from "@/shared/models/site-edit.model";
+import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
+import { createSpawnEditSlides } from "./(models)/spawn-carousel.model";
+import { asSectionsContent } from "@/shared/api/site";
+import { EditableSections } from "@/shared/components/edit/editable-sections";
+import type { Data } from "./+data";
 
 const introImage = getStaticObject("arts", "server-status-widget.webp")
 const shareImage = getStaticObject("arts", "bzzvanet-.jpg")
@@ -39,9 +48,27 @@ const Weather = () => {
   return <div class={`weather ${data()} absolute z-1 w-full h-full top-0 right-0 left-0`} />
 }
 
-export default function Page() {
+export default reatomComponent(({ ctx }) => {
+  const pageData = useData<Data>()
+  const edit = pageData?.edit
+  const editContent = useAtomAccessor(siteEdit.content)
+
+  if (edit?.active) {
+    siteEdit.init(ctx, {
+      page: "home",
+      locale: edit.locale,
+      version: edit.version,
+      canPublish: edit.canPublish,
+      content: {
+        kind: "home",
+        slides: createSpawnEditSlides(pageData.content),
+        sections: asSectionsContent(pageData.content),
+      },
+    })
+  }
+
   return (
-    <MainWrapperPage variant="with_section" class="landing-page">
+    <MainWrapperPage variant="with_section" class={edit?.active ? "landing-page pb-24" : "landing-page"}>
       <div id="title" class={sectionVariant()}>
         <div class="absolute top-0 right-0 left-0 overflow-hidden h-full">
           <img
@@ -177,6 +204,15 @@ export default function Page() {
           </div>
         </div>
       </div>
+      <EditableSections
+        sections={edit?.active && editContent()
+          ? editContent()!.sections
+          : asSectionsContent(pageData.content)}
+        editing={Boolean(edit?.active)}
+      />
+      <Show when={edit?.active}>
+        <EditToolbar />
+      </Show>
     </MainWrapperPage>
   )
-}
+}, "LandingPage")
