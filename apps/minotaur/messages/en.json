@@ -1890,6 +1890,7 @@
     "site-edit": "Edit on the site",
     "site-blocks": "Current sections",
     "site-blocks-hint": "Headings and descriptions of the page's existing sections. An empty field keeps the site default.",
+    "site-reset": "Reset",
     "block-hero": "Hero",
     "block-join": "How to start",
     "block-features": "What the project has",

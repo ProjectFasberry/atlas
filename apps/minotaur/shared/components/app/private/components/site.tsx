@@ -20,6 +20,7 @@ import {
   type ImageTarget, type ServerDraft, type SiteDraft, type SiteLocale,
   type SitePageId, type SiteTarget,
 } from "../models/site.model"
+import { BLOCK_DEFAULTS } from "../models/site-defaults"
 import { translate } from "@/shared/locales/helpers"
 
 const { Storage, storageState } = storageModel({
@@ -354,8 +355,8 @@ const ServersEditor = reatomComponent<{ draft: Extract<SiteDraft, { kind: "serve
   "SiteServersEditor",
 )
 
-const BlocksEditor = reatomComponent<{ page: SitePageId, draft: SiteDraft, canEdit: boolean }>(
-  ({ ctx, page, draft, canEdit }) => {
+const BlocksEditor = reatomComponent<{ page: SitePageId, locale: SiteLocale, draft: SiteDraft, canEdit: boolean }>(
+  ({ ctx, page, locale, draft, canEdit }) => {
     const blocks = PAGE_BLOCKS[page]
 
     if (!blocks.length) return null
@@ -369,7 +370,11 @@ const BlocksEditor = reatomComponent<{ page: SitePageId, draft: SiteDraft, canEd
           {translate["panel.site-blocks-hint"]()}
         </Typography>
         {blocks.map(({ id, label }) => {
-          const value = draft.blocks[id] ?? { title: "", description: "", hidden: false }
+          const override = draft.blocks[id]
+          const defaults = BLOCK_DEFAULTS[page]?.[id]?.[locale] ?? {}
+          const title = override?.title ?? defaults.title ?? ""
+          const description = override?.description ?? defaults.description ?? ""
+          const hidden = override?.hidden ?? false
 
           return (
             <div key={id} className="flex flex-col gap-2 rounded-lg border border-neutral-800 p-2">
@@ -377,25 +382,37 @@ const BlocksEditor = reatomComponent<{ page: SitePageId, draft: SiteDraft, canEd
                 <Typography className="text-xs font-semibold text-neutral-400">
                   {label()}
                 </Typography>
-                <label className="flex items-center gap-2 text-[11px] text-neutral-400">
-                  <input
-                    type="checkbox"
-                    checked={value.hidden}
-                    disabled={!canEdit}
-                    onChange={() => siteEditor.toggleBlock(ctx, id)}
-                  />
-                  {translate["panel.site-hide-section"]()}
-                </label>
+                <div className="flex items-center gap-2">
+                  {override && (
+                    <button
+                      type="button"
+                      className="text-[11px] text-neutral-400 underline-offset-2 hover:underline"
+                      disabled={!canEdit}
+                      onClick={() => siteEditor.resetBlock(ctx, id)}
+                    >
+                      {translate["panel.site-reset"]()}
+                    </button>
+                  )}
+                  <label className="flex items-center gap-2 text-[11px] text-neutral-400">
+                    <input
+                      type="checkbox"
+                      checked={hidden}
+                      disabled={!canEdit}
+                      onChange={() => siteEditor.toggleBlock(ctx, id)}
+                    />
+                    {translate["panel.site-hide-section"]()}
+                  </label>
+                </div>
               </div>
               <TextField
                 label={translate["panel.title"]()}
-                value={value.title}
+                value={title}
                 disabled={!canEdit}
                 onChange={(next) => siteEditor.setBlock(ctx, id, { title: next })}
               />
               <TextArea
                 label={translate["panel.description"]()}
-                value={value.description}
+                value={description}
                 disabled={!canEdit}
                 onChange={(next) => siteEditor.setBlock(ctx, id, { description: next })}
               />
@@ -602,7 +619,7 @@ export const SitePanel = reatomComponent(({ ctx }) => {
           </div>
           {draft.kind === "home" && <CarouselEditor draft={draft} canEdit={canEdit} />}
           {draft.kind === "servers" && <ServersEditor draft={draft} canEdit={canEdit} />}
-          <BlocksEditor page={page} draft={draft} canEdit={canEdit} />
+          <BlocksEditor page={page} locale={locale} draft={draft} canEdit={canEdit} />
           <SectionsEditor draft={draft} canEdit={canEdit} />
           <div className="flex flex-wrap items-center gap-2">
             <Button

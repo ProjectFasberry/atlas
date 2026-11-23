@@ -17,6 +17,7 @@ import {
   type SitePageId,
 } from "@/shared/api/site"
 import { translate } from "@/shared/locales/helpers"
+import { BLOCK_DEFAULTS } from "./site-defaults"
 
 export type SiteTarget = { page: SitePageId; locale: SiteLocale }
 export type { SiteLocale, SitePageId }
@@ -24,7 +25,7 @@ export type { SiteLocale, SitePageId }
 export type SlideDraft = { image: string; alt: string }
 export type FeatureDraft = { icon: string; title: string; description: string }
 export type SectionDraft = { id: string; title: string; body: string; hidden: boolean }
-export type BlockDraft = { title: string; description: string; hidden: boolean }
+export type BlockDraft = { title?: string; description?: string; hidden: boolean }
 
 export type ServerDraft = {
   name: string
@@ -149,8 +150,8 @@ function normalizeBlocks(value: unknown): Record<string, BlockDraft> {
   for (const [id, item] of Object.entries(source)) {
     const entry = asRecord(item)
     result[id] = {
-      title: asString(entry.title),
-      description: asString(entry.description),
+      title: typeof entry.title === "string" ? entry.title : undefined,
+      description: typeof entry.description === "string" ? entry.description : undefined,
       hidden: entry.hidden === true,
     }
   }
@@ -200,7 +201,7 @@ function normalizeServer(value: unknown): ServerDraft {
 }
 
 /** Only overrides leave the panel; an empty field keeps the site default. */
-export function serializeDraft(draft: SiteDraft): unknown {
+export function serializeDraft(page: SitePageId, draft: SiteDraft, locale: SiteLocale): unknown {
   if (draft.kind === "home") {
     const carousel = draft.carousel
       .filter((slide) => slide.image.trim())
@@ -216,11 +217,18 @@ export function serializeDraft(draft: SiteDraft): unknown {
     const sections = serializeSections(draft.sections)
     if (sections.length) result.sections = sections
 
+    const blocks = serializeBlocks(page, locale, draft.blocks)
+    if (Object.keys(blocks).length) result.blocks = blocks
+
     return result
   }
 
   if (draft.kind === "sections") {
-    return { sections: serializeSections(draft.sections) }
+    const result: Record<string, unknown> = { sections: serializeSections(draft.sections) }
+    const blocks = serializeBlocks(page, locale, draft.blocks)
+    if (Object.keys(blocks).length) result.blocks = blocks
+
+    return result
   }
 
   const result: Record<string, unknown> = {}
@@ -241,19 +249,29 @@ export function serializeDraft(draft: SiteDraft): unknown {
   const sections = serializeSections(draft.sections)
   if (sections.length) result.sections = sections
 
-  const blocks = serializeBlocks(draft.blocks)
+  const blocks = serializeBlocks(page, locale, draft.blocks)
   if (Object.keys(blocks).length) result.blocks = blocks
 
   return result
 }
 
-function serializeBlocks(blocks: Record<string, BlockDraft>) {
+function serializeBlocks(
+  page: SitePageId,
+  locale: SiteLocale,
+  blocks: Record<string, BlockDraft>,
+) {
   const result: Record<string, { title?: string, description?: string, hidden?: boolean }> = {}
 
   for (const [id, block] of Object.entries(blocks)) {
+    const defaults = BLOCK_DEFAULTS[page]?.[id]?.[locale] ?? {}
     const value: { title?: string, description?: string, hidden?: boolean } = {}
-    if (block.title.trim()) value.title = block.title
-    if (block.description.trim()) value.description = block.description
+
+    // Only fields that differ from the site copy are stored; the panel shows the
+    // defaults, so an untouched field must not freeze them in the document.
+    if (block.title !== undefined && block.title !== (defaults.title ?? "")) value.title = block.title
+    if (block.description !== undefined && block.description !== (defaults.description ?? "")) {
+      value.description = block.description
+    }
     if (block.hidden) value.hidden = true
 
     if (Object.keys(value).length) result[id] = value
@@ -494,7 +512,7 @@ const setBlock = action((ctx, id: string, patch: Partial<Omit<BlockDraft, never>
   const draft = currentDraft(ctx)
   if (!draft) return
 
-  const current = draft.blocks[id] ?? { title: "", description: "", hidden: false }
+  const current = draft.blocks[id] ?? { hidden: false }
   patchDraft(ctx, draft, (value) => ({
     ...value,
     blocks: { ...value.blocks, [id]: { ...current, ...patch } },
@@ -505,12 +523,22 @@ const toggleBlock = action((ctx, id: string) => {
   const draft = currentDraft(ctx)
   if (!draft) return
 
-  const current = draft.blocks[id] ?? { title: "", description: "", hidden: false }
+  const current = draft.blocks[id] ?? { hidden: false }
   patchDraft(ctx, draft, (value) => ({
     ...value,
     blocks: { ...value.blocks, [id]: { ...current, hidden: !current.hidden } },
   }))
 }, "siteEditor.toggleBlock")
+
+const resetBlock = action((ctx, id: string) => {
+  const draft = currentDraft(ctx)
+  if (!draft) return
+
+  const blocks = { ...draft.blocks }
+  delete blocks[id]
+
+  patchDraft(ctx, draft, (current) => ({ ...current, blocks }))
+}, "siteEditor.resetBlock")
 
 const patchSections = action((ctx, update: (sections: SectionDraft[]) => SectionDraft[]) => {
   const draft = currentDraft(ctx)
@@ -586,7 +614,7 @@ const save = reatomAsync(async (ctx, target: SiteTarget) => {
   const payload = await ctx.schedule(() =>
     saveSiteContentDraft(target.page, target.locale, {
       version: doc.version,
-      content: serializeDraft(draft),
+      content: serializeDraft(target.page, draft, target.locale),
     }),
   )
 
@@ -705,6 +733,7 @@ export const siteEditor = {
   removeFeature,
   setBlock,
   toggleBlock,
+  resetBlock,
   addSection,
   setSection,
   removeSection,
