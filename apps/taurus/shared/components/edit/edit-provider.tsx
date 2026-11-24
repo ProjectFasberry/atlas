@@ -1,4 +1,4 @@
-import { createEffect, on, onMount } from "solid-js"
+import { createEffect, onMount } from "solid-js"
 import { toast } from "solid-sonner"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { useAtomAccessor } from "@/shared/lib/utils"
@@ -26,15 +26,26 @@ export const EditProvider = reatomComponent<{
 
   onMount(() => hydrateSiteEditMode(ctx))
 
-  const ready = () => draft()?.page === page && draft()?.locale === locale
+  // Only identity matters: a locale mismatch in the response must not make the
+  // effect refetch forever.
+  const ready = () => draft()?.page === page
+  /** Page and locale of the pending/last request, so each pair loads once. */
+  let requested: string | null = null
 
-  // Refetch whenever the editor turns edit mode on or switches page: another
-  // editor may have saved meanwhile.
-  createEffect(on([active, () => page, () => locale], ([enabled]) => {
-    if (!enabled || !canEdit) return
+  // Not deferred: with the flag already set on load, hydration toggles the atom
+  // before a deferred effect has subscribed, and the draft would never load.
+  createEffect(() => {
+    if (!active() || !canEdit) {
+      requested = null
+      return
+    }
 
+    const key = `${page}:${locale}`
+    if (requested === key) return
+
+    requested = key
     siteEdit.loadDraft(ctx, { page, locale })
-  }, { defer: true }))
+  })
 
   createEffect(() => {
     if (!active() || !canEdit || !ready()) return

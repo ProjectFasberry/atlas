@@ -97,6 +97,8 @@ const close = action((ctx) => {
   dirtyAtom(ctx, false)
   pastAtom(ctx, [])
   futureAtom(ctx, [])
+  // Drop the cached document: the next entry must read it again.
+  loadDraft.dataAtom(ctx, null)
 }, "siteEdit.close")
 
 const patch = (ctx: Parameters<typeof init>[0], content: EditContent) => {

@@ -176,7 +176,7 @@ export default reatomComponent(({ ctx }) => {
           : asSectionsContent(pageData.content)}
         editing={editing()}
       />
-      <EditEntry active={editing()} canEdit={Boolean(pageData?.canEdit)} />
+      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
       <Show when={editing()}>
         <EditToolbar />
       </Show>
