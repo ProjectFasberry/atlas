@@ -1,4 +1,4 @@
-import { Show } from "solid-js"
+import { onCleanup, onMount, Show } from "solid-js"
 import { Button } from "@/shared/ui/button"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { useAtomAccessor } from "@/shared/lib/utils"
@@ -14,13 +14,32 @@ export const EditToolbar = reatomComponent(({ ctx }) => {
   const canPublish = useAtomAccessor(siteEdit.canPublish)
   const saving = useAtomAccessor(siteEdit.save.statusesAtom)
   const publishing = useAtomAccessor(siteEdit.publish.statusesAtom)
+  const canUndo = useAtomAccessor(siteEdit.canUndo)
+  const canRedo = useAtomAccessor(siteEdit.canRedo)
 
   const busy = () => saving().isPending || publishing().isPending
+
+  onMount(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!active() || !(event.metaKey || event.ctrlKey)) return
+
+      const key = event.key.toLowerCase()
+      if (key !== "z" && key !== "y") return
+
+      event.preventDefault()
+
+      if (key === "y" || event.shiftKey) siteEdit.redo(ctx)
+      else siteEdit.undo(ctx)
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+    onCleanup(() => window.removeEventListener("keydown", onKeyDown))
+  })
 
   return (
     <Show when={active()}>
       <div class="fixed bottom-3 left-1/2 z-50 w-[calc(100%-1.5rem)] max-w-3xl -translate-x-1/2">
-        <div class="transparent-achievement-panel flex flex-wrap items-center gap-2 p-2">
+        <div class="panel-dark flex flex-wrap items-center gap-2 p-2">
           <span class="transparent-slot px-2 py-1 text-xs text-neutral-200">
             {translate["edit.mode"]()} · v{version()}
           </span>
@@ -30,6 +49,22 @@ export const EditToolbar = reatomComponent(({ ctx }) => {
             </span>
           </Show>
           <div class="ml-auto flex flex-wrap items-center gap-2">
+            <Button
+              class="px-2 py-1.5 text-xs"
+              disabled={!canUndo() || busy()}
+              title={translate["edit.undo"]()}
+              onClick={() => siteEdit.undo(ctx)}
+            >
+              ↶
+            </Button>
+            <Button
+              class="px-2 py-1.5 text-xs"
+              disabled={!canRedo() || busy()}
+              title={translate["edit.redo"]()}
+              onClick={() => siteEdit.redo(ctx)}
+            >
+              ↷
+            </Button>
             <Button
               class="px-3 py-1.5 text-xs"
               disabled={!dirty() || busy()}

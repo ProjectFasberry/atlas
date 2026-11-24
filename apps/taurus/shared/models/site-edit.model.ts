@@ -50,6 +50,12 @@ const versionAtom = atom(0, "siteEdit.version")
 const canPublishAtom = atom(false, "siteEdit.canPublish")
 const contentAtom = atom<EditContent | null>(null, "siteEdit.content")
 const dirtyAtom = atom(false, "siteEdit.dirty")
+const pastAtom = atom<EditContent[]>([], "siteEdit.past")
+const futureAtom = atom<EditContent[]>([], "siteEdit.future")
+const canUndoAtom = atom((ctx) => ctx.spy(pastAtom).length > 0, "siteEdit.canUndo")
+const canRedoAtom = atom((ctx) => ctx.spy(futureAtom).length > 0, "siteEdit.canRedo")
+/** Deep history is wasted memory: the editor only needs a few steps back. */
+const HISTORY_LIMIT = 50
 /** Published overrides, used by the built-in sections outside edit mode. */
 const publishedBlocksAtom = atom<Record<string, EditBlock>>({}, "siteEdit.publishedBlocks")
 
@@ -67,6 +73,8 @@ const init = action((ctx, input: EditInit) => {
   canPublishAtom(ctx, input.canPublish)
   contentAtom(ctx, input.content)
   dirtyAtom(ctx, false)
+  pastAtom(ctx, [])
+  futureAtom(ctx, [])
 }, "siteEdit.init")
 
 /**
@@ -87,12 +95,43 @@ const close = action((ctx) => {
   activeAtom(ctx, false)
   contentAtom(ctx, null)
   dirtyAtom(ctx, false)
+  pastAtom(ctx, [])
+  futureAtom(ctx, [])
 }, "siteEdit.close")
 
 const patch = (ctx: Parameters<typeof init>[0], content: EditContent) => {
+  const previous = ctx.get(contentAtom)
+
+  if (previous) {
+    pastAtom(ctx, [...ctx.get(pastAtom), previous].slice(-HISTORY_LIMIT))
+    futureAtom(ctx, [])
+  }
+
   contentAtom(ctx, content)
   dirtyAtom(ctx, true)
 }
+
+const undo = action((ctx) => {
+  const past = ctx.get(pastAtom)
+  const current = ctx.get(contentAtom)
+  if (!past.length || !current) return
+
+  pastAtom(ctx, past.slice(0, -1))
+  futureAtom(ctx, [current, ...ctx.get(futureAtom)])
+  contentAtom(ctx, past[past.length - 1])
+  dirtyAtom(ctx, true)
+}, "siteEdit.undo")
+
+const redo = action((ctx) => {
+  const future = ctx.get(futureAtom)
+  const current = ctx.get(contentAtom)
+  if (!future.length || !current) return
+
+  futureAtom(ctx, future.slice(1))
+  pastAtom(ctx, [...ctx.get(pastAtom), current].slice(-HISTORY_LIMIT))
+  contentAtom(ctx, future[0])
+  dirtyAtom(ctx, true)
+}, "siteEdit.redo")
 
 const setPublishedBlocks = action((ctx, blocks: Record<string, EditBlock>) => {
   publishedBlocksAtom(ctx, blocks)
@@ -343,6 +382,7 @@ const save = reatomAsync(async (ctx) => {
     if (errorCode(result.error) === "VERSION_CONFLICT") {
       toast.error(translate["edit.conflict"]())
     } else {
+      console.error("[siteEdit] save failed", result.error)
       toast.error(translate["edit.save-error"]())
     }
 
@@ -392,10 +432,16 @@ const discard = reatomAsync(async (ctx) => {
   const result = await discardSiteDraft(ctx.get(pageAtom), ctx.get(localeAtom), ctx.get(versionAtom))
 
   if (result.error || !result.data?.data) {
-    if (errorCode(result.error) === "VERSION_CONFLICT") {
+    const code = errorCode(result.error)
+
+    if (code === "VERSION_CONFLICT") {
       toast.error(translate["edit.conflict"]())
+    } else if (code === "CONTENT_NOT_FOUND" || code === "DRAFT_EMPTY") {
+      // Nothing was saved since the last publish, so there is nothing to roll back.
+      toast.info(translate["edit.nothing-to-discard"]())
     } else {
-      toast.error(translate["edit.save-error"]())
+      console.error("[siteEdit] discard failed", result.error)
+      toast.error(translate["edit.discard-error"]())
     }
 
     return null
@@ -423,6 +469,10 @@ export const siteEdit = {
   canPublish: canPublishAtom,
   content: contentAtom,
   dirty: dirtyAtom,
+  canUndo: canUndoAtom,
+  canRedo: canRedoAtom,
+  undo,
+  redo,
   init,
   close,
   loadDraft,

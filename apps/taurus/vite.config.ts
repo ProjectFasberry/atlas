@@ -18,7 +18,8 @@ export default defineConfig(({ mode }) => {
   let isSSR = false;
 
   const appOrigin = "https://app.fasberry.fun"
-  const apiTarget = env.PUBLIC_ENV__API_URL || "https://api.fasberry.fun"
+  // Process env wins so a local mock can replace the API without touching .env.
+  const apiTarget = process.env["PUBLIC_ENV__API_URL"] || env.PUBLIC_ENV__API_URL || "https://api.fasberry.fun"
 
   /** Secure cookies cannot be read over plain http, so drop the flag in dev. */
   const stripSecureCookie = (proxy: any) => {

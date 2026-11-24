@@ -602,6 +602,10 @@
     "picker.up": "Up",
     "picker.open": "Choose",
     "picker.close": "Close",
-    "draft-error": "Could not load the draft"
+    "draft-error": "Could not load the draft",
+    "undo": "Undo",
+    "redo": "Redo",
+    "nothing-to-discard": "There is no draft to discard",
+    "discard-error": "Could not discard the draft"
   }
 }
