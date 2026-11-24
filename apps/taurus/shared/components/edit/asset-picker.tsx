@@ -146,7 +146,9 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
         <Dialog.Positioner class={dialogVariant.positioner()}>
           <Dialog.Content
             class={dialogVariant.content({
-              className: "flex w-full max-w-[min(1000px,96vw)]! flex-col gap-3 panel-reset",
+              // `items-stretch` beats the dialog's centered column, otherwise
+              // the grid shrinks to the intrinsic width of its tiles.
+              className: "flex w-full max-w-[min(1000px,96vw)]! flex-col items-stretch gap-3 panel-reset",
             })}
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -206,7 +208,7 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
               onInput={(event) => setAssetSearch(ctx, event.currentTarget.value)}
             />
 
-            <div class="flex min-h-[45vh] max-h-[60vh] flex-col gap-3 overflow-y-auto overscroll-contain">
+            <div class="flex min-h-[45vh] max-h-[60vh] w-full flex-col items-stretch gap-3 overflow-y-auto overscroll-contain">
               <Show when={pageError()}>
                 {(error) => (
                   <Typography color="gray" class="p-2 text-xs">
