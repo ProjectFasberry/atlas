@@ -8,6 +8,7 @@ import { pageState } from '@/shared/models/page.model';
 import { Footer } from '@/shared/components/footer';
 import { Header } from '@/shared/components/header/header';
 import { LayoutSettings } from '@/shared/components/settings/settings';
+import { AssetPicker } from '@/shared/components/edit/asset-picker';
 import { createEffect, type JSXElement } from 'solid-js';
 import { useCtx } from '@reatom/npm-solid-js';
 import { snapshotAtom } from '@/shared/models/ssr'
@@ -60,6 +61,7 @@ const LayoutContent = (props: { children: JSXElement }) => {
     <main>
       <Toaster />
       <Header />
+      <AssetPicker />
       <SyncPageCtx />
       <div id="page-content">
         {props.children}

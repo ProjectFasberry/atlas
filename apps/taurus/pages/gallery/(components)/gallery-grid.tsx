@@ -4,8 +4,9 @@ import { getStaticObject } from "@/shared/lib/helpers";
 import { Typography } from "@/shared/ui/typography";
 import { translate } from "@/shared/locales/helpers";
 import {
-  GALLERY_ITEMS,
   type GalleryFilter,
+  type GalleryItem,
+  galleryItemSrc,
   galleryState,
   galleryTagLabel,
   openGallery,
@@ -25,16 +26,16 @@ const filters: Array<{ value: GalleryFilter, label: () => string }> = [
   { value: "builds", label: () => translate["gallery.tags.builds"]() }
 ]
 
-const countFor = (filter: GalleryFilter) =>
-  filter === "all"
-    ? GALLERY_ITEMS.length
-    : GALLERY_ITEMS.filter((item) => item.tag === filter).length
+const countFor = (items: GalleryItem[], filter: GalleryFilter) => filter === "all"
+  ? items.length
+  : items.filter((item) => item.tag === filter).length
 
 export const GalleryGrid = reatomComponent(({ ctx }) => {
   const filter = useAtomAccessor(galleryState.filter)
+  const items = useAtomAccessor(galleryState.items)
 
   const visible = createMemo(() =>
-    GALLERY_ITEMS
+    items()
       .map((item, index) => ({ item, index }))
       .filter(({ item }) => filter() === "all" || item.tag === filter())
   )
@@ -49,7 +50,7 @@ export const GalleryGrid = reatomComponent(({ ctx }) => {
             {translate["gallery.heading"]()}
           </h2>
           <span class="text-xs text-neutral-500 sm:text-sm">
-            {translate["gallery.count"]({ count: GALLERY_ITEMS.length })}
+            {translate["gallery.count"]({ count: items().length })}
           </span>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -65,7 +66,7 @@ export const GalleryGrid = reatomComponent(({ ctx }) => {
                   sm:text-sm`
                 }
               >
-                {item.label()} · {countFor(item.value)}
+                {item.label()} · {countFor(items(), item.value)}
               </button>
             )}
           </For>
@@ -88,7 +89,7 @@ export const GalleryGrid = reatomComponent(({ ctx }) => {
               >
                 <div class="relative h-full w-full overflow-hidden bg-neutral-900">
                   <img
-                    src={entry.item.src}
+                    src={galleryItemSrc(entry.item, "thumb")}
                     alt=""
                     width={1920}
                     height={1080}
@@ -115,7 +116,8 @@ export const GalleryGrid = reatomComponent(({ ctx }) => {
           }}
         </For>
         <Show when={isAll()}>
-          <div class="col-span-2 flex flex-col justify-between gap-3 p-3 transparent-achievement-panel sm:p-4 md:col-span-1">
+          <div class="col-span-2 flex flex-col justify-between
+            gap-3 p-3 transparent-achievement-panel sm:p-4 md:col-span-1">
             <img
               src={infoIcon}
               alt=""

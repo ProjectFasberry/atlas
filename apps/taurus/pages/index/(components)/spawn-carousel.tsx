@@ -2,18 +2,18 @@ import { Index, Show } from "solid-js"
 import { useData } from "vike-solid/useData"
 import { Carousel } from '@ark-ui/solid/carousel'
 import {
-  createSpawnEditSlides, createSpawnImages, setSpawnPage, spawnCarouselState,
+  createSpawnImages, setSpawnPage, spawnCarouselState,
 } from "../(models)/spawn-carousel.model"
 import { carouselVariant } from "@/shared/ui/carousel"
 import { Button } from "@/shared/ui/button"
 import { useAtomAccessor } from "@/shared/lib/utils"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { siteEdit } from "@/shared/models/site-edit.model"
+import { openAssetPicker } from "@/shared/models/storage.model"
 import { getStaticAsset } from "@/shared/lib/helpers"
 import { translate } from "@/shared/locales/helpers"
 import type { Data } from "../+data"
 
-/** The editor can add slides, so the carousel length comes from the state. */
 export const SpawnCarousel = reatomComponent(({ ctx }) => {
   const page = useAtomAccessor(spawnCarouselState.page)
   const pageData = useData<Data>()
@@ -54,16 +54,27 @@ export const SpawnCarousel = reatomComponent(({ ctx }) => {
                   alt={image().alt}
                 />
                 <Show when={editing()}>
-                  <div class="transparent-achievement-panel absolute top-2 right-2 left-2 z-2 flex flex-col gap-1 p-2">
-                    <input
-                      class="w-full border border-dashed border-green-400/45 bg-black/40 px-1 text-xs outline-none focus:border-green-400"
-                      placeholder={translate["edit.image-key"]()}
-                      value={editSlides()[idx]?.imageKey ?? ""}
-                      onInput={(event) => siteEdit.setHomeSlide(ctx, idx, { imageKey: event.currentTarget.value })}
-                    />
+                  <div class="transparent-achievement-panel absolute top-2 right-2
+                    left-2 z-2 flex flex-col gap-1 p-2">
                     <div class="flex items-center gap-1">
                       <input
-                        class="w-full border border-dashed border-green-400/45 bg-black/40 px-1 text-xs outline-none focus:border-green-400"
+                        class="w-full border border-dashed border-green-400/45
+                        bg-black/40 px-1 text-xs outline-none focus:border-green-400"
+                        placeholder={translate["edit.image-key"]()}
+                        value={editSlides()[idx]?.imageKey ?? ""}
+                        onInput={(event) => siteEdit.setHomeSlide(ctx, idx, { imageKey: event.currentTarget.value })}
+                      />
+                      <Button
+                        class="shrink-0 px-2 py-1 text-[11px]"
+                        onClick={() => openAssetPicker(ctx, { kind: "slide", index: idx })}
+                      >
+                        {translate["edit.picker.open"]()}
+                      </Button>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <input
+                        class="w-full border border-dashed border-green-400/45
+                        bg-black/40 px-1 text-xs outline-none focus:border-green-400"
                         placeholder={translate["edit.alt"]()}
                         value={editSlides()[idx]?.alt ?? ""}
                         onInput={(event) => siteEdit.setHomeSlide(ctx, idx, { alt: event.currentTarget.value })}

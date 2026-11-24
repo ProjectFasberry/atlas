@@ -10,13 +10,17 @@ import { translate } from "@/shared/locales/helpers";
 import { serverStatus } from "@/shared/models/server-status.model";
 import { reatomComponent } from "@/shared/lib/reatom";
 import { useAtomAccessor } from "@/shared/lib/utils";
-import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
+import {
+  BlockControls, BlockSubtitle, BlockTitle,
+  useBlockHidden
+} from "@/shared/components/edit/section-block";
 
 const APP_URL = env.VITE_APP_URL
 const WINDOWS_URL = getLauncherDownloadUrl("windows-x86_64")
 
 const joinSection = tv({
-  base: `full-screen-section relative flex flex-col items-center justify-center py-16 sm:py-20 lg:py-28`
+  base: `full-screen-section relative flex flex-col items-center
+    justify-center py-16 sm:py-20 lg:py-28`
 })
 
 const stepCard = tv({
@@ -47,7 +51,9 @@ export const JoinSection = reatomComponent(({ ctx }) => {
   const statuses = useAtomAccessor(serverStatus.fetch.statusesAtom)
 
   onMount(() => {
-    if (!status() && !statuses().isPending) serverStatus.fetch(ctx)
+    if (!status() && !statuses().isPending) {
+      serverStatus.fetch(ctx)
+    }
   })
 
   const isOnline = () => status()?.proxy.status === "online"
@@ -57,7 +63,6 @@ export const JoinSection = reatomComponent(({ ctx }) => {
   const fillPercent = () => {
     const max = maxPlayers()
     if (!max) return 0
-
     return Math.min(100, Math.max(0, ((players() ?? 0) / max) * 100))
   }
 
@@ -66,7 +71,8 @@ export const JoinSection = reatomComponent(({ ctx }) => {
 
   return (
     <div id="join" class={joinSection()}>
-      <div class="responsive z-1 grid items-center gap-5 lg:grid-cols-[1.05fr_.95fr] lg:gap-3">
+      <div class="responsive z-1 grid items-center gap-5
+        lg:grid-cols-[1.05fr_.95fr] lg:gap-3">
         <div class="flex flex-col justify-center gap-4 sm:gap-5">
           <Typography class="text-xs uppercase tracking-[0.2em] text-green-400">
             {translate["join.eyebrow"]()}
@@ -88,7 +94,8 @@ export const JoinSection = reatomComponent(({ ctx }) => {
             <For each={getSteps()}>
               {(step, idx) => (
                 <li class={stepCard()}>
-                  <span class="raised-slot flex h-9 w-9 shrink-0 items-center justify-center text-lg text-neutral-800">
+                  <span class="raised-slot flex h-9 w-9 shrink-0
+                    items-center justify-center text-lg text-neutral-800">
                     {idx() + 1}
                   </span>
                   <div class="flex min-w-0 flex-col gap-1">
@@ -122,7 +129,12 @@ export const JoinSection = reatomComponent(({ ctx }) => {
             </For>
           </ol>
           <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-            <a href={WINDOWS_URL} target="_blank" rel="noreferrer" class="w-full sm:w-auto">
+            <a
+              href={WINDOWS_URL}
+              target="_blank"
+              rel="noreferrer"
+              class="w-full sm:w-auto"
+            >
               <Button class="w-full sm:w-auto">
                 <Typography color="white" class="text-sm sm:text-base text-nowrap">
                   {translate["join.action-windows"]()}
@@ -136,17 +148,20 @@ export const JoinSection = reatomComponent(({ ctx }) => {
             >
               <Typography color="white" class="text-sm sm:text-base text-nowrap">
                 {translate["join.action-macos"]()}
-                <span class="ml-2 border border-neutral-400/60 px-1 text-[10px] uppercase tracking-wide text-neutral-200">
+                <span class="ml-2 border border-neutral-400/60 px-1 text-[10px]
+                  uppercase tracking-wide text-neutral-200">
                   {translate["shared.soon"]()}
                 </span>
               </Typography>
             </Button>
-            <Link href="/start" class="text-sm text-neutral-300 underline underline-offset-4 hover:text-white sm:whitespace-nowrap">
+            <Link href="/start" class="text-sm text-neutral-300 underline
+              underline-offset-4 hover:text-white sm:whitespace-nowrap">
               {translate["join.action-guide"]()}
             </Link>
           </div>
         </div>
-        <div class="transparent-achievement-panel flex flex-col gap-5 bg-black/30 p-4 backdrop-blur-sm sm:p-6">
+        <div class="transparent-achievement-panel flex flex-col gap-5 bg-black/30
+          p-4 backdrop-blur-sm sm:p-6">
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-2">
               <span
@@ -157,7 +172,8 @@ export const JoinSection = reatomComponent(({ ctx }) => {
                   "bg-neutral-500": !status()
                 }}
               />
-              <Typography class="text-xs uppercase tracking-wide text-neutral-300 sm:text-sm">
+              <Typography class="text-xs uppercase tracking-wide
+                text-neutral-300 sm:text-sm">
                 {!status()
                   ? translate["join.status.connecting"]()
                   : isOnline()
@@ -171,7 +187,8 @@ export const JoinSection = reatomComponent(({ ctx }) => {
               {translate["join.status.players"]()}
             </Typography>
             <div class="flex items-end gap-2">
-              <span class="text-3xl leading-none text-white text-shadow-lg tabular-nums sm:text-4xl">
+              <span class="text-3xl leading-none text-white
+                text-shadow-lg tabular-nums sm:text-4xl">
                 {players() ?? "—"}
               </span>
               <span class="mb-1 text-sm text-neutral-400 tabular-nums">
@@ -195,12 +212,15 @@ export const JoinSection = reatomComponent(({ ctx }) => {
                       {server.fullname || key}
                     </Typography>
                     <Show when={key === "bisquite"}>
-                      <span class="shrink-0 border border-neutral-700 px-1 py-0.5 text-[10px] uppercase tracking-wider text-neutral-500">
+                      <span class="shrink-0 border border-neutral-700 px-1
+                        py-0.5 text-[10px] uppercase tracking-wider text-neutral-500">
                         {translate["join.status.semi-vanilla"]()}
                       </span>
                     </Show>
                   </div>
-                  <span class="text-sm text-neutral-400 tabular-nums">{server.online}</span>
+                  <span class="text-sm text-neutral-400 tabular-nums">
+                    {server.online}
+                  </span>
                 </div>
               )}
             </For>

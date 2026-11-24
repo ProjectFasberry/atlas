@@ -347,8 +347,25 @@
   opacity: 1;
 }
 
+/* The drawer trigger swaps the chest art on open; the pop reads as a lid
+   opening instead of a single-frame blink. */
+@keyframes chest-pop {
+  0% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-1px) scale(1.14); }
+  70% { transform: translateY(0) scale(0.97); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.chest-pop {
+  animation: chest-pop 240ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .layout-settings-tip {
     transition: none;
+  }
+
+  .chest-pop {
+    animation: none;
   }
 }

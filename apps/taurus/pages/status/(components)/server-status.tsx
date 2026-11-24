@@ -1,121 +1,13 @@
-import { createEffect, For, mergeProps, onMount, onCleanup, Show } from "solid-js";
-import { type PlayerStatusProps, fetchPlayerAvatars, playerAvatars, serverStatus } from "../(models)/server-status.model";
-import { pageState } from "@/shared/models/page.model";
-import { Skeleton } from "@/shared/ui/skeleton";
-import { Dialog } from '@ark-ui/solid/dialog';
-import { Typography } from "@/shared/ui/typography";
-import { Link } from "@/shared/components/link";
-import { env } from "@/shared/env";
-import { Portal } from "solid-js/web";
-import { dialogVariant } from "@/shared/ui/dialog";
-import { getStaticObject } from "@/shared/lib/helpers";
-import { useAtomAccessor } from "@/shared/lib/utils";
-import { reatomComponent } from "@/shared/lib/reatom";
+import { createEffect, For, onCleanup, onMount, Show } from "solid-js"
+import { serverStatus, fetchPlayerAvatars } from "../(models)/server-status.model"
+import { pageState } from "@/shared/models/page.model"
+import { translate } from "@/shared/locales/helpers"
+import { useAtomAccessor } from "@/shared/lib/utils"
+import { reatomComponent } from "@/shared/lib/reatom"
+import { ServerStatusSkeleton } from "./server-status-skeleton"
+import { PlayerStatus } from "./player-status"
 
-const APP_URL = env.VITE_APP_URL
-const FALLBACK_HEAD = getStaticObject("fallback", "steve_head.png")
-
-type PlayerStatusImageProps = { type?: "small" | "full" } & PlayerStatusProps
-
-const PlayerStatusImage = (props: PlayerStatusImageProps) => {
-  const avatars = useAtomAccessor(playerAvatars)
-  const merged = mergeProps({ type: "small" }, props);
-
-  const size = () => merged.type === 'small'
-    ? 'max-w-[36px] max-h-[36px]'
-    : 'max-w-[164px] max-h-[164px]'
-
-  const isLoading = () => !Object.hasOwn(avatars(), merged.nickname)
-
-  return (
-    <Show
-      when={!isLoading()}
-      fallback={
-        <Skeleton class={`rounded-md ${size()}`} />
-      }
-    >
-      <img
-        height={800}
-        width={800}
-        class={`rounded-md ${size()}`}
-        alt=""
-        src={avatars()[merged.nickname] || FALLBACK_HEAD}
-        onError={(event) => {
-          event.currentTarget.onerror = null;
-          event.currentTarget.src = FALLBACK_HEAD;
-        }}
-      />
-    </Show>
-  )
-}
-
-const PlayerStatus = (props: PlayerStatusProps) => {
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger class="w-full">
-        <div
-          class="
-            flex items-center w-full px-4 py-3 rounded-xl duration-300
-          hover:bg-neutral-700 bg-neutral-800 justify-start gap-4
-          "
-        >
-          <PlayerStatusImage type="small" nickname={props.nickname} />
-          <Typography color="white" class="text-xl">
-            {props.nickname}
-          </Typography>
-        </div>
-      </Dialog.Trigger>
-      <Portal>
-        <Dialog.Backdrop class={dialogVariant.backdrop()} />
-        <Dialog.Positioner>
-          <Dialog.Content class="justify-center max-w-xl!">
-            <Dialog.Title class={dialogVariant.title()}>{props.nickname}</Dialog.Title>
-            <div class="flex flex-col items-center gap-8 w-full">
-              <PlayerStatusImage type="full" nickname={props.nickname} />
-              <div class="flex flex-col gap-2 w-full">
-                <Link
-                  href={`${APP_URL}/player/${props.nickname}`}
-                  class="inline-flex items-center justify-center whitespace-nowrap
-							px-4 py-2 hover:bg-[#05b458] duration-300 ease-in-out bg-[#088d47] rounded-md w-full"
-                >
-                  <p class="text-white text-lg">
-                    Перейти к профилю
-                  </p>
-                </Link>
-                <Dialog.CloseTrigger class="w-full">
-                  <div
-                    class="inline-flex items-center justify-center whitespace-nowrap
-								px-4 py-2 hover:bg-[#E66A6D] bg-[#C65558] rounded-md w-full"
-                  >
-                    <p class="text-white text-lg">
-                      Закрыть
-                    </p>
-                  </div>
-                </Dialog.CloseTrigger>
-              </div>
-            </div>
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Portal>
-    </Dialog.Root>
-  )
-}
-
-const ServerStatusSkeleton = () => {
-  return (
-    <div class="flex flex-col gap-6 w-full">
-      <Skeleton class="w-full h-10" />
-      <div class="flex flex-col gap-2 w-full">
-        <Skeleton class="w-full h-12" />
-        <Skeleton class="w-full h-12" />
-        <Skeleton class="w-full h-12" />
-        <Skeleton class="w-full h-12" />
-        <Skeleton class="w-full h-12" />
-      </div>
-    </div>
-  )
-}
-
+/** Player list of the proxy, with a skeleton until the first client-side load. */
 export const ServerStatus = reatomComponent(({ ctx }) => {
   const isClient = useAtomAccessor(pageState.isClient)
 
@@ -149,18 +41,21 @@ export const ServerStatus = reatomComponent(({ ctx }) => {
             <>
               {!isServerOnline && (
                 <p class="text-xl lg:text-2xl">
-                  Список игроков недоступен
+                  {translate["pages.status.players.unavailable"]()}
                 </p>
               )}
               {(isServerOnline && playersList) && (
                 <>
                   <p class="text-xl lg:text-2xl">
-                    Все игроки: {data().proxy.online}/{data().proxy.max}
+                    {translate["pages.status.players.title"]({
+                      online: data().proxy.online,
+                      max: data().proxy.max,
+                    })}
                   </p>
                   <div class="flex flex-col gap-2 h-full">
                     {playersList.length === 0 && (
                       <p class="px-2">
-                        тишина...
+                        {translate["pages.status.players.empty"]()}
                       </p>
                     )}
                     <For each={playersList}>

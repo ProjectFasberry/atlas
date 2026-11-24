@@ -3,7 +3,7 @@ import { toast } from 'solid-sonner';
 import { Menu } from '@ark-ui/solid/menu'
 import { Typography } from "@/shared/ui/typography";
 import { useAtom } from "@reatom/npm-solid-js";
-import { For, lazy, Show } from "solid-js";
+import { createEffect, For, lazy, on, Show } from "solid-js";
 import { pageState } from "@/shared/models/page.model";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/shared/ui/drawer";
 import { getStaticObject } from "@/shared/lib/helpers";
@@ -24,12 +24,20 @@ const bgImage = getStaticObject("minecraft/static", "cracked_polished_blacked.we
 const HeaderDrawerContent = lazy(() => import("./header-drawer")
   .then(m => ({ default: m.HeaderDrawerContent })))
 
+const chestOpenedImage = getStaticObject("minecraft/icons", "chest_opened.webp")
+const chestClosedImage = getStaticObject("minecraft/icons", "chest_closed.webp")
+
 const HeaderDrawer = () => {
   const [isOpenAtom, setIsOpenAtom] = useAtom(headerDrawerState.isOpen)
+  const urlParsed = useAtomAccessor(pageState.urlParsed)
 
-  const chestStatusImage = isOpenAtom()
-    ? getStaticObject("minecraft/icons", "chest_opened.webp")
-    : getStaticObject("minecraft/icons", "chest_closed.webp")
+  // Vike swaps the page without unmounting the layout, so the drawer has to
+  // close itself when the path changes.
+  createEffect(on(() => urlParsed()?.pathname, (path, previous) => {
+    if (path && previous && path !== previous) setIsOpenAtom(false)
+  }, { defer: true }))
+
+  const chestStatusImage = () => isOpenAtom() ? chestOpenedImage : chestClosedImage
 
   return (
     <Drawer
@@ -43,8 +51,14 @@ const HeaderDrawer = () => {
         aria-controls="header-menu"
         class="xl:hidden absolute top-2 right-2 z-60 flex cursor-pointer items-center gap-1.5"
       >
-        <img src={chestStatusImage} alt="" width={44} height={44} />
-        <span class="select-none text-sm text-neutral-200">{translate["header.menu"]()}</span>
+        <img
+          src={chestStatusImage()}
+          class="size-11"
+          classList={{ "chest-pop": isOpenAtom() }}
+          alt=""
+          width={44}
+          height={44}
+        />
       </DrawerTrigger>
       <DrawerContent
         id="header-menu"

@@ -319,11 +319,6 @@
       "description-global": "How many top Minecraft servers do you know? Now you know one more.",
       "site_name": "Official website of the Fasberry Minecraft server."
     },
-    "info": {
-      "credits": {
-        "title": "Credits"
-      }
-    },
     "rules": {
       "title": "Rules",
       "description": "Read the rules of our Fasberry server to ensure a fair and friendly game for all participants. Respect other players and follow the established code of conduct.",
@@ -331,7 +326,16 @@
     },
     "status": {
       "title": "Server status",
-      "description": "Live Fasberry server status: online players, availability and versions. Check the servers before joining."
+      "description": "Live Fasberry server status: online players, availability and versions. Check the servers before joining.",
+      "overview.title": "Status",
+      "overview.players": "{count} playing",
+      "overview.total-label": "Total:",
+      "overview.total": "Total: {count}",
+      "players.title": "All players: {online}/{max}",
+      "players.unavailable": "The player list is unavailable",
+      "players.empty": "silence...",
+      "player.profile": "Open profile",
+      "player.close": "Close"
     },
     "support": {
       "title": "Support",
@@ -340,6 +344,9 @@
     "start-play": {
       "title": "Start Playing",
       "description": "Join the Fasberry community and help us grow! Your support matters."
+    },
+    "credits": {
+      "title": "Credits"
     }
   },
   "gallery": {
@@ -381,13 +388,23 @@
     }
   },
   "credits": {
-    "title": "Special Credits",
+    "title": "Credits",
+    "description": "Some of the artwork and tooling comes from other authors. Thank you for the work.",
     "sections": {
       "images": {
-        "title": "Images",
-        "description": "bzzVanet"
+        "title": "Illustrations",
+        "description": "Art, covers and screenshots"
+      },
+      "icons": {
+        "title": "Icons",
+        "description": "Tabler icon set, MIT licence"
+      },
+      "font": {
+        "title": "Font",
+        "description": "Minecraft Rus by BOGDAN Software"
       }
-    }
+    },
+    "minecraft-note": "Minecraft assets, names and textures belong to Mojang AB. This project is not affiliated with Mojang AB or Microsoft."
   },
   "modpack": {
     "title": "Modpacks",
@@ -577,6 +594,13 @@
     "section-hidden": "hidden",
     "up": "Up",
     "down": "Down",
-    "enter": "Edit page"
+    "enter": "Edit page",
+    "picker.title": "Choose a file",
+    "picker.search": "Search by key",
+    "picker.empty": "This folder is empty",
+    "picker.loading": "Loading…",
+    "picker.up": "Up",
+    "picker.open": "Choose",
+    "picker.close": "Close"
   }
 }

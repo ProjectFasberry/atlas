@@ -52,8 +52,8 @@ const DrawerContent = <T extends ValidComponent = "div">(
         class={cn(
           `
             fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[80dvh] flex-col overflow-y-auto
-            border-t-2 border-neutral-700 bg-neutral-900 p-2 pb-[env(safe-area-inset-bottom)]
-            after:absolute after:inset-x-0 after:top-full after:h-1/2 after:bg-inherit md:select-none
+            overscroll-contain border-t-2 border-neutral-700 bg-neutral-900 p-2
+            pb-[env(safe-area-inset-bottom)] md:select-none
           `,
           props.class
         )}

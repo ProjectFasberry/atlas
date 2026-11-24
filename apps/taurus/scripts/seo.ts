@@ -30,7 +30,7 @@ const ROUTES: Route[] = [
   { path: "/gallery", page: "pages/gallery", priority: "0.7", changefreq: "weekly" },
   { path: "/rules", page: "pages/rules", priority: "0.6", changefreq: "monthly" },
   { path: "/support", page: "pages/support", priority: "0.6", changefreq: "monthly" },
-  { path: "/info/credits", page: "pages/info", priority: "0.3", changefreq: "yearly" },
+  { path: "/credits", page: "pages/credits", priority: "0.3", changefreq: "yearly" },
 ]
 
 const appRoot = resolve(import.meta.dir, "..")

@@ -30,7 +30,7 @@ test.describe('landing pages', () => {
   });
 
   test('serves the static pages', async ({ request }) => {
-    for (const path of ['/support', '/gallery', '/info/credits', '/status', '/start']) {
+    for (const path of ['/support', '/gallery', '/credits', '/status', '/start']) {
       const { response, body } = await text(request, path);
       expect(response.status(), path).toBe(200);
       expect(body, path).toContain('Fasberry');

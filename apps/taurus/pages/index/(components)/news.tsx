@@ -8,7 +8,9 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { Typography } from "@/shared/ui/typography";
 import { newsList, type NewsItem } from "../(models)/news.model";
 import { useAtomAccessor } from "@/shared/lib/utils";
-import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
+import {
+  BlockControls, BlockSubtitle, BlockTitle, useBlockHidden
+} from "@/shared/components/edit/section-block";
 import { reatomComponent } from "@/shared/lib/reatom";
 
 const APP_URL = env.VITE_APP_URL
@@ -83,7 +85,9 @@ export const NewsSection = reatomComponent(({ ctx }) => {
   const error = useAtomAccessor(newsList.errorAtom)
 
   onMount(() => {
-    if (!statuses().isPending) newsList(ctx)
+    if (!statuses().isPending) {
+      newsList(ctx)
+    }
   })
 
   onCleanup(() => {

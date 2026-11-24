@@ -3,14 +3,17 @@ import { Link } from "@/shared/components/link";
 import { Typography } from "@/shared/ui/typography";
 import { translate } from "@/shared/locales/helpers";
 import { createCommunityItems } from "../(models)/community.model";
-import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
+import {
+  BlockControls, BlockSubtitle, BlockTitle, useBlockHidden
+} from "@/shared/components/edit/section-block";
 
 export const CommunitySection = () => {
   const hidden = useBlockHidden("community")
   if (hidden()) return null
 
   return (
-    <div id="community" class="section-edge relative flex w-full flex-col items-center py-16 sm:py-20 lg:py-28">
+    <div id="community" class="section-edge relative flex w-full
+      flex-col items-center py-16 sm:py-20 lg:py-28">
       <div class="responsive z-1 flex flex-col gap-6 sm:gap-8">
         <div class="flex flex-col gap-1">
           <BlockTitle

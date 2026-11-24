@@ -7,15 +7,15 @@ import { Typography } from "@/shared/ui/typography";
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog";
 import { translate } from "@/shared/locales/helpers";
 import {
-  GALLERY_ITEMS,
-  closeGallery, galleryState, galleryTagLabel, nextGallery, openGallery, prevGallery
+  closeGallery, galleryItemSrc, galleryState, galleryTagLabel, nextGallery, openGallery, prevGallery
 } from "../(models)/gallery.model";
 import { useAtomAccessor } from "@/shared/lib/utils";
 import { reatomComponent } from "@/shared/lib/reatom";
 
 export const GalleryLightbox = reatomComponent(({ ctx }) => {
   const selected = useAtomAccessor(galleryState.selected)
-  const item = createMemo(() => GALLERY_ITEMS[selected() ?? 0])
+  const items = useAtomAccessor(galleryState.items)
+  const item = createMemo(() => items()[selected() ?? 0])
 
   return (
     <Dialog.Root
@@ -37,7 +37,7 @@ export const GalleryLightbox = reatomComponent(({ ctx }) => {
             </Dialog.Title>
             <div class="relative w-full bg-black">
               <Carousel.Root
-                slideCount={GALLERY_ITEMS.length}
+                slideCount={items().length}
                 page={selected() ?? 0}
                 onPageChange={(details) => openGallery(ctx, details.page)}
                 allowMouseDrag
@@ -46,14 +46,14 @@ export const GalleryLightbox = reatomComponent(({ ctx }) => {
                 class="w-full"
               >
                 <Carousel.ItemGroup class="flex w-full overflow-hidden">
-                  <Index each={GALLERY_ITEMS}>
+                  <Index each={items()}>
                     {(galleryItem, idx) => (
                       <Carousel.Item
                         index={idx}
                         class="flex min-w-0 flex-[0_0_100%] items-center justify-center"
                       >
                         <img
-                          src={galleryItem().src}
+                          src={galleryItemSrc(galleryItem())}
                           alt={galleryItem().title()}
                           width={1920}
                           height={1080}
@@ -65,12 +65,12 @@ export const GalleryLightbox = reatomComponent(({ ctx }) => {
                 </Carousel.ItemGroup>
                 <div class="absolute bottom-3 left-0 right-0 flex justify-center">
                   <Carousel.IndicatorGroup class="flex gap-2 bg-black/40 px-3 py-1.5 backdrop-blur-sm">
-                    <Index each={GALLERY_ITEMS}>
+                    <Index each={items()}>
                       {(_, idx) => (
                         <Carousel.Indicator
                           index={idx}
                           class="h-2 w-2 cursor-pointer border-none
-                          bg-neutral-400/80 data-[current]:bg-gold"
+                          bg-neutral-400/80 data-current:bg-gold"
                         />
                       )}
                     </Index>
@@ -98,7 +98,8 @@ export const GalleryLightbox = reatomComponent(({ ctx }) => {
                 <Icon name="sprite:arrow-right" class="h-5 w-5" />
               </button>
             </div>
-            <div class="flex w-full flex-col items-start justify-between gap-2 px-3 py-3 sm:flex-row sm:items-center sm:px-4">
+            <div class="flex w-full flex-col items-start justify-between
+              gap-2 px-3 py-3 sm:flex-row sm:items-center sm:px-4">
               <div class="flex min-w-0 flex-col gap-0.5">
                 <Typography color="white" class="text-base sm:text-lg">
                   {item().title()}
@@ -109,10 +110,10 @@ export const GalleryLightbox = reatomComponent(({ ctx }) => {
               </div>
               <div class="flex shrink-0 items-center gap-3 text-xs text-neutral-400">
                 <span class="tabular-nums">
-                  {(selected() ?? 0) + 1} / {GALLERY_ITEMS.length}
+                  {(selected() ?? 0) + 1} / {items().length}
                 </span>
                 <a
-                  href={item().src}
+                  href={galleryItemSrc(item())}
                   target="_blank"
                   rel="noreferrer"
                   class="text-green-400 underline-offset-4 hover:underline"

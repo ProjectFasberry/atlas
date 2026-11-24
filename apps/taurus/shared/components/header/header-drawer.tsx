@@ -38,7 +38,13 @@ export const HeaderDrawerContent = reatomComponent(({ ctx }) => {
 
   const handleToPage = (href?: string) => {
     if (!href) return;
-    headerDrawerState.isOpen(ctx, state => !state);
+
+    // Internal links close through the path effect in `HeaderDrawer`: closing
+    // here unmounts the anchor before Vike follows the click, so the page never
+    // changes. External links leave the SPA, so they close right away.
+    if (!href.startsWith("/") || href === pathname()) {
+      headerDrawerState.isOpen(ctx, false);
+    }
   };
 
   const openSettings = () => {

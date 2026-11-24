@@ -187,7 +187,7 @@ export const IdeaPreviewCard = reatomComponent(({ ctx }) => {
         width={1000}
         height={1000}
         loading="lazy"
-        class="absolute inset-0 size-full object-cover brightness-[55%]"
+        class="absolute inset-0 size-full object-cover brightness-55"
       />
       <div class="absolute inset-0
         max-sm:bg-[linear-gradient(180deg,rgba(10,10,12,.2)_0%,rgba(10,10,12,.55)_45%,rgba(10,10,12,.9)_100%)]

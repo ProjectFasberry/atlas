@@ -5,10 +5,10 @@ import { translate } from '../locales/helpers';
 import { env } from '@/shared/env';
 
 const createFooterLinks = () => ([
-  { name: translate["footer.links.privacy"](), href: 'privacy' },
-  { name: translate["footer.links.terms"](), href: 'terms' },
-  { name: translate["footer.links.contacts"](), href: 'contacts' },
-  { name: translate["footer.links.credits"](), href: 'credits' },
+  { name: translate["footer.links.privacy"](), href: '/info/privacy' },
+  { name: translate["footer.links.terms"](), href: '/info/terms' },
+  { name: translate["footer.links.contacts"](), href: '/info/contacts' },
+  { name: translate["footer.links.credits"](), href: '/credits' },
 ]);
 
 /** Hiring lives in the app, the landing only links to it. */
@@ -26,7 +26,7 @@ export const Footer = () => {
         <For each={createFooterLinks()}>
           {(item, idx) => (
             <>
-              <Link href={`/info/${item.href}`}>
+              <Link href={item.href}>
                 <p>{item.name}</p>
               </Link>
               {idx() < createFooterLinks.length - 1 &&

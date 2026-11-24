@@ -1,0 +1,61 @@
+import { Accordion } from "@ark-ui/solid/accordion"
+import { For, Show } from "solid-js"
+import { Typography } from "@/shared/ui/typography"
+import { translate } from "@/shared/locales/helpers"
+import { setSupportFaq, supportFaqItems, supportState } from "../(models)/support.model"
+import { useAtomAccessor } from "@/shared/lib/utils"
+import { reatomComponent } from "@/shared/lib/reatom"
+import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block"
+
+export const SupportFaq = reatomComponent(({ ctx }) => {
+  const faqOpen = useAtomAccessor(supportState.faqOpen)
+  const hidden = useBlockHidden("support-faq")
+
+  return (
+    <Show when={!hidden()}>
+      <section class="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:gap-10">
+        <div class="flex flex-col gap-1">
+          <BlockTitle
+            id="support-faq"
+            fallback={translate["support.faq.title"]()}
+            class="text-2xl sm:text-3xl lg:text-4xl"
+          />
+          <BlockSubtitle
+            id="support-faq"
+            fallback={translate["support.faq.subtitle"]()}
+            class="text-sm sm:text-base"
+          />
+          <BlockControls id="support-faq" />
+        </div>
+        <Accordion.Root
+          multiple
+          collapsible
+          value={faqOpen()}
+          onValueChange={(details) => setSupportFaq(ctx, details.value)}
+          class="flex w-full flex-col gap-2"
+        >
+          <For each={supportFaqItems()}>
+            {(item) => (
+              <Accordion.Item value={item.value} class="transparent-achievement-panel">
+                <Accordion.ItemTrigger class="flex w-full cursor-pointer items-center justify-between gap-4 p-3 text-left sm:p-4">
+                  <Typography color="white" class="text-sm sm:text-base">
+                    {item.question}
+                  </Typography>
+                  <Accordion.ItemIndicator class="group shrink-0 text-lg text-green-400">
+                    <span class="group-data-[state=open]:hidden">+</span>
+                    <span class="hidden group-data-[state=open]:inline">−</span>
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+                <Accordion.ItemContent class="px-3 pb-3 sm:px-4 sm:pb-4">
+                  <Typography color="gray" class="text-xs leading-5 sm:text-sm sm:leading-6">
+                    {item.answer}
+                  </Typography>
+                </Accordion.ItemContent>
+              </Accordion.Item>
+            )}
+          </For>
+        </Accordion.Root>
+      </section>
+    </Show>
+  )
+}, "SupportFaq")

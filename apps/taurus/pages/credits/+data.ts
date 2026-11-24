@@ -5,7 +5,7 @@ import type { PageContextServer } from "vike/types";
 
 export const data = async (pageCtx: PageContextServer) => {
   const config = useConfig();
-  const title = wrapTitle(translate["pages.info.credits.title"]())
+  const title = wrapTitle(translate["pages.credits.title"]())
 
   config({
     title
