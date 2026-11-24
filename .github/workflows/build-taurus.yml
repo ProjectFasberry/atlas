@@ -99,8 +99,6 @@ jobs:
         env:
           STAGE: ${{ steps.stage.outputs.stage }}
           NODE_ENV: production
-          # Self-hosted runtime: no Cloudflare plugin, plain Node server entry.
-          DEPLOY_TARGET: node
 
       - name: Generate sitemap
         working-directory: apps/taurus

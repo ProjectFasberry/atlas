@@ -77,8 +77,7 @@ Container apps (`minotaur`, `taurus`, `wiki`) are built by GitHub Actions only:
   (Traefik, Zot, compose files, cron install) belong to the infra repo.
 - Rollback pins `:sha-<commit>` in the host compose file.
 - `apps/taurus` ships the same way: CI builds `prod/taurus:latest` from
-  `apps/taurus/Dockerfile` with `DEPLOY_TARGET=node`, and the host rolls it out.
-  `wrangler` remains only a rollback path for the old Worker.
+  `apps/taurus/Dockerfile`, and the host rolls it out.
 
 ## Local frontends against the production API
 

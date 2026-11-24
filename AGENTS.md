@@ -109,9 +109,7 @@ manual: `ssh i-m '/opt/main/fasberry deploy prod <app>'`.
 - Required repo secrets: `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`; add
   `NODE_AUTH_TOKEN` only when the build installs private packages.
 - Rollback is a compose change to `:sha-<commit>` on the host, not a rebuild.
-- `taurus` builds with `DEPLOY_TARGET=node` and ships as a container image; the
-  Cloudflare Worker config (`wrangler.jsonc`, `@cloudflare/vite-plugin`) is kept
-  only as a rollback path and is not part of the normal deploy.
+- `taurus` builds a plain Node server entry and ships as a container image.
 - Verify the public health/status endpoint after a rollout and report the image
   digest, not just "deployed".
 

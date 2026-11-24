@@ -12,7 +12,6 @@
     "lint": "pnpm biome lint",
     "type-check": "tsc --build",
     "------------------": "",
-    "deploy:worker": "wrangler deploy",
     "size": "node ../../scripts/build-size.mjs --app taurus",
     "size:prod": "cross-env STAGE=prod sh ./scripts/size-prod.sh",
     "-------------------": "",
@@ -26,6 +25,7 @@
     "@ark-ui/solid": "5.36.2",
     "@bprogress/core": "1.3.4",
     "@corvu/drawer": "0.2.4",
+    "@projectfasberry/storage": "0.3.0",
     "@reatom/framework": "3.4.68",
     "@reatom/npm-solid-js": "3.6.2",
     "@reatom/persist": "3.4.3",
@@ -50,7 +50,6 @@
     "zod": "4.1.11"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.42.1",
     "@inlang/cli": "3.0.0",
     "@inlang/paraglide-js": "2.18.0",
     "@neodx/svg": "0.8.0",
@@ -64,7 +63,6 @@
     "typescript": "5.8.3",
     "vite": "8.0.14",
     "vite-bundle-analyzer": "1.3.8",
-    "wrangler": "4.103.0",
     "@playwright/test": "1.55.0"
   }
 }

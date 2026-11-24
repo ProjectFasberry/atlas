@@ -86,7 +86,6 @@ web_modules/
 .vscode-test
 
 # Cloudflare
-.wrangler/
 
 # Sentry Vite Plugin
 .env.sentry-build-plugin

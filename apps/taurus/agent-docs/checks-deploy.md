@@ -35,7 +35,7 @@ pnpm --filter taurus size:prod    # build + upload the size report
 ## Generated / do not edit
 
 - `paraglide/`
-- `dist/`, `.wrangler/`
+- `dist/`
 - `public/sprites/`, `shared/sprite.gen.ts`
 - `shared/types/gen.ts` and `pkgs/shared/types/gen/`
 - `node_modules/`; dependencies via `pnpm`, never hand-edited lockfiles
@@ -45,7 +45,7 @@ pnpm --filter taurus size:prod    # build + upload the size report
 Taurus ships as a container image, like the other container apps.
 
 - Push to `main` runs `.github/workflows/build-taurus.yml`: it builds the client
-  bundle on the runner (`vike build`, `DEPLOY_TARGET=node`, node rather than bun)
+  bundle on the runner (`vike build`, node rather than bun)
   and pushes `registry.fasberry.fun/<stage>/taurus:latest` plus
   `:sha-<commit>` (`linux/amd64`, `apps/taurus/Dockerfile`).
 - The image carries only `dist/`; `entrypoint.sh` runs
@@ -55,13 +55,11 @@ Taurus ships as a container image, like the other container apps.
 - Rollback pins `prod/taurus:sha-<commit>` in the host compose file, not a rebuild.
 - Deploy only on an explicit request, from a tree whose changes are understood.
   Other apps may be dirty; do not include them.
-- After rollout verify `/`, `/rules`, `/support`, `/gallery`, `/modpack`:
+- After rollout verify `/`, `/rules`, `/support`, `/gallery`, `/modpack`, `/credits`:
   HTTP 200, expected copy, no console errors, no horizontal overflow. Report the
   image digest, not just "deployed".
-- The Cloudflare Worker (`wrangler.jsonc`, `@cloudflare/vite-plugin`) is only a
-  rollback path: the default build target is still Cloudflare, so
-  `pnpm --filter taurus build:prod && pnpm --filter taurus deploy:worker` still
-  produces a Worker. Do not treat that as the normal deploy.
+- The container is the only target: `vite build` emits the Node server entry,
+  and `wrangler.jsonc`/`@cloudflare/vite-plugin` are gone from the app.
 
 ## Git
 
@@ -70,4 +68,4 @@ Taurus ships as a container image, like the other container apps.
 - Pre-commit runs a repo-wide type-check; on `w-m` ensure `bun` is on PATH
   (`PATH="$HOME/.bun/bin:$PATH"`). Do not use `--no-verify` to hide a failure.
 - Short lowercase commit messages, e.g. `taurus: simplify landing copy`.
-- No `dist/`, `.wrangler/`, `paraglide/` or secrets in a commit.
+- No `dist/`, `paraglide/` or secrets in a commit.

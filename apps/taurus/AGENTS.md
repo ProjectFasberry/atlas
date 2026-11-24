@@ -4,8 +4,7 @@ Read the repo rules in [`../../AGENTS.md`](../../AGENTS.md) first; they win.
 App guides start at [`agent-docs/README.md`](./agent-docs/README.md).
 
 - Taurus is Vike + Solid + Reatom, SSR, shipped as the `taurus` container image
-  (`fasberry.fun`). The Cloudflare Worker setup is a rollback path, not the
-  current deploy.
+  (`fasberry.fun`) running the Node server entry.
 - No Solid signals/stores/context for state. Use atoms/actions and
   `useAtom`/`useCtx`.
 - No hardcoded copy, domains or asset hosts.

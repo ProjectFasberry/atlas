@@ -20,6 +20,6 @@ folder.
 - No state in Solid signals, stores or context. Use Reatom atoms/actions and
   read them with `useAtom`/`useCtx`.
 - Do not hardcode user-facing text, domains, API URLs or asset hosts.
-- Do not edit generated output: `paraglide/`, `dist/`, `.wrangler/`,
+- Do not edit generated output: `paraglide/`, `dist/`,
   `public/sprites/`, `shared/sprite.gen.ts`.
 - Do not commit, push or deploy without an explicit request.
