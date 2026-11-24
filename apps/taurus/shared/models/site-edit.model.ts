@@ -253,7 +253,9 @@ function serialize(content: EditContent): unknown {
       }))
       .filter((feature) => feature.icon && feature.title && feature.description)
 
-    if (features.length) item.features = features
+    // An empty array must reach the document: omitting the key restores the
+    // shipped defaults on the next page load.
+    item.features = features
 
     items[server.id] = item
   }

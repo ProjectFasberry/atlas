@@ -7,6 +7,7 @@ import { dialogVariant } from "@/shared/ui/dialog"
 import { useAtomAccessor } from "@/shared/lib/utils"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { translate } from "@/shared/locales/helpers"
+import { env } from "@/shared/env"
 import { siteEdit } from "@/shared/models/site-edit.model"
 import {
   assetPicker,
@@ -20,6 +21,8 @@ import {
 const IMAGE_RE = /\.(png|jpe?g|webp|gif|avif|svg)$/i
 /** Opening a large folder should not fire a presign request per file at once. */
 const PREVIEW_LIMIT = 60
+/** Readable without a signature, so the grid needs no presign round trip. */
+const PUBLIC_BUCKET = "static"
 
 /**
  * Bucket browser in a dialog. It writes the chosen S3 key into the editor field
@@ -86,7 +89,7 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
   // Presign previews for the images of the open folder, in small batches.
   createEffect(() => {
     const name = bucket()
-    if (!open() || !name) return
+    if (!open() || !name || name === PUBLIC_BUCKET) return
 
     const cache = previews()
     let requested = 0
@@ -125,7 +128,10 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
 
   const previewUrl = (key: string) => {
     const name = bucket()
-    return name ? previews()[`${name}/${key}`] : undefined
+    if (!name) return undefined
+    if (name === PUBLIC_BUCKET) return `${env.VITE_VOLUME_URL}/static/${key}`
+
+    return previews()[`${name}/${key}`]
   }
 
   return (
