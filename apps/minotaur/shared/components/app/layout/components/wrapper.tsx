@@ -12,6 +12,8 @@ import { AppearanceSync } from './appearance-sync';
 import { useCreateCtx } from '@/shared/lib/reatom/index';
 import { ENVIRONMENT } from '@/shared/consts';
 import { localeState } from '@/shared/models/shared.model';
+import { setLocale } from '@/paraglide/runtime';
+import type { AtomState } from '@reatom/framework';
 
 const Sync = () => {
   const pageCtx = usePageContext()
@@ -53,6 +55,15 @@ const ReatomProvider = ({ children }: PropsWithChildren) => {
   const reatomCtx = useCreateCtx((ctx) => {
     if (import.meta.env.DEV && ENVIRONMENT === 'client') {
       app.initReatomLogger(ctx)
+    }
+
+    // The server already resolved the locale (cookie/Accept-Language); reuse it
+    // instead of recomputing from navigator on hydration. Persisting it to the
+    // cookie also keeps later getLocale() calls in sync without freezing them.
+    const pageLocale = pageCtx.locale as AtomState<typeof localeState.current> | undefined
+    if (pageLocale) {
+      localeState.current(ctx, pageLocale)
+      if (ENVIRONMENT === 'client') void setLocale(pageLocale, { reload: false })
     }
 
     app.preInit(ctx, pageCtx.snapshot)
