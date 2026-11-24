@@ -566,7 +566,7 @@ export const SitePanel = reatomComponent(({ ctx }) => {
           </a>
           {canEdit && (
             <a
-              href={`${env.VITE_LANDING_URL}${currentPage.path}?edit=1`}
+              href={`${env.VITE_LANDING_URL}${currentPage.path}`}
               target="_blank"
               rel="noreferrer"
               className="flex h-7 items-center gap-1 rounded-lg bg-emerald-600/20 px-2 text-xs

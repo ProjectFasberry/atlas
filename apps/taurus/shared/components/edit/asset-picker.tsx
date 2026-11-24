@@ -244,8 +244,8 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
                       <button
                         type="button"
                         title={object.key}
-                        class="group relative aspect-video overflow-hidden border-2
-                        border-neutral-600 bg-neutral-900 p-0.5 hover:border-green-400"
+                        class="group relative h-20 overflow-hidden border-2 border-neutral-600
+                        bg-neutral-900 p-0.5 hover:border-green-400 sm:h-24"
                         onClick={() => choose(object.key)}
                       >
                         <Show when={previewUrl(object.key)}>
@@ -254,7 +254,7 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
                               src={url()}
                               alt=""
                               loading="lazy"
-                              class="size-full object-cover"
+                              class="absolute inset-0 size-full object-cover"
                             />
                           )}
                         </Show>

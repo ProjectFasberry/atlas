@@ -168,16 +168,6 @@ export async function fetchServersContent(locale: SiteLocale, headers: ContentHe
 
 export type SiteAccess = { nickname: string | null; canEdit: boolean; canPublish: boolean }
 
-/** Present on a page's data only when the visitor may edit it. */
-export type SiteEditMeta = {
-  active: true
-  canPublish: boolean
-  version: number
-  updatedAt: string | null
-  /** Resolved on the server, so the client does not re-init in another locale. */
-  locale: SiteLocale
-}
-
 export async function fetchSiteAccess(headers: ContentHeaders): Promise<SiteAccess | null> {
   const result = await mainClient
     .GET("/site/access", { headers })
@@ -186,19 +176,29 @@ export async function fetchSiteAccess(headers: ContentHeaders): Promise<SiteAcce
   return result?.data?.data ?? null
 }
 
-/** The editor's document: the draft when it exists, published otherwise. */
-export async function fetchSiteDraft(page: SitePage, locale: SiteLocale, headers: ContentHeaders) {
+export type SiteEditorDraft = {
+  page: string
+  locale: SiteLocale
+  content: unknown
+  version: number
+  updatedAt: string | null
+}
+
+/**
+ * The editor's document (draft when it exists, published otherwise) for the
+ * browser: the cookie decides the access, so no token or flag leaves the page.
+ */
+export async function fetchEditorDraft(page: SitePage, locale: SiteLocale): Promise<SiteEditorDraft | null> {
   const result = await mainClient
     .GET("/site/content/{page}", {
       params: { path: { page }, query: { locale, draft: "1" } },
-      headers,
     })
     .catch((error) => {
       console.error(`[content] ${page} draft request failed`, error)
       return null
     })
 
-  return result?.data?.data ?? null
+  return (result?.data?.data ?? null) as SiteEditorDraft | null
 }
 
 export function saveSiteDraft(page: SitePage, locale: SiteLocale, version: number, content: unknown) {
@@ -262,37 +262,21 @@ export async function fetchPageContent(page: SitePage, locale: SiteLocale, heade
 }
 
 /**
- * Published content for visitors; the draft and the edit metadata for editors.
- * Access is resolved from the forwarded cookie on the server.
+ * Published content plus the visitor's permissions. The draft is not part of the
+ * render: edit mode lives in the browser and fetches it on demand.
  */
 export async function resolvePageContent(
   page: SitePage,
   locale: SiteLocale,
   headers: ContentHeaders,
-  wantsEdit: boolean,
-): Promise<{ content: unknown; edit: SiteEditMeta | null; canEdit: boolean }> {
-  // The access check runs for every render: it is what shows the "Edit page"
-  // entry to staff without putting a token or a flag in the URL.
+): Promise<{ content: unknown; canEdit: boolean; canPublish: boolean }> {
   const access = await fetchSiteAccess(headers)
-  const canEdit = Boolean(access?.canEdit)
 
-  if (wantsEdit && access?.canEdit) {
-    const draft = await fetchSiteDraft(page, locale, headers)
-
-    return {
-      content: draft?.content ?? null,
-      canEdit,
-      edit: {
-        active: true,
-        canPublish: access.canPublish,
-        version: draft?.version ?? 0,
-        updatedAt: draft?.updatedAt ?? null,
-        locale: draft?.locale ?? locale,
-      },
-    }
+  return {
+    content: await fetchPageContent(page, locale, headers),
+    canEdit: Boolean(access?.canEdit),
+    canPublish: Boolean(access?.canPublish),
   }
-
-  return { content: await fetchPageContent(page, locale, headers), edit: null, canEdit }
 }
 
 /** Overrides for the page's built-in sections. */

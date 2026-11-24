@@ -1,8 +1,8 @@
-import { action, atom, reatomAsync, withStatusesAtom, type Ctx } from "@reatom/framework"
+import { action, atom, reatomAsync, withDataAtom, withErrorAtom, withStatusesAtom, type Ctx } from "@reatom/framework"
 import { toast } from "solid-sonner"
 import {
-  discardSiteDraft, publishSiteDraft, saveSiteDraft,
-  type BlockContent, type SiteAdminPayload, type SiteLocale,
+  discardSiteDraft, fetchEditorDraft, publishSiteDraft, saveSiteDraft,
+  type BlockContent, type SiteAdminPayload, type SiteEditorDraft, type SiteLocale,
 } from "@/shared/api/site"
 import { translate } from "@/shared/locales/helpers"
 
@@ -68,6 +68,26 @@ const init = action((ctx, input: EditInit) => {
   contentAtom(ctx, input.content)
   dirtyAtom(ctx, false)
 }, "siteEdit.init")
+
+/**
+ * Edit mode lives in the browser: the page renders published content, and the
+ * draft is fetched here once an editor enables it.
+ */
+const loadDraft = reatomAsync(
+  async (_ctx, params: { page: EditPage; locale: SiteLocale }) =>
+    fetchEditorDraft(params.page, params.locale),
+  "siteEdit.loadDraft",
+).pipe(
+  withDataAtom(null as SiteEditorDraft | null),
+  withStatusesAtom(),
+  withErrorAtom(),
+)
+
+const close = action((ctx) => {
+  activeAtom(ctx, false)
+  contentAtom(ctx, null)
+  dirtyAtom(ctx, false)
+}, "siteEdit.close")
 
 const patch = (ctx: Parameters<typeof init>[0], content: EditContent) => {
   contentAtom(ctx, content)
@@ -404,6 +424,8 @@ export const siteEdit = {
   content: contentAtom,
   dirty: dirtyAtom,
   init,
+  close,
+  loadDraft,
   setHomeSlide,
   addSlide,
   removeSlide,

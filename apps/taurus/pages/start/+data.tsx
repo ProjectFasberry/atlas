@@ -3,21 +3,21 @@ import type { PageContextServer } from 'vike/types';
 import { getUrl, wrapTitle, getStaticObject } from '@/shared/lib/helpers';
 import { translate } from '@/shared/locales/helpers';
 import { apiRequestHeaders } from '@/shared/api/server';
-import { resolvePageContent, type SiteEditMeta } from '@/shared/api/site';
+import { resolvePageContent, type SiteLocale } from '@/shared/api/site';
 import { getLocale } from '@/paraglide/runtime';
 
 const image = getStaticObject("backgrounds", "rules_background.png")
 
-export type Data = { content: unknown; edit: SiteEditMeta | null; canEdit: boolean }
+export type Data = { content: unknown; locale: SiteLocale; canEdit: boolean; canPublish: boolean }
 
 export async function data(pageCtx: PageContextServer): Promise<Data> {
   const config = useConfig()
 
-  const { content, edit, canEdit } = await resolvePageContent(
+  const locale = getLocale()
+  const { content, canEdit, canPublish } = await resolvePageContent(
     "start",
-    getLocale(),
+    locale,
     apiRequestHeaders(pageCtx),
-    pageCtx.urlParsed.search.edit === "1",
   )
 
   const title = wrapTitle(translate["pages.start-play.title"]());
@@ -44,10 +44,9 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
         <meta property="twitter:image:type" content="image/jpeg" />
         <meta property="twitter:image:width" content="1200" />
         <meta property="twitter:image:height" content="630" />
-        {edit && <meta name="robots" content="noindex, nofollow" />}
       </>
     )
   })
 
-  return { content, edit, canEdit }
+  return { content, locale, canEdit, canPublish }
 }

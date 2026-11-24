@@ -47,11 +47,13 @@ resolved with `getStaticAsset`; `toStaticKey` reverses it for edit mode.
 
 ## Edit mode
 
-`?edit=1` is handled on the server: the page forwards the session cookie to
-`/site/access`, and when `canEdit` is true it reads `/site/content/{page}?draft=1`.
-The draft is rendered as the usual page, adds `noindex`, and initializes
-`shared/models/site-edit.model.ts` with the effective values (defaults merged with
-the draft).
+Edit mode is client-only and lives in `localStorage` (`fasberry:site-edit`,
+`shared/models/site-edit-mode.model.ts`); no query flag is involved. The page
+always renders published content; `EditProvider` (`shared/components/edit/`)
+fetches `/site/content/{page}?draft=1` with the browser cookie when an editor
+turns the mode on, then initializes `shared/models/site-edit.model.ts` with the
+effective values (defaults merged with the draft). The flag survives reloads and
+navigation.
 
 Every editable page also carries `blocks` - overrides for its built-in sections
 (`{ title?, description?, hidden? }` keyed by ids such as `hero`, `news`,
@@ -69,9 +71,8 @@ the API `cors-origins` runtime config (`getUrlConfig("cors-origins")`); without 
 the browser blocks the write requests.
 
 `resolvePageContent` asks `/site/access` on every render, so staff see a fixed
-"Edit page" button (`EditEntry`) even outside edit mode. The button does a full
-reload into `?edit=1`: the draft depends on request data, and a client-side
-navigation would render the published copy.
+"Edit page" button (`EditEntry`) even outside edit mode. The button only flips the
+stored flag; the draft is fetched in the browser, so no reload is needed.
 
 ## Errors
 

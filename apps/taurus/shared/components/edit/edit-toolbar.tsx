@@ -1,14 +1,13 @@
 import { Show } from "solid-js"
-import { usePageContext } from "vike-solid/usePageContext"
 import { Button } from "@/shared/ui/button"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { useAtomAccessor } from "@/shared/lib/utils"
 import { siteEdit } from "@/shared/models/site-edit.model"
+import { setSiteEditMode } from "@/shared/models/site-edit-mode.model"
 import { translate } from "@/shared/locales/helpers"
 
 /** Fixed panel shown on every page with edit mode enabled. */
 export const EditToolbar = reatomComponent(({ ctx }) => {
-  const pageCtx = usePageContext()
   const active = useAtomAccessor(siteEdit.active)
   const version = useAtomAccessor(siteEdit.version)
   const dirty = useAtomAccessor(siteEdit.dirty)
@@ -56,9 +55,7 @@ export const EditToolbar = reatomComponent(({ ctx }) => {
             <button
               type="button"
               class="button px-3 py-1.5 text-xs text-neutral-50"
-              onClick={() => {
-                window.location.href = pageCtx.urlPathname
-              }}
+              onClick={() => setSiteEditMode(ctx, false)}
             >
               {translate["edit.exit"]()}
             </button>

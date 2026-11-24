@@ -601,6 +601,7 @@
     "picker.loading": "Loading…",
     "picker.up": "Up",
     "picker.open": "Choose",
-    "picker.close": "Close"
+    "picker.close": "Close",
+    "draft-error": "Could not load the draft"
   }
 }

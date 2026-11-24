@@ -15,37 +15,35 @@ import { siteEdit } from "@/shared/models/site-edit.model";
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
 import { EditEntry } from "@/shared/components/edit/edit-entry";
 import { createSpawnEditSlides } from "./(models)/spawn-carousel.model";
-import { asBlocks, asSectionsContent } from "@/shared/api/site";
+import { asBlocks, asSectionsContent, type HomeContent } from "@/shared/api/site";
 import { EditableSections } from "@/shared/components/edit/editable-sections";
+import { EditProvider } from "@/shared/components/edit/edit-provider";
 import type { Data } from "./+data";
 
 export default reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
-  const edit = pageData?.edit
   const editContent = useAtomAccessor(siteEdit.content)
+  const editing = useAtomAccessor(siteEdit.active)
 
   siteEdit.setPublishedBlocks(ctx, asBlocks(pageData?.content))
-
-  if (edit?.active) {
-    siteEdit.init(ctx, {
-      page: "home",
-      locale: edit.locale,
-      version: edit.version,
-      canPublish: edit.canPublish,
-      content: {
-        kind: "home",
-        slides: createSpawnEditSlides(pageData.content),
-        sections: asSectionsContent(pageData.content),
-        blocks: asBlocks(pageData.content),
-      },
-    })
-  }
 
   return (
     <MainWrapperPage
       variant="with_section"
-      class={edit?.active ? "landing-page pb-24" : "landing-page"}
+      class={editing() ? "landing-page pb-24" : "landing-page"}
     >
+      <EditProvider
+        page="home"
+        locale={pageData.locale}
+        canEdit={Boolean(pageData.canEdit)}
+        canPublish={Boolean(pageData.canPublish)}
+        build={(content) => ({
+          kind: "home",
+          slides: createSpawnEditSlides(content as HomeContent | null),
+          sections: asSectionsContent(content),
+          blocks: asBlocks(content),
+        })}
+      />
       <HeroSection />
       <JoinSection />
       <FeaturesSection />
@@ -55,13 +53,13 @@ export default reatomComponent(({ ctx }) => {
       <FaqSection />
       <SocialsSection />
       <EditableSections
-        sections={edit?.active && editContent()
+        sections={editing() && editContent()
           ? editContent()!.sections
           : asSectionsContent(pageData.content)}
-        editing={Boolean(edit?.active)}
+        editing={editing()}
       />
-      <EditEntry active={Boolean(edit?.active)} canEdit={Boolean(pageData?.canEdit)} />
-      <Show when={edit?.active}>
+      <EditEntry active={editing()} canEdit={Boolean(pageData?.canEdit)} />
+      <Show when={editing()}>
         <EditToolbar />
       </Show>
     </MainWrapperPage>

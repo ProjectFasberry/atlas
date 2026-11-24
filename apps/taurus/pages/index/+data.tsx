@@ -4,15 +4,16 @@ import { getUrl, wrapTitle } from '@/shared/lib/helpers';
 import { translate } from '@/shared/locales/helpers';
 import {
   asHomeContent, resolvePageContent,
-  type HomeContent, type SiteEditMeta,
+  type HomeContent, type SiteLocale,
 } from '@/shared/api/site';
 import { apiRequestHeaders } from '@/shared/api/server';
 import { getLocale } from '@/paraglide/runtime';
 
 export type Data = {
   content: HomeContent | null
-  edit: SiteEditMeta | null
+  locale: SiteLocale
   canEdit: boolean
+  canPublish: boolean
 }
 
 export async function data(pageCtx: PageContextServer): Promise<Data> {
@@ -20,11 +21,8 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
 
   const locale = getLocale();
   const headers = apiRequestHeaders(pageCtx);
-  const wantsEdit = pageCtx.urlParsed.search.edit === "1";
-
-  const pageContent = await resolvePageContent("home", locale, headers, wantsEdit);
+  const pageContent = await resolvePageContent("home", locale, headers);
   const content = asHomeContent(pageContent.content);
-  const edit = pageContent.edit;
 
   const title = wrapTitle(translate['pages.index.title']());
   const description = translate['pages.index.description']();
@@ -57,11 +55,15 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
         <meta property="og:title" content={title} />
         <meta property="og:site_name" content={title} />
         <meta name="twitter:title" content={title} />
-        {edit && <meta name="robots" content="noindex, nofollow" />}
         <script type="application/ld+json" innerHTML={JSON.stringify(gameLd)} />
       </>
     )
   })
 
-  return { content, edit, canEdit: pageContent.canEdit };
+  return {
+    content,
+    locale,
+    canEdit: pageContent.canEdit,
+    canPublish: pageContent.canPublish,
+  };
 }

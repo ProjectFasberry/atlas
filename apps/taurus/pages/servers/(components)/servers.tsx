@@ -12,7 +12,8 @@ import { EditToolbar } from "@/shared/components/edit/edit-toolbar"
 import { EditEntry } from "@/shared/components/edit/edit-entry"
 import { EditableSections } from "@/shared/components/edit/editable-sections"
 import { toStaticKey } from "@/shared/lib/helpers"
-import { asBlocks, asSectionsContent } from "@/shared/api/site"
+import { asBlocks, asServersContent, asSectionsContent } from "@/shared/api/site"
+import { EditProvider } from "@/shared/components/edit/edit-provider"
 import { ServerSection } from "./server-section"
 import type { Data } from "../+data"
 
@@ -31,29 +32,11 @@ const toEditServers = (profiles: ServerProfile[]): EditServer[] => profiles.map(
 
 export const ServersPage = reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
-  const edit = pageData?.edit
   const profiles = () => createServerProfiles(pageData?.content)
 
   siteEdit.setPublishedBlocks(ctx, asBlocks(pageData?.content))
 
-  if (edit?.active) {
-    siteEdit.init(ctx, {
-      page: "servers",
-      locale: edit.locale,
-      version: edit.version,
-      canPublish: edit.canPublish,
-      content: {
-        kind: "servers",
-        title: pageData.content?.title ?? translate["servers.page.title"](),
-        description: pageData.content?.description ?? translate["servers.page.description"](),
-        servers: toEditServers(profiles()),
-        sections: asSectionsContent(pageData.content),
-        blocks: asBlocks(pageData.content),
-      },
-    })
-  }
-
-  const editing = () => Boolean(edit?.active)
+  const editing = useAtomAccessor(siteEdit.active)
   const editContent = useAtomAccessor(siteEdit.content)
 
   const view = () => {
@@ -70,6 +53,24 @@ export const ServersPage = reatomComponent(({ ctx }) => {
 
   return (
     <MainWrapperPage class={`flex flex-col gap-10 ${editing() ? "pb-24" : ""}`}>
+      <EditProvider
+        page="servers"
+        locale={pageData.locale}
+        canEdit={Boolean(pageData.canEdit)}
+        canPublish={Boolean(pageData.canPublish)}
+        build={(content) => {
+          const parsed = asServersContent(content)
+
+          return {
+            kind: "servers",
+            title: parsed?.title ?? translate["servers.page.title"](),
+            description: parsed?.description ?? translate["servers.page.description"](),
+            servers: toEditServers(createServerProfiles(parsed)),
+            sections: asSectionsContent(content),
+            blocks: asBlocks(content),
+          }
+        }}
+      />
       <div class="flex flex-col gap-2">
         <Show
           when={editing()}

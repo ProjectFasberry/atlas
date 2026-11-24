@@ -11,9 +11,11 @@ import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { SupportContent } from "./(components)/support-content";
 import { reatomComponent } from "@/shared/lib/reatom";
+import { useAtomAccessor } from "@/shared/lib/utils";
 import { siteEdit } from "@/shared/models/site-edit.model";
 import { asBlocks, asSectionsContent } from "@/shared/api/site";
 import { EditableSections } from "@/shared/components/edit/editable-sections";
+import { EditProvider } from "@/shared/components/edit/edit-provider";
 import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
 import { EditEntry } from "@/shared/components/edit/edit-entry";
 import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
@@ -23,28 +25,26 @@ const bgImage = getStaticObject("backgrounds", "support_background.png");
 
 export default reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
-  const edit = pageData?.edit
+  const editing = useAtomAccessor(siteEdit.active)
 
   siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.content))
 
   const heroHidden = useBlockHidden("support-hero")
 
-  if (edit?.active) {
-    siteEdit.init(ctx, {
-      page: "support",
-      locale: edit.locale,
-      version: edit.version,
-      canPublish: edit.canPublish,
-      content: {
-        kind: "sections",
-        sections: asSectionsContent(pageData.content),
-        blocks: asBlocks(pageData.content),
-      },
-    })
-  }
 
   return (
-    <MainWrapperPage variant="with_section" class={edit?.active ? "pb-24" : undefined}>
+    <MainWrapperPage variant="with_section" class={editing() ? "pb-24" : undefined}>
+      <EditProvider
+        page="support"
+        locale={pageData.locale}
+        canEdit={Boolean(pageData.canEdit)}
+        canPublish={Boolean(pageData.canPublish)}
+        build={(content) => ({
+          kind: "sections",
+          sections: asSectionsContent(content),
+          blocks: asBlocks(content),
+        })}
+      />
       <Show when={!heroHidden()}>
       <div
         class={sectionVariant()}
@@ -82,13 +82,13 @@ export default reatomComponent(({ ctx }) => {
         <SupportContent />
       </div>
       <EditableSections
-        sections={edit?.active && ctx.get(siteEdit.content)?.kind === "sections"
+        sections={editing() && ctx.get(siteEdit.content)?.kind === "sections"
           ? ctx.get(siteEdit.content)!.sections
           : asSectionsContent(pageData.content)}
-        editing={Boolean(edit?.active)}
+        editing={editing()}
       />
-      <EditEntry active={Boolean(edit?.active)} canEdit={Boolean(pageData?.canEdit)} />
-      <Show when={edit?.active}>
+      <EditEntry active={editing()} canEdit={Boolean(pageData?.canEdit)} />
+      <Show when={editing()}>
         <EditToolbar />
       </Show>
     </MainWrapperPage>
