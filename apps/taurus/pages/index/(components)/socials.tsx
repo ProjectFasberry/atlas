@@ -43,7 +43,7 @@ export const SocialsSection = () => {
             <BlockTitle
               id="share"
               fallback={translate["contacts.title"]()}
-              class="text-2xl sm:text-3xl lg:text-4xl"
+              class="text-xl sm:text-3xl lg:text-4xl"
             />
             <BlockSubtitle
               id="share"

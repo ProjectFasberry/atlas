@@ -18,7 +18,7 @@ export const ModpackFaq = reatomComponent(({ ctx }) => {
           <BlockTitle
             id="modpack-faq"
             fallback={translate["modpack.faq.title"]()}
-            class="text-2xl sm:text-3xl lg:text-4xl"
+            class="text-xl sm:text-3xl lg:text-4xl"
           />
           <BlockSubtitle
             id="modpack-faq"

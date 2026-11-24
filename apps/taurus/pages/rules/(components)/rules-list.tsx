@@ -50,7 +50,7 @@ export const RulesContent = reatomComponent(({ ctx }) => {
   return (
     <div id="rules-list" class="flex flex-col gap-6">
       <div class="flex flex-col gap-2">
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl">
+        <h2 class="text-xl sm:text-3xl lg:text-4xl">
           {translate["rules.content.title"]()}
         </h2>
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-neutral-400 sm:text-sm">

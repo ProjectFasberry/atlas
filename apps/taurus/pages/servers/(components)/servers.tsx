@@ -76,13 +76,13 @@ export const ServersPage = reatomComponent(({ ctx }) => {
           when={editing()}
           fallback={
             <>
-              <Typography color="white" class="text-3xl sm:text-4xl">{view().title}</Typography>
+              <Typography color="white" class="text-xl sm:text-3xl lg:text-4xl">{view().title}</Typography>
               <Typography color="gray" class="text-sm sm:text-base">{view().description}</Typography>
             </>
           }
         >
           <EditableText
-            class="text-3xl sm:text-4xl"
+            class="text-xl sm:text-3xl lg:text-4xl"
             value={view().title}
             onInput={(value) => siteEdit.setServersPage(ctx, { title: value })}
           />

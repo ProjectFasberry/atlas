@@ -46,7 +46,7 @@ export const GalleryGrid = reatomComponent(({ ctx }) => {
     <div id="gallery" class="flex flex-col gap-6 sm:gap-8">
       <div class="flex flex-col gap-4">
         <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl">
+          <h2 class="text-xl sm:text-3xl lg:text-4xl">
             {translate["gallery.heading"]()}
           </h2>
           <span class="text-xs text-neutral-500 sm:text-sm">

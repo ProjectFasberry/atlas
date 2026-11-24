@@ -73,7 +73,7 @@ export const SupportCards = reatomComponent(({ ctx }) => {
         <BlockTitle
           id="support-help"
           fallback={translate["support.heading"]()}
-          class="text-2xl sm:text-3xl lg:text-4xl"
+          class="text-xl sm:text-3xl lg:text-4xl"
         />
         <BlockSubtitle
           id="support-help"

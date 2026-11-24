@@ -25,7 +25,7 @@ const launcherPoints = () => [
 export const ModpackLauncher = () => (
   <section id="launcher" class="scroll-mt-24 transparent-achievement-panel flex flex-col gap-5 p-4 sm:p-6">
     <div class="flex max-w-3xl flex-col gap-2">
-      <h2 class="text-2xl sm:text-3xl">
+      <h2 class="text-xl sm:text-3xl">
         {translate["modpack.launcher.title"]()}
       </h2>
       <Typography color="gray" class="text-sm leading-6 sm:text-base">

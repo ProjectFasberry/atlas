@@ -147,8 +147,9 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
           <Dialog.Content
             class={dialogVariant.content({
               // `items-stretch` beats the dialog's centered column, otherwise
-              // the grid shrinks to the intrinsic width of its tiles.
-              className: "flex w-full max-w-[min(1000px,96vw)]! flex-col items-stretch gap-3 panel-reset",
+              // the grid shrinks to the intrinsic width of its tiles. No
+              // `panel-reset`: it would strip the opaque panel background.
+              className: "flex max-h-[88dvh] w-full max-w-[min(1000px,96vw)]! flex-col items-stretch gap-3",
             })}
           >
             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -157,8 +158,9 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
               </Dialog.Title>
               <Show when={(buckets()?.length ?? 0) > 1}>
                 <select
-                  class="raised-slot cursor-pointer px-2 py-1 text-xs"
+                  class="raised-slot w-full cursor-pointer px-2 py-1 text-xs sm:w-auto"
                   value={bucket() ?? ""}
+                  aria-label={translate["edit.picker.bucket"]()}
                   onChange={(event) => {
                     assetStorage.selectBucket(ctx, event.currentTarget.value)
                     assetStorage.load(ctx)
@@ -174,10 +176,11 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
             <div class="flex flex-wrap items-center gap-1 text-xs text-neutral-400">
               <button
                 type="button"
-                class="raised-slot cursor-pointer px-2 py-1"
+                class="raised-slot cursor-pointer px-2 py-1 disabled:opacity-60"
+                disabled={!bucket()}
                 onClick={() => goTo("")}
               >
-                {bucket() ?? "…"}
+                {bucket() ?? "—"}
               </button>
               <For each={crumbs()}>
                 {(crumb) => (
@@ -288,7 +291,7 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
                 </ul>
               </Show>
 
-              <Show when={!pagePending().isPending && objects().length === 0 && folders().length === 0}>
+              <Show when={Boolean(bucket()) && !pagePending().isPending && objects().length === 0 && folders().length === 0}>
                 <Typography color="gray" class="p-2 text-xs">
                   {translate["edit.picker.empty"]()}
                 </Typography>

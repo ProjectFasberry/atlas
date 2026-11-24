@@ -34,7 +34,7 @@ export default function Page() {
     <MainWrapperPage>
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-2">
-          <h1 class="text-3xl text-white text-shadow-lg">
+          <h1 class="text-2xl text-white text-shadow-lg sm:text-3xl">
             {translate["credits.title"]()}
           </h1>
           <Typography color="gray">

@@ -52,25 +52,27 @@ export const ServerFeatureCard = reatomComponent<{
           value={feature.description}
           onInput={(value) => siteEdit.setFeature(ctx, serverId, index, { description: value })}
         />
-        <div class="flex items-center gap-1">
+        <div class="flex flex-col gap-1 sm:flex-row sm:items-center">
           <EditableText
-            class="flex-1 text-xs"
+            class="text-xs sm:flex-1"
             placeholder={translate["edit.image-key"]()}
             value={feature.iconKey}
             onInput={(value) => siteEdit.setFeature(ctx, serverId, index, { iconKey: value })}
           />
-          <Button
-            class="shrink-0 px-2 py-1 text-[11px]"
-            onClick={() => openAssetPicker(ctx, { kind: "feature", serverId, index })}
-          >
-            {translate["edit.picker.open"]()}
-          </Button>
-          <Button
-            class="shrink-0 px-2 py-1 text-[11px]"
-            onClick={() => siteEdit.removeFeature(ctx, serverId, index)}
-          >
-            {translate["edit.remove"]()}
-          </Button>
+          <div class="flex gap-1">
+            <Button
+              class="shrink-0 px-2 py-1 text-[11px]"
+              onClick={() => openAssetPicker(ctx, { kind: "feature", serverId, index })}
+            >
+              {translate["edit.picker.open"]()}
+            </Button>
+            <Button
+              class="shrink-0 px-2 py-1 text-[11px]"
+              onClick={() => siteEdit.removeFeature(ctx, serverId, index)}
+            >
+              {translate["edit.remove"]()}
+            </Button>
+          </div>
         </div>
       </Show>
     </div>

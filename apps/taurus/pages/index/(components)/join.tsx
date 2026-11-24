@@ -187,7 +187,7 @@ export const JoinSection = reatomComponent(({ ctx }) => {
               {translate["join.status.players"]()}
             </Typography>
             <div class="flex items-end gap-2">
-              <span class="text-3xl leading-none text-white
+              <span class="text-2xl leading-none text-white
                 text-shadow-lg tabular-nums sm:text-4xl">
                 {players() ?? "—"}
               </span>

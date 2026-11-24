@@ -16,7 +16,7 @@ export const ModpackManual = (props: { data: Data["data"]; failed: Data["failed"
             <BlockTitle
               id="modpack-manual"
               fallback={translate["modpack.manual.title"]()}
-              class="text-2xl sm:text-3xl"
+              class="text-xl sm:text-3xl"
             />
             <BlockSubtitle
               id="modpack-manual"

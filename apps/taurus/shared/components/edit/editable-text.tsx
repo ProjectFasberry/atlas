@@ -1,4 +1,4 @@
-import { Show, createEffect } from "solid-js"
+import { Show, createEffect, onMount } from "solid-js"
 
 type EditableTextProps = {
   value: string
@@ -34,23 +34,37 @@ export const EditableText = (props: EditableTextProps) => (
 
 /**
  * `value` on a hydrated `<textarea>` is not applied when the SSR attribute is
- * present, so the property is synced explicitly.
+ * present, so the property is synced explicitly. The height follows the content
+ * too: a character-count guess breaks as soon as the mobile column is narrow.
  */
 const MultilineField = (props: EditableTextProps) => {
   let element: HTMLTextAreaElement | undefined
 
+  const resize = () => {
+    if (!element) return
+
+    element.style.height = "auto"
+    element.style.height = `${element.scrollHeight}px`
+  }
+
   createEffect(() => {
     const value = props.value
     if (element && element.value !== value) element.value = value
+    resize()
   })
+
+  onMount(resize)
 
   return (
     <textarea
       ref={element}
       placeholder={props.placeholder}
-      rows={Math.min(10, Math.max(2, Math.ceil((props.value.length || 1) / 70)))}
-      onInput={(event) => props.onInput(event.currentTarget.value)}
-      class={`${base} resize-y leading-inherit ${props.class ?? ""}`}
+      rows={2}
+      onInput={(event) => {
+        props.onInput(event.currentTarget.value)
+        resize()
+      }}
+      class={`${base} max-h-96 resize-none overflow-y-auto leading-inherit ${props.class ?? ""}`}
     />
   )
 }

@@ -17,11 +17,11 @@ export const ServerSection = reatomComponent<{ server: EditServer, editing: bool
         <Show
           when={editing}
           fallback={
-            <Typography color="white" class="text-2xl sm:text-3xl">{server.name}</Typography>
+            <Typography color="white" class="text-xl sm:text-3xl">{server.name}</Typography>
           }
         >
           <EditableText
-            class="text-2xl sm:text-3xl"
+            class="text-xl sm:text-3xl"
             value={server.name}
             onInput={(value) => siteEdit.setServer(ctx, server.id, { name: value })}
           />
@@ -68,15 +68,15 @@ export const ServerSection = reatomComponent<{ server: EditServer, editing: bool
               value={server.description}
               onInput={(value) => siteEdit.setServer(ctx, server.id, { description: value })}
             />
-            <div class="flex items-center gap-1">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center">
               <EditableText
-                class="flex-1 text-xs"
+                class="text-xs sm:flex-1"
                 placeholder={translate["edit.image-key"]()}
                 value={server.imageKey}
                 onInput={(value) => siteEdit.setServer(ctx, server.id, { imageKey: value })}
               />
               <Button
-                class="px-2 py-1 text-[11px]"
+                class="w-fit px-2 py-1 text-[11px]"
                 onClick={() => openAssetPicker(ctx, { kind: "server", id: server.id })}
               >
                 {translate["edit.picker.open"]()}

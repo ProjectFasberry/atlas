@@ -606,6 +606,7 @@
     "undo": "Undo",
     "redo": "Redo",
     "nothing-to-discard": "There is no draft to discard",
-    "discard-error": "Could not discard the draft"
+    "discard-error": "Could not discard the draft",
+    "picker.bucket": "Bucket"
   }
 }

@@ -21,7 +21,7 @@ export const FaqSection = reatomComponent(({ ctx }) => {
           <BlockTitle
             id="faq"
             fallback={translate["faq.title"]()}
-            class="text-2xl sm:text-3xl lg:text-4xl"
+            class="text-xl sm:text-3xl lg:text-4xl"
           />
           <BlockSubtitle
             id="faq"

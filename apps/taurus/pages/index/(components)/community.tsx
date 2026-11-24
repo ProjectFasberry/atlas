@@ -19,7 +19,7 @@ export const CommunitySection = () => {
           <BlockTitle
             id="community"
             fallback={translate["community.title"]()}
-            class="text-2xl sm:text-3xl lg:text-4xl"
+            class="text-xl sm:text-3xl lg:text-4xl"
           />
           <BlockSubtitle
             id="community"
