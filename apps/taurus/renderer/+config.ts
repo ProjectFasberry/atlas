@@ -9,6 +9,8 @@ export default {
   redirects: {
     "/wiki": "https://wiki.fasberry.fun/",
     "/wiki/*": "https://wiki.fasberry.fun/*",
+    "/map": "https://map.fasberry.fun/",
+    "/map/*": "https://map.fasberry.fun/*",
     "/info/privacy": "https://api.fasberry.fun/misc/privacy",
     "/info/terms": "https://api.fasberry.fun/misc/terms",
     "/info/contacts": "https://api.fasberry.fun/misc/contacts",
