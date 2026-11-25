@@ -1961,7 +1961,11 @@
     "anticheat.suppressed": "Скрыто",
     "anticheat.empty": "Флагов нет",
     "anticheat.hours": "за {hours} ч",
-    "anticheat.filters": "Фильтры"
+    "anticheat.filters": "Фильтры",
+    "anticheat.actions": "Действия",
+    "anticheat.kick": "Кик",
+    "anticheat.ban": "Бан",
+    "anticheat.exempt": "Исключить"
   },
   "wallet": {
     "title": "Кошелёк",

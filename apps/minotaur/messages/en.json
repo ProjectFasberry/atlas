@@ -1961,7 +1961,11 @@
     "anticheat.suppressed": "Suppressed",
     "anticheat.empty": "No flags",
     "anticheat.hours": "last {hours}h",
-    "anticheat.filters": "Filters"
+    "anticheat.filters": "Filters",
+    "anticheat.actions": "Actions",
+    "anticheat.kick": "Kick",
+    "anticheat.ban": "Ban",
+    "anticheat.exempt": "Exempt"
   },
   "wallet": {
     "title": "Wallet",

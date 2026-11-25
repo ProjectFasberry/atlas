@@ -47,3 +47,18 @@ export const grimSummary = async (hours: number): Promise<GrimSummaryRow[]> => {
 
   return (result ?? []) as GrimSummaryRow[]
 }
+
+export type GrimAction = "kick" | "ban" | "exempt"
+
+export type GrimActionBody = {
+  target: string
+  action: GrimAction
+  server?: string
+  reason?: string
+}
+
+type UntypedPost = (path: string, init: { json: Record<string, unknown> }) => Promise<unknown>
+
+export const runGrimAction = async (body: GrimActionBody): Promise<void> => {
+  await (client.post as unknown as UntypedPost)("/privated/anticheat/action", { json: body })
+}

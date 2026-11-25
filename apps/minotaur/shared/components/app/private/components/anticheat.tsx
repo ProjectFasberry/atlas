@@ -9,6 +9,7 @@ import {
 import { Typography } from "@/shared/ui/typography"
 import { dayjs } from "@/shared/lib/dayjs"
 import { anticheat, anticheatState, setAnticheatFilter, setAnticheatHours } from "../models/anticheat.model"
+import { runGrimAction, type GrimAction } from "@/shared/api/anticheat"
 import { translate } from "@/shared/locales/helpers"
 
 const HOURS = [6, 24, 72, 168]
@@ -91,24 +92,57 @@ export const AnticheatPanel = reatomComponent(({ ctx }) => {
               <TableHead className="text-right">{translate["panel.anticheat.suppressed"]()}</TableHead>
               <TableHead>{translate["panel.anticheat.server"]()}</TableHead>
               <TableHead className="text-right">{translate["panel.anticheat.time"]()}</TableHead>
+              <TableHead className="text-right">{translate["panel.anticheat.actions"]()}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {(data?.flags ?? []).map((flag) => (
               <TableRow key={flag.id}>
                 <TableCell>
-                  <Typography className="text-sm text-white">{flag.nickname}</Typography>
+                  <button
+                    type="button"
+                    className="text-left text-sm text-white underline-offset-2 hover:underline"
+                    onClick={() => setAnticheatFilter(ctx, "nickname", flag.nickname)}
+                  >
+                    {flag.nickname}
+                  </button>
                 </TableCell>
                 <TableCell className="text-sm text-neutral-300">{flag.check_name}</TableCell>
                 <TableCell className="text-right tabular-nums text-sm text-amber-300">{flag.violations}</TableCell>
                 <TableCell className="text-right tabular-nums text-sm text-neutral-400">{flag.suppressed}</TableCell>
                 <TableCell className="text-sm text-neutral-400">{flag.server}</TableCell>
                 <TableCell className="text-right text-xs text-neutral-500">{formatTime(flag.created_at)}</TableCell>
+                <TableCell>
+                  <div className="flex justify-end gap-1">
+                    {(["kick", "ban", "exempt"] as GrimAction[]).map((action) => (
+                      <Button
+                        key={action}
+                        className={`h-7 px-2 text-[11px] ${action === "ban" ? "text-red" : ""}`}
+                        disabled={statuses.isPending}
+                        onClick={() => {
+                          if (action !== "kick" && !window.confirm(`${action} ${flag.nickname}?`)) return
+
+                          void runGrimAction({
+                            target: flag.nickname,
+                            action,
+                            server: flag.server,
+                          })
+                            .then(() => anticheat.fetch(ctx))
+                            .catch((actionError: unknown) => {
+                              window.alert(actionError instanceof Error ? actionError.message : String(actionError))
+                            })
+                        }}
+                      >
+                        {translate[`panel.anticheat.${action}`]()}
+                      </Button>
+                    ))}
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
             {!statuses.isPending && (data?.flags ?? []).length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-6 text-center text-sm text-neutral-500">
+                <TableCell colSpan={7} className="py-6 text-center text-sm text-neutral-500">
                   {translate["panel.anticheat.empty"]()}
                 </TableCell>
               </TableRow>
