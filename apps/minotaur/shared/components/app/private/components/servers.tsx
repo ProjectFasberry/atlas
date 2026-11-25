@@ -11,7 +11,7 @@ import { Typography } from "@/shared/ui/typography"
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { currentUserState } from "@/shared/models/current-user/index.model"
 import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
-import { patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
+import { createOf, patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
 import { translate } from "@/shared/locales/helpers"
 import { Link } from "@/shared/components/config/link/link"
 
@@ -57,8 +57,9 @@ const SelectField = ({ label, val, options, onChange }: {
 const LOADERS = ["fabric", "quilt", "neoforge", "forge", "vanilla"];
 
 const ServerEditorFields = reatomComponent(({ ctx }) => {
+  const mode = ctx.spy(serverEditor.mode)
   const server = ctx.spy(serverEditor.target)
-  if (!server) return null;
+  if (mode === "edit" && !server) return null;
 
   const form = ctx.spy(serverEditor.form)
 
@@ -66,16 +67,31 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
     (val: string) => serverEditor.set(ctx, key, val)
 
   const handleSave = async () => {
-    await servers.save(ctx, { id: server.id, patch: patchOf(form) })
+    if (mode === "create") {
+      const created = await servers.create(ctx, createOf(form))
+      if (created) serverEditor.isOpen(ctx, false)
+      return
+    }
+
+    if (!server) return
+
+    const updated = await servers.save(ctx, { id: server.id, patch: patchOf(form) })
+    if (updated) serverEditor.isOpen(ctx, false)
   }
 
   const isSaving = ctx.spy(servers.save.statusesAtom).isPending
+    || ctx.spy(servers.create.statusesAtom).isPending
+  const error = ctx.spy(servers.create.errorAtom) ?? ctx.spy(servers.save.errorAtom)
 
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
         <Field label={translate["panel.title-2"]()} val={form.fullname} onChange={handleSet("fullname")} />
-        <Field label="Origin" val={server.origin} onChange={() => undefined} />
+        <Field
+          label="Origin"
+          val={mode === "create" ? form.origin : (server?.origin ?? "")}
+          onChange={mode === "create" ? handleSet("origin") : () => undefined}
+        />
         <Field label={translate["panel.description"]()} val={form.description} onChange={handleSet("description")} />
         <Field label={translate["panel.preview-url"]()} val={form.thumbnail} onChange={handleSet("thumbnail")} />
         <Field label={translate["panel.minecraft-version"]()} val={form.client_version} onChange={handleSet("client_version")} />
@@ -95,26 +111,29 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
           onChange={handleSet("client_mod")}
         />
       </div>
+      {error && (
+        <span className="text-xs text-red-400">
+          {error.message}
+        </span>
+      )}
       <div className="flex justify-end gap-2 w-full">
-        <Dialog.CloseTrigger asChild>
-          <Button background="default" className="h-9">
-            {translate["panel.cancel"]()}</Button>
-        </Dialog.CloseTrigger>
-        <Dialog.CloseTrigger asChild>
-          <Button
-            background="positive"
-            className="h-9"
-            disabled={isSaving}
-            onClick={handleSave}
-          >
-            {translate["panel.save"]()}</Button>
-        </Dialog.CloseTrigger>
+        <Button background="default" className="h-9" onClick={() => serverEditor.isOpen(ctx, false)}>
+          {translate["panel.cancel"]()}</Button>
+        <Button
+          background="positive"
+          className="h-9"
+          disabled={isSaving}
+          onClick={handleSave}
+        >
+          {translate["panel.save"]()}</Button>
       </div>
     </>
   )
 }, "ServerEditorFields")
 
 const ServersDialog = reatomComponent(({ ctx }) => {
+  const mode = ctx.spy(serverEditor.mode)
+
   return (
     <Dialog.Root
       open={ctx.spy(serverEditor.isOpen)}
@@ -126,7 +145,7 @@ const ServersDialog = reatomComponent(({ ctx }) => {
           <Dialog.Content className={dialogVariant.content()}>
             <DialogClose />
             <Dialog.Title className={dialogVariant.title()}>
-              {translate["panel.edit-the-server"]()}</Dialog.Title>
+              {mode === "create" ? translate["panel.new-server"]() : translate["panel.edit-the-server"]()}</Dialog.Title>
             <ServerEditorFields />
           </Dialog.Content>
         </Dialog.Positioner>
@@ -163,6 +182,13 @@ export const Servers = reatomComponent(({ ctx }) => {
               text-neutral-50 duration-150 hover:bg-neutral-700"
           >
             {translate["panel.servers-content"]()}</Link>
+          <Button
+            background="positive"
+            className="h-8 text-sm"
+            disabled={!canEdit || status.isPending}
+            onClick={() => serverEditor.openCreate(ctx)}
+          >
+            {translate["panel.add-server"]()}</Button>
           <Button
             background="default"
             className="h-8 text-sm"

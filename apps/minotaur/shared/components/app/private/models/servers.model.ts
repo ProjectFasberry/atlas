@@ -38,6 +38,7 @@ export type ServerPatch = Partial<Pick<
 >>
 
 export type ServerForm = {
+  origin: string
   fullname: string
   description: string
   thumbnail: string
@@ -50,6 +51,7 @@ export type ServerForm = {
 }
 
 const emptyForm: ServerForm = {
+  origin: "",
   fullname: "",
   description: "",
   thumbnail: "",
@@ -63,6 +65,7 @@ const emptyForm: ServerForm = {
 
 function formOf(s: ServerPayload): ServerForm {
   return {
+    origin: s.origin,
     fullname: s.fullname,
     description: s.description ?? "",
     thumbnail: s.thumbnail,
@@ -72,6 +75,22 @@ function formOf(s: ServerPayload): ServerForm {
     java_major: String(s.java_major),
     resource_pack: s.resource_pack ?? "",
     client_mod: s.client_mod,
+  }
+}
+
+/** Body of `POST /privated/servers`: the origin is only settable on create. */
+export function createOf(form: ServerForm) {
+  return {
+    origin: form.origin.trim().toLowerCase(),
+    fullname: form.fullname.trim(),
+    description: form.description.trim() || null,
+    thumbnail: form.thumbnail.trim(),
+    client_version: form.client_version.trim(),
+    loader: form.loader as "fabric" | "quilt" | "neoforge" | "forge" | "vanilla",
+    loader_version: form.loader_version.trim() || null,
+    java_major: Number(form.java_major),
+    resource_pack: form.resource_pack.trim() || null,
+    client_mod: form.client_mod as "required" | "optional",
   }
 }
 
@@ -94,12 +113,20 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
   withAssign((_, name) => ({
     target: atom<ServerPayload | null>(null, `${name}.target`),
     form: atom<ServerForm>(emptyForm, `${name}.form`),
+    mode: atom<"edit" | "create">("edit", `${name}.mode`),
     isOpen: atom(false, `${name}.isOpen`),
     open: action((ctx, s: ServerPayload) => {
       serverEditor.isOpen(ctx, true)
+      serverEditor.mode(ctx, "edit")
       serverEditor.target(ctx, s)
       serverEditor.form(ctx, formOf(s))
     }, `${name}.open`),
+    openCreate: action((ctx) => {
+      serverEditor.isOpen(ctx, true)
+      serverEditor.mode(ctx, "create")
+      serverEditor.target(ctx, null)
+      serverEditor.form(ctx, emptyForm)
+    }, `${name}.openCreate`),
     close: action((ctx) => {
       serverEditor.target(ctx, null)
       serverEditor.form(ctx, emptyForm)
@@ -139,6 +166,20 @@ export const servers = atom(null, "servers").pipe(
         // Keep the table in sync without a second round trip.
         const current = ctx.get(servers.fetch.dataAtom) ?? []
         servers.fetch.dataAtom(ctx, current.map((s) => s.id === updated.id ? updated : s))
+      }
+    }).pipe(
+      withStatusesAtom(),
+      withErrorAtom(),
+    ),
+    create: reatomAsync(async (ctx, body: ExtractApiBody<"postPrivatedServers">["content"]["application/json"]) => {
+      return await ctx.schedule(() =>
+        client.post("/privated/servers/", { json: body })
+      )
+    }, {
+      name: `${name}.create`,
+      onFulfill: (ctx, created) => {
+        const current = ctx.get(servers.fetch.dataAtom) ?? []
+        servers.fetch.dataAtom(ctx, [...current, created])
       }
     }).pipe(
       withStatusesAtom(),

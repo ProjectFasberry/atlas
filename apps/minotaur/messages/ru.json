@@ -1965,7 +1965,9 @@
     "anticheat.actions": "Действия",
     "anticheat.kick": "Кик",
     "anticheat.ban": "Бан",
-    "anticheat.exempt": "Исключить"
+    "anticheat.exempt": "Исключить",
+    "add-server": "Добавить сервер",
+    "new-server": "Новый сервер"
   },
   "wallet": {
     "title": "Кошелёк",

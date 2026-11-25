@@ -1105,7 +1105,8 @@ export interface paths {
         /** List servers with their descriptions */
         get: operations["getPrivatedServers"];
         put?: never;
-        post?: never;
+        /** Create a server: runtime, availability and presentation */
+        post: operations["postPrivatedServers"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1260,6 +1261,57 @@ export interface paths {
         /** Update a project rules category */
         put: operations["putPrivatedRulesById"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/anticheat/flags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List anticheat flags */
+        get: operations["getPrivatedAnticheatFlags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/anticheat/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Anticheat flags grouped by check */
+        get: operations["getPrivatedAnticheatSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/anticheat/action": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kick, ban or exempt a flagged player */
+        post: operations["postPrivatedAnticheatAction"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6431,6 +6483,137 @@ export interface operations {
             };
         };
     };
+    postPrivatedServers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    origin: string;
+                    fullname: string;
+                    description?: (string | null) | null;
+                    thumbnail?: string;
+                    available?: boolean;
+                    excluded?: boolean;
+                    is_default?: boolean;
+                    client_version: string;
+                    /**
+                     * @default fabric
+                     * @enum {string}
+                     */
+                    loader: "fabric" | "quilt" | "neoforge" | "forge" | "vanilla";
+                    loader_version?: (string | null) | null;
+                    java_major: string | number;
+                    resource_pack?: (string | null) | null;
+                    /**
+                     * @default required
+                     * @enum {string}
+                     */
+                    client_mod?: "required" | "optional";
+                };
+                "application/x-www-form-urlencoded": {
+                    origin: string;
+                    fullname: string;
+                    description?: (string | null) | null;
+                    thumbnail?: string;
+                    available?: boolean;
+                    excluded?: boolean;
+                    is_default?: boolean;
+                    client_version: string;
+                    /**
+                     * @default fabric
+                     * @enum {string}
+                     */
+                    loader: "fabric" | "quilt" | "neoforge" | "forge" | "vanilla";
+                    loader_version?: (string | null) | null;
+                    java_major: string | number;
+                    resource_pack?: (string | null) | null;
+                    /**
+                     * @default required
+                     * @enum {string}
+                     */
+                    client_mod?: "required" | "optional";
+                };
+                "multipart/form-data": {
+                    origin: string;
+                    fullname: string;
+                    description?: (string | null) | null;
+                    thumbnail?: string;
+                    available?: boolean;
+                    excluded?: boolean;
+                    is_default?: boolean;
+                    client_version: string;
+                    /**
+                     * @default fabric
+                     * @enum {string}
+                     */
+                    loader: "fabric" | "quilt" | "neoforge" | "forge" | "vanilla";
+                    loader_version?: (string | null) | null;
+                    java_major: string | number;
+                    resource_pack?: (string | null) | null;
+                    /**
+                     * @default required
+                     * @enum {string}
+                     */
+                    client_mod?: "required" | "optional";
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            fullname: string;
+                            description: (string | null) | null;
+                            thumbnail: string;
+                            origin: string;
+                            available: boolean;
+                            excluded: boolean;
+                            is_default: boolean;
+                            client_version: string;
+                            client_mod: string;
+                            java_major: number;
+                            loader: string;
+                            loader_version: (string | null) | null;
+                            resource_pack: (string | null) | null;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     getPrivatedServersById: {
         parameters: {
             query?: never;
@@ -6584,6 +6767,17 @@ export interface operations {
                             loader_version: (string | null) | null;
                             resource_pack: (string | null) | null;
                         };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
@@ -7058,6 +7252,129 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedAnticheatFlags: {
+        parameters: {
+            query?: {
+                nickname?: string;
+                check?: string;
+                server?: string;
+                before?: string;
+                limit?: string | number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            uuid: string;
+                            nickname: string;
+                            check_name: string;
+                            violations: number;
+                            setback_vl: number;
+                            server: string;
+                            suppressed: number;
+                            created_at: string | (Record<string, never> | string | number);
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    getPrivatedAnticheatSummary: {
+        parameters: {
+            query?: {
+                hours?: string | number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            check_name: string;
+                            server: string;
+                            total: number | string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedAnticheatAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    target: string;
+                    /**
+                     * @default kick
+                     * @enum {string}
+                     */
+                    action: "kick" | "ban" | "exempt";
+                    server?: string;
+                    reason?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    target: string;
+                    /**
+                     * @default kick
+                     * @enum {string}
+                     */
+                    action: "kick" | "ban" | "exempt";
+                    server?: string;
+                    reason?: string;
+                };
+                "multipart/form-data": {
+                    target: string;
+                    /**
+                     * @default kick
+                     * @enum {string}
+                     */
+                    action: "kick" | "ban" | "exempt";
+                    server?: string;
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            ok: boolean;
+                        };
                     };
                 };
             };
