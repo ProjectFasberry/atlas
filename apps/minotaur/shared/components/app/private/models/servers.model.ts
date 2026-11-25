@@ -116,12 +116,16 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
     mode: atom<"edit" | "create">("edit", `${name}.mode`),
     isOpen: atom(false, `${name}.isOpen`),
     open: action((ctx, s: ServerPayload) => {
+      servers.save.errorAtom.reset(ctx)
+      servers.create.errorAtom.reset(ctx)
       serverEditor.isOpen(ctx, true)
       serverEditor.mode(ctx, "edit")
       serverEditor.target(ctx, s)
       serverEditor.form(ctx, formOf(s))
     }, `${name}.open`),
     openCreate: action((ctx) => {
+      servers.save.errorAtom.reset(ctx)
+      servers.create.errorAtom.reset(ctx)
       serverEditor.isOpen(ctx, true)
       serverEditor.mode(ctx, "create")
       serverEditor.target(ctx, null)
