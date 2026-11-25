@@ -1951,7 +1951,17 @@
     "open-for-play": "Open for play",
     "close-for-play": "Close for play",
     "servers-flags-hint": "\"For play\" lets players into the launcher. \"Hidden from lists\" removes the server from every list, the site included; it is a separate flag.",
-    "servers-content": "Server content"
+    "servers-content": "Server content",
+    "anticheat": "Anticheat",
+    "anticheat.nickname": "Player",
+    "anticheat.check": "Check",
+    "anticheat.server": "Server",
+    "anticheat.vl": "VL",
+    "anticheat.time": "Time",
+    "anticheat.suppressed": "Suppressed",
+    "anticheat.empty": "No flags",
+    "anticheat.hours": "last {hours}h",
+    "anticheat.filters": "Filters"
   },
   "wallet": {
     "title": "Wallet",

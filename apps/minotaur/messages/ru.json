@@ -1951,7 +1951,17 @@
     "open-for-play": "Открыть для игры",
     "close-for-play": "Закрыть для игры",
     "servers-flags-hint": "«Для игры» пускает игроков в лаунчер. «Скрыт из списков» убирает сервер из всех списков, включая сайт; это отдельный флаг.",
-    "servers-content": "Контент серверов"
+    "servers-content": "Контент серверов",
+    "anticheat": "Античит",
+    "anticheat.nickname": "Игрок",
+    "anticheat.check": "Проверка",
+    "anticheat.server": "Сервер",
+    "anticheat.vl": "VL",
+    "anticheat.time": "Время",
+    "anticheat.suppressed": "Скрыто",
+    "anticheat.empty": "Флагов нет",
+    "anticheat.hours": "за {hours} ч",
+    "anticheat.filters": "Фильтры"
   },
   "wallet": {
     "title": "Кошелёк",
