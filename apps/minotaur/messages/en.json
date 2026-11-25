@@ -1967,7 +1967,8 @@
     "anticheat.ban": "Ban",
     "anticheat.exempt": "Exempt",
     "add-server": "Add server",
-    "new-server": "New server"
+    "new-server": "New server",
+    "delete-server": "Delete server"
   },
   "wallet": {
     "title": "Wallet",

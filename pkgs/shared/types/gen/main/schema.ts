@@ -1141,7 +1141,8 @@ export interface paths {
         get: operations["getPrivatedServersById"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete a server from the catalog */
+        delete: operations["deletePrivatedServersById"];
         options?: never;
         head?: never;
         /** Update a server: availability, runtime and presentation */
@@ -6720,6 +6721,46 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    deletePrivatedServersById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default SERVER_NOT_FOUND
+                         * @enum {string}
+                         */
+                        error: "SERVER_NOT_FOUND";
                     };
                 };
             };

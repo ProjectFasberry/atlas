@@ -1967,7 +1967,8 @@
     "anticheat.ban": "Бан",
     "anticheat.exempt": "Исключить",
     "add-server": "Добавить сервер",
-    "new-server": "Новый сервер"
+    "new-server": "Новый сервер",
+    "delete-server": "Удалить сервер"
   },
   "wallet": {
     "title": "Кошелёк",

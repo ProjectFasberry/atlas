@@ -9,11 +9,13 @@ import { PageLoader } from "@/shared/ui/page-loader"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
 import { Typography } from "@/shared/ui/typography"
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
+import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
 import { currentUserState } from "@/shared/models/current-user/index.model"
 import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
 import { clientVersions, createOf, patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
 import { translate } from "@/shared/locales/helpers"
 import { Link } from "@/shared/components/config/link/link"
+import { DeleteButton } from "./ui"
 
 const Flag = ({ active, label }: { active: boolean, label: string }) => (
   <span
@@ -187,6 +189,17 @@ export const Servers = reatomComponent(({ ctx }) => {
     await servers.save(ctx, { id: server.id, patch: change })
   }
 
+  const handleDelete = (server: ServerPayload) => {
+    alertDialog.open(ctx, {
+      title: translate["panel.delete-server"](),
+      description: server.fullname,
+      onConfirm: () => servers.remove(ctx, server.id),
+      // A deleted default promotes another server, so refresh the flags.
+      onClose: () => servers.fetch(ctx),
+      errorAtom: servers.remove.errorAtom,
+    })
+  }
+
   const isSaving = ctx.spy(servers.save.statusesAtom).isPending
   const canEdit = ctx.spy(currentUserState.perms).includes(SERVERS_UPDATE_PERMISSION)
 
@@ -288,6 +301,11 @@ export const Servers = reatomComponent(({ ctx }) => {
                     onClick={() => serverEditor.open(ctx, s)}
                   >
                     {translate["panel.edit"]()}</Button>
+                  <DeleteButton
+                    className="h-8"
+                    disabled={!canEdit || isSaving}
+                    onClick={() => handleDelete(s)}
+                  />
                 </div>
               </TableCell>
             </TableRow>

@@ -190,6 +190,14 @@ export const servers = atom(null, "servers").pipe(
       withStatusesAtom(),
       withErrorAtom(),
     ),
+    remove: reatomAsync(async (ctx, id: number) => {
+      return await ctx.schedule(() =>
+        client.delete("/privated/servers/{id}", { params: { path: { id } } })
+      )
+    }, { name: `${name}.remove` }).pipe(
+      withStatusesAtom(),
+      withErrorAtom(),
+    ),
     create: reatomAsync(async (ctx, body: ExtractApiBody<"postPrivatedServers">["content"]["application/json"]) => {
       return await ctx.schedule(() =>
         client.post("/privated/servers/", { json: body })
