@@ -1113,6 +1113,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/servers/client-versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List client versions with published content */
+        get: operations["getPrivatedServersClient-versions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/servers/{id}": {
         parameters: {
             query?: never;
@@ -6612,6 +6629,50 @@ export interface operations {
                     };
                 };
             };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "getPrivatedServersClient-versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: string[];
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
         };
     };
     getPrivatedServersById: {
@@ -6783,6 +6844,17 @@ export interface operations {
             };
             /** @description Response for status 404 */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

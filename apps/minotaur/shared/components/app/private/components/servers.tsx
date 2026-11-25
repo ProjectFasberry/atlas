@@ -11,7 +11,7 @@ import { Typography } from "@/shared/ui/typography"
 import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { currentUserState } from "@/shared/models/current-user/index.model"
 import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
-import { createOf, patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
+import { clientVersions, createOf, patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
 import { translate } from "@/shared/locales/helpers"
 import { Link } from "@/shared/components/config/link/link"
 
@@ -62,6 +62,15 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
   if (mode === "edit" && !server) return null;
 
   const form = ctx.spy(serverEditor.form)
+  const versions = ctx.spy(clientVersions.fetch.dataAtom) ?? []
+  // A server may predate the published list; keep its current version visible
+  // instead of silently changing it on save.
+  const versionOptions = form.client_version && !versions.includes(form.client_version)
+    ? [form.client_version, ...versions]
+    : versions
+  const javaOptions = form.java_major && !["17", "21", "25"].includes(form.java_major)
+    ? [form.java_major, "17", "21", "25"]
+    : ["17", "21", "25"]
 
   const handleSet = (key: Parameters<typeof serverEditor.set>[1]) =>
     (val: string) => serverEditor.set(ctx, key, val)
@@ -94,7 +103,12 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
         />
         <Field label={translate["panel.description"]()} val={form.description} onChange={handleSet("description")} />
         <Field label={translate["panel.preview-url"]()} val={form.thumbnail} onChange={handleSet("thumbnail")} />
-        <Field label={translate["panel.minecraft-version"]()} val={form.client_version} onChange={handleSet("client_version")} />
+        <SelectField
+          label={translate["panel.minecraft-version"]()}
+          val={form.client_version}
+          options={versionOptions.length > 0 ? versionOptions : [form.client_version]}
+          onChange={handleSet("client_version")}
+        />
         <SelectField
           label={translate["panel.loader"]()}
           val={form.loader}
@@ -102,7 +116,12 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
           onChange={handleSet("loader")}
         />
         <Field label={translate["panel.loader-version"]()} val={form.loader_version} onChange={handleSet("loader_version")} />
-        <Field label="Java major" val={form.java_major} onChange={handleSet("java_major")} />
+        <SelectField
+          label="Java major"
+          val={form.java_major}
+          options={javaOptions}
+          onChange={handleSet("java_major")}
+        />
         <Field label={translate["panel.resource-pack"]()} val={form.resource_pack} onChange={handleSet("resource_pack")} />
         <SelectField
           label={translate["panel.client-mod"]()}
@@ -155,6 +174,7 @@ const ServersDialog = reatomComponent(({ ctx }) => {
 })
 export const Servers = reatomComponent(({ ctx }) => {
   useUpdate(servers.fetch, [])
+  useUpdate(clientVersions.fetch, [])
 
   const status = ctx.spy(servers.fetch.statusesAtom)
   const data = ctx.spy(servers.fetch.dataAtom)

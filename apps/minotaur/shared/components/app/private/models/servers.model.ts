@@ -50,6 +50,12 @@ export type ServerForm = {
   client_mod: string
 }
 
+/** Java major used by the current client versions; other versions keep the field as is. */
+const JAVA_BY_VERSION: Record<string, string> = {
+  "1.20.1": "17",
+  "1.20.4": "21",
+}
+
 const emptyForm: ServerForm = {
   origin: "",
   fullname: "",
@@ -136,7 +142,16 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
       serverEditor.form(ctx, emptyForm)
     }, `${name}.close`),
     set: action((ctx, key: keyof ServerForm, value: string) => {
-      serverEditor.form(ctx, { ...ctx.get(serverEditor.form), [key]: value })
+      const next = { ...ctx.get(serverEditor.form), [key]: value }
+
+      // Picking a Minecraft version fills the Java major the stack uses for it;
+      // staff can still override the value afterwards.
+      if (key === "client_version") {
+        const suggested = JAVA_BY_VERSION[value]
+        if (suggested) next.java_major = suggested
+      }
+
+      serverEditor.form(ctx, next)
     }, `${name}.set`),
   }))
 )
@@ -186,6 +201,33 @@ export const servers = atom(null, "servers").pipe(
         servers.fetch.dataAtom(ctx, [...current, created])
       }
     }).pipe(
+      withStatusesAtom(),
+      withErrorAtom(),
+    ),
+  }))
+)
+
+/** Client versions with published content; the form must not offer anything else. */
+export const clientVersions = atom(null, "clientVersions").pipe(
+  withAssign((_, name) => ({
+    fetch: reatomAsync(async (ctx) => {
+      return await ctx.schedule(() =>
+        client.get("/privated/servers/client-versions")
+      )
+    }, {
+      name: `${name}.fetch`,
+      onFulfill: (ctx, versions) => {
+        if (!ctx.get(serverEditor.isOpen) || ctx.get(serverEditor.mode) !== "create") return;
+
+        const form = ctx.get(serverEditor.form)
+        if (form.client_version || versions.length === 0) return;
+
+        // A fresh server starts on a version that exists, with its Java major.
+        const preferred = versions.includes("1.20.1") ? "1.20.1" : versions[versions.length - 1]!
+        serverEditor.set(ctx, "client_version", preferred)
+      }
+    }).pipe(
+      withDataAtom([] as string[]),
       withStatusesAtom(),
       withErrorAtom(),
     ),
