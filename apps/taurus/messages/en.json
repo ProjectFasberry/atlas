@@ -106,7 +106,7 @@
       "rules": "Rules",
       "support": "Support",
       "account": "Account",
-      "map": "Map",
+      "map": "Bisquite map",
       "wiki": "Wiki",
       "modpack": "Modpack",
       "game": "Game"
@@ -523,8 +523,8 @@
     "subtitle": "Map, wiki and modpack — all in one place",
     "items": {
       "map": {
-        "title": "Map",
-        "description": "Live map of the world and the town"
+        "title": "Bisquite map",
+        "description": "The Bisquite world map and cities"
       },
       "wiki": {
         "title": "Wiki",
@@ -550,7 +550,8 @@
       },
       "2": {
         "question": "Which Minecraft version do I need?",
-        "answer": "The launcher picks the version for the server. Without the launcher, check the list: Bisquite is 1.20.1, Muffin is 1.20.4."
+        "answer": "The launcher picks the version for the server. See the server list for the current versions.",
+        "link": "Server list"
       },
       "3": {
         "question": "Is it free to play?",

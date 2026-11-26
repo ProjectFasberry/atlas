@@ -1,6 +1,7 @@
 import { Accordion } from "@ark-ui/solid/accordion";
 import { For } from "solid-js";
 import { Typography } from "@/shared/ui/typography";
+import { Link } from "@/shared/components/link";
 import { translate } from "@/shared/locales/helpers";
 import { createFaqItems, faqOpenAtom, setFaqOpen } from "../(models)/faq.model";
 import { useAtomAccessor } from "@/shared/lib/utils";
@@ -54,6 +55,14 @@ export const FaqSection = reatomComponent(({ ctx }) => {
                   <Typography color="gray" class="text-xs leading-5 sm:text-sm sm:leading-6">
                     {item.answer}
                   </Typography>
+                  {item.href && (
+                    <Link
+                      href={item.href}
+                      class="mt-2 inline-flex text-xs font-semibold text-green-400 underline underline-offset-4 hover:text-green-300"
+                    >
+                      {item.linkLabel}
+                    </Link>
+                  )}
                 </Accordion.ItemContent>
               </Accordion.Item>
             )}

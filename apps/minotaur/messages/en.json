@@ -65,8 +65,8 @@
           "label": "Go to store"
         },
         "map": {
-          "value": "Map",
-          "label": "Go to world map"
+          "value": "Bisquite map",
+          "label": "Open the Bisquite map"
         },
         "lands": {
           "value": "Regions",
@@ -134,7 +134,7 @@
   "index": {
     "page": {
       "title": "Home",
-      "description": "Official application of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20.1+. Game servers: 1.20.1 and 1.20.4. Play at: {IP}"
+      "description": "Official application of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20.1+. Server versions are on the site. Play at: {IP}"
     },
     "news": "News",
     "latest-events": "Latest events",
@@ -766,16 +766,16 @@
   },
   "map": {
     "page": {
-      "title": "Game map",
-      "description": "List of available web maps for Fasberry game servers"
+      "title": "Bisquite map",
+      "description": "The Bisquite world map: players, markers and builds"
     },
-    "title": "Choose a server",
+    "title": "Bisquite map",
     "goTo": "Open map",
     "online": "online",
     "offline": "offline",
     "players": "Playing now: {count}",
-    "description": "Web map of the world with lands and builds.",
-    "summary": "{count} players on the project right now",
+    "description": "Web map of the Bisquite world with lands and builds.",
+    "summary": "{count} players online now",
     "sort": {
       "label": "Sorting",
       "online": "Online first",
@@ -1223,11 +1223,12 @@
       "q1": "Do I need a Minecraft license?",
       "a1": "No license is needed: a nickname and a password are enough. The launcher makes signing in easier.",
       "q2": "Which versions are supported?",
-      "a2": "Game servers: Bisquite — 1.20.1, Muffin — 1.20.4. Hub and auth: 1.20.1 and newer.",
+      "a2": "The launcher picks the server version. The server list and current versions are on the site.",
       "q3": "Is the server paid?",
       "a3": "Playing is free. Donating speeds up progress but gives no combat advantage.",
       "q4": "What are lands?",
-      "a4": "Your own protected territory with members and stats - the core of survival."
+      "a4": "Your own protected territory with members and stats - the core of survival.",
+      "a2.link": "Open the server list"
     },
     "season": {
       "title": "What's happening",

@@ -107,6 +107,9 @@ export async function data(pageCtx: PageContextServer) {
     const ctx = createCtx()
     ratingsState.data(ctx, rows)
     ratingsState.meta(ctx, page.meta)
+    ratingsState.filters.server(ctx, ratingsFilters.server)
+    ratingsState.filters.by(ctx, ratingsFilters.type)
+    ratingsState.filters.asc(ctx, ratingsFilters.asc)
     ratingsState.loaded(ctx, true)
     pageCtx.snapshot = snapshots.merge(ctx, pageCtx)
   } catch {

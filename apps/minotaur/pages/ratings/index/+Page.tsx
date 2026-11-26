@@ -1,5 +1,5 @@
 import { Ratings } from "@/shared/components/app/ratings/components/rating-list";
-import { rating, ratings } from "@/shared/components/app/ratings/models/ratings.model";
+import { rating, ratings, ratingsState } from "@/shared/components/app/ratings/models/ratings.model";
 import { DEFAULT_RATINGS_PREFERENCES } from "@/shared/components/app/ratings/preferences";
 import { type RatingsPageData } from "@/shared/components/app/ratings/types";
 import { createPageModel } from "@/shared/lib/events";
@@ -12,6 +12,14 @@ const page = createPageModel({
     onConnect: (ctx) => {
       const data = ctx.get(pageState.data) as RatingsPageData | null
       const filters = data?.ratingsFilters ?? DEFAULT_RATINGS_PREFERENCES
+
+      // SSR already loaded the first page: seed the filter atoms before
+      // applyFilters, otherwise it sees a mismatch and resets the table.
+      if (ctx.get(ratingsState.loaded)) {
+        ratingsState.filters.server(ctx, filters.server)
+        ratingsState.filters.by(ctx, filters.type)
+        ratingsState.filters.asc(ctx, filters.asc)
+      }
 
       ratings.applyFilters(ctx, filters)
       rating.fetch(ctx)

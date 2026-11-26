@@ -347,6 +347,19 @@ const RatingTableSkeleton = reatomComponent(({ ctx }) => {
   )
 }, "RatingTableSkeleton")
 
+const RatingsToolbarSkeleton = () => (
+  <Toolbar>
+    <ToolbarGroup>
+      <Skeleton className="h-9 w-36 rounded-xl" />
+      <Skeleton className="h-9 w-36 rounded-xl" />
+    </ToolbarGroup>
+    <ToolbarActions>
+      <Skeleton className="h-9 w-9 rounded-xl" />
+      <Skeleton className="h-9 w-28 rounded-xl" />
+    </ToolbarActions>
+  </Toolbar>
+)
+
 const sortItems = [
   { label: translate["ratings.sort.best"](), value: "best" },
   { label: translate["ratings.sort.worst"](), value: "worst" }

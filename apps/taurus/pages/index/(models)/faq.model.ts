@@ -1,7 +1,7 @@
 import { action, atom } from "@reatom/framework";
 import { translate } from "@/shared/locales/helpers";
 
-export type FaqItem = { value: string, question: string, answer: string }
+export type FaqItem = { value: string, question: string, answer: string, href?: string, linkLabel?: string }
 
 export const createFaqItems = (): FaqItem[] => [
   {
@@ -12,7 +12,9 @@ export const createFaqItems = (): FaqItem[] => [
   {
     value: "2",
     question: translate["faq.items.2.question"](),
-    answer: translate["faq.items.2.answer"]()
+    answer: translate["faq.items.2.answer"](),
+    href: "/servers",
+    linkLabel: translate["faq.items.2.link"]()
   },
   {
     value: "3",
