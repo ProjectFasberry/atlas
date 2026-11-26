@@ -1130,6 +1130,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/servers/resource-packs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List resource packs published in the content manifest */
+        get: operations["getPrivatedServersResource-packs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/servers/{id}": {
         parameters: {
             query?: never;
@@ -6729,6 +6746,42 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: string[];
+                    };
+                };
+            };
+            /** @description Response for status 503 */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "getPrivatedServersResource-packs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            name: string;
+                            versions: string[];
+                        }[];
                     };
                 };
             };

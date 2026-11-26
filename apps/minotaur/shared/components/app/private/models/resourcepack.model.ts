@@ -18,11 +18,6 @@ export const uploadForm = atom<UploadForm>({ minecraft: "1.20.1,1.20.4", notes: 
     set: action((ctx, key: keyof UploadForm, value: string) => {
       uploadForm(ctx, { ...ctx.get(uploadForm), [key]: value })
     }, `${name}.set`),
-    reset: action((ctx) => {
-      uploadForm(ctx, { minecraft: "1.20.1,1.20.4", notes: "" })
-      uploadFile(ctx, null)
-      uploadWarnings(ctx, [])
-    }, `${name}.reset`),
   }))
 )
 

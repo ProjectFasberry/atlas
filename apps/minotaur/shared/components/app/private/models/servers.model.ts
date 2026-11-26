@@ -4,6 +4,9 @@ import {
   withAssign, withDataAtom, withErrorAtom, withStatusesAtom
 } from "@reatom/framework"
 
+/** One `<name>` that can be stored in `servers.resource_pack` for a client version. */
+export type ResourcePackOption = ExtractApiData<"getPrivatedServersResource-packs">["data"][number]
+
 export type ServerPayload = {
   id: number
   fullname: string
@@ -149,6 +152,11 @@ export const serverEditor = atom<ServerForm | null>(null, "serverEditor").pipe(
       if (key === "client_version") {
         const suggested = JAVA_BY_VERSION[value]
         if (suggested) next.java_major = suggested
+
+        // A pack published for the old runtime may not exist for the new one.
+        const packs = ctx.get(publishedResourcePacks.fetch.dataAtom) ?? []
+        const supported = packs.some((pack) => pack.name === next.resource_pack && pack.versions.includes(value))
+        if (next.resource_pack && packs.length > 0 && !supported) next.resource_pack = ""
       }
 
       serverEditor.form(ctx, next)
@@ -209,6 +217,19 @@ export const servers = atom(null, "servers").pipe(
         servers.fetch.dataAtom(ctx, [...current, created])
       }
     }).pipe(
+      withStatusesAtom(),
+      withErrorAtom(),
+    ),
+  }))
+)
+
+/** Packs published in the manifest; the server form must not offer arbitrary names. */
+export const publishedResourcePacks = atom(null, "publishedResourcePacks").pipe(
+  withAssign((_, name) => ({
+    fetch: reatomAsync(async (ctx) => {
+      return await ctx.schedule(() => client.get("/privated/servers/resource-packs"))
+    }, `${name}.fetch`).pipe(
+      withDataAtom([] as ResourcePackOption[]),
       withStatusesAtom(),
       withErrorAtom(),
     ),

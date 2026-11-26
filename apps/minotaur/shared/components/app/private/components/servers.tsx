@@ -12,7 +12,7 @@ import { DialogClose, dialogVariant } from "@/shared/ui/dialog"
 import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
 import { currentUserState } from "@/shared/models/current-user/index.model"
 import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
-import { clientVersions, createOf, patchOf, serverEditor, servers, type ServerPayload } from "../models/servers.model"
+import { clientVersions, createOf, patchOf, publishedResourcePacks, serverEditor, servers, type ServerPayload } from "../models/servers.model"
 import { translate } from "@/shared/locales/helpers"
 import { Link } from "@/shared/components/config/link/link"
 import { DeleteButton } from "./ui"
@@ -37,8 +37,8 @@ const Field = ({ label, val, onChange }: { label: string, val: string, onChange:
   </label>
 )
 
-const SelectField = ({ label, val, options, onChange }: {
-  label: string, val: string, options: string[], onChange: (val: string) => void
+const SelectField = ({ label, val, options, labels, onChange }: {
+  label: string, val: string, options: string[], labels?: Record<string, string>, onChange: (val: string) => void
 }) => (
   <label className="flex flex-col gap-1 w-full">
     <span className="text-xs font-medium text-neutral-400">
@@ -50,7 +50,7 @@ const SelectField = ({ label, val, options, onChange }: {
       onChange={(e) => onChange(e.target.value)}
     >
       {options.map((o) => (
-        <option key={o} value={o}>{o}</option>
+        <option key={o} value={o}>{labels?.[o] ?? o}</option>
       ))}
     </select>
   </label>
@@ -65,6 +65,7 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
 
   const form = ctx.spy(serverEditor.form)
   const versions = ctx.spy(clientVersions.fetch.dataAtom) ?? []
+  const publishedPacks = ctx.spy(publishedResourcePacks.fetch.dataAtom) ?? []
   // A server may predate the published list; keep its current version visible
   // instead of silently changing it on save.
   const versionOptions = form.client_version && !versions.includes(form.client_version)
@@ -124,7 +125,16 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
           options={javaOptions}
           onChange={handleSet("java_major")}
         />
-        <Field label={translate["panel.resource-pack"]()} val={form.resource_pack} onChange={handleSet("resource_pack")} />
+        <SelectField
+          label={translate["panel.resource-pack"]()}
+          val={form.resource_pack}
+          options={["", ...new Set([
+            ...(form.resource_pack ? [form.resource_pack] : []),
+            ...publishedPacks.filter((pack) => pack.versions.includes(form.client_version)).map((pack) => pack.name),
+          ])]}
+          labels={{ "": translate["panel.empty"]() }}
+          onChange={handleSet("resource_pack")}
+        />
         <SelectField
           label={translate["panel.client-mod"]()}
           val={form.client_mod}
@@ -177,6 +187,7 @@ const ServersDialog = reatomComponent(({ ctx }) => {
 export const Servers = reatomComponent(({ ctx }) => {
   useUpdate(servers.fetch, [])
   useUpdate(clientVersions.fetch, [])
+  useUpdate(publishedResourcePacks.fetch, [])
 
   const status = ctx.spy(servers.fetch.statusesAtom)
   const data = ctx.spy(servers.fetch.dataAtom)
