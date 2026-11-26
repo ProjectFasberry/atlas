@@ -1251,6 +1251,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/resourcepack/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List uploaded resource pack versions */
+        get: operations["getPrivatedResourcepack"];
+        put?: never;
+        /** Upload a resource pack archive (max 100 MB) */
+        post: operations["postPrivatedResourcepack"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/resourcepack/{id}/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish a resource pack version or roll back to it */
+        post: operations["postPrivatedResourcepackByIdCurrent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/resourcepack/adopt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adopt and publish the pack already stored at the canonical path */
+        post: operations["postPrivatedResourcepackAdopt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/rules/list": {
         parameters: {
             query?: never;
@@ -2941,6 +2993,23 @@ export interface paths {
         };
         /** Get server runtime catalog */
         get: operations["getServerCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/server/resourcepack/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the current resource pack URL and SHA-1 */
+        get: operations["getServerResourcepackMeta"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7273,6 +7342,274 @@ export interface operations {
             };
         };
     };
+    getPrivatedResourcepack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            current: ({
+                                id: number;
+                                sha1: string;
+                                sha256: string;
+                                size: number;
+                                url: string;
+                                stable_url: string;
+                                minecraft: string[];
+                                pack_format: (number | null) | null;
+                                notes: (string | null) | null;
+                                uploaded_by: (string | null) | null;
+                                created_at: string;
+                                is_current: boolean;
+                            } | null) | null;
+                            items: {
+                                id: number;
+                                sha1: string;
+                                sha256: string;
+                                size: number;
+                                url: string;
+                                stable_url: string;
+                                minecraft: string[];
+                                pack_format: (number | null) | null;
+                                notes: (string | null) | null;
+                                uploaded_by: (string | null) | null;
+                                created_at: string;
+                                is_current: boolean;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedResourcepack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    file: string;
+                    minecraft?: string;
+                    notes?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            pack: {
+                                id: number;
+                                sha1: string;
+                                sha256: string;
+                                size: number;
+                                url: string;
+                                stable_url: string;
+                                minecraft: string[];
+                                pack_format: (number | null) | null;
+                                notes: (string | null) | null;
+                                uploaded_by: (string | null) | null;
+                                created_at: string;
+                                is_current: boolean;
+                            };
+                            warnings: string[];
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedResourcepackByIdCurrent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            sha1: string;
+                            sha256: string;
+                            size: number;
+                            url: string;
+                            stable_url: string;
+                            minecraft: string[];
+                            pack_format: (number | null) | null;
+                            notes: (string | null) | null;
+                            uploaded_by: (string | null) | null;
+                            created_at: string;
+                            is_current: boolean;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedResourcepackAdopt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            sha1: string;
+                            sha256: string;
+                            size: number;
+                            url: string;
+                            stable_url: string;
+                            minecraft: string[];
+                            pack_format: (number | null) | null;
+                            notes: (string | null) | null;
+                            uploaded_by: (string | null) | null;
+                            created_at: string;
+                            is_current: boolean;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     getPrivatedRulesList: {
         parameters: {
             query?: never;
@@ -11521,6 +11858,49 @@ export interface operations {
                                 };
                             };
                         };
+                    };
+                };
+            };
+        };
+    };
+    getServerResourcepackMeta: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            version: number;
+                            sha1: string;
+                            sha256: string;
+                            size: number;
+                            url: string;
+                            stable_url: string;
+                            minecraft: string[];
+                            pack_format: (number | null) | null;
+                            updated_at: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
                     };
                 };
             };
