@@ -71,7 +71,7 @@ export const linkFlow = atom(null, "linkFlow").pipe(
         linkState.error(ctx, translate["auth.link.error-passwords"]());
         return null;
       }
-      if (password.length < 4) {
+      if (password.length < 8) {
         linkState.error(ctx, translate["auth.link.error-password-short"]());
         return null;
       }

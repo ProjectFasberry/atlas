@@ -60,7 +60,7 @@ const PasswordField = ({
           type={isVisible ? "text" : "password"}
           autoComplete={autoComplete}
           minLength={minLength}
-          maxLength={72}
+          maxLength={32}
           required
           autoFocus={autoFocus}
           variant={error ? "danger" : "default"}

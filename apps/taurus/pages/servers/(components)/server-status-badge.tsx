@@ -16,6 +16,7 @@ export const ServerStatusBadge = reatomComponent<{ id: string }>(({ ctx, id }) =
 
   const server = () => status()?.servers?.[id]
   const available = () => server()?.available ?? false
+  const version = () => server()?.runtime?.minecraft
   const label = () => {
     const current = server()
 
@@ -36,6 +37,11 @@ export const ServerStatusBadge = reatomComponent<{ id: string }>(({ ctx, id }) =
         }}
       />
       <Typography class="text-xs text-neutral-200 sm:text-sm">{label()}</Typography>
+      {version() && (
+        <Typography class="text-xs text-neutral-400 sm:text-sm">
+          {translate["servers.version"]({ version: version()! })}
+        </Typography>
+      )}
     </span>
   )
 }, "ServerStatusBadge")

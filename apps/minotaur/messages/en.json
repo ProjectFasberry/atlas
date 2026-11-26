@@ -134,7 +134,7 @@
   "index": {
     "page": {
       "title": "Home",
-      "description": "Official application of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20.1+. Play at: {IP}"
+      "description": "Official application of the Fasberry Minecraft project. Genre: RP, RPG, semi-vanilla. 1.20.1+. Game servers: 1.20.1 and 1.20.4. Play at: {IP}"
     },
     "news": "News",
     "latest-events": "Latest events",
@@ -201,7 +201,7 @@
       "acceptRulesProcessing": "terms of service",
       "acceptRulesProject": "project rules",
       "existing-player": "This player is already registered",
-      "password-hint": "At least 8 characters, no spaces",
+      "password-hint": "At least 8 characters, at most 32, no spaces",
       "password-mismatch": "Passwords do not match",
       "nickname-hint": "Latin letters, up to 16 characters, no spaces",
       "labels": {
@@ -243,7 +243,7 @@
       "nickname-spaces": "The nickname cannot contain spaces",
       "password-required": "Enter a password",
       "password-min": "The password must be at least 8 characters",
-      "password-max": "The password cannot be longer than 72 characters",
+      "password-max": "The password cannot be longer than 32 characters",
       "password-spaces": "The password cannot contain spaces",
       "findout-required": "Tell us how you heard about the project",
       "findout-max": "The answer cannot be longer than 128 characters",
@@ -292,7 +292,7 @@
       "submit": "Create a password",
       "error-invalid": "The link is invalid or expired",
       "error-passwords": "Passwords do not match",
-      "error-password-short": "The password must be at least 4 characters",
+      "error-password-short": "The password must be at least 8 characters",
       "error-nickname-short": "The nickname must be at least 3 characters"
     }
   },
@@ -904,7 +904,7 @@
       "password-differs": "The new password must be different",
       "passwords-mismatch": "Passwords do not match",
       "invalid-password": "Invalid password",
-      "password-hint": "At least 8 characters, no spaces",
+      "password-hint": "At least 8 characters, at most 32, no spaces",
       "change-password-cancel": "Cancel",
       "show-password": "Show password",
       "hide-password": "Hide password",
@@ -1203,8 +1203,8 @@
       "action": "Create an account",
       "one_title": "Create an account",
       "one_text": "A nickname and a password are all you need.",
-      "two_title": "Install the launcher",
-      "two_text": "Version 1.20.x, client mods are optional.",
+      "two_title": "Install the launcher (recommended)",
+      "two_text": "The launcher picks the server version. Without it, join from a 1.20.1+ client and check the server version.",
       "three_title": "Open the launcher",
       "three_text": "Sign in with your account and pick a server."
     },
@@ -1221,9 +1221,9 @@
     "faq": {
       "title": "FAQ",
       "q1": "Do I need a Minecraft license?",
-      "a1": "No, the server runs in offline mode: a nickname is enough.",
+      "a1": "No license is needed: a nickname and a password are enough. The launcher makes signing in easier.",
       "q2": "Which versions are supported?",
-      "a2": "Java Edition 1.20.1-1.20.4, joined through our launcher.",
+      "a2": "Game servers: Bisquite — 1.20.1, Muffin — 1.20.4. Hub and auth: 1.20.1 and newer.",
       "q3": "Is the server paid?",
       "a3": "Playing is free. Donating speeds up progress but gives no combat advantage.",
       "q4": "What are lands?",

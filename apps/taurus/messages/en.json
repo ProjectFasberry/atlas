@@ -5,7 +5,7 @@
     "description": "A cozy Minecraft project with a friendly atmosphere and welcoming players!\nJoin your friends and chill together!",
     "action-text": "Start playing",
     "online": "{count} playing now",
-    "simple": "First time? Just download the launcher — it sets everything up."
+    "simple": "First time? Download the launcher — it sets everything up. You can also join with your password."
   },
   "features": {
     "title": "What the project offers",
@@ -16,7 +16,7 @@
   "servers": {
     "page": {
       "title": "Project Servers",
-      "description": "Fasberry modes: survival, RP and anarchy - pick your server and start playing."
+      "description": "Fasberry modes: RP, RPG and survival - pick your server and start playing."
     },
     "status": {
       "online": "{count} online",
@@ -31,13 +31,13 @@
       },
       "lobby": {
         "name": "Lobby",
-        "tagline": "Home server and entry point",
-        "description": "The journey starts here: pick a mode, read project news, join events and jump to any server."
+        "tagline": "Hub and entry point",
+        "description": "The project hub: pick a mode, read news, join events and jump to game servers. Not a game server itself."
       },
       "muffin": {
         "name": "Muffin",
-        "tagline": "Anarchy without rules",
-        "description": ""
+        "tagline": "Anarchy — coming soon",
+        "description": "The server is being prepared."
       }
     },
     "features": {
@@ -81,7 +81,8 @@
         "title": "Economy",
         "description": "Auction, shops and currency - earn and spend."
       }
-    }
+    },
+    "version": "Version {version}"
   },
   "contacts": {
     "title": "Project Socials",
@@ -289,10 +290,10 @@
       "steps": {
         "title": "How to start playing",
         "luckily-game": "Have a great game!",
-        "download": "You can only play through the Fasberry launcher. Download it and log in with your nickname.",
+        "download": "Play through the Fasberry launcher: it picks the version, mods and textures for you. A third-party launcher works too — sign in with your password.",
         "download-windows": "Download for Windows",
         "download-macos": "Download for macOS",
-        "download-hint": "Windows 10/11 x64. The macOS build is coming soon."
+        "download-hint": "Windows 10/11 x64. macOS is not available yet."
       }
     }
   },
@@ -304,7 +305,7 @@
   "pages": {
     "index": {
       "title": "Minecraft server Fasberry",
-      "description": "Fasberry is a Minecraft project with vanilla survival, SMP and RP modes. Join through the Fasberry launcher: servers, cities, events and a friendly community."
+      "description": "Fasberry is a Minecraft project with vanilla survival, SMP and RP modes. Join through the Fasberry launcher or a third-party client with your password: servers, cities, events and a friendly community."
     },
     "gallery": {
       "title": "Gallery",
@@ -315,7 +316,7 @@
       "description": "Fasberry modpack: mod list, version and installation through the Fasberry launcher."
     },
     "global": {
-      "description": "The official page of the Fasberry Minecraft project. Different servers and modes. Play via the Fasberry launcher.",
+      "description": "The official page of the Fasberry Minecraft project. Different servers and modes. Play through the Fasberry launcher or with your password.",
       "description-global": "How many top Minecraft servers do you know? Now you know one more.",
       "site_name": "Official website of the Fasberry Minecraft server."
     },
@@ -481,14 +482,14 @@
   "join": {
     "eyebrow": "Getting in",
     "title": "Three steps to your first day",
-    "description": "A launcher and an account — that's it.",
+    "description": "A launcher and an account are the easiest path. A third-party launcher works too: sign in with your password.",
     "action-windows": "Download for Windows",
     "action-macos": "Download for macOS",
     "action-guide": "Full guide",
     "steps": {
       "1": {
         "title": "Download the launcher",
-        "description": "Windows 10/11 x64. The macOS build is coming soon."
+        "description": "Windows 10/11 x64. macOS is not available yet."
       },
       "2": {
         "title": "Create an account",
@@ -545,11 +546,11 @@
     "items": {
       "1": {
         "question": "Do I need the launcher to play?",
-        "answer": "Yes. You can only play through the Fasberry launcher. It downloads the version, mods and updates for you."
+        "answer": "We recommend the Fasberry launcher: it downloads the version, mods and updates. Without it you can join from any 1.20.1+ client with your password."
       },
       "2": {
         "question": "Which Minecraft version do I need?",
-        "answer": "The launcher picks the right one. You don't need to set anything up."
+        "answer": "The launcher picks the version for the server. Without the launcher, check the list: Bisquite is 1.20.1, Muffin is 1.20.4."
       },
       "3": {
         "question": "Is it free to play?",

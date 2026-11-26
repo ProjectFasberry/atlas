@@ -57,7 +57,7 @@ const PasswordRepeatInput = reatomComponent(({ ctx }) => {
         value={ctx.spy(authState.fields.passwordRepeat)}
         onClick={() => auth.resetError(ctx)}
         onChange={e => authState.fields.passwordRepeat(ctx, e.target.value)}
-        maxLength={72}
+        maxLength={32}
       />
       <PasswordVisibility visibility={authState.settings.showPasswordRepeat} />
     </div>
