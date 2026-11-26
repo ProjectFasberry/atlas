@@ -11925,6 +11925,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: ({
+                            updatedAt?: string;
                             proxy: {
                                 status: string;
                                 online: number;
