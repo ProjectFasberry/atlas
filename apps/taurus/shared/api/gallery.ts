@@ -11,7 +11,7 @@ export type GalleryTag = NonNullable<GalleryQuery["tag"]>
 export type GalleryFilter = "all" | GalleryTag
 export type GalleryLocale = NonNullable<GalleryQuery["locale"]>
 
-export const GALLERY_PAGE_SIZE = 12
+export const GALLERY_PAGE_SIZE = 8
 
 export async function fetchGallery(params: {
   locale: GalleryLocale
