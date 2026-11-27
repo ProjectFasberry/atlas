@@ -16,7 +16,7 @@
   "servers": {
     "page": {
       "title": "Серверы проекта",
-      "description": "Режимы Fasberry: RP, RPG и выживание - выбери сервер и начни играть. Адрес: play.fasberry.fun."
+      "description": "Режимы Fasberry: RP, RPG и выживание - выбери сервер и начни играть."
     },
     "status": {
       "online": "{count} онлайн",
@@ -83,9 +83,6 @@
       }
     },
     "version": "Версия {version}",
-    "connect.title": "Как подключиться",
-    "connect.description": "Лаунчер сам подберёт версию и моды. Без лаунчера заходи с любого клиента по адресу:",
-    "connect.launch": "Скачать лаунчер",
     "details": "Подробнее",
     "play": "Играть"
   },

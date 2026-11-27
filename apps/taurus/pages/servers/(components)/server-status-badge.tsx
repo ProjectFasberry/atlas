@@ -1,12 +1,12 @@
 import { onMount } from "solid-js"
 import { Typography } from "@/shared/ui/typography"
+import { cn } from "@/shared/lib/utils"
 import { serverStatus } from "@/shared/models/server-status.model"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { useAtomAccessor } from "@/shared/lib/utils"
 import { translate } from "@/shared/locales/helpers"
 
-/** Live online counter for one server, loaded once per visit. */
-export const ServerStatusBadge = reatomComponent<{ id: string }>(({ ctx, id }) => {
+export const ServerStatusBadge = reatomComponent<{ id: string, class?: string }>(({ ctx, id, ...props }) => {
   const status = useAtomAccessor(serverStatus.fetch.dataAtom)
   const statuses = useAtomAccessor(serverStatus.fetch.statusesAtom)
 
@@ -27,7 +27,7 @@ export const ServerStatusBadge = reatomComponent<{ id: string }>(({ ctx, id }) =
   }
 
   return (
-    <span class="flex w-fit items-center gap-2 transparent-slot px-3 py-1">
+    <span class={cn("flex w-fit items-center gap-2 text-xs", props.class)}>
       <span
         class="h-2 w-2 rounded-full"
         classList={{
@@ -36,11 +36,14 @@ export const ServerStatusBadge = reatomComponent<{ id: string }>(({ ctx, id }) =
           "bg-neutral-500": !server(),
         }}
       />
-      <Typography class="text-xs text-neutral-200 sm:text-sm">{label()}</Typography>
+      <Typography class="text-xs text-neutral-200">{label()}</Typography>
       {version() && (
-        <Typography class="text-xs text-neutral-400 sm:text-sm">
-          {translate["servers.version"]({ version: version()! })}
-        </Typography>
+        <>
+          <span class="text-neutral-600">·</span>
+          <Typography class="text-xs text-neutral-500">
+            {translate["servers.version"]({ version: version()! })}
+          </Typography>
+        </>
       )}
     </span>
   )

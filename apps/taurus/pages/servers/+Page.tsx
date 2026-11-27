@@ -2,13 +2,13 @@ import { For, Show, type Accessor } from "solid-js"
 import { useData } from "vike-solid/useData"
 import { Typography } from "@/shared/ui/typography"
 import { Button } from "@/shared/ui/button"
-import { Link } from "@/shared/components/link"
 import { MainWrapperPage } from "@/shared/ui/main-wrapper"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { useAtomAccessor } from "@/shared/lib/utils"
 import { translate } from "@/shared/locales/helpers"
 import { createServerProfiles, type ServerProfile } from "./(models)/servers.model"
 import { siteEdit, type EditServer } from "@/shared/models/site-edit.model"
+import { setSiteEditMode } from "@/shared/models/site-edit-mode.model"
 import { EditableText } from "@/shared/components/edit/editable-text"
 import { toStaticKey } from "@/shared/lib/helpers"
 import { asBlocks, asServersContent, asSectionsContent } from "@/shared/api/site"
@@ -30,29 +30,6 @@ const toEditServers = (profiles: ServerProfile[]): EditServer[] => profiles.map(
   })),
 }))
 
-const ConnectBlock = () => (
-  <section class="transparent-achievement-panel flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-    <div class="flex flex-col gap-1">
-      <Typography color="white" class="text-lg font-semibold">
-        {translate["servers.connect.title"]()}
-      </Typography>
-      <Typography color="gray" class="text-sm">
-        {translate["servers.connect.description"]()}
-      </Typography>
-    </div>
-    <div class="flex flex-wrap items-center gap-2">
-      <code class="rounded-lg bg-neutral-800 px-3 py-2 text-sm text-green-300">play.fasberry.fun</code>
-      <Link href="/start">
-        <Button class="px-4 py-1">
-          <Typography color="white" class="text-sm font-semibold">
-            {translate["servers.connect.launch"]()}
-          </Typography>
-        </Button>
-      </Link>
-    </div>
-  </section>
-)
-
 const ServersView = reatomComponent<{ pageData: Data, editing: Accessor<boolean> }>(({ ctx, ...props }) => {
   const editContent = useAtomAccessor(siteEdit.content)
   const profiles = () => createServerProfiles(props.pageData?.content)
@@ -71,7 +48,8 @@ const ServersView = reatomComponent<{ pageData: Data, editing: Accessor<boolean>
 
   return (
     <>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="flex min-w-0 flex-col gap-2">
         <Show
           when={props.editing()}
           fallback={
@@ -93,9 +71,17 @@ const ServersView = reatomComponent<{ pageData: Data, editing: Accessor<boolean>
             onInput={(value) => siteEdit.setServersPage(ctx, { description: value })}
           />
         </Show>
+        </div>
+        <Show when={props.pageData.canEdit && !props.editing()}>
+          <Button
+            class="h-9 px-3 text-xs"
+            onClick={() => setSiteEditMode(ctx, true)}
+          >
+            {translate["edit.enter"]()}
+          </Button>
+        </Show>
       </div>
-      <ConnectBlock />
-      <div class="grid gap-4 lg:grid-cols-3">
+      <div class="grid items-start gap-4 lg:grid-cols-3">
         <For each={view().servers}>
           {(server) => <ServerSection server={server} editing={props.editing()} />}
         </For>

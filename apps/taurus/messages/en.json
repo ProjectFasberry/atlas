@@ -16,7 +16,7 @@
   "servers": {
     "page": {
       "title": "Project Servers",
-      "description": "Fasberry modes: RP, RPG and survival - pick a server and start playing. Address: play.fasberry.fun."
+      "description": "Fasberry modes: RP, RPG and survival - pick a server and start playing."
     },
     "status": {
       "online": "{count} online",
@@ -83,9 +83,6 @@
       }
     },
     "version": "Version {version}",
-    "connect.title": "How to connect",
-    "connect.description": "The launcher picks the version and mods. Without it, join from any client at:",
-    "connect.launch": "Download launcher",
     "details": "Details",
     "play": "Play"
   },
