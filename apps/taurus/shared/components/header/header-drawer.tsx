@@ -87,7 +87,6 @@ export const HeaderDrawerContent = reatomComponent(({ ctx }) => {
               <Accordion.Root
                 multiple={false}
                 collapsible
-                defaultValue={[item.name]}
                 class={accordionVariant.root()}
               >
                 <Accordion.Item value={item.name} class={accordionVariant.item()}>
