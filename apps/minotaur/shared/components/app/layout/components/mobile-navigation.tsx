@@ -13,7 +13,7 @@ export const MobileBottomBar = () => {
     <div
       className="
         fixed flex items-center rounded-t-xl justify-center z-[50] bottom-0 px-4
-        border-t border-neutral-800 bg-neutral-900 h-[calc(4rem+env(safe-area-inset-bottom))]
+        border-t border-neutral-800 bg-neutral-900 h-[calc(4rem_+_env(safe-area-inset-bottom,0px))]
         pb-[env(safe-area-inset-bottom)] w-full
       "
     >

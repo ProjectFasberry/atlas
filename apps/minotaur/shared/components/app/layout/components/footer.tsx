@@ -67,7 +67,7 @@ export const Footer = reatomComponent(({ ctx }) => {
 
   return (
     <SiteFooter
-      className="pb-[calc(6rem+env(safe-area-inset-bottom))]"
+      className="pb-[calc(6rem_+_env(safe-area-inset-bottom,0px))]"
       linkComponent={Link}
       logo={
         <div className="h-14 w-full">

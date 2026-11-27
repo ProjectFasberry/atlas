@@ -180,13 +180,13 @@ export const Header = () => {
       <Link href="/" class="bg-transparent cursor-pointer relative md:-right-10 top-3 xl:-right-15">
         <img src={logoImage} draggable={false} width={224} height={64} title="Fasberry" alt="Fasberry" />
       </Link>
-      <div class="hidden xl:flex gap-8 items-center justify-start pr-33">
+      <div class="hidden xl:flex gap-8 items-center justify-start">
         <For each={createMainHeaderLinks()}>
           {/* @ts-expect-error */}
           {(item) => <HeaderItemMenu {...item} />}
         </For>
       </div>
-      <div class="absolute top-3 right-16 z-60 hidden xl:flex items-center gap-4">
+      <div class="hidden xl:flex items-center gap-4 pr-2">
         <Link
           href={APP_URL}
           class="text-sm font-medium text-neutral-200 duration-150 hover:text-white"
