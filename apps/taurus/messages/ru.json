@@ -106,7 +106,7 @@
       "rules": "Правила",
       "support": "Поддержка",
       "account": "Аккаунт",
-      "map": "Карта Bisquite",
+      "map": "Карта",
       "wiki": "Вики",
       "modpack": "Модпак",
       "game": "Игра"
@@ -523,8 +523,8 @@
     "subtitle": "Карта, вики и модпак — в одном месте",
     "items": {
       "map": {
-        "title": "Карта Bisquite",
-        "description": "Карта мира Bisquite и города"
+        "title": "Карта",
+        "description": "Живая карта мира и города"
       },
       "wiki": {
         "title": "Вики",

@@ -106,7 +106,7 @@
       "rules": "Rules",
       "support": "Support",
       "account": "Account",
-      "map": "Bisquite map",
+      "map": "Map",
       "wiki": "Wiki",
       "modpack": "Modpack",
       "game": "Game"
@@ -523,8 +523,8 @@
     "subtitle": "Map, wiki and modpack — all in one place",
     "items": {
       "map": {
-        "title": "Bisquite map",
-        "description": "The Bisquite world map and cities"
+        "title": "Map",
+        "description": "Live world map and cities"
       },
       "wiki": {
         "title": "Wiki",

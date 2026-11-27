@@ -65,8 +65,8 @@
           "label": "Go to store"
         },
         "map": {
-          "value": "Bisquite map",
-          "label": "Open the Bisquite map"
+          "value": "Map",
+          "label": "Open the world map"
         },
         "lands": {
           "value": "Regions",
@@ -766,22 +766,28 @@
   },
   "map": {
     "page": {
-      "title": "Bisquite map",
-      "description": "The Bisquite world map: players, markers and builds"
+      "title": "Map",
+      "description": "Interactive Fasberry world map: players, markers and builds"
     },
-    "title": "Bisquite map",
+    "title": "Map",
     "goTo": "Open map",
     "online": "online",
     "offline": "offline",
     "players": "Playing now: {count}",
-    "description": "Web map of the Bisquite world with lands and builds.",
-    "summary": "{count} players online now",
+    "description": "Web map of the world with lands and builds.",
+    "summary": "{count} players on the project now",
     "sort": {
       "label": "Sorting",
       "online": "Online first",
       "name": "By name"
     },
-    "empty": "The map is not available yet"
+    "empty": "The map is not available yet",
+    "frameTitle": "{server} map",
+    "server": {
+      "label": "Server"
+    },
+    "openNewTab": "Open in a new tab",
+    "loading": "Loading the map..."
   },
   "news": {
     "page": {
