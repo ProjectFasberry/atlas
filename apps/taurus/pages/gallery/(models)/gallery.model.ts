@@ -125,6 +125,11 @@ export const retryGallery = action((ctx) => {
 
 export const openGallery = action((ctx, index: number) => {
   gallerySelected(ctx, index);
+
+  // The carousel can be dragged past the loaded page: fetch the rest before
+  // the user reaches the last slide, not after the list dead-ends.
+  const total = ctx.get(galleryItems).length;
+  if (ctx.get(galleryHasNext) && index >= total - 2) loadMoreGallery(ctx);
 }, "openGallery");
 
 export const closeGallery = action((ctx) => {
