@@ -787,7 +787,11 @@
       "label": "Server"
     },
     "openNewTab": "Open in a new tab",
-    "loading": "Loading the map..."
+    "loading": "Loading the map...",
+    "back": "All maps",
+    "soon": "Soon",
+    "notFound": "This map does not exist yet",
+    "soonDescription": "The world map will appear later"
   },
   "news": {
     "page": {
