@@ -174,19 +174,19 @@ const HeaderItemMenu = (props: MainHeaderLink) => {
 export const Header = () => {
   return (
     <div
-      class={`header flex items-center justify-between fixed top-0 w-full bg-repeat-x z-50 xl:absolute`}
+      class={`header flex items-center justify-between fixed top-0 w-full bg-repeat-x z-50 px-4 xl:absolute xl:px-8`}
       style={{ "background-size": '160px', "background-image": `url(${bgImage})` }}
     >
-      <Link href="/" class="bg-transparent cursor-pointer relative md:-right-10 top-3 xl:-right-15">
+      <Link href="/" class="bg-transparent cursor-pointer">
         <img src={logoImage} draggable={false} width={224} height={64} title="Fasberry" alt="Fasberry" />
       </Link>
-      <div class="hidden xl:flex gap-8 items-center justify-start">
+      <div class="absolute inset-y-0 left-1/2 hidden -translate-x-1/2 items-center gap-8 xl:flex">
         <For each={createMainHeaderLinks()}>
           {/* @ts-expect-error */}
           {(item) => <HeaderItemMenu {...item} />}
         </For>
       </div>
-      <div class="hidden xl:flex items-center gap-4 pr-2">
+      <div class="hidden xl:flex items-center gap-4">
         <Link
           href={APP_URL}
           class="text-sm font-medium text-neutral-200 duration-150 hover:text-white"
