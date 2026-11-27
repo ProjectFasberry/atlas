@@ -19,7 +19,7 @@ const bedrockImage = getStaticObject("minecraft", "static/bedrock.webp")
 export const Footer = () => {
   return (
     <footer
-      class={`flex flex-col justify-center items-center gap-6 pt-12 pb-[calc(3rem_+_env(safe-area-inset-bottom,0px))]`}
+      class={`flex flex-col justify-center items-center gap-6 pt-12 pb-[calc(4.5rem_+_env(safe-area-inset-bottom,0px))] sm:pb-6`}
       style={{ "background-size": '160px', "background-image": `url(${bedrockImage})` }}
     >
       <div class="flex flex-col justify-center items-center lg:flex-row responsive gap-2 mx-auto">
