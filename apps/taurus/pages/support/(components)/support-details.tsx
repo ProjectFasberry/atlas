@@ -27,7 +27,6 @@ const whereItems = () => [
   }
 ]
 
-/** Where the money goes and who the donors are. */
 export const SupportDetails = () => {
   const whereHidden = useBlockHidden("support-where")
   const thanksHidden = useBlockHidden("support-thanks")

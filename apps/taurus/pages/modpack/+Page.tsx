@@ -1,29 +1,21 @@
-import { Show } from "solid-js";
 import { useData } from "vike-solid/useData";
 import { MainWrapperPage } from "@/shared/ui/main-wrapper";
-import { translate } from "@/shared/locales/helpers";
 import type { Data } from "./+data";
 import { siteEdit } from "@/shared/models/site-edit.model";
 import { asBlocks, asSectionsContent } from "@/shared/api/site";
-import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditProvider } from "@/shared/components/edit/edit-provider";
-import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
-import { EditEntry } from "@/shared/components/edit/edit-entry";
+import { PageEdit } from "@/shared/components/edit/page-edit";
 import { ModpackHero } from "./(components)/modpack-hero";
 import { ModpackLauncher } from "./(components)/modpack-launcher";
 import { ModpackManual } from "./(components)/modpack-manual";
 import { ModpackFaq } from "./(components)/modpack-faq";
-import { reatomComponent } from "@/shared/lib/reatom";
 import { useAtomAccessor } from "@/shared/lib/utils";
 
-export default reatomComponent(({ ctx }) => {
+export default function Page() {
   const pageData = useData<Data>()
   const data = pageData?.data
   const failed = pageData?.failed
   const editing = useAtomAccessor(siteEdit.active)
-
-  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.sections))
-
 
   return (
     <MainWrapperPage variant="with_section" class={editing() ? "pb-24" : undefined}>
@@ -46,16 +38,7 @@ export default reatomComponent(({ ctx }) => {
           <ModpackFaq />
         </div>
       </div>
-      <EditableSections
-        sections={editing() && ctx.get(siteEdit.content)?.kind === "sections"
-          ? ctx.get(siteEdit.content)!.sections
-          : asSectionsContent(pageData.sections)}
-        editing={editing()}
-      />
-      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
-      <Show when={editing()}>
-        <EditToolbar />
-      </Show>
+      <PageEdit page="modpack" kind="sections" content={pageData.sections} canEdit={pageData.canEdit} editing={editing} />
     </MainWrapperPage>
   )
-}, "ModpackPage")
+}

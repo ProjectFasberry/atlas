@@ -2,7 +2,7 @@ import { getStaticAsset, getStaticObject } from "@/shared/lib/helpers"
 import { translate } from "@/shared/locales/helpers"
 import type { ServersContent } from "@/shared/api/site"
 
-export type ServerFeatureKey =
+type ServerFeatureKey =
   | "survival"
   | "rp"
   | "quests"
@@ -28,7 +28,7 @@ const FEATURES = {
   economy: { icon: "icons/chest_closed.webp", key: "economy" },
 } as const
 
-export type ServerFeature = {
+type ServerFeature = {
   title: string
   description: string
   icon: string

@@ -2,7 +2,7 @@ import { env } from "@/shared/env";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 
-export type CommunityItem = {
+type CommunityItem = {
   title: string
   description: string
   href: string

@@ -16,7 +16,7 @@ const overlayVariants = tv({
   }
 });
 
-export type OverlayVariantsProps = JSX.HTMLAttributes<HTMLDivElement> &
+type OverlayVariantsProps = JSX.HTMLAttributes<HTMLDivElement> &
   VariantProps<typeof overlayVariants>
 
 export const Overlay = (props: OverlayVariantsProps) => {

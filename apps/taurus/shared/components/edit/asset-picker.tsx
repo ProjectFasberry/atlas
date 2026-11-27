@@ -68,14 +68,12 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
     return result
   })
 
-  // Load the bucket list the first time the dialog opens.
   createEffect(() => {
     if (!open()) return
 
     if (!buckets()) assetStorage.listBuckets(ctx)
   })
 
-  // Default to the public asset bucket; another bucket stays selectable.
   createEffect(() => {
     const list = buckets()
     if (!open() || !list?.length || bucket()) return
@@ -86,7 +84,6 @@ export const AssetPicker = reatomComponent(({ ctx }) => {
     assetStorage.load(ctx)
   })
 
-  // Presign previews for the images of the open folder, in small batches.
   createEffect(() => {
     const name = bucket()
     if (!open() || !name || name === PUBLIC_BUCKET) return

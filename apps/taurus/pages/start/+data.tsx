@@ -1,24 +1,18 @@
 import { useConfig } from 'vike-solid/useConfig';
 import type { PageContextServer } from 'vike/types';
-import { getUrl, wrapTitle, getStaticObject } from '@/shared/lib/helpers';
+import { wrapTitle, getStaticObject } from '@/shared/lib/helpers';
+import { createPageHead } from '@/shared/lib/page-head';
 import { translate } from '@/shared/locales/helpers';
-import { apiRequestHeaders } from '@/shared/api/server';
-import { resolvePageContent, type SiteLocale } from '@/shared/api/site';
-import { getLocale } from '@/paraglide/runtime';
+import { loadPageData, type EditablePageData } from '@/shared/api/page-data';
 
 const image = getStaticObject("backgrounds", "rules_background.png")
 
-export type Data = { content: unknown; locale: SiteLocale; canEdit: boolean; canPublish: boolean }
+export type Data = EditablePageData
 
 export async function data(pageCtx: PageContextServer): Promise<Data> {
   const config = useConfig()
 
-  const locale = getLocale()
-  const { content, canEdit, canPublish } = await resolvePageContent(
-    "start",
-    locale,
-    apiRequestHeaders(pageCtx),
-  )
+  const pageData = await loadPageData("start", pageCtx)
 
   const title = wrapTitle(translate["pages.start-play.title"]());
   const description = translate["pages.start-play.description"]()
@@ -26,27 +20,8 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
   config({
     title,
     description,
-    Head: (
-      <>
-        <link rel="canonical" href={getUrl(pageCtx)} />
-        <meta property="og:url" content={getUrl(pageCtx)} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content={title} />
-        <meta property="og:image" content={image} />
-        <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={image} />
-        <meta property="twitter:image:type" content="image/jpeg" />
-        <meta property="twitter:image:width" content="1200" />
-        <meta property="twitter:image:height" content="630" />
-      </>
-    )
+    Head: createPageHead(pageCtx, { title, description, image })
   })
 
-  return { content, locale, canEdit, canPublish }
+  return pageData
 }

@@ -1,9 +1,8 @@
 import { action, atom, withAssign } from "@reatom/framework";
 import { getStaticAsset } from "@/shared/lib/helpers";
 import type { HomeContent } from "@/shared/api/site";
-import type { EditSlide } from "@/shared/models/site-edit.model";
 
-export type SpawnImage = { src: string; alt: string }
+export type SpawnSlide = { imageKey: string; alt: string; src: string }
 
 /** Shipped defaults; the API document overrides them when it has a carousel. */
 const DEFAULT_SPAWN_KEYS = [
@@ -14,29 +13,23 @@ const DEFAULT_SPAWN_KEYS = [
   "images/offenburg-5.webp",
 ]
 
-const DEFAULT_SPAWN_IMAGES: SpawnImage[] = DEFAULT_SPAWN_KEYS.map((key) => ({
-  src: getStaticAsset(key),
+const DEFAULT_SPAWN_SLIDES: SpawnSlide[] = DEFAULT_SPAWN_KEYS.map((imageKey) => ({
+  imageKey,
   alt: "",
+  src: getStaticAsset(imageKey),
 }))
 
-export const createSpawnImages = (content: HomeContent | null): SpawnImage[] => {
+/** Published carousel and the editor's slide list come from the same document. */
+export const resolveSpawnSlides = (content: HomeContent | null): SpawnSlide[] => {
   const items = content?.carousel
 
-  if (!items?.length) return DEFAULT_SPAWN_IMAGES
+  if (!items?.length) return DEFAULT_SPAWN_SLIDES
 
   return items.map((item) => ({
-    src: getStaticAsset(item.image),
+    imageKey: item.image,
     alt: item.alt ?? "",
+    src: getStaticAsset(item.image),
   }))
-}
-
-/** Edit mode starts from the effective slides, so their keys survive a save. */
-export const createSpawnEditSlides = (content: HomeContent | null): EditSlide[] => {
-  const items = content?.carousel
-
-  if (!items?.length) return DEFAULT_SPAWN_KEYS.map((imageKey) => ({ imageKey, alt: "" }))
-
-  return items.map((item) => ({ imageKey: item.image, alt: item.alt ?? "" }))
 }
 
 export const spawnCarouselState = atom(null, "spawnCarouselState").pipe(

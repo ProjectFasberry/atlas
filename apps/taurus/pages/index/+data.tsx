@@ -2,32 +2,25 @@ import { useConfig } from 'vike-solid/useConfig';
 import type { PageContextServer } from 'vike/types';
 import { getUrl, wrapTitle } from '@/shared/lib/helpers';
 import { translate } from '@/shared/locales/helpers';
-import {
-  asHomeContent, resolvePageContent,
-  type HomeContent, type SiteLocale,
-} from '@/shared/api/site';
-import { apiRequestHeaders } from '@/shared/api/server';
-import { fetchFaq, type FaqApiItem } from '@/shared/api/faq';
+import { asHomeContent, type HomeContent } from '@/shared/api/site';
+import { loadPageData, type EditablePageData } from '@/shared/api/page-data';
 import { getLocale } from '@/paraglide/runtime';
+import { fetchFaq, type FaqApiItem } from '@/shared/api/faq';
 
-export type Data = {
+export type Data = EditablePageData & {
   content: HomeContent | null
   faq: FaqApiItem[]
-  locale: SiteLocale
-  canEdit: boolean
-  canPublish: boolean
 }
 
 export async function data(pageCtx: PageContextServer): Promise<Data> {
   const config = useConfig();
 
   const locale = getLocale();
-  const headers = apiRequestHeaders(pageCtx);
-  const [pageContent, faq] = await Promise.all([
-    resolvePageContent("home", locale, headers),
+  const [pageData, faq] = await Promise.all([
+    loadPageData("home", pageCtx),
     fetchFaq("home", locale).catch(() => []),
   ]);
-  const content = asHomeContent(pageContent.content);
+  const content = asHomeContent(pageData.content);
 
   const title = wrapTitle(translate['pages.index.title']());
   const description = translate['pages.index.description']();
@@ -65,11 +58,5 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
     )
   })
 
-  return {
-    content,
-    faq,
-    locale,
-    canEdit: pageContent.canEdit,
-    canPublish: pageContent.canPublish,
-  };
+  return { ...pageData, content, faq };
 }

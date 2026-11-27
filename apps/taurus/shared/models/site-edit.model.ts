@@ -35,7 +35,7 @@ export type EditContent =
   | { kind: "servers"; title: string; description: string; servers: EditServer[]; sections: EditSection[]; blocks: Record<string, EditBlock> }
   | { kind: "sections"; sections: EditSection[]; blocks: Record<string, EditBlock> }
 
-export type EditInit = {
+type EditInit = {
   page: EditPage
   locale: SiteLocale
   version: number

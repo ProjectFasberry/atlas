@@ -10,27 +10,20 @@ import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { SupportContent } from "./(components)/support-content";
-import { reatomComponent } from "@/shared/lib/reatom";
 import { useAtomAccessor } from "@/shared/lib/utils";
 import { siteEdit } from "@/shared/models/site-edit.model";
 import { asBlocks, asSectionsContent } from "@/shared/api/site";
-import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditProvider } from "@/shared/components/edit/edit-provider";
-import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
-import { EditEntry } from "@/shared/components/edit/edit-entry";
+import { PageEdit } from "@/shared/components/edit/page-edit";
 import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 import type { Data } from "./+data";
 
 const bgImage = getStaticObject("backgrounds", "support_background.png");
 
-export default reatomComponent(({ ctx }) => {
+export default function Page() {
   const pageData = useData<Data>()
   const editing = useAtomAccessor(siteEdit.active)
-
-  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.content))
-
   const heroHidden = useBlockHidden("support-hero")
-
 
   return (
     <MainWrapperPage variant="with_section" class={editing() ? "pb-24" : undefined}>
@@ -81,16 +74,7 @@ export default reatomComponent(({ ctx }) => {
       <div id="support-list" class="full-screen-section py-16 lg:py-24">
         <SupportContent />
       </div>
-      <EditableSections
-        sections={editing() && ctx.get(siteEdit.content)?.kind === "sections"
-          ? ctx.get(siteEdit.content)!.sections
-          : asSectionsContent(pageData.content)}
-        editing={editing()}
-      />
-      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
-      <Show when={editing()}>
-        <EditToolbar />
-      </Show>
+      <PageEdit page="support" kind="sections" content={pageData.content} canEdit={pageData.canEdit} editing={editing} />
     </MainWrapperPage>
   )
-}, "SupportPage")
+}

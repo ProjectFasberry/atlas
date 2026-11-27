@@ -2,7 +2,7 @@ import { Index, Show } from "solid-js"
 import { useData } from "vike-solid/useData"
 import { Carousel } from '@ark-ui/solid/carousel'
 import {
-  createSpawnImages, setSpawnPage, spawnCarouselState,
+  resolveSpawnSlides, setSpawnPage, spawnCarouselState,
 } from "../(models)/spawn-carousel.model"
 import { carouselVariant } from "@/shared/ui/carousel"
 import { Button } from "@/shared/ui/button"
@@ -27,7 +27,7 @@ export const SpawnCarousel = reatomComponent(({ ctx }) => {
 
   const images = () => editing()
     ? editSlides().map((slide) => ({ src: getStaticAsset(slide.imageKey), alt: slide.alt }))
-    : createSpawnImages(pageData?.content ?? null)
+    : resolveSpawnSlides(pageData?.content ?? null)
 
   return (
     <div class="flex w-full flex-col gap-2">

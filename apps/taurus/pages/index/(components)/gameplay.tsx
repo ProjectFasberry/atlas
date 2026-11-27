@@ -62,7 +62,6 @@ const IdeasItem = reatomComponent<{ idx: number, title: string, ref: (el: HTMLBu
   "IdeasItem",
 );
 
-/** Tabs, arrows and keyboard/mouse navigation around the feature preview. */
 export const IdeasNav = reatomComponent(({ ctx }) => {
   const selected = useAtomAccessor(selectedKeyAtom);
   const ideas = createIdeas();

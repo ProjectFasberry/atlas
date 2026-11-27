@@ -15,7 +15,7 @@ test.describe('landing pages', () => {
     const { response, body } = await text(request, '/');
     expect(response.status()).toBe(200);
     expect(body).toContain('Minecraft-проект: разные режимы');
-    expect(body).toContain('Правила');
+    expect(body).toContain('Сообщество');
     expect(body).toContain('Конфиденциальность');
   });
 
@@ -23,7 +23,7 @@ test.describe('landing pages', () => {
     const { response, body } = await text(request, '/');
     expect(response.status()).toBe(200);
     expect(body).toContain('Три шага до первого дня');
-    expect(body).not.toContain('play.fasberry.fun');
+    expect(body).toContain('play.fasberry.fun');
     expect(body).toContain('Что нового');
     expect(body).toContain('Куда дальше');
     expect(body).toContain('Частые вопросы');

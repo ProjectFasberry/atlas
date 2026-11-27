@@ -1,5 +1,4 @@
 import { Link } from "@/shared/components/link";
-import { toast } from 'solid-sonner';
 import { Menu } from '@ark-ui/solid/menu'
 import { Portal } from "solid-js/web"
 import { Typography } from "@/shared/ui/typography";
@@ -22,7 +21,6 @@ import { env } from "@/shared/env";
 
 const APP_URL = env.VITE_APP_URL;
 
-const bellImg = getStaticObject("minecraft/icons", "bell.webp");
 const bgImage = getStaticObject("minecraft/static", "cracked_polished_blacked.webp")
 
 const HeaderDrawerContent = lazy(() => import("./header-drawer")
@@ -97,22 +95,6 @@ const HeaderItemMenu = (props: MainHeaderLink) => {
   const pathname = () => urlParsed()?.pathname
   const isActive = () => pathname() === props.href;
 
-  const handlePathDetect = (href: string) => {
-    if (pathname() !== href) return;
-
-    toast.info("Вы уже на этой странице", {
-      icon: (
-        <img
-          alt=""
-          loading="lazy"
-          width={32}
-          height={32}
-          src={bellImg}
-        />
-      )
-    })
-  }
-
   return (
     <Show
       when={props.href}
@@ -152,7 +134,6 @@ const HeaderItemMenu = (props: MainHeaderLink) => {
         <Link
           href={href()}
           class={cn("flex items-center gap-1 text-neutral-200", props.class)}
-          onClick={() => handlePathDetect(href())}
         >
           <Show when={isActive()}>
             <img

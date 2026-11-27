@@ -13,7 +13,7 @@ export const {
 } = createBaseStorageModel({ name: "assets", api: taurusStorageApi })
 
 /** Which editor field the picker will fill when the user chooses a file. */
-export type AssetTarget =
+type AssetTarget =
   | { kind: "server"; id: string }
   | { kind: "slide"; index: number }
   | { kind: "feature"; serverId: string; index: number }

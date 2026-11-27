@@ -60,7 +60,6 @@ export const ActionButton = (props: { children: JSX.Element; onClick?: () => voi
     : <div class="w-full">{content}</div>
 }
 
-/** Intro copy plus the three ways to help the project. */
 export const SupportCards = reatomComponent(({ ctx }) => {
   const hidden = useBlockHidden("support-help")
 

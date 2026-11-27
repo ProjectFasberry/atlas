@@ -5,10 +5,6 @@ import { settingsListAtom } from "./settings.model"
 import { useAtomAccessor } from "@/shared/lib/utils"
 import { translate } from "@/shared/locales/helpers"
 
-/**
- * Minecraft-style option rows: an icon slot, the label, and a cycling button
- * with arrows. Changes apply immediately; the dialog closes on "Done".
- */
 export const SettingsList = () => {
   const list = useAtomAccessor(settingsListAtom)
 

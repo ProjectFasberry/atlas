@@ -13,7 +13,7 @@ import type { Data } from "./+data";
 
 const url = getStaticObject("arts", "adventure-in-blossom.jpg")
 
-export default function GalleryPage() {
+export default function Page() {
   const pageData = useData<Data>()
 
   return (

@@ -2,7 +2,7 @@ import type { Ctx } from "@reatom/framework";
 import { useCtx } from "@reatom/npm-solid-js";
 import { mergeProps, type Component, type JSX } from "solid-js";
 
-export type ReatomComponentProps<T extends object = {}> = T & { ctx: Ctx }
+type ReatomComponentProps<T extends object = {}> = T & { ctx: Ctx }
 
 export const reatomComponent = <T extends object>(
   render: (props: ReatomComponentProps<T>) => JSX.Element,

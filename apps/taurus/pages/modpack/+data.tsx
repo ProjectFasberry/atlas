@@ -1,10 +1,11 @@
-import { getUrl, wrapTitle } from "@/shared/lib/helpers"
+import { wrapTitle } from "@/shared/lib/helpers"
+import { createPageHead } from "@/shared/lib/page-head"
 import { useConfig } from "vike-solid/useConfig"
 import type { PageContext } from "vike/types"
 import { translate } from "@/shared/locales/helpers"
 import { mainClient } from "@/shared/api/client"
 import { apiRequestHeaders } from "@/shared/api/server"
-import { resolvePageContent, type SiteLocale } from "@/shared/api/site"
+import { loadPageData } from "@/shared/api/page-data"
 import { getLocale } from "@/paraglide/runtime"
 import { fetchFaq } from "@/shared/api/faq"
 
@@ -13,42 +14,29 @@ export type Data = Awaited<ReturnType<typeof data>>
 export async function data(pageCtx: PageContext) {
   const config = useConfig()
 
-  const headers = apiRequestHeaders(pageCtx);
-
   const locale = getLocale()
-  const [pageContent, faq] = await Promise.all([
-    resolvePageContent("modpack", locale, headers),
+  const [pageData, faq, data] = await Promise.all([
+    loadPageData("modpack", pageCtx),
     fetchFaq("modpack", locale).catch(() => []),
+    mainClient.GET("/modpack/list", { headers: apiRequestHeaders(pageCtx) })
+      .then(r => r.data?.data ?? [])
+      .catch(() => null),
   ]);
 
   const title = wrapTitle(translate["pages.modpack.title"]())
   const description = translate["pages.modpack.description"]()
 
-  const data = await mainClient.GET("/modpack/list", { headers })
-    .then(r => r.data?.data ?? [])
-    .catch(() => null)
-
   config({
     title,
     description,
-    Head: (
-      <>
-        <link rel="canonical" href={getUrl(pageCtx)} />
-        <meta property="og:url" content={getUrl(pageCtx)} />
-        <meta property="og:title" content={title} />
-        <meta property="og:site_name" content={title} />
-        <meta name="twitter:title" content={title} />
-      </>
-    )
+    Head: createPageHead(pageCtx, { title, description })
   })
 
   return {
+    ...pageData,
     data: data ?? [],
     faq,
     failed: data === null,
-    sections: pageContent.content,
-    locale,
-    canEdit: pageContent.canEdit,
-    canPublish: pageContent.canPublish,
+    sections: pageData.content,
   }
 }

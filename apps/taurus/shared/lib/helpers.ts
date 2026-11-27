@@ -9,7 +9,7 @@ export const getStaticAsset = (key: string) => `${env.VITE_VOLUME_URL}/static/${
 export const toStaticKey = (url: string) =>
   url.replace(`${env.VITE_VOLUME_URL}/static/`, "").replace(/^\/+/, "")
 
-export type LauncherPlatform = "windows-x86_64" | "darwin-aarch64"
+type LauncherPlatform = "windows-x86_64" | "darwin-aarch64"
 
 /**
  * Stable launcher links: the API resolves the current prod release itself, so the

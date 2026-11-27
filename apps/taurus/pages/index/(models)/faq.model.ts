@@ -8,7 +8,6 @@ export type FaqItem = {
   linkLabel?: string | null
 }
 
-/** First question is open by default, so the block never looks like a dead list. */
 export const faqOpenAtom = atom<string[]>(["1"], "faqOpenAtom")
 
 export const setFaqOpen = action(

@@ -49,6 +49,22 @@ const routes = {
       meta: { hasNextPage: false, hasPrevPage: false },
     },
   }),
+  '/faq': () => ({
+    data: [
+      {
+        id: 'e2e-faq',
+        scope: 'home',
+        locale: 'ru',
+        question: 'E2E вопрос?',
+        answer: 'E2E ответ.',
+        linkLabel: null,
+        linkHref: null,
+        position: 1,
+        published: true,
+      },
+    ],
+  }),
+  '/site/access': () => ({ data: { nickname: null, canEdit: false, canPublish: false } }),
   '/server/status': () => ({
     data: {
       proxy: { status: 'online', online: 0, max: 200, players: [] },

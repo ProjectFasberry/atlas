@@ -1,38 +1,21 @@
 import { mainClient } from "./client"
+import type { paths } from "../types/gen"
 
-/**
- * Editable landing content served by the API.
- *
- * The operations are not in the checked-in OpenAPI schema yet, so they are
- * described here. Regenerate the schema (`pnpm --filter @repo/shared openapi`)
- * after the API ships and this block can be deleted.
- */
+type ContentByPage = paths["/site/content/{page}"]["get"]
+type ContentResponse = ContentByPage["responses"][200]["content"]["application/json"]["data"]
+type ContentQuery = NonNullable<ContentByPage["parameters"]["query"]>
 
-export type SiteLocale = "ru" | "en"
+export type SiteLocale = NonNullable<ContentQuery["locale"]>
 export type SitePage = "home" | "servers" | "start" | "support" | "modpack"
 
-export type SiteSection = { id: string; title: string; body: string; hidden: boolean }
+type SiteSection = { id: string; title: string; body: string; hidden: boolean }
 export type BlockContent = { title?: string; description?: string; hidden?: boolean }
-export type SectionsContent = { sections?: SiteSection[] }
 
-export type SiteContentPayload = {
-  page: string
-  locale: SiteLocale
-  content: unknown
-  version: number
-  updatedAt: string | null
-}
+export type SiteEditorDraft = ContentResponse
 
 /** Admin responses carry the draft and the published copy, not `content`. */
-export type SiteAdminPayload = {
-  page: string
-  locale: SiteLocale
-  draft: unknown
-  published: unknown
-  version: number
-  updatedAt: string | null
-  updatedBy: string | null
-}
+export type SiteAdminPayload =
+  paths["/privated/content/{page}/{locale}"]["put"]["responses"][200]["content"]["application/json"]["data"]
 
 export type HomeContent = {
   carousel?: { image: string; alt?: string }[]
@@ -40,7 +23,7 @@ export type HomeContent = {
   blocks?: Record<string, BlockContent>
 }
 
-export type ServerContentItem = {
+type ServerContentItem = {
   name?: string
   tagline?: string
   description?: string
@@ -138,35 +121,8 @@ function isObject(value: unknown): value is Record<string, unknown> {
 type ContentHeaders = Record<string, string>
 
 /** One request per page on the server render; the API caches the document. */
-export async function fetchHomeContent(locale: SiteLocale, headers: ContentHeaders) {
-  const result = await mainClient
-    .GET("/site/content/{page}", {
-      params: { path: { page: "home" }, query: { locale } },
-      headers,
-    })
-    .catch((error) => {
-      console.error("[content] home request failed", error)
-      return null
-    })
-
-  return asHomeContent(result?.data?.data?.content)
-}
-
-export async function fetchServersContent(locale: SiteLocale, headers: ContentHeaders) {
-  const result = await mainClient
-    .GET("/site/content/{page}", {
-      params: { path: { page: "servers" }, query: { locale } },
-      headers,
-    })
-    .catch((error) => {
-      console.error("[content] servers request failed", error)
-      return null
-    })
-
-  return asServersContent(result?.data?.data?.content)
-}
-
-export type SiteAccess = { nickname: string | null; canEdit: boolean; canPublish: boolean }
+type SiteAccess =
+  paths["/site/access"]["get"]["responses"][200]["content"]["application/json"]["data"]
 
 export async function fetchSiteAccess(headers: ContentHeaders): Promise<SiteAccess | null> {
   const result = await mainClient
@@ -174,14 +130,6 @@ export async function fetchSiteAccess(headers: ContentHeaders): Promise<SiteAcce
     .catch(() => null)
 
   return result?.data?.data ?? null
-}
-
-export type SiteEditorDraft = {
-  page: string
-  locale: SiteLocale
-  content: unknown
-  version: number
-  updatedAt: string | null
 }
 
 /**
@@ -198,7 +146,7 @@ export async function fetchEditorDraft(page: SitePage, locale: SiteLocale): Prom
       return null
     })
 
-  return (result?.data?.data ?? null) as SiteEditorDraft | null
+  return result?.data?.data ?? null
 }
 
 export function saveSiteDraft(page: SitePage, locale: SiteLocale, version: number, content: unknown) {
@@ -270,10 +218,13 @@ export async function resolvePageContent(
   locale: SiteLocale,
   headers: ContentHeaders,
 ): Promise<{ content: unknown; canEdit: boolean; canPublish: boolean }> {
-  const access = await fetchSiteAccess(headers)
+  const [content, access] = await Promise.all([
+    fetchPageContent(page, locale, headers),
+    fetchSiteAccess(headers),
+  ])
 
   return {
-    content: await fetchPageContent(page, locale, headers),
+    content,
     canEdit: Boolean(access?.canEdit),
     canPublish: Boolean(access?.canPublish),
   }

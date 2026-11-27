@@ -6,14 +6,11 @@ import { tv } from "tailwind-variants";
 import { getLauncherDownloadUrl, getStaticObject } from "@/shared/lib/helpers";
 import { env } from "@/shared/env";
 import { translate } from "@/shared/locales/helpers";
-import { reatomComponent } from "@/shared/lib/reatom";
 import { useAtomAccessor } from "@/shared/lib/utils";
 import { siteEdit } from "@/shared/models/site-edit.model";
 import { asBlocks, asSectionsContent } from "@/shared/api/site";
-import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditProvider } from "@/shared/components/edit/edit-provider";
-import { EditToolbar } from "@/shared/components/edit/edit-toolbar";
-import { EditEntry } from "@/shared/components/edit/edit-entry";
+import { PageEdit } from "@/shared/components/edit/page-edit";
 import { BlockControls, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block";
 import type { Data } from "./+data";
 
@@ -41,14 +38,10 @@ const stepImageVariant = tv({
   base: `flex justify-center sm:justify-end items-center w-full sm:w-1/3`
 })
 
-export default reatomComponent(({ ctx }) => {
+export default function Page() {
   const pageData = useData<Data>()
   const editing = useAtomAccessor(siteEdit.active)
-
-  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.content))
-
   const heroHidden = useBlockHidden("start-hero")
-
 
   return (
     <MainWrapperPage class={editing() ? "pb-24" : undefined}>
@@ -170,16 +163,7 @@ export default reatomComponent(({ ctx }) => {
         </div>
       </div>
       </Show>
-      <EditableSections
-        sections={editing() && ctx.get(siteEdit.content)?.kind === "sections"
-          ? ctx.get(siteEdit.content)!.sections
-          : asSectionsContent(pageData.content)}
-        editing={editing()}
-      />
-      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
-      <Show when={editing()}>
-        <EditToolbar />
-      </Show>
+      <PageEdit page="start" kind="sections" content={pageData.content} canEdit={pageData.canEdit} editing={editing} />
     </MainWrapperPage>
   )
-}, "StartPage")
+}

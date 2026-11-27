@@ -9,7 +9,7 @@ export type GalleryCounts = GalleryOperation["responses"][200]["content"]["appli
 export type GalleryPage = GalleryOperation["responses"][200]["content"]["application/json"]
 export type GalleryTag = NonNullable<GalleryQuery["tag"]>
 export type GalleryFilter = "all" | GalleryTag
-export type GalleryLocale = NonNullable<GalleryQuery["locale"]>
+type GalleryLocale = NonNullable<GalleryQuery["locale"]>
 
 export const GALLERY_PAGE_SIZE = 8
 

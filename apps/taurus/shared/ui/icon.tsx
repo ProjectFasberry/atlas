@@ -1,7 +1,7 @@
 import { type ComponentProps, createMemo, splitProps } from 'solid-js';
 import { type SpritePrepareConfig, sprites, type SpritesMeta } from '../sprite.gen';
 
-export interface IconProps extends ComponentProps<'svg'> {
+interface IconProps extends ComponentProps<'svg'> {
   /** Icon name, e.g. "common:close" */
   name: IconName;
   /**
@@ -11,7 +11,7 @@ export interface IconProps extends ComponentProps<'svg'> {
   invert?: boolean;
 }
 
-export type IconName = {
+type IconName = {
   [Key in keyof SpritesMeta]: `${Key & string}:${SpritesMeta[Key] & string}`;
 }[keyof SpritesMeta];
 
