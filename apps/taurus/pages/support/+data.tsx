@@ -5,20 +5,21 @@ import { translate } from '@/shared/locales/helpers';
 import { apiRequestHeaders } from '@/shared/api/server';
 import { resolvePageContent, type SiteLocale } from '@/shared/api/site';
 import { getLocale } from '@/paraglide/runtime';
+import { fetchFaq, type FaqApiItem } from '@/shared/api/faq';
 
 const image = getStaticObject("community", "dragon_dead.webp")
 
-export type Data = { content: unknown; locale: SiteLocale; canEdit: boolean; canPublish: boolean }
+export type Data = { content: unknown; faq: FaqApiItem[]; locale: SiteLocale; canEdit: boolean; canPublish: boolean }
 
 export async function data(pageCtx: PageContextServer): Promise<Data> {
   const config = useConfig();
 
   const locale = getLocale()
-  const { content, canEdit, canPublish } = await resolvePageContent(
-    "support",
-    locale,
-    apiRequestHeaders(pageCtx),
-  );
+  const [pageContent, faq] = await Promise.all([
+    resolvePageContent("support", locale, apiRequestHeaders(pageCtx)),
+    fetchFaq("support", locale).catch(() => []),
+  ]);
+  const { content, canEdit, canPublish } = pageContent;
 
   const title = wrapTitle(translate["pages.support.title"]());
   const description = translate["pages.support.description"]()
@@ -48,5 +49,5 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
     )
   })
 
-  return { content, locale, canEdit, canPublish }
+  return { content, faq, locale, canEdit, canPublish }
 }

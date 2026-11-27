@@ -6,6 +6,7 @@ import { mainClient } from "@/shared/api/client"
 import { apiRequestHeaders } from "@/shared/api/server"
 import { resolvePageContent, type SiteLocale } from "@/shared/api/site"
 import { getLocale } from "@/paraglide/runtime"
+import { fetchFaq } from "@/shared/api/faq"
 
 export type Data = Awaited<ReturnType<typeof data>>
 
@@ -15,7 +16,10 @@ export async function data(pageCtx: PageContext) {
   const headers = apiRequestHeaders(pageCtx);
 
   const locale = getLocale()
-  const pageContent = await resolvePageContent("modpack", locale, headers);
+  const [pageContent, faq] = await Promise.all([
+    resolvePageContent("modpack", locale, headers),
+    fetchFaq("modpack", locale).catch(() => []),
+  ]);
 
   const title = wrapTitle(translate["pages.modpack.title"]())
   const description = translate["pages.modpack.description"]()
@@ -40,6 +44,7 @@ export async function data(pageCtx: PageContext) {
 
   return {
     data: data ?? [],
+    faq,
     failed: data === null,
     sections: pageContent.content,
     locale,

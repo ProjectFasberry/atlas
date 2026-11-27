@@ -1,8 +1,10 @@
 import { Accordion } from "@ark-ui/solid/accordion"
 import { For, Show } from "solid-js"
+import { useData } from "vike-solid/useData"
 import { Typography } from "@/shared/ui/typography"
 import { translate } from "@/shared/locales/helpers"
-import { setSupportFaq, supportFaqItems, supportState } from "../(models)/support.model"
+import { setSupportFaq, supportState } from "../(models)/support.model"
+import type { Data } from "../+data"
 import { useAtomAccessor } from "@/shared/lib/utils"
 import { reatomComponent } from "@/shared/lib/reatom"
 import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block"
@@ -10,9 +12,11 @@ import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shar
 export const SupportFaq = reatomComponent(({ ctx }) => {
   const faqOpen = useAtomAccessor(supportState.faqOpen)
   const hidden = useBlockHidden("support-faq")
+  const pageData = useData<Data>()
+  const items = pageData.faq.map((item) => ({ value: String(item.position), ...item }))
 
   return (
-    <Show when={!hidden()}>
+    <Show when={!hidden() && items.length > 0}>
       <section class="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:gap-10">
         <div class="flex flex-col gap-1">
           <BlockTitle
@@ -34,7 +38,7 @@ export const SupportFaq = reatomComponent(({ ctx }) => {
           onValueChange={(details) => setSupportFaq(ctx, details.value)}
           class="flex w-full flex-col gap-2"
         >
-          <For each={supportFaqItems()}>
+          <For each={items}>
             {(item) => (
               <Accordion.Item value={item.value} class="transparent-achievement-panel">
                 <Accordion.ItemTrigger class="flex w-full cursor-pointer items-center justify-between gap-4 p-3 text-left sm:p-4">
