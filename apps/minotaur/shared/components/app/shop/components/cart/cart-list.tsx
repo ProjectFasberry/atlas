@@ -11,7 +11,6 @@ import {
 } from "../../models/store-cart.model"
 import { cart } from "../../models/store-cart.model"
 import { translate } from "@/shared/locales/helpers"
-import { storeCurrencyLabel } from "../../lib/labels"
 
 const CURRENCY_ORDER = ["BELKOIN", "CHARISM"] as const
 
@@ -30,7 +29,7 @@ const CartCurrencyGroup = reatomComponent<{ currency: string }>(({ ctx, currency
         <span className="flex items-center gap-1.5 text-xs font-semibold
           uppercase tracking-wide text-neutral-500">
           {info?.img ? <img src={info.img} alt="" className="size-4" /> : info?.symbol ?? currency}
-          {storeCurrencyLabel(currency)}
+          {currency}
         </span>
         <span className="text-xs text-neutral-500">
           {translate["cart.count.items"]({ count: data.length })}

@@ -8,7 +8,7 @@ import { Typography } from "@/shared/ui/typography"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { storeItemState } from "../../models/store-item.model"
 import { cart, cartContainsItemAtom } from "../../models/store-cart.model"
-import { ItemPrice } from "../items/store-item"
+import { ItemPrice, ItemSelectToCart } from "../items/store-item"
 import { translate } from "@/shared/locales/helpers"
 
 const FEATURES = [
@@ -65,7 +65,7 @@ const ItemBuyNow = reatomComponent<{ className: string }>(({ ctx, className }) =
   }
 
   return (
-    <Button background="positive" className={className} onClick={buyNow}>
+    <Button background="white" className={className} onClick={buyNow}>
       {inCart ? translate["store.item.checkout"]() : translate["store.item.buy-now"]()}
     </Button>
   )
@@ -82,9 +82,9 @@ export const ItemPurchase = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-4 rounded-xl bg-neutral-900 p-4
       sm:p-5 lg:sticky lg:top-24">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold leading-tight">
+        <Typography className="text-2xl font-semibold leading-tight">
           {data.title}
-        </h1>
+        </Typography>
         {data.description && (
           <Typography color="gray" className="text-sm">
             {data.description}
@@ -100,7 +100,10 @@ export const ItemPurchase = reatomComponent(({ ctx }) => {
           {translate["store.item.vat-included"]()}
         </span>
       </div>
-      <ItemBuyNow className="h-10 w-full font-semibold" />
+      <div className="flex flex-col gap-2">
+        <ItemBuyNow className="h-10 w-full font-semibold" />
+        <ItemSelectToCart id={data.id} />
+      </div>
       <ItemFeatures />
       <ItemShare />
     </div>

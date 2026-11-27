@@ -16,7 +16,6 @@ import { userState } from "@/shared/models/app/index.model";
 import { cartContainsItemAtom, cartState } from "./store-cart.state";
 import { toast } from "sonner";
 import { translate } from "@/shared/locales/helpers";
-import type { GameServer } from "../lib/servers";
 
 export * from "./store-cart.state";
 
@@ -27,7 +26,7 @@ async function getCartData(init?: RequestInit) {
 async function getCartPrice(server?: string, init?: RequestInit) {
 	return client.get("/store/cart/price", {
 		...init,
-		params: { query: { server: server as GameServer | undefined } },
+		params: { query: { server: server as "bisquite" | "muffin" | undefined } },
 	});
 }
 

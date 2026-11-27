@@ -12,12 +12,18 @@ import { appState } from "@/shared/models/app/index.model"
 import { WalletStrip } from "@/shared/components/app/wallet/components/wallet-strip"
 import { ItemPurchase, MobilePurchaseBar } from "./item-purchase"
 import { translate } from "@/shared/locales/helpers"
-import { storeCurrencyLabel, storeItemTypeLabel } from "../../lib/labels"
 
 const cardClass = "rounded-xl bg-neutral-900 p-4 sm:p-5"
 
 const itemCategory = (item: StoreItemData): "donate" | "event" | "all" =>
   item.type === "donate" || item.type === "event" ? item.type : "all"
+
+const itemTypeLabel = (item: StoreItemData) =>
+  item.type === "donate"
+    ? translate["store.filters.type.variants.donate"]()
+    : item.type === "event"
+      ? translate["store.filters.type.variants.event"]()
+      : item.type
 
 const Breadcrumbs = reatomComponent(({ ctx }) => {
   const data = ctx.spy(storeItemState.data)
@@ -51,11 +57,11 @@ const ItemGallery = reatomComponent(({ ctx }) => {
       <div className="absolute left-4 top-4 flex items-center gap-2">
         <span className="rounded-md bg-black/60
           px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-200">
-          {storeItemTypeLabel(data.type)}
+          {itemTypeLabel(data)}
         </span>
         <span className="rounded-md bg-black/60
           px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-200">
-          {storeCurrencyLabel(data.currency)}
+          {data.currency}
         </span>
       </div>
     </div>
@@ -63,22 +69,16 @@ const ItemGallery = reatomComponent(({ ctx }) => {
 }, "ItemGallery")
 
 const ItemDescription = reatomComponent(({ ctx }) => {
-  const item = ctx.spy(storeItemState.data)
   const html = ctx.spy(selectedDonateDataAtom)
   const isMobile = ctx.spy(appState.current.isMobile)
   const isExpanded = ctx.spy(storeItemState.isExpanded)
-
-  const hasHtml = Boolean(html?.trim())
-  const text = item?.description?.trim()
-
-  if (!hasHtml && !text) return null
 
   return (
     <section className={`${cardClass} flex flex-col gap-3`}>
       <Typography className="text-lg font-semibold">
         {translate["store.item.about"]()}
       </Typography>
-      {hasHtml ? (
+      {html ? (
         <div
           className="relative w-full overflow-hidden rounded-xl"
           onClick={() => {
@@ -89,7 +89,7 @@ const ItemDescription = reatomComponent(({ ctx }) => {
         >
           <div
             className="tiptap whitespace-pre-wrap p-0! duration-150"
-            dangerouslySetInnerHTML={{ __html: html! }}
+            dangerouslySetInnerHTML={{ __html: html }}
           />
           {!isExpanded && (
             <>
@@ -102,9 +102,7 @@ const ItemDescription = reatomComponent(({ ctx }) => {
           )}
         </div>
       ) : (
-        <p className="whitespace-pre-line text-sm leading-6 text-neutral-300 sm:text-base">
-          {text}
-        </p>
+        <Skeleton className="h-40 w-full" />
       )}
     </section>
   )

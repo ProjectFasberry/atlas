@@ -1,4 +1,4 @@
-import { reatomAsync, withErrorAtom, withStatusesAtom } from "@reatom/framework"
+import { reatomAsync, withStatusesAtom } from "@reatom/framework"
 import { action, atom, createCtx } from "@reatom/framework"
 import { reatomMap, sleep, withAssign, withConcurrency, withReset } from "@reatom/framework"
 import { logError } from '@/shared/lib/log';
@@ -117,8 +117,7 @@ export const storeItems = atom(null, "storeItems").pipe(
       },
       onReject: (_, e) => logError(e)
     }).pipe(
-      withStatusesAtom(),
-      withErrorAtom()
+      withStatusesAtom()
     ),
     loadMore: reatomAsync(async (ctx) => {
       const meta = ctx.get(storeItemsState.meta)
@@ -158,16 +157,6 @@ export const storeItems = atom(null, "storeItems").pipe(
 
       storeItemsState.filters.wallet(ctx, value as StoreWallet)
     }, `${name}.setFilter`),
-    setSearch: action((ctx, value: string) => {
-      storeItemsState.filters.searchQuery(ctx, value)
-      storeItems.fetch(ctx)
-    }, `${name}.setSearch`),
-    resetFilters: action((ctx) => {
-      storeItemsState.filters.category(ctx, "all")
-      storeItemsState.filters.wallet(ctx, "ALL")
-      storeItemsState.filters.searchQuery(ctx, "")
-      storeItems.fetch(ctx)
-    }, `${name}.resetFilters`),
     onChangeEvent: action(async (ctx, e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
       storeItemsState.filters.searchQuery(ctx, value)

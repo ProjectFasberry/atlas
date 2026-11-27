@@ -38,12 +38,7 @@ export default function Page() {
     <div className="flex flex-col gap-6 w-full h-full">
       <PageHeaderImage img={storeImage} />
       <div className="flex flex-col gap-4 h-full w-full">
-        <div className="flex flex-col gap-1">
-          <Typography className="text-3xl font-semibold">{translate["store.title"]()}</Typography>
-          <Typography color="gray" className="max-w-2xl text-sm">
-            {translate["store.page.tagline"]()}
-          </Typography>
-        </div>
+        <Typography className="text-3xl font-semibold">{translate["store.title"]()}</Typography>
         <WalletStrip />
         <Store />
       </div>
