@@ -1354,6 +1354,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/faq/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List FAQ entries for the panel */
+        get: operations["getPrivatedFaqList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/faq/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a FAQ entry */
+        post: operations["postPrivatedFaqCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/privated/faq/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a FAQ entry */
+        delete: operations["deletePrivatedFaqById"];
+        options?: never;
+        head?: never;
+        /** Update a FAQ entry */
+        patch: operations["patchPrivatedFaqById"];
+        trace?: never;
+    };
     "/privated/anticheat/flags": {
         parameters: {
             query?: never;
@@ -2498,6 +2550,23 @@ export interface paths {
         };
         /** Who may edit site content */
         get: operations["getSiteAccess"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faq": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the public FAQ for a page */
+        get: operations["getFaq"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7777,6 +7846,262 @@ export interface operations {
             };
         };
     };
+    getPrivatedFaqList: {
+        parameters: {
+            query?: {
+                scope?: "home" | "modpack" | "support";
+                locale?: "ru" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            scope: string;
+                            locale: string;
+                            question: string;
+                            answer: string;
+                            linkLabel: (string | null) | null;
+                            linkHref: (string | null) | null;
+                            position: number;
+                            published: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    postPrivatedFaqCreate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default home
+                     * @enum {string}
+                     */
+                    scope: "home" | "modpack" | "support";
+                    /**
+                     * @default ru
+                     * @enum {string}
+                     */
+                    locale: "ru" | "en";
+                    question: string;
+                    answer: string;
+                    linkLabel?: (string | null) | null;
+                    linkHref?: (string | null) | null;
+                    published?: boolean;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default home
+                     * @enum {string}
+                     */
+                    scope: "home" | "modpack" | "support";
+                    /**
+                     * @default ru
+                     * @enum {string}
+                     */
+                    locale: "ru" | "en";
+                    question: string;
+                    answer: string;
+                    linkLabel?: (string | null) | null;
+                    linkHref?: (string | null) | null;
+                    published?: boolean;
+                };
+                "multipart/form-data": {
+                    /**
+                     * @default home
+                     * @enum {string}
+                     */
+                    scope: "home" | "modpack" | "support";
+                    /**
+                     * @default ru
+                     * @enum {string}
+                     */
+                    locale: "ru" | "en";
+                    question: string;
+                    answer: string;
+                    linkLabel?: (string | null) | null;
+                    linkHref?: (string | null) | null;
+                    published?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            scope: string;
+                            locale: string;
+                            question: string;
+                            answer: string;
+                            linkLabel: (string | null) | null;
+                            linkHref: (string | null) | null;
+                            position: number;
+                            published: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    deletePrivatedFaqById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    patchPrivatedFaqById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default home
+                     * @enum {string}
+                     */
+                    scope?: "home" | "modpack" | "support";
+                    /**
+                     * @default ru
+                     * @enum {string}
+                     */
+                    locale?: "ru" | "en";
+                    question?: string;
+                    answer?: string;
+                    linkLabel?: (string | null) | null;
+                    linkHref?: (string | null) | null;
+                    published?: boolean;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * @default home
+                     * @enum {string}
+                     */
+                    scope?: "home" | "modpack" | "support";
+                    /**
+                     * @default ru
+                     * @enum {string}
+                     */
+                    locale?: "ru" | "en";
+                    question?: string;
+                    answer?: string;
+                    linkLabel?: (string | null) | null;
+                    linkHref?: (string | null) | null;
+                    published?: boolean;
+                };
+                "multipart/form-data": {
+                    /**
+                     * @default home
+                     * @enum {string}
+                     */
+                    scope?: "home" | "modpack" | "support";
+                    /**
+                     * @default ru
+                     * @enum {string}
+                     */
+                    locale?: "ru" | "en";
+                    question?: string;
+                    answer?: string;
+                    linkLabel?: (string | null) | null;
+                    linkHref?: (string | null) | null;
+                    published?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            scope: string;
+                            locale: string;
+                            question: string;
+                            answer: string;
+                            linkLabel: (string | null) | null;
+                            linkHref: (string | null) | null;
+                            position: number;
+                            published: boolean;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     getPrivatedAnticheatFlags: {
         parameters: {
             query?: {
@@ -10166,6 +10491,41 @@ export interface operations {
                             canEdit: boolean;
                             canPublish: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    getFaq: {
+        parameters: {
+            query?: {
+                scope?: "home" | "modpack" | "support";
+                locale?: "ru" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            scope: string;
+                            locale: string;
+                            question: string;
+                            answer: string;
+                            linkLabel: (string | null) | null;
+                            linkHref: (string | null) | null;
+                            position: number;
+                            published: boolean;
+                        }[];
                     };
                 };
             };

@@ -1,9 +1,11 @@
 import { Accordion } from "@ark-ui/solid/accordion";
 import { For } from "solid-js";
+import { useData } from "vike-solid/useData";
 import { Typography } from "@/shared/ui/typography";
 import { Link } from "@/shared/components/link";
 import { translate } from "@/shared/locales/helpers";
-import { createFaqItems, faqOpenAtom, setFaqOpen } from "../(models)/faq.model";
+import { faqOpenAtom, setFaqOpen, type FaqItem } from "../(models)/faq.model";
+import type { Data } from "..//+data";
 import { useAtomAccessor } from "@/shared/lib/utils";
 import { reatomComponent } from "@/shared/lib/reatom";
 import {
@@ -13,7 +15,17 @@ import {
 export const FaqSection = reatomComponent(({ ctx }) => {
   const open = useAtomAccessor(faqOpenAtom)
   const hidden = useBlockHidden("faq")
-  if (hidden()) return null
+  const pageData = useData<Data>()
+
+  const items: FaqItem[] = pageData.faq.map((item) => ({
+    value: String(item.position),
+    question: item.question,
+    answer: item.answer,
+    href: item.linkHref,
+    linkLabel: item.linkLabel,
+  }))
+
+  if (hidden() || items.length === 0) return null
 
   return (
     <div id="faq" class="section-edge relative flex w-full flex-col items-center py-16 sm:py-20 lg:py-28">
@@ -38,7 +50,7 @@ export const FaqSection = reatomComponent(({ ctx }) => {
           onValueChange={(details) => setFaqOpen(ctx, details.value)}
           class="flex w-full flex-col gap-2"
         >
-          <For each={createFaqItems()}>
+          <For each={items}>
             {(item) => (
               <Accordion.Item value={item.value} class="transparent-achievement-panel">
                 <Accordion.ItemTrigger class="flex w-full cursor-pointer

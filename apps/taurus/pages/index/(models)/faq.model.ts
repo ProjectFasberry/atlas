@@ -1,32 +1,12 @@
 import { action, atom } from "@reatom/framework";
-import { translate } from "@/shared/locales/helpers";
 
-export type FaqItem = { value: string, question: string, answer: string, href?: string, linkLabel?: string }
-
-export const createFaqItems = (): FaqItem[] => [
-  {
-    value: "1",
-    question: translate["faq.items.1.question"](),
-    answer: translate["faq.items.1.answer"]()
-  },
-  {
-    value: "2",
-    question: translate["faq.items.2.question"](),
-    answer: translate["faq.items.2.answer"](),
-    href: "/servers",
-    linkLabel: translate["faq.items.2.link"]()
-  },
-  {
-    value: "3",
-    question: translate["faq.items.3.question"](),
-    answer: translate["faq.items.3.answer"]()
-  },
-  {
-    value: "4",
-    question: translate["faq.items.4.question"](),
-    answer: translate["faq.items.4.answer"]()
-  }
-]
+export type FaqItem = {
+  value: string
+  question: string
+  answer: string
+  href?: string | null
+  linkLabel?: string | null
+}
 
 /** First question is open by default, so the block never looks like a dead list. */
 export const faqOpenAtom = atom<string[]>(["1"], "faqOpenAtom")

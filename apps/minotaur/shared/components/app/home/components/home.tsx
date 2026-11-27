@@ -21,6 +21,7 @@ import { Skeleton } from "@/shared/ui/skeleton"
 import { Typography } from "@/shared/ui/typography"
 import { WalletChips } from "@/shared/components/app/wallet/components/wallet-chips"
 import { home } from "../models/home.model"
+import { homeFaq } from "../models/faq.model"
 import { translate } from "@/shared/locales/helpers"
 
 const HERO_IMAGE = getStaticImage("images/village_pillage.webp")
@@ -409,37 +410,37 @@ const GuestStore = reatomComponent(({ ctx }) => {
   )
 }, "GuestStore")
 
-const FAQ = [
-  { question: "home.faq.q1", answer: "home.faq.a1" },
-  { question: "home.faq.q2", answer: "home.faq.a2", href: "https://fasberry.fun/servers", link: "home.faq.a2.link" },
-  { question: "home.faq.q3", answer: "home.faq.a3" },
-  { question: "home.faq.q4", answer: "home.faq.a4" },
-] as const
+const GuestFaq = reatomComponent(({ ctx }) => {
+  useUpdate(homeFaq, [])
 
-const GuestFaq = () => (
-  <Card>
-    <CardTitle>{translate["home.faq.title"]()}</CardTitle>
-    <div className="flex flex-col divide-y divide-neutral-800">
-      {FAQ.map((item) => (
-        <details key={item.question} className="group py-2">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-sm font-medium">
-            {translate[item.question]()}
-            <Icon name="sprite:chevron-down" className="size-4 shrink-0 text-neutral-500 group-open:rotate-180" />
-          </summary>
-          <p className="pt-1 text-xs text-neutral-400">{translate[item.answer]()}</p>
-          {"href" in item && (
-            <a
-              href={item.href}
-              className="mt-1 inline-flex text-xs font-semibold text-green-400 underline underline-offset-4 hover:text-green-300"
-            >
-              {translate[item.link]()}
-            </a>
-          )}
-        </details>
-      ))}
-    </div>
-  </Card>
-)
+  const items = ctx.spy(homeFaq.dataAtom) ?? []
+  if (items.length === 0) return null
+
+  return (
+    <Card>
+      <CardTitle>{translate["home.faq.title"]()}</CardTitle>
+      <div className="flex flex-col divide-y divide-neutral-800">
+        {items.map((item) => (
+          <details key={item.id} className="group py-2">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-sm font-medium">
+              {item.question}
+              <Icon name="sprite:chevron-down" className="size-4 shrink-0 text-neutral-500 group-open:rotate-180" />
+            </summary>
+            <p className="pt-1 text-xs text-neutral-400">{item.answer}</p>
+            {item.linkHref && (
+              <a
+                href={item.linkHref}
+                className="mt-1 inline-flex text-xs font-semibold text-green-400 underline underline-offset-4 hover:text-green-300"
+              >
+                {item.linkLabel ?? item.linkHref}
+              </a>
+            )}
+          </details>
+        ))}
+      </div>
+    </Card>
+  )
+}, "GuestFaq")
 
 const GuestSeason = reatomComponent(({ ctx }) => {
   const news = ctx.spy(newsState.data)

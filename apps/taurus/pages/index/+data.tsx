@@ -7,10 +7,12 @@ import {
   type HomeContent, type SiteLocale,
 } from '@/shared/api/site';
 import { apiRequestHeaders } from '@/shared/api/server';
+import { fetchFaq, type FaqApiItem } from '@/shared/api/faq';
 import { getLocale } from '@/paraglide/runtime';
 
 export type Data = {
   content: HomeContent | null
+  faq: FaqApiItem[]
   locale: SiteLocale
   canEdit: boolean
   canPublish: boolean
@@ -21,7 +23,10 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
 
   const locale = getLocale();
   const headers = apiRequestHeaders(pageCtx);
-  const pageContent = await resolvePageContent("home", locale, headers);
+  const [pageContent, faq] = await Promise.all([
+    resolvePageContent("home", locale, headers),
+    fetchFaq("home", locale).catch(() => []),
+  ]);
   const content = asHomeContent(pageContent.content);
 
   const title = wrapTitle(translate['pages.index.title']());
@@ -62,6 +67,7 @@ export async function data(pageCtx: PageContextServer): Promise<Data> {
 
   return {
     content,
+    faq,
     locale,
     canEdit: pageContent.canEdit,
     canPublish: pageContent.canPublish,
