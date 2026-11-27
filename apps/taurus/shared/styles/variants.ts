@@ -22,7 +22,3 @@ export const sectionVariant = tv({
     variant: "default"
   }
 })
-
-export const withWeather = tv({
-  base: `weather [html[data-weather='rain']_&]:rain`
-})

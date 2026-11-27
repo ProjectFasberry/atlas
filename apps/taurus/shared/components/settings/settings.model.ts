@@ -2,7 +2,7 @@ import { action, atom, withAssign, withConcurrency, type Ctx } from "@reatom/fra
 import { createListCollection } from "@ark-ui/solid/select";
 import { setLocale, type Locale } from "@/paraglide/runtime";
 import { translate } from "@/shared/locales/helpers";
-import { appState } from "@/shared/models/app.model";
+import { appState, writeWeatherCookie } from "@/shared/models/app.model";
 import { getStaticObject } from "@/shared/lib/helpers";
 
 export type Weather = {
@@ -33,7 +33,11 @@ export const settingsListAtom = atom((ctx) => {
       icon: getStaticObject("minecraft", "icons/experience_big.webp"),
       list: weathers,
       collection: createListCollection({ items: weathers }),
-      onChange: (value: unknown) => layoutSettings.apply(ctx, () => appState.selectedWeather(ctx, value as string)),
+      onChange: (value: unknown) => layoutSettings.apply(ctx, () => {
+        const weather = value as string
+        appState.selectedWeather(ctx, weather)
+        writeWeatherCookie(weather)
+      }),
       current: atom((ctx) =>
         weathers.find(d => d.value === ctx.spy(appState.selectedWeather)) ?? weathers[0]
       )

@@ -5,16 +5,9 @@ import { Typography } from "@/shared/ui/typography"
 import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants"
 import { getStaticObject } from "@/shared/lib/helpers"
 import { translate } from "@/shared/locales/helpers"
-import { appState } from "@/shared/models/app.model"
-import { useAtomAccessor } from "@/shared/lib/utils"
 import { BlockControls, BlockSubtitle, BlockTitle, useBlockHidden } from "@/shared/components/edit/section-block"
 
 const introImage = getStaticObject("arts", "server-status-widget.webp")
-
-const Weather = () => {
-  const data = useAtomAccessor(appState.selectedWeather)
-  return <div class={`weather ${data()} absolute z-1 w-full h-full top-0 right-0 left-0`} />
-}
 
 export const HeroSection = () => {
   const hidden = useBlockHidden("hero")
@@ -34,7 +27,6 @@ export const HeroSection = () => {
         bg-[linear-gradient(180deg,rgba(13,13,13,.5)_0%,rgba(13,13,13,.88)_65%,rgba(13,13,13,.95)_100%)]
         lg:bg-[linear-gradient(90deg,rgba(13,13,13,.92)_0%,rgba(13,13,13,.62)_45%,rgba(13,13,13,.12)_100%)]"
           />
-          <Weather />
         </div>
         <div class="flex items-center justify-start responsive z-1 mx-auto h-full">
           <div
