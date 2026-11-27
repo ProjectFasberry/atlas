@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { Show, type Accessor } from "solid-js";
 import { useData } from "vike-solid/useData";
 import { MainWrapperPage } from "@/shared/ui/main-wrapper";
 import { JoinSection } from "./(components)/join";
@@ -20,12 +20,30 @@ import { EditableSections } from "@/shared/components/edit/editable-sections";
 import { EditProvider } from "@/shared/components/edit/edit-provider";
 import type { Data } from "./+data";
 
-export default reatomComponent(({ ctx }) => {
-  const pageData = useData<Data>()
+const Edit = reatomComponent<{ pageData: Data, editing: Accessor<boolean> }>(({ ctx, ...props }) => {
   const editContent = useAtomAccessor(siteEdit.content)
-  const editing = useAtomAccessor(siteEdit.active)
 
-  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData?.content))
+  siteEdit.setPublishedBlocks(ctx, asBlocks(props.pageData?.content))
+
+  return (
+    <>
+      <EditableSections
+        sections={props.editing() && editContent()
+          ? editContent()!.sections
+          : asSectionsContent(props.pageData.content)}
+        editing={props.editing()}
+      />
+      <EditEntry canEdit={Boolean(props.pageData?.canEdit)} />
+      <Show when={props.editing()}>
+        <EditToolbar />
+      </Show>
+    </>
+  )
+})
+
+export default function Page() {
+  const pageData = useData<Data>()
+  const editing = useAtomAccessor(siteEdit.active)
 
   return (
     <MainWrapperPage
@@ -52,16 +70,7 @@ export default reatomComponent(({ ctx }) => {
       <CommunitySection />
       <FaqSection />
       <SocialsSection />
-      <EditableSections
-        sections={editing() && editContent()
-          ? editContent()!.sections
-          : asSectionsContent(pageData.content)}
-        editing={editing()}
-      />
-      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
-      <Show when={editing()}>
-        <EditToolbar />
-      </Show>
+      <Edit editing={editing} pageData={pageData} />
     </MainWrapperPage>
   )
-}, "LandingPage")
+}

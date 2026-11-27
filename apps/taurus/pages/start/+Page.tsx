@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { Show, type Accessor } from "solid-js";
 import { useData } from "vike-solid/useData";
 import { MainWrapperPage } from "@/shared/ui/main-wrapper";
 import { Typography } from "@/shared/ui/typography";
@@ -41,14 +41,31 @@ const stepImageVariant = tv({
   base: `flex justify-center sm:justify-end items-center w-full sm:w-1/3`
 })
 
-export default reatomComponent(({ ctx }) => {
+const Edit = reatomComponent<{ pageData: Data, editing: Accessor<boolean> }>(({ ctx, ...props }) => {
+  const content = useAtomAccessor(siteEdit.content)
+
+  siteEdit.setPublishedBlocks(ctx, asBlocks(props.pageData.content))
+
+  return (
+    <>
+      <EditableSections
+        sections={props.editing() && content()?.kind === "sections"
+          ? content()!.sections
+          : asSectionsContent(props.pageData.content)}
+        editing={props.editing()}
+      />
+      <EditEntry canEdit={Boolean(props.pageData?.canEdit)} />
+      <Show when={props.editing()}>
+        <EditToolbar />
+      </Show>
+    </>
+  )
+})
+
+export default function Page() {
   const pageData = useData<Data>()
   const editing = useAtomAccessor(siteEdit.active)
-
-  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.content))
-
   const heroHidden = useBlockHidden("start-hero")
-
 
   return (
     <MainWrapperPage class={editing() ? "pb-24" : undefined}>
@@ -170,16 +187,7 @@ export default reatomComponent(({ ctx }) => {
         </div>
       </div>
       </Show>
-      <EditableSections
-        sections={editing() && ctx.get(siteEdit.content)?.kind === "sections"
-          ? ctx.get(siteEdit.content)!.sections
-          : asSectionsContent(pageData.content)}
-        editing={editing()}
-      />
-      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
-      <Show when={editing()}>
-        <EditToolbar />
-      </Show>
+      <Edit pageData={pageData} editing={editing} />
     </MainWrapperPage>
   )
-}, "StartPage")
+}
