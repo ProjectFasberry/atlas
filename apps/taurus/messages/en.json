@@ -16,7 +16,7 @@
   "servers": {
     "page": {
       "title": "Project Servers",
-      "description": "Fasberry modes: RP, RPG and survival - pick your server and start playing."
+      "description": "Fasberry modes: RP, RPG and survival - pick a server and start playing. Address: play.fasberry.fun."
     },
     "status": {
       "online": "{count} online",

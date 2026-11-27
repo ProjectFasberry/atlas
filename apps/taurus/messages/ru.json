@@ -16,7 +16,7 @@
   "servers": {
     "page": {
       "title": "Серверы проекта",
-      "description": "Режимы Fasberry: RP, RPG и выживание - выбери сервер и начни играть."
+      "description": "Режимы Fasberry: RP, RPG и выживание - выбери сервер и начни играть. Адрес: play.fasberry.fun."
     },
     "status": {
       "online": "{count} онлайн",
