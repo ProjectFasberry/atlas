@@ -95,6 +95,14 @@ export async function data(pageCtx: PageContextServer) {
 
   let rows: RatingData | null = null
 
+  // The toolbar and its options do not depend on the table request: keep them
+  // in the snapshot even when the rows fail, so filters never pop in later.
+  const ctx = createCtx()
+  ratingsGroups(ctx, groups)
+  ratingsState.filters.server(ctx, ratingsFilters.server)
+  ratingsState.filters.by(ctx, ratingsFilters.type)
+  ratingsState.filters.asc(ctx, ratingsFilters.asc)
+
   try {
     const page = await fetchRatings(
       ratingsFilters.type,
@@ -104,18 +112,14 @@ export async function data(pageCtx: PageContextServer) {
 
     rows = page.data.length === 0 ? null : page.data as RatingData
 
-    const ctx = createCtx()
-    ratingsGroups(ctx, groups)
     ratingsState.data(ctx, rows)
     ratingsState.meta(ctx, page.meta)
-    ratingsState.filters.server(ctx, ratingsFilters.server)
-    ratingsState.filters.by(ctx, ratingsFilters.type)
-    ratingsState.filters.asc(ctx, ratingsFilters.asc)
     ratingsState.loaded(ctx, true)
-    pageCtx.snapshot = snapshots.merge(ctx, pageCtx)
   } catch {
-    // Search engines still get the metadata and the static copy.
+    // The table shows its own error and retry state on the client.
   }
+
+  pageCtx.snapshot = snapshots.merge(ctx, pageCtx)
 
   config(metadata(typeLabel, serverLabel, canonical.toString(), rows ?? []))
 
