@@ -2,6 +2,7 @@ import { pageState } from "@/shared/models/page.model";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { layoutSettings } from "../settings/settings.model";
 import { getLocale, setLocale, type Locale } from "@/paraglide/runtime";
+import { env } from "@/shared/env";
 import { translate } from "@/shared/locales/helpers";
 import { tv } from "tailwind-variants";
 import { For, Show } from "solid-js";
@@ -125,6 +126,13 @@ export const HeaderDrawerContent = reatomComponent(({ ctx }) => {
           </Show>
         )}
       </For>
+      <a
+        href={env.VITE_APP_URL}
+        onClick={() => handleToPage(env.VITE_APP_URL)}
+        class={itemVariant()}
+      >
+        <Typography>{translate["header.links.account"]()}</Typography>
+      </a>
       <div
         class="mt-2 flex w-full items-center justify-between gap-4 border-2
           border-neutral-600 bg-neutral-800 px-2 py-2"

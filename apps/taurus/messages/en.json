@@ -100,7 +100,6 @@
   "header": {
     "menu": "Menu",
     "links": {
-      "home": "Home",
       "servers": "Servers",
       "gallery": "Gallery",
       "rules": "Rules",
@@ -109,7 +108,11 @@
       "map": "Map",
       "wiki": "Wiki",
       "modpack": "Modpack",
-      "game": "Game"
+      "play": "Play",
+      "world": "World",
+      "community": "Community",
+      "discord": "Discord",
+      "telegram": "Telegram"
     }
   },
   "footer": {

@@ -100,7 +100,6 @@
   "header": {
     "menu": "Меню",
     "links": {
-      "home": "Главная",
       "servers": "Серверы",
       "gallery": "Галерея",
       "rules": "Правила",
@@ -109,7 +108,11 @@
       "map": "Карта",
       "wiki": "Вики",
       "modpack": "Модпак",
-      "game": "Игра"
+      "play": "Играть",
+      "world": "Мир",
+      "community": "Сообщество",
+      "discord": "Discord",
+      "telegram": "Telegram"
     }
   },
   "footer": {

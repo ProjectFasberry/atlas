@@ -17,6 +17,9 @@ import { menuVariant } from "../../ui/menu";
 import { cn, useAtomAccessor } from "../../lib/utils";
 import { translate } from "../../locales/helpers";
 import { SettingsTrigger } from "../settings/settings";
+import { env } from "@/shared/env";
+
+const APP_URL = env.VITE_APP_URL;
 
 const bellImg = getStaticObject("minecraft/icons", "bell.webp");
 const bgImage = getStaticObject("minecraft/static", "cracked_polished_blacked.webp")
@@ -183,7 +186,13 @@ export const Header = () => {
           {(item) => <HeaderItemMenu {...item} />}
         </For>
       </div>
-      <div class="absolute top-3 right-16 z-60 hidden xl:block">
+      <div class="absolute top-3 right-16 z-60 hidden xl:flex items-center gap-4">
+        <Link
+          href={APP_URL}
+          class="text-sm font-medium text-neutral-200 duration-150 hover:text-white"
+        >
+          {translate["header.links.account"]()}
+        </Link>
         <SettingsTrigger />
       </div>
       <HeaderDrawer />

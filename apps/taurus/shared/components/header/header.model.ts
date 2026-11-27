@@ -16,18 +16,28 @@ export type MainHeaderLink = {
 }
 
 export const createMainHeaderLinks = () => ([
-  { name: translate["header.links.home"](), href: "/", },
-  { name: translate["header.links.servers"](), href: "/servers", },
-  { name: translate["header.links.rules"](), href: "/rules", },
-  { name: translate["header.links.support"](), href: "/support", class: "text-gold" },
-  { name: translate["header.links.gallery"](), href: "/gallery", },
   {
-    name: translate["header.links.game"](),
+    name: translate["header.links.play"](),
+    href: "/start",
+    class: "rounded-xl bg-green-700 px-3 py-1.5 text-neutral-50 hover:bg-green-600",
+  },
+  { name: translate["header.links.servers"](), href: "/servers", },
+  {
+    name: translate["header.links.world"](),
     childs: [
-      { name: translate["header.links.account"](), href: APP_URL, },
       { name: translate["header.links.map"](), href: `${APP_URL}/map`, },
       { name: translate["header.links.wiki"](), href: "https://wiki.fasberry.fun", },
+      { name: translate["header.links.gallery"](), href: "/gallery", },
       { name: translate["header.links.modpack"](), href: "/modpack", },
+    ],
+  },
+  {
+    name: translate["header.links.community"](),
+    childs: [
+      { name: translate["header.links.support"](), href: "/support", },
+      { name: translate["header.links.rules"](), href: "/rules", },
+      { name: translate["header.links.discord"](), href: "https://api.fasberry.fun/misc/discord", },
+      { name: translate["header.links.telegram"](), href: "https://api.fasberry.fun/misc/telegram", },
     ],
   },
 ]);
