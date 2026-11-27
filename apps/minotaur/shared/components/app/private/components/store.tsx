@@ -1,7 +1,9 @@
 import { DeleteButton, EditButton, SectionWrapper, LinkButton, sectionActionVariant } from "@/shared/components/app/private/components/ui"
 import {
-  itemToEditAtom, editStoreItem, editStoreItemState, deleteStoreItem, duplicateStoreItem,
-  storeState, storeItems, createStoreItem, createStoreItemState
+  itemToEditAtom, editStoreItem, editStoreItemState, editStoreItemAttemptedAtom, editStoreItemValidationAtom,
+  deleteStoreItem, duplicateStoreItem,
+  storeState, storeItems, createStoreItem, createStoreItemState,
+  type AdminStoreItemsParams
 } from "@/shared/components/app/private/models/store.model"
 import { EditorMenuBar } from "@/shared/components/config/editor/editor"
 import { action, atom, type AtomState, type Ctx, type CtxSpy } from "@reatom/framework"
@@ -70,6 +72,52 @@ const uploadLabel = ({ imageUploading, imgUrl }: { imageUploading: boolean, imgU
   if (imgUrl) return translate["panel.replace"]()
   return translate["panel.select-a-file"]()
 }
+
+const StoreImageField = ({ value, uploading, error, onFile, onClear }: {
+  value?: string | null
+  uploading: boolean
+  error?: string
+  onFile: (file: File) => void
+  onClear: () => void
+}) => (
+  <Field
+    label={translate["panel.picture"]()}
+    hint={translate["panel.png-jpeg-or-webp-up-to-2-mb"]()}
+    error={error}
+  >
+    <div className="flex flex-wrap items-center gap-2">
+      <label className="inline-flex h-10 items-center rounded-xl bg-neutral-800 px-4 text-sm cursor-pointer hover:bg-neutral-700">
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          className="hidden"
+          disabled={uploading}
+          onChange={(event) => {
+            const file = event.target.files?.[0]
+            if (file) onFile(file)
+            event.currentTarget.value = ""
+          }}
+        />
+        {uploadLabel({ imageUploading: uploading, imgUrl: value })}
+      </label>
+      {value && (
+        <>
+          <img
+            src={getStaticImage(value)}
+            alt=""
+            className="size-10 rounded-lg object-cover"
+          />
+          <Button
+            background="default"
+            className="h-10 px-3 text-xs"
+            onClick={onClear}
+          >
+            {translate["panel.remove"]()}</Button>
+        </>
+      )}
+    </div>
+  </Field>
+)
 
 const fieldError = (ctx: CtxSpy, field: string, errors: Record<string, string>) => {
   if (!ctx.spy(createAttemptedAtom) && !ctx.spy(createTouchedAtom).has(field)) return undefined
@@ -245,39 +293,13 @@ export const CreateItem = reatomComponent(({ ctx }) => {
           />
         </Field>
 
-        <Field
-          label={translate["panel.picture"]()}
-          hint={translate["panel.png-jpeg-or-webp-up-to-2-mb"]()}
+        <StoreImageField
+          value={imgUrl}
+          uploading={imageUploading}
           error={imageError ?? undefined}
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="inline-flex h-10 items-center rounded-xl bg-neutral-800 px-4 text-sm cursor-pointer hover:bg-neutral-700">
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-                disabled={imageUploading}
-                onChange={e => onFile(e.target.files?.[0])}
-              />
-              {uploadLabel({ imageUploading, imgUrl })}
-            </label>
-            {imgUrl && (
-              <>
-                <img
-                  src={getStaticImage(imgUrl)}
-                  alt=""
-                  className="size-10 rounded-lg object-cover"
-                />
-                <Button
-                  background="default"
-                  className="h-10 px-3 text-xs"
-                  onClick={() => createStoreItemState.imgUrl(ctx, null)}
-                >
-                  {translate["panel.remove"]()}</Button>
-              </>
-            )}
-          </div>
-        </Field>
+          onFile={(file) => onFile(file)}
+          onClear={() => createStoreItemState.imgUrl(ctx, null)}
+        />
 
         <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-neutral-400">{translate["panel.content-3"]()}</span>
@@ -405,9 +427,27 @@ const StoreItems = reatomComponent(({ ctx }) => {
   const data = ctx.spy(storeItems.fetch.dataAtom)?.data;
   if (!data) return null;
 
+  const meta = ctx.spy(storeItems.fetch.dataAtom)?.meta;
+  const loadingMore = ctx.spy(storeItems.loadMore.statusesAtom).isPending;
+
   return (
     <div className="flex flex-col gap-2 w-full h-full">
+      {!data.length && (
+        <Typography color="gray" className="text-sm">
+          {translate["panel.nothing-found"]()}
+        </Typography>
+      )}
       {data.map((item) => <StoreItem key={item.id} {...item} />)}
+      {meta?.hasNextPage && (
+        <Button
+          background="default"
+          className="h-9 w-fit self-center text-sm"
+          disabled={loadingMore}
+          onClick={() => storeItems.loadMore(ctx)}
+        >
+          {translate["panel.show-more"]()}
+        </Button>
+      )}
     </div>
   )
 }, "StoreItems")
@@ -457,48 +497,79 @@ const EditItem = reatomComponent(({ ctx }) => {
   const currencyCollection = createListCollection({ items: CURRENCY_ITEMS(ctx) })
   const typeCollection = createListCollection({ items: TYPE_ITEMS })
   const typeTitle = TYPE_ITEMS.find((item) => item.value === ctx.spy(editStoreItemState.type))?.title ?? ""
+  const validation = ctx.spy(editStoreItemValidationAtom)
+  const attempted = ctx.spy(editStoreItemAttemptedAtom)
+  const imageUploading = ctx.spy(editStoreItemState.imageUploading)
+  const imageError = ctx.spy(editStoreItemState.imageError)
+  const fieldError = (field: string) => attempted ? validation.errors[field] : undefined
 
   return (
     <div className="flex flex-col gap-3 w-full h-full">
-      <Typography className="text-2xl font-semibold">
-        {ctx.spy(editStoreItemState.title)}
-      </Typography>
-      <div className="flex overflow-hidden h-40">
-        <img
-          src={ctx.spy(editStoreItemState.imageUrl)}
-          alt=""
-          draggable={false}
-          className="object-cover w-auto h-full"
-        />
+      <div className="flex items-center justify-between gap-2">
+        <Typography className="text-2xl font-semibold truncate">
+          {ctx.spy(editStoreItemState.title)}
+        </Typography>
+        <span className="text-[11px] text-neutral-500">#{data.id}</span>
       </div>
-      <Input
-        value={ctx.spy(editStoreItemState.title)}
-        onChange={e => editStoreItemState.title(ctx, e.target.value)}
-        placeholder={translate["panel.title"]()}
+      <StoreImageField
+        value={ctx.spy(editStoreItemState.imageUrl)}
+        uploading={imageUploading}
+        error={imageError ?? undefined}
+        onFile={(file) => editStoreItem.uploadImage(ctx, file)}
+        onClear={() => editStoreItemState.imageUrl(ctx, "")}
       />
-      <Input
-        value={ctx.spy(editStoreItemState.value)}
-        onChange={e => editStoreItemState.value(ctx, e.target.value)}
-        placeholder={translate["panel.value"]()}
-      />
-      <Input
-        value={ctx.spy(editStoreItemState.command)}
-        onChange={e => editStoreItemState.command(ctx, e.target.value)}
-        placeholder={translate["panel.grant-command-2"]()}
-      />
-      <Input
-        value={ctx.spy(editStoreItemState.refundCmd) ?? ""}
-        onChange={e => editStoreItemState.refundCmd(ctx, e.target.value || null)}
-        placeholder={translate["panel.refund-command-optional"]()}
-      />
-      <div className="flex items-center gap-2 w-full">
+      <Field label={translate["panel.title-2"]()} required error={fieldError("title")}>
         <Input
-          value={ctx.spy(editStoreItemState.price)}
-          onChange={e => editStoreItemState.price(ctx, e.target.value)}
-          placeholder={translate["panel.price"]()}
-          type="number"
-          className="bg-transparent border border-neutral-800 text-sm h-8 w-fit"
+          value={ctx.spy(editStoreItemState.title)}
+          onChange={e => editStoreItemState.title(ctx, e.target.value)}
+          placeholder={translate["panel.title"]()}
         />
+      </Field>
+      <Field
+        label={translate["panel.description"]()}
+        hint={translate["panel.short-text-under-the-name-in-the-store"]()}
+      >
+        <textarea
+          value={ctx.spy(editStoreItemState.description) ?? ""}
+          onChange={e => editStoreItemState.description(ctx, e.target.value || null)}
+          placeholder={translate["panel.what-the-player-gets"]()}
+          className={textareaClass}
+        />
+      </Field>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Field label={translate["panel.value"]()} required error={fieldError("value")}>
+          <Input
+            value={ctx.spy(editStoreItemState.value)}
+            onChange={e => editStoreItemState.value(ctx, e.target.value)}
+            placeholder={translate["panel.value"]()}
+          />
+        </Field>
+        <Field label={translate["panel.price"]()} required error={fieldError("price")}>
+          <Input
+            value={ctx.spy(editStoreItemState.price)}
+            onChange={e => editStoreItemState.price(ctx, e.target.value)}
+            placeholder={translate["panel.price"]()}
+            type="number"
+            min={0}
+          />
+        </Field>
+      </div>
+      <Field label={translate["panel.grant-command"]()} error={fieldError("command")}>
+        <Input
+          value={ctx.spy(editStoreItemState.command)}
+          onChange={e => editStoreItemState.command(ctx, e.target.value)}
+          placeholder={translate["panel.grant-command-2"]()}
+        />
+      </Field>
+      <Field label={translate["panel.refund-command"]()}>
+        <Input
+          value={ctx.spy(editStoreItemState.refundCmd) ?? ""}
+          onChange={e => editStoreItemState.refundCmd(ctx, e.target.value || null)}
+          placeholder={translate["panel.refund-command-optional"]()}
+        />
+      </Field>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Field label={translate["panel.currency"]()} required>
         <Select.Root
           collection={currencyCollection}
           value={[ctx.spy(editStoreItemState.currency)]}
@@ -540,6 +611,8 @@ const EditItem = reatomComponent(({ ctx }) => {
           </Portal>
           <Select.HiddenSelect />
         </Select.Root>
+        </Field>
+        <Field label={translate["panel.type"]()} required>
         <Select.Root
           collection={typeCollection}
           value={[ctx.spy(editStoreItemState.type)]}
@@ -581,17 +654,28 @@ const EditItem = reatomComponent(({ ctx }) => {
           </Portal>
           <Select.HiddenSelect />
         </Select.Root>
+        </Field>
       </div>
       <div className="flex flex-col gap-4 rounded-lg border border-neutral-800 w-full p-2">
         <EditorMenuBar editor={editor} />
         <EditorContent editor={editor} />
       </div>
-      <Button
-        onClick={() => editStoreItem.submit(ctx, data.id)}
-        disabled={ctx.spy(editStoreItem.submit.statusesAtom).isPending}
-        className="bg-neutral-50 text-neutral-950 font-semibold text-lg self-end"
-      >
-        {translate["panel.apply"]()}</Button>
+      <div className="flex flex-col gap-1 items-end">
+        <Button
+          onClick={() => {
+            editStoreItemAttemptedAtom(ctx, true)
+            if (validation.valid) editStoreItem.submit(ctx, data.id)
+          }}
+          disabled={ctx.spy(editStoreItem.submit.statusesAtom).isPending || imageUploading}
+          className="bg-neutral-50 text-neutral-950 font-semibold text-lg"
+        >
+          {translate["panel.apply"]()}</Button>
+        {attempted && !validation.valid && (
+          <span className="text-[11px] text-red">
+            {translate["panel.fill-in-the-required-fields"]()}{Object.keys(validation.errors).join(", ")}
+          </span>
+        )}
+      </div>
     </div>
   )
 }, "EditItem")
@@ -626,11 +710,80 @@ const StoreHeader = reatomComponent(({ ctx }) => {
 
 const Components = reatomComponent(({ ctx }) => COMPONENTS[ctx.spy(storeState.searchParamTarget)], "Components")
 
-export const StorePrivated = () => {
+const STORE_CATEGORIES: { value: AdminStoreItemsParams["category"], title: () => string }[] = [
+  { value: "all", title: translate["panel.all"] },
+  { value: "donate", title: translate["panel.donation"] },
+  { value: "event", title: translate["panel.event"] },
+]
+
+const StoreFilters = reatomComponent(({ ctx }) => {
+  const category = ctx.spy(storeState.category)
+  const wallet = ctx.spy(storeState.wallet)
+  const searchQuery = ctx.spy(storeState.searchQuery)
+
+  const wallets: { value: AdminStoreItemsParams["wallet"], title: string }[] = [
+    { value: "ALL", title: translate["panel.all"]() },
+    ...CURRENCY_ITEMS(ctx).map((item) => ({
+      value: item.value as AdminStoreItemsParams["wallet"],
+      title: item.title,
+    })),
+  ]
+
+  const chip = (active: boolean) => active
+    ? "bg-neutral-50! text-neutral-950!"
+    : "bg-neutral-800"
+
+  return (
+    <div className="flex flex-col gap-2 w-full">
+      <Input
+        value={searchQuery}
+        placeholder={translate["panel.search-by-title"]()}
+        onChange={(event) => storeItems.search(ctx, event.target.value)}
+      />
+      <div className="flex flex-wrap items-center gap-1">
+        {STORE_CATEGORIES.map((item) => (
+          <Button
+            key={item.value}
+            background="default"
+            className={`h-7 rounded-lg px-3 text-xs ${chip(category === item.value)}`}
+            onClick={() => storeItems.setCategory(ctx, item.value)}
+          >
+            {item.title()}
+          </Button>
+        ))}
+        <span className="mx-1 h-5 w-px bg-neutral-800" />
+        {wallets.map((item) => (
+          <Button
+            key={item.value}
+            background="default"
+            className={`h-7 rounded-lg px-3 text-xs ${chip(wallet === item.value)}`}
+            onClick={() => storeItems.setWallet(ctx, item.value)}
+          >
+            {item.title}
+          </Button>
+        ))}
+        {(category !== "all" || wallet !== "ALL" || searchQuery.length > 0) && (
+          <Button
+            background="default"
+            className="h-7 rounded-lg px-3 text-xs bg-neutral-800"
+            onClick={() => storeItems.resetFilters(ctx)}
+          >
+            {translate["panel.reset-the-filters"]()}
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}, "StoreFilters")
+
+export const StorePrivated = reatomComponent(({ ctx }) => {
+  const target = ctx.spy(storeState.searchParamTarget)
+
   return (
     <Wrapper>
       <StoreHeader />
+      {target === "view" && <StoreFilters />}
       <Components />
     </Wrapper>
   )
-}
+}, "StorePrivated")

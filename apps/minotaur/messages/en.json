@@ -574,7 +574,8 @@
       }
     },
     "list": {
-      "empty": "No items available"
+      "empty": "No items available",
+      "load-more": "Show more"
     },
     "orders": {
       "status": {
@@ -1421,7 +1422,8 @@
   },
   "validation": {
     "command-value": "The command needs a value",
-    "command-starts": "The command must start with {parents}"
+    "command-starts": "The command must start with {parents}",
+    "price": "Price must be a whole number"
   },
   "panel": {
     "resourcepacks": "Resource packs",

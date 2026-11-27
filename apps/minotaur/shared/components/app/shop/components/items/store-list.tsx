@@ -1,4 +1,5 @@
 import { Typography } from "@/shared/ui/typography"
+import { Button } from "@/shared/ui/button"
 import { reatomComponent } from "@reatom/npm-react"
 import { storeItems, storeItemsState } from "../../models/store.model"
 import { getStaticImage } from "@/shared/lib/helpers"
@@ -28,19 +29,40 @@ export const StoreList = reatomComponent(({ ctx }) => {
   const data = ctx.spy(storeItemsState.data)
   if (!data || isEmptyArray(data)) return <ItemsNotFound />;
 
+  const meta = ctx.spy(storeItemsState.meta)
+  const isLoadingMore = ctx.spy(storeItems.loadMore.statusesAtom).isPending
+  const footer = meta?.hasNextPage ? (
+    <div className="flex w-full justify-center">
+      <Button
+        background="default"
+        className="h-9 px-4 text-sm"
+        disabled={isLoadingMore}
+        onClick={() => storeItems.loadMore(ctx)}
+      >
+        {translate["store.list.load-more"]()}
+      </Button>
+    </div>
+  ) : null
+
   const isList = ctx.spy(pageState.isClientside) && ctx.spy(appearanceState.storeView) === "list"
 
   if (isList) {
     return (
-      <div className="flex flex-col gap-2 w-full h-full">
-        {data.map(item => <StoreItemRow key={item.id} {...item} />)}
-      </div>
+      <>
+        <div className="flex flex-col gap-2 w-full h-full">
+          {data.map(item => <StoreItemRow key={item.id} {...item} />)}
+        </div>
+        {footer}
+      </>
     )
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 auto-rows-auto gap-2 lg:gap-4 w-full h-full">
-      {data.map(item => <StoreItem key={item.id} {...item} />)}
-    </div>
+    <>
+      <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 auto-rows-auto gap-2 lg:gap-4 w-full h-full">
+        {data.map(item => <StoreItem key={item.id} {...item} />)}
+      </div>
+      {footer}
+    </>
   )
 }, "StoreList")

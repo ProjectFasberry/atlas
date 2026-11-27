@@ -18,7 +18,8 @@ type StoreWallet = "CHARISM" | "BELKOIN" | "ALL"
 export type StoreItemsParams = {
   category: StoreCategory,
   wallet: StoreWallet,
-  searchQuery: string | undefined
+  searchQuery: string | undefined,
+  endCursor?: string
 }
 
 export type StoreItemsPayload = ExtractApiData<"getStoreItems">["data"]
@@ -112,6 +113,32 @@ export const storeItems = atom(null, "storeItems").pipe(
       name: `${name}.fetch`,
       onFulfill: (ctx, { data, meta }) => {
         storeItemsState.data(ctx, data)
+        storeItemsState.meta(ctx, meta)
+      },
+      onReject: (_, e) => logError(e)
+    }).pipe(
+      withStatusesAtom()
+    ),
+    loadMore: reatomAsync(async (ctx) => {
+      const meta = ctx.get(storeItemsState.meta)
+      if (!meta?.hasNextPage || !meta.endCursor) return null
+
+      const params: StoreItemsParams = {
+        category: ctx.get(storeItemsState.filters.category),
+        wallet: ctx.get(storeItemsState.filters.wallet),
+        searchQuery: ctx.get(storeItemsState.filters.searchQuery),
+        endCursor: meta.endCursor
+      }
+
+      return await ctx.schedule(() => getStoreItems(params, { signal: ctx.controller.signal }))
+    }, {
+      name: `${name}.loadMore`,
+      onFulfill: (ctx, payload) => {
+        if (!payload) return
+
+        const { data, meta } = payload
+        const current = ctx.get(storeItemsState.data) ?? []
+        storeItemsState.data(ctx, [...current, ...data])
         storeItemsState.meta(ctx, meta)
       },
       onReject: (_, e) => logError(e)

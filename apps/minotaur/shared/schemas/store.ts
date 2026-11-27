@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { editorFieldSchema, type JsonValue } from "./news";
-import { GAME_CURRENCIES, nullableStoreCommandSchema, storeItemSchema } from "./payment";
+import { GAME_CURRENCIES, nullableStoreCommandSchema, storeItemSchema, storePriceStringSchema } from "./payment";
 
 const fields = storeItemSchema.pick({
 	title: true,
@@ -44,7 +44,7 @@ export const storeItemEditSchema = z.array(
 export const storeItemCreateSchema = z.object({
 	title: z.string(),
 	description: z.string().nullable(),
-	price: z.string(),
+	price: storePriceStringSchema,
 	type: z.string(),
 	value: z.string(),
 	currency: z.enum(GAME_CURRENCIES),
