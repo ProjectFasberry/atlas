@@ -14,8 +14,8 @@ import { currentUserState } from "@/shared/models/current-user/index.model"
 import { SERVERS_UPDATE_PERMISSION } from "@/shared/consts/permissions"
 import { clientVersions, createOf, patchOf, publishedResourcePacks, serverEditor, servers, type ServerPayload } from "../models/servers.model"
 import { translate } from "@/shared/locales/helpers"
-import { Link } from "@/shared/components/config/link/link"
 import { DeleteButton } from "./ui"
+import { env } from "@/shared/env"
 
 const Flag = ({ active, label }: { active: boolean, label: string }) => (
   <span
@@ -220,12 +220,14 @@ export const Servers = reatomComponent(({ ctx }) => {
         <Typography color="gray" className="text-sm">
           {translate["panel.servers-flags-hint"]()}</Typography>
         <div className="flex items-center gap-2">
-          <Link
-            href="/private/site"
+          <a
+            href={`${env.VITE_LANDING_URL}/servers`}
+            target="_blank"
+            rel="noreferrer"
             className="flex h-8 items-center rounded-xl bg-neutral-800 px-3 text-sm
               text-neutral-50 duration-150 hover:bg-neutral-700"
           >
-            {translate["panel.servers-content"]()}</Link>
+            {translate["panel.servers-content"]()}</a>
           <Button
             background="positive"
             className="h-8 text-sm"

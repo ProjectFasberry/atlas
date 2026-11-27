@@ -81,6 +81,22 @@ export const SpawnCarousel = reatomComponent(({ ctx }) => {
                       />
                       <Button
                         class="shrink-0 px-2 py-1 text-[11px]"
+                        disabled={idx === 0}
+                        title={translate["edit.up"]()}
+                        onClick={() => siteEdit.moveSlide(ctx, idx, -1)}
+                      >
+                        ↑
+                      </Button>
+                      <Button
+                        class="shrink-0 px-2 py-1 text-[11px]"
+                        disabled={idx === images().length - 1}
+                        title={translate["edit.down"]()}
+                        onClick={() => siteEdit.moveSlide(ctx, idx, 1)}
+                      >
+                        ↓
+                      </Button>
+                      <Button
+                        class="shrink-0 px-2 py-1 text-[11px]"
                         onClick={() => siteEdit.removeSlide(ctx, idx)}
                       >
                         {translate["edit.remove"]()}

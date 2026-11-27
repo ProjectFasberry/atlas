@@ -56,7 +56,9 @@ navigation.
 Every editable page also carries `blocks` - overrides for its built-in sections
 (`{ title?, description?, hidden? }` keyed by ids such as `hero`, `news`,
 `support-faq`). Components render `BlockTitle`/`BlockSubtitle`/`BlockControls`,
-which fall back to their own translated copy; the panel lists the same ids.
+which fall back to their own translated copy; the controls also reset an
+override back to that copy. The home carousel is ordered in edit mode through
+`siteEdit.moveSlide`.
 
 Every editable page also carries ordered `sections` (`{ id, title, body, hidden }`):
 `EditableSections` renders them at the end of the page and, in edit mode, adds

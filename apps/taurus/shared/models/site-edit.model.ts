@@ -154,6 +154,15 @@ const toggleBlock = action((ctx, id: string) => {
   patch(ctx, { ...content, blocks: { ...content.blocks, [id]: { ...content.blocks[id], hidden: !hidden } } })
 }, "siteEdit.toggleBlock")
 
+const resetBlock = action((ctx, id: string) => {
+  const content = ctx.get(contentAtom)
+  if (!content || !Object.hasOwn(content.blocks, id)) return
+
+  const blocks = { ...content.blocks }
+  delete blocks[id]
+  patch(ctx, { ...content, blocks })
+}, "siteEdit.resetBlock")
+
 const setHomeSlide = action((ctx, index: number, value: Partial<EditSlide>) => {
   const content = ctx.get(contentAtom)
   if (content?.kind !== "home") return
@@ -177,6 +186,21 @@ const removeSlide = action((ctx, index: number) => {
 
   patch(ctx, { ...content, slides: content.slides.filter((_, idx) => idx !== index) })
 }, "siteEdit.removeSlide")
+
+const moveSlide = action((ctx, index: number, direction: -1 | 1) => {
+  const content = ctx.get(contentAtom)
+  if (content?.kind !== "home") return
+
+  const target = index + direction
+  if (target < 0 || target >= content.slides.length) return
+
+  const slides = [...content.slides]
+  const [slide] = slides.splice(index, 1)
+  if (!slide) return
+
+  slides.splice(target, 0, slide)
+  patch(ctx, { ...content, slides })
+}, "siteEdit.moveSlide")
 
 const setServersPage = action((ctx, value: { title?: string; description?: string }) => {
   const content = ctx.get(contentAtom)
@@ -481,6 +505,7 @@ export const siteEdit = {
   setHomeSlide,
   addSlide,
   removeSlide,
+  moveSlide,
   setServersPage,
   setServer,
   addFeature,
@@ -489,6 +514,7 @@ export const siteEdit = {
   setPublishedBlocks,
   setBlock,
   toggleBlock,
+  resetBlock,
   publishedBlocks: publishedBlocksAtom,
   addSection,
   setSection,

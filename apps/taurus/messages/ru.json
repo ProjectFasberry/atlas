@@ -557,6 +557,7 @@
     "redo": "Повторить",
     "nothing-to-discard": "Нет черновика для отката",
     "discard-error": "Не удалось откатить черновик",
-    "picker.bucket": "Бакет"
+    "picker.bucket": "Бакет",
+    "reset": "Сбросить"
   }
 }

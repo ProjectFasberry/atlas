@@ -17,10 +17,14 @@ function useBlockState(id: string) {
   const content = useAtomAccessor(siteEdit.content)
   const published = useAtomAccessor(siteEdit.publishedBlocks)
 
-  const override = (): EditBlock =>
-    (editing() ? content()?.blocks?.[id] : published()[id]) ?? {}
+  const source = () => editing() ? content()?.blocks : published()
+  const override = (): EditBlock => source()?.[id] ?? {}
+  const hasOverride = () => {
+    const blocks = source()
+    return Boolean(blocks && Object.hasOwn(blocks, id))
+  }
 
-  return { editing, override }
+  return { editing, override, hasOverride }
 }
 
 /** True only for visitors: editors keep seeing the hidden section to unhide it. */
@@ -86,11 +90,19 @@ export const BlockSubtitle = reatomComponent<{
 
 /** Hide/unhide a built-in section; rendered only in edit mode. */
 export const BlockControls = reatomComponent<{ id: string }>(({ ctx, id }) => {
-  const { editing, override } = useBlockState(id)
+  const { editing, override, hasOverride } = useBlockState(id)
 
   return (
     <Show when={editing()}>
       <div class="flex items-center gap-2">
+        <Show when={hasOverride()}>
+          <Button
+            class="px-2 py-1 text-[11px]"
+            onClick={() => siteEdit.resetBlock(ctx, id)}
+          >
+            {translate["edit.reset"]()}
+          </Button>
+        </Show>
         <Button
           class="px-2 py-1 text-[11px]"
           onClick={() => siteEdit.toggleBlock(ctx, id)}

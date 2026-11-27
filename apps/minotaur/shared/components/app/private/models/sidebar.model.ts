@@ -217,8 +217,7 @@ export type SidebarLink = { title: string, value: string, permissions: string[],
 
 export const sidebarLinks: SidebarLink[] = [
   { title: translate["panel.configuration"](), value: "/private/", permissions: [CONFIG_PANEL_READ_PERMISSION], icon: "sprite:settings" },
-  { title: translate["panel.content"](), value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "tasks.create", "tasks.update", "tasks.delete", LANDS_READ_PERMISSION, RULES_READ_PERMISSION], icon: "sprite:category" },
-  { title: translate["panel.site"](), value: "/private/site", permissions: [CONTENT_READ_PERMISSION], icon: "sprite:device-desktop" },
+  { title: translate["panel.content"](), value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "tasks.create", "tasks.update", "tasks.delete", LANDS_READ_PERMISSION, RULES_READ_PERMISSION, CONTENT_READ_PERMISSION], icon: "sprite:category" },
   { title: translate["panel.store"](), value: "/private/store", permissions: [STORE_ITEM_READ_PERMISSION], icon: "sprite:building-store" },
   { title: translate["panel.player"](), value: "/private/users", permissions: [PLAYERS_READ_PERMISSION], icon: "sprite:user-circle" },
   { title: translate["panel.moderation"](), value: "/private/moderation", permissions: [TEAM_APPLICATIONS_READ_PERMISSION, HISTORY_READ_PERMISSION], icon: "sprite:shield-half" },
