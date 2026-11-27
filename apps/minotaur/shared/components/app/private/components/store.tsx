@@ -386,9 +386,13 @@ const StoreItem = reatomComponent<StoreItemProps>(({ ctx, imageUrl, description,
         px-2 sm:px-4 py-2 w-full h-18 rounded-lg
       "
     >
-      <div className="flex items-center gap-2 overflow-hidden">
-        <img src={imageUrl} alt="" className="hidden sm:block object-cover min-h-10 min-w-10 h-10 w-10" />
-        <div className="flex flex-col min-w-0 w-full">
+      <div className="flex min-w-0 items-center gap-2 overflow-hidden">
+        <img
+          src={imageUrl}
+          alt=""
+          className="hidden size-10 min-h-10 min-w-10 rounded-lg bg-neutral-800 object-contain sm:block"
+        />
+        <div className="flex min-w-0 w-full flex-col">
           <Typography className="text-nowrap truncate ">
             {title}
           </Typography>
@@ -396,6 +400,14 @@ const StoreItem = reatomComponent<StoreItemProps>(({ ctx, imageUrl, description,
             {description}
           </Typography>
         </div>
+      </div>
+      <div className="hidden shrink-0 flex-col items-end gap-0.5 sm:flex">
+        <span className="text-sm font-semibold tabular-nums">
+          {base.price} {getCurrencyTitle(ctx, base.currency)}
+        </span>
+        <span className="rounded-md bg-neutral-800 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-neutral-400">
+          {TYPE_ITEMS.find((item) => item.value === base.type)?.title ?? base.type}
+        </span>
       </div>
       <div className="flex items-center gap-2 h-full w-fit">
         <div className="flex items-center border border-neutral-800 p-1 rounded-lg gap-1">
@@ -438,7 +450,20 @@ const StoreItems = reatomComponent(({ ctx }) => {
   }
 
   const error = ctx.spy(storeItems.fetch.errorAtom)
-  if (error) return <ErrorBlock title={error.message} />
+  if (error) {
+    return (
+      <div className="flex flex-col items-start gap-2">
+        <ErrorBlock title={error.message} />
+        <Button
+          background="default"
+          className="h-8 text-sm"
+          onClick={() => storeItems.fetch(ctx)}
+        >
+          {translate["panel.retry"]()}
+        </Button>
+      </div>
+    )
+  }
 
   const data = ctx.spy(storeItems.fetch.dataAtom)?.data;
   if (!data) return null;
@@ -446,15 +471,33 @@ const StoreItems = reatomComponent(({ ctx }) => {
   const meta = ctx.spy(storeItems.fetch.dataAtom)?.meta;
   const loadingMore = ctx.spy(storeItems.loadMore.statusesAtom).isPending;
   const fetching = ctx.spy(storeItems.fetch.statusesAtom).isPending;
+  const canCreate = ctx.spy(currentUserState.perms).includes("store.item.create")
 
   return (
     <div className="flex flex-col gap-2 w-full h-full">
-      {!data.length && (
-        <Typography color="gray" className="text-sm">
-          {translate["panel.nothing-found"]()}
-        </Typography>
+      {!data.length ? (
+        <div className="flex flex-col items-center gap-3 py-8">
+          <Typography color="gray" className="text-sm">
+            {translate["panel.nothing-found"]()}
+          </Typography>
+          {canCreate && (
+            <Button
+              background="positive"
+              className="h-9 px-4 text-sm"
+              onClick={() => navigate("/private/store?target=create")}
+            >
+              {translate["panel.create"]()}
+            </Button>
+          )}
+        </div>
+      ) : (
+        <>
+          <span className="text-[11px] text-neutral-500">
+            {translate["panel.store-loaded"]({ count: data.length })}
+          </span>
+          {data.map((item) => <StoreItem key={item.id} {...item} />)}
+        </>
       )}
-      {data.map((item) => <StoreItem key={item.id} {...item} />)}
       {meta?.hasNextPage && (
         <Button
           background="default"
@@ -707,6 +750,7 @@ const StoreHeader = reatomComponent(({ ctx }) => {
   const title = ctx.spy(headerTitleAtom);
   const styles = sectionActionVariant({ state: "default" })
   const canCreate = ctx.spy(currentUserState.perms).includes("store.item.create")
+  const target = ctx.spy(storeState.searchParamTarget)
 
   return (
     <div className="flex items-center justify-between gap-1 w-full">
@@ -715,13 +759,23 @@ const StoreHeader = reatomComponent(({ ctx }) => {
           {title}
         </Typography>
       </div>
-      {canCreate && (
+      {target === "view" ? (
+        canCreate && (
+          <Button
+            onClick={() => navigate("/private/store?target=create")}
+            className={styles.root()}
+          >
+            <Typography className={styles.label()}>{translate["panel.create"]()}</Typography>
+            <Icon name="sprite:plus" className={styles.icon()} />
+          </Button>
+        )
+      ) : (
         <Button
-          onClick={() => navigate("/private/store?target=create")}
-          className={styles.root()}
+          background="default"
+          className="h-9 px-3 text-sm"
+          onClick={() => navigate("/private/store")}
         >
-          <Typography className={styles.label()}>{translate["panel.create"]()}</Typography>
-          <Icon name="sprite:plus" className={styles.icon()} />
+          {translate["panel.back-to-store"]()}
         </Button>
       )}
     </div>
@@ -755,11 +809,25 @@ const StoreFilters = reatomComponent(({ ctx }) => {
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Input
-        value={searchQuery}
-        placeholder={translate["panel.search-by-title"]()}
-        onChange={(event) => storeItems.search(ctx, event.target.value)}
-      />
+      <div className="relative flex items-center">
+        <Input
+          value={searchQuery}
+          className="pr-9"
+          placeholder={translate["panel.search-by-title"]()}
+          onChange={(event) => storeItems.search(ctx, event.target.value)}
+        />
+        {searchQuery.length > 0 && (
+          <button
+            type="button"
+            aria-label={translate["panel.clear"]()}
+            className="absolute right-2 flex size-7 items-center justify-center rounded-lg
+              text-neutral-400 duration-150 hover:bg-neutral-700 hover:text-neutral-100"
+            onClick={() => storeItems.search(ctx, "")}
+          >
+            <Icon name="sprite:x" className="size-4" />
+          </button>
+        )}
+      </div>
       <div className="flex flex-wrap items-center gap-1">
         {STORE_CATEGORIES.map((item) => (
           <Button

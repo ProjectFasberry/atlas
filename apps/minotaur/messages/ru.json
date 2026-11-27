@@ -1943,7 +1943,9 @@
     "faq-saved": "Вопрос сохранён",
     "faq-save-error": "Не удалось сохранить вопрос",
     "faq-deleted": "Вопрос удалён",
-    "faq-delete-error": "Не удалось удалить вопрос"
+    "faq-delete-error": "Не удалось удалить вопрос",
+    "store-loaded": "Загружено: {count}",
+    "back-to-store": "К списку"
   },
   "wallet": {
     "title": "Кошелёк",
