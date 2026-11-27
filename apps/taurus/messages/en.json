@@ -5,7 +5,7 @@
     "description": "A cozy Minecraft project with a friendly atmosphere and welcoming players!\nJoin your friends and chill together!",
     "action-text": "Start playing",
     "online": "{count} playing now",
-    "simple": "First time? Download the launcher — it sets everything up. You can also join with your password."
+    "simple": "First time? Download the launcher — it sets everything up. You can also join play.fasberry.fun with your password."
   },
   "features": {
     "title": "What the project offers",
@@ -204,7 +204,7 @@
     "eyebrow": "Support",
     "heading": "How to help the project",
     "description": "You can help without money: with a vote, a link, or help with the wiki and art.",
-    "share-text": "Check out this cozy server",
+    "share-text": "Check out this cozy project",
     "cards": {
       "vote": {
         "title": "Vote",
@@ -290,7 +290,7 @@
       "steps": {
         "title": "How to start playing",
         "luckily-game": "Have a great game!",
-        "download": "Play through the Fasberry launcher: it picks the version, mods and textures for you. A third-party launcher works too — sign in with your password.",
+        "download": "Play through the Fasberry launcher: it picks the version, mods and textures for you. A third-party launcher works too: play.fasberry.fun, sign in with your password.",
         "download-windows": "Download for Windows",
         "download-macos": "Download for macOS",
         "download-hint": "Windows 10/11 x64. macOS is not available yet."
@@ -304,8 +304,8 @@
   },
   "pages": {
     "index": {
-      "title": "Minecraft server Fasberry",
-      "description": "Fasberry is a Minecraft project with vanilla survival, SMP and RP modes. Join through the Fasberry launcher or a third-party client with your password: servers, cities, events and a friendly community."
+      "title": "Minecraft project Fasberry",
+      "description": "Fasberry is a Minecraft project with vanilla survival, SMP and RP modes. Join through the Fasberry launcher or a third-party client with your password: several servers, cities, events and a friendly community."
     },
     "gallery": {
       "title": "Gallery",
@@ -317,13 +317,13 @@
     },
     "global": {
       "description": "The official page of the Fasberry Minecraft project. Different servers and modes. Play through the Fasberry launcher or with your password.",
-      "description-global": "How many top Minecraft servers do you know? Now you know one more.",
-      "site_name": "Official website of the Fasberry Minecraft server."
+      "description-global": "How many top Minecraft projects do you know? Now you know one more.",
+      "site_name": "Official website of the Fasberry Minecraft project."
     },
     "rules": {
       "title": "Rules",
-      "description": "Read the rules of our Fasberry server to ensure a fair and friendly game for all participants. Respect other players and follow the established code of conduct.",
-      "description-additional": "Rules of our Fasberry server for comfortable gameplay. Follow the established standards and maintain a friendly atmosphere!"
+      "description": "Read the rules of the Fasberry project to ensure a fair and friendly game for all participants. Respect other players and follow the established code of conduct.",
+      "description-additional": "Rules of the Fasberry project for comfortable gameplay. Follow the established standards and maintain a friendly atmosphere!"
     },
     "status": {
       "title": "Server status",
@@ -340,7 +340,7 @@
     },
     "support": {
       "title": "Support",
-      "description": "Help develop the Fasberry project by supporting us! Your contribution will go toward developing servers, improving the gaming experience, and creating unique content for players."
+      "description": "Help develop the Fasberry project by supporting us! Your contribution will go toward developing the project, improving the gaming experience, and creating unique content for players."
     },
     "start-play": {
       "title": "Start Playing",
@@ -377,7 +377,7 @@
       "early-sunset": "Early sunset"
     },
     "info": {
-      "title": "Shot on the server",
+      "title": "Shot in game",
       "description": "Every shot is from the game. Send yours in Discord.",
       "action": "To Discord"
     },
@@ -386,7 +386,9 @@
       "prev": "Previous shot",
       "next": "Next shot",
       "close": "Close"
-    }
+    },
+    "loading": "Loading more...",
+    "retry": "Could not load. Retry"
   },
   "credits": {
     "title": "Credits",
@@ -482,7 +484,7 @@
   "join": {
     "eyebrow": "Getting in",
     "title": "Three steps to your first day",
-    "description": "A launcher and an account are the easiest path. A third-party launcher works too: sign in with your password.",
+    "description": "A launcher and an account are the easiest path. A third-party launcher works too: play.fasberry.fun, sign in with your password.",
     "action-windows": "Download for Windows",
     "action-macos": "Download for macOS",
     "action-guide": "Full guide",
@@ -497,7 +499,7 @@
       },
       "3": {
         "title": "Join the server",
-        "description": "Launch the app and pick a server."
+        "description": "Launch the app and pick a server. Without the launcher, connect to play.fasberry.fun."
       }
     },
     "status": {
@@ -511,7 +513,7 @@
   },
   "news": {
     "title": "What is new",
-    "subtitle": "Project, server and wiki updates",
+    "subtitle": "Project and wiki updates",
     "action": "All news",
     "read": "Read",
     "empty": "No news yet — the freshest stuff lives in Discord",
@@ -536,7 +538,7 @@
       },
       "gallery": {
         "title": "Gallery",
-        "description": "Screenshots and moments from the server"
+        "description": "Screenshots and moments from the game"
       }
     }
   },
@@ -546,7 +548,7 @@
     "items": {
       "1": {
         "question": "Do I need the launcher to play?",
-        "answer": "We recommend the Fasberry launcher: it downloads the version, mods and updates. Without it you can join from any 1.20.1+ client with your password."
+        "answer": "We recommend the Fasberry launcher: it downloads the version, mods and updates. Without it, join play.fasberry.fun from any 1.20.1+ client with your password."
       },
       "2": {
         "question": "Which Minecraft version do I need?",
@@ -555,7 +557,7 @@
       },
       "3": {
         "question": "Is it free to play?",
-        "answer": "Yes, joining the server is free."
+        "answer": "Yes, playing is free."
       },
       "4": {
         "question": "Where do I report a problem?",

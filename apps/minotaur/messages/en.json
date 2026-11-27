@@ -153,7 +153,7 @@
       "title": "Authorization",
       "description": "Join the best Minecraft project. Registration on the Fasberry project",
       "heading": "Fasberry account",
-      "subheading": "Sign in or create an account to play and manage your purchases.",
+      "subheading": "Sign in or create an account to play and manage your purchases. Server address: play.fasberry.fun.",
       "brand-title": "Welcome!",
       "brand-description": "Join the Fasberry community: play, chat and grow with us.",
       "online": "playing now",
@@ -298,10 +298,10 @@
   },
   "ratings": {
     "page": {
-      "title": "Server rankings",
+      "title": "Project rankings",
       "description": "Current player rankings across different categories"
     },
-    "title": "Server rankings",
+    "title": "Project rankings",
     "caption": "Leaderboard",
     "columns": {
       "rank": "#",
@@ -527,7 +527,7 @@
   "store": {
     "page": {
       "title": "Store",
-      "description": "Support our Fasberry server by purchasing ranks, unique items, and in-game currency. Enhance your gameplay and help the project grow!"
+      "description": "Support the Fasberry project by purchasing ranks, unique items, and in-game currency. Enhance your gameplay and help the project grow!"
     },
     "title": "Store",
     "buy": "Buy",
@@ -1178,7 +1178,7 @@
       "title_user": "Your adventure continues",
       "title_guest": "A world you build yourself",
       "text_user": "Tasks, referrals and your land - all in one place. Join the game or catch up on the news.",
-      "text_guest": "Survival, lands, events and a friendly community. Start in a couple of minutes - all you need is a nickname and a password.",
+      "text_guest": "Survival, lands, events and a friendly community. Start in a couple of minutes: all you need is a nickname, a password and play.fasberry.fun.",
       "online": "{count} online",
       "play": "How to play",
       "register": "Create an account",
@@ -1214,7 +1214,7 @@
       "one_title": "Create an account",
       "one_text": "A nickname and a password are all you need.",
       "two_title": "Install the launcher (recommended)",
-      "two_text": "The launcher picks the server version. Without it, join from a 1.20.1+ client and check the server version.",
+      "two_text": "The launcher picks the server version. Without it, join play.fasberry.fun from a 1.20.1+ client and check the version in the list.",
       "three_title": "Open the launcher",
       "three_text": "Sign in with your account and pick a server."
     },
@@ -1231,10 +1231,10 @@
     "faq": {
       "title": "FAQ",
       "q1": "Do I need a Minecraft license?",
-      "a1": "No license is needed: a nickname and a password are enough. The launcher makes signing in easier.",
+      "a1": "No license is needed: a nickname, a password and play.fasberry.fun are enough. The launcher makes signing in easier.",
       "q2": "Which versions are supported?",
       "a2": "The launcher picks the server version. The server list and current versions are on the site.",
-      "q3": "Is the server paid?",
+      "q3": "Is playing paid?",
       "a3": "Playing is free. Donating speeds up progress but gives no combat advantage.",
       "q4": "What are lands?",
       "a4": "Your own protected territory with members and stats - the core of survival.",
