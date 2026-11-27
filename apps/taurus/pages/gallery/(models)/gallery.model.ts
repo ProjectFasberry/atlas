@@ -1,100 +1,148 @@
-import { action, atom, withAssign } from "@reatom/framework";
-import { getCommunityFolder } from "@/shared/const/folders";
+import { action, atom, reatomAsync, withAbort, withErrorAtom, withStatusesAtom } from "@reatom/framework";
+import { getLocale } from "@/paraglide/runtime";
 import { translate } from "@/shared/locales/helpers";
+import {
+  fetchGallery,
+  type GalleryApiItem, type GalleryCounts, type GalleryFilter, type GalleryPage, type GalleryTag,
+} from "@/shared/api/gallery";
 
-export type GalleryTag = "nature" | "cities" | "events" | "builds"
-export type GalleryFilter = "all" | GalleryTag
+export type { GalleryApiItem as GalleryItem, GalleryFilter, GalleryTag };
 
-export type GalleryItem = {
-  key: string
-  tag: GalleryTag
-  title: () => string
-  /**
-   * Absolute URL served by the API route. While the gallery is still static the
-   * field is empty and `galleryItemSrc` falls back to the volume folder; once
-   * the API returns links, only this list has to change.
-   */
-  src?: string
-  /** Smaller rendition for the grid; the lightbox always uses `src`. */
-  thumb?: string
-}
+const EMPTY_COUNTS: GalleryCounts = { all: 0, nature: 0, cities: 0, events: 0, builds: 0 };
 
-/** Bundled fallback list; the API replaces it once the dynamic gallery lands. */
-export const GALLERY_ITEMS: GalleryItem[] = [
-  { key: "moon", tag: "nature", title: () => translate["gallery.items.moon"]() },
-  { key: "sunset", tag: "nature", title: () => translate["gallery.items.sunset"]() },
-  { key: "market", tag: "cities", title: () => translate["gallery.items.market"]() },
-  { key: "duck", tag: "builds", title: () => translate["gallery.items.duck"]() },
-  { key: "dragon_dead", tag: "events", title: () => translate["gallery.items.dragon"]() },
-  { key: "hills", tag: "nature", title: () => translate["gallery.items.hills"]() },
-  { key: "market_seller", tag: "cities", title: () => translate["gallery.items.seller"]() },
-  { key: "offenburg", tag: "cities", title: () => translate["gallery.items.offenburg"]() },
-  { key: "night", tag: "cities", title: () => translate["gallery.items.night"]() },
-  { key: "water_sand", tag: "nature", title: () => translate["gallery.items.shore"]() },
-  { key: "early_sunset", tag: "nature", title: () => translate["gallery.items.early-sunset"]() }
-]
+/** API links are absolute; the grid takes a smaller rendition, the lightbox the full one. */
+export const galleryItemSrc = (item: GalleryApiItem, variant: "full" | "thumb" = "full") =>
+  variant === "thumb" ? item.thumb : item.src;
 
 /**
- * The image an item should render. API URLs win; the static volume keeps the
- * page working until the gallery endpoint returns its own links.
+ * Seeded items keep their caption in paraglide, editor-created ones carry text.
+ * The id is the last resort, so a broken translation never hides an image.
  */
-export const galleryItemSrc = (item: GalleryItem, variant: "full" | "thumb" = "full") =>
-  (variant === "thumb" ? item.thumb : item.src) ?? getCommunityFolder(item.key)
+export const galleryItemTitle = (item: GalleryApiItem) => {
+  if (item.title) return item.title;
+
+  const messages = translate as unknown as Record<string, (() => string) | undefined>;
+  const message = item.titleKey ? messages[item.titleKey] : undefined;
+
+  return message?.() ?? item.id;
+};
 
 export const galleryTagLabel = (tag: GalleryTag) => {
   switch (tag) {
     case "nature":
-      return translate["gallery.tags.nature"]()
+      return translate["gallery.tags.nature"]();
     case "cities":
-      return translate["gallery.tags.cities"]()
+      return translate["gallery.tags.cities"]();
     case "events":
-      return translate["gallery.tags.events"]()
+      return translate["gallery.tags.events"]();
     case "builds":
-      return translate["gallery.tags.builds"]()
+      return translate["gallery.tags.builds"]();
   }
-}
+};
 
-export const galleryState = atom(null, "galleryState").pipe(
-  withAssign((_, name) => ({
-    items: atom<GalleryItem[]>(GALLERY_ITEMS, `${name}.items`),
-    filter: atom<GalleryFilter>("all", `${name}.filter`),
-    selected: atom<number | null>(null, `${name}.selected`)
-  }))
+/*
+ * Gallery list state.
+ *
+ * The cursor protocol lives here, not in the component: the page only observes
+ * a sentinel and calls `loadMoreGallery`, so resets, guards and appends are the
+ * same for any list view built on top of this model.
+ */
+
+/** Page data the atoms were seeded from; a new object means a new route visit. */
+export const gallerySource = atom<GalleryPage | null>(null, "gallerySource")
+export const galleryItems = atom<GalleryApiItem[]>([], "galleryItems")
+export const galleryCounts = atom<GalleryCounts>(EMPTY_COUNTS, "galleryCounts")
+export const galleryFilter = atom<GalleryFilter>("all", "galleryFilter")
+export const galleryCursor = atom<string | null>(null, "galleryCursor")
+export const galleryHasNext = atom(false, "galleryHasNext")
+export const gallerySelected = atom<number | null>(null, "gallerySelected")
+
+export const galleryFetch = reatomAsync(async (ctx) => {
+  const filter = ctx.get(galleryFilter)
+
+  return await fetchGallery({
+    locale: getLocale(),
+    tag: filter === "all" ? undefined : filter as GalleryTag,
+    // A reset clears the cursor first, so a missing cursor is the reset signal.
+    cursor: ctx.get(galleryCursor) ?? undefined,
+  })
+}, {
+  name: "galleryFetch",
+  onFulfill: (ctx, page: GalleryPage) => {
+    const isReset = ctx.get(galleryCursor) === null
+    const previous = ctx.get(galleryItems)
+
+    galleryItems(ctx, isReset ? page.data : [...previous, ...page.data])
+    galleryCounts(ctx, page.meta.counts)
+    galleryCursor(ctx, page.meta.nextCursor)
+    galleryHasNext(ctx, page.meta.hasNextPage)
+  },
+}).pipe(
+  withStatusesAtom(),
+  withErrorAtom(),
+  withAbort(),
 )
 
-/** Feeds the gallery from the API; an empty list keeps the bundled items. */
-export const setGalleryItems = action(
-  (ctx, items: GalleryItem[]) => galleryState.items(ctx, items.length > 0 ? items : GALLERY_ITEMS),
-  "setGalleryItems"
-)
+/** Seed from the route data; repeat renders with the same object keep the state. */
+export const initGallery = action((ctx, page: GalleryPage | null) => {
+  if (ctx.get(gallerySource) === page) return;
 
-export const setGalleryFilter = action(
-  (ctx, value: GalleryFilter) => galleryState.filter(ctx, value),
-  "setGalleryFilter"
-)
+  gallerySource(ctx, page);
+  galleryItems(ctx, page?.data ?? []);
+  galleryCounts(ctx, page?.meta.counts ?? EMPTY_COUNTS);
+  galleryCursor(ctx, page?.meta.nextCursor ?? null);
+  galleryHasNext(ctx, Boolean(page?.meta.hasNextPage));
+  galleryFilter(ctx, "all");
+  gallerySelected(ctx, null);
+}, "initGallery");
 
-export const openGallery = action(
-  (ctx, index: number) => galleryState.selected(ctx, index),
-  "openGallery"
-)
+export const selectGalleryFilter = action((ctx, value: GalleryFilter) => {
+  if (ctx.get(galleryFilter) === value) return;
 
-export const closeGallery = action(
-  (ctx) => galleryState.selected(ctx, null),
-  "closeGallery"
-)
+  galleryFilter(ctx, value);
+  gallerySelected(ctx, null);
+  galleryItems(ctx, []);
+  galleryCursor(ctx, null);
+  galleryHasNext(ctx, false);
+
+  galleryFetch(ctx);
+}, "selectGalleryFilter");
+
+/** Called by the sentinel observer; all guards and the cursor live here. */
+export const loadMoreGallery = action((ctx) => {
+  if (ctx.get(galleryFetch.statusesAtom).isPending) return;
+  if (!ctx.get(galleryHasNext) || !ctx.get(galleryCursor)) return;
+
+  galleryFetch(ctx);
+}, "loadMoreGallery");
+
+/** First page failed: the retry either starts over or continues the list. */
+export const retryGallery = action((ctx) => {
+  if (ctx.get(galleryFetch.statusesAtom).isPending) return;
+
+  galleryFetch(ctx);
+}, "retryGallery");
+
+export const openGallery = action((ctx, index: number) => {
+  gallerySelected(ctx, index);
+}, "openGallery");
+
+export const closeGallery = action((ctx) => {
+  gallerySelected(ctx, null);
+}, "closeGallery");
 
 export const nextGallery = action((ctx) => {
-  const current = ctx.get(galleryState.selected)
-  const total = ctx.get(galleryState.items).length
-  if (current === null || total === 0) return
+  const current = ctx.get(gallerySelected);
+  const total = ctx.get(galleryItems).length;
+  if (current === null || total === 0) return;
 
-  galleryState.selected(ctx, (current + 1) % total)
-}, "nextGallery")
+  gallerySelected(ctx, (current + 1) % total);
+}, "nextGallery");
 
 export const prevGallery = action((ctx) => {
-  const current = ctx.get(galleryState.selected)
-  const total = ctx.get(galleryState.items).length
-  if (current === null || total === 0) return
+  const current = ctx.get(gallerySelected);
+  const total = ctx.get(galleryItems).length;
+  if (current === null || total === 0) return;
 
-  galleryState.selected(ctx, (current - 1 + total) % total)
-}, "prevGallery")
+  gallerySelected(ctx, (current - 1 + total) % total);
+}, "prevGallery");

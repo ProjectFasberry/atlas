@@ -2472,6 +2472,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/site/gallery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get landing gallery */
+        get: operations["getSiteGallery"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/site/access": {
         parameters: {
             query?: never;
@@ -10070,6 +10087,59 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    getSiteGallery: {
+        parameters: {
+            query?: {
+                locale?: "ru" | "en";
+                tag?: "nature" | "cities" | "events" | "builds";
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            /**
+                             * @default nature
+                             * @enum {string}
+                             */
+                            tag: "nature" | "cities" | "events" | "builds";
+                            title: (string | null) | null;
+                            titleKey: (string | null) | null;
+                            src: string;
+                            thumb: string;
+                            width: (number | null) | null;
+                            height: (number | null) | null;
+                            createdAt: (string | null) | null;
+                        }[];
+                        meta: {
+                            total: number;
+                            hasNextPage: boolean;
+                            nextCursor: (string | null) | null;
+                            counts: {
+                                all: number;
+                                nature: number;
+                                cities: number;
+                                events: number;
+                                builds: number;
+                            };
+                        };
                     };
                 };
             };

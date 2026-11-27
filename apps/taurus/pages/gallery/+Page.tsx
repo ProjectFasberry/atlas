@@ -8,10 +8,14 @@ import { sectionVariant, sectionVariantChild } from "@/shared/styles/variants";
 import { getStaticObject } from "@/shared/lib/helpers";
 import { translate } from "@/shared/locales/helpers";
 import { GalleryGrid } from "./(components)/gallery-grid";
+import { useData } from "vike-solid/useData";
+import type { Data } from "./+data";
 
 const url = getStaticObject("arts", "adventure-in-blossom.jpg")
 
 export default function GalleryPage() {
+  const pageData = useData<Data>()
+
   return (
     <MainWrapperPage variant="with_section">
       <div
@@ -41,7 +45,7 @@ export default function GalleryPage() {
       </div>
       <div class="full-screen-section py-16 lg:py-24">
         <div class="responsive mx-auto">
-          <GalleryGrid />
+          <GalleryGrid initial={pageData.gallery} />
         </div>
       </div>
     </MainWrapperPage>
