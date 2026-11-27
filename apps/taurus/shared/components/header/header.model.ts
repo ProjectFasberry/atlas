@@ -16,11 +16,7 @@ export type MainHeaderLink = {
 }
 
 export const createMainHeaderLinks = () => ([
-  {
-    name: translate["header.links.play"](),
-    href: "/start",
-    class: "rounded-xl bg-green-700 px-3 py-1.5 text-neutral-50 hover:bg-green-600",
-  },
+  { name: translate["header.links.play"](), href: "/start", },
   { name: translate["header.links.servers"](), href: "/servers", },
   {
     name: translate["header.links.world"](),
