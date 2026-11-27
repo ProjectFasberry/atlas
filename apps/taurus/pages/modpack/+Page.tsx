@@ -1,4 +1,4 @@
-import { Show, type Accessor } from "solid-js";
+import { Show } from "solid-js";
 import { useData } from "vike-solid/useData";
 import { MainWrapperPage } from "@/shared/ui/main-wrapper";
 import { translate } from "@/shared/locales/helpers";
@@ -16,32 +16,14 @@ import { ModpackFaq } from "./(components)/modpack-faq";
 import { reatomComponent } from "@/shared/lib/reatom";
 import { useAtomAccessor } from "@/shared/lib/utils";
 
-const Edit = reatomComponent<{ pageData: Data, editing: Accessor<boolean> }>(({ ctx, ...props }) => {
-  const content = useAtomAccessor(siteEdit.content)
-
-  siteEdit.setPublishedBlocks(ctx, asBlocks(props.pageData.sections))
-
-  return (
-    <>
-      <EditableSections
-        sections={props.editing() && content()?.kind === "sections"
-          ? content()!.sections
-          : asSectionsContent(props.pageData.sections)}
-        editing={props.editing()}
-      />
-      <EditEntry canEdit={Boolean(props.pageData?.canEdit)} />
-      <Show when={props.editing()}>
-        <EditToolbar />
-      </Show>
-    </>
-  )
-})
-
-export default function Page() {
+export default reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
   const data = pageData?.data
   const failed = pageData?.failed
   const editing = useAtomAccessor(siteEdit.active)
+
+  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.sections))
+
 
   return (
     <MainWrapperPage variant="with_section" class={editing() ? "pb-24" : undefined}>
@@ -64,7 +46,16 @@ export default function Page() {
           <ModpackFaq />
         </div>
       </div>
-      <Edit pageData={pageData} editing={editing} />
+      <EditableSections
+        sections={editing() && ctx.get(siteEdit.content)?.kind === "sections"
+          ? ctx.get(siteEdit.content)!.sections
+          : asSectionsContent(pageData.sections)}
+        editing={editing()}
+      />
+      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
+      <Show when={editing()}>
+        <EditToolbar />
+      </Show>
     </MainWrapperPage>
   )
-}
+}, "ModpackPage")

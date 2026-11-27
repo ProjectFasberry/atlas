@@ -1,4 +1,4 @@
-import { Show, type Accessor } from "solid-js";
+import { Show } from "solid-js";
 import { useData } from "vike-solid/useData";
 import { Link } from "@/shared/components/link";
 import { Button } from "@/shared/ui/button";
@@ -23,31 +23,14 @@ import type { Data } from "./+data";
 
 const bgImage = getStaticObject("backgrounds", "support_background.png");
 
-const Edit = reatomComponent<{ pageData: Data, editing: Accessor<boolean> }>(({ ctx, ...props }) => {
-  const content = useAtomAccessor(siteEdit.content)
-
-  siteEdit.setPublishedBlocks(ctx, asBlocks(props.pageData.content))
-
-  return (
-    <>
-      <EditableSections
-        sections={props.editing() && content()?.kind === "sections"
-          ? content()!.sections
-          : asSectionsContent(props.pageData.content)}
-        editing={props.editing()}
-      />
-      <EditEntry canEdit={Boolean(props.pageData?.canEdit)} />
-      <Show when={props.editing()}>
-        <EditToolbar />
-      </Show>
-    </>
-  )
-})
-
-export default function Page() {
+export default reatomComponent(({ ctx }) => {
   const pageData = useData<Data>()
   const editing = useAtomAccessor(siteEdit.active)
+
+  siteEdit.setPublishedBlocks(ctx, asBlocks(pageData.content))
+
   const heroHidden = useBlockHidden("support-hero")
+
 
   return (
     <MainWrapperPage variant="with_section" class={editing() ? "pb-24" : undefined}>
@@ -98,7 +81,16 @@ export default function Page() {
       <div id="support-list" class="full-screen-section py-16 lg:py-24">
         <SupportContent />
       </div>
-      <Edit pageData={pageData} editing={editing} />
+      <EditableSections
+        sections={editing() && ctx.get(siteEdit.content)?.kind === "sections"
+          ? ctx.get(siteEdit.content)!.sections
+          : asSectionsContent(pageData.content)}
+        editing={editing()}
+      />
+      <EditEntry canEdit={Boolean(pageData?.canEdit)} />
+      <Show when={editing()}>
+        <EditToolbar />
+      </Show>
     </MainWrapperPage>
   )
-}
+}, "SupportPage")
