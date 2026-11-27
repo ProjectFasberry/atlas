@@ -8,7 +8,7 @@ import { Typography } from "@/shared/ui/typography"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { storeItemState } from "../../models/store-item.model"
 import { cart, cartContainsItemAtom } from "../../models/store-cart.model"
-import { ItemPrice, ItemSelectToCart } from "../items/store-item"
+import { ItemPrice } from "../items/store-item"
 import { translate } from "@/shared/locales/helpers"
 
 const FEATURES = [
@@ -65,7 +65,7 @@ const ItemBuyNow = reatomComponent<{ className: string }>(({ ctx, className }) =
   }
 
   return (
-    <Button background="white" className={className} onClick={buyNow}>
+    <Button background="positive" className={className} onClick={buyNow}>
       {inCart ? translate["store.item.checkout"]() : translate["store.item.buy-now"]()}
     </Button>
   )
@@ -100,10 +100,7 @@ export const ItemPurchase = reatomComponent(({ ctx }) => {
           {translate["store.item.vat-included"]()}
         </span>
       </div>
-      <div className="flex flex-col gap-2">
-        <ItemBuyNow className="h-10 w-full font-semibold" />
-        <ItemSelectToCart id={data.id} />
-      </div>
+      <ItemBuyNow className="h-10 w-full font-semibold" />
       <ItemFeatures />
       <ItemShare />
     </div>

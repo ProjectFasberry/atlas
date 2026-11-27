@@ -29,8 +29,9 @@ import { getStaticImage } from "@/shared/lib/helpers"
 import { currentUserState } from "@/shared/models/current-user/index.model"
 import { createStoreItemValidationAtom } from "@/shared/components/app/private/models/store.model"
 import { translate } from "@/shared/locales/helpers"
+import { GAME_CURRENCIES } from "@/shared/schemas/payment"
 
-const currencyValues = ["CHARISM", "BELKOIN"];
+const currencyValues = [...GAME_CURRENCIES];
 const getCurrencyTitle = (ctx: Ctx, val: string) => getFromDictionary(ctx, val)
 
 const CURRENCY_ITEMS = (ctx: Ctx) => currencyValues.map((value) => ({
