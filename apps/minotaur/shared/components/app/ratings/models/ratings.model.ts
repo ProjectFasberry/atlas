@@ -26,6 +26,13 @@ export async function fetchRatingList(): Promise<RatingItem[]> {
     .then((items) => items ?? [])
 }
 
+/** Groups (servers and their rating types) shown by the toolbar. Persisted in
+ * the SSR snapshot, so the filters exist in the first HTML, not after fetch. */
+export const ratingsGroups = atom<RatingItem[] | null>(null, "ratingsGroups").pipe(
+  withReset(),
+  withSsr("ratingsGroups"),
+)
+
 export const ratingsState = atom(null, "ratingsState").pipe(
   withAssign((_, name) => ({
     data: atom<RatingsPayload["data"] | null>(null, `${name}.data`).pipe(withReset(), withSsr(`${name}.data`)),
@@ -33,9 +40,9 @@ export const ratingsState = atom(null, "ratingsState").pipe(
     loaded: atom(false, `${name}.loaded`).pipe(withSsr(`${name}.loaded`)),
     filters: atom(null, `${name}.filters`).pipe(
       withAssign((_, name) => ({
-        by: atom<RatingType>(DEFAULT_RATINGS_PREFERENCES.type, `${name}.by`),
-        server: atom<Maybe<string>>(undefined, `${name}.server`),
-        asc: atom(false, `${name}.asc`),
+        by: atom<RatingType>(DEFAULT_RATINGS_PREFERENCES.type, `${name}.by`).pipe(withSsr(`${name}.filters.by`)),
+        server: atom<Maybe<string>>(undefined, `${name}.server`).pipe(withSsr(`${name}.filters.server`)),
+        asc: atom(false, `${name}.asc`).pipe(withSsr(`${name}.filters.asc`)),
         endCursor: atom<Maybe<string>>(undefined, `${name}.endCursor`).pipe(withReset())
       }))
     )
@@ -142,7 +149,9 @@ ratingIsViewAtom.onChange((ctx, state) => {
 export const rating = atom(null, "rating").pipe(
   withAssign((_, name) => ({
     fetch: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => fetchRatingList())
+      const groups = await ctx.schedule(() => fetchRatingList())
+      ratingsGroups(ctx, groups)
+      return groups
     }, `${name}.fetch`).pipe(
       withDataAtom(null),
       withCache({ swr: false }),

@@ -12,7 +12,7 @@ import {
 } from "@/shared/ui/table";
 import { Typography } from "@/shared/ui/typography";
 import { currentUserState } from "@/shared/models/current-user/index.model";
-import { rating, ratings, ratingsState, RatingsViewer } from "../models/ratings.model";
+import { ratings, ratingsGroups, ratingsState, RatingsViewer } from "../models/ratings.model";
 import { getRatingTypeLabel, getServerLabel, type RatingType } from "../labels";
 import { formatDuration, formatNumber } from "../format";
 import { translate } from "@/shared/locales/helpers";
@@ -366,12 +366,12 @@ const sortItems = [
 ];
 
 const RatingsToolbar = reatomComponent(({ ctx }) => {
-  const groups = ctx.spy(rating.fetch.dataAtom) ?? [];
+  const groups = ctx.spy(ratingsGroups) ?? [];
   const currentServer = ctx.spy(ratingsState.filters.server);
   const currentType = ctx.spy(ratingsState.filters.by);
   const asc = ctx.spy(ratingsState.filters.asc);
 
-  if (!groups.length) return null;
+  if (!groups.length) return <RatingsToolbarSkeleton />;
 
   const group = groups.find((item) => item.key === currentServer) ?? groups[0];
   const activeType = group?.childs.some((child) => child.value === currentType)

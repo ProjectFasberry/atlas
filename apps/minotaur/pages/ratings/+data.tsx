@@ -7,7 +7,7 @@ import { translate } from '@/shared/locales/helpers'
 import { env } from "@/shared/env"
 import { createCtx } from "@reatom/framework"
 import { snapshots } from "@/shared/models/ssr"
-import { fetchRatingList, fetchRatings, ratingsState } from "@/shared/components/app/ratings/models/ratings.model"
+import { fetchRatingList, fetchRatings, ratingsGroups, ratingsState } from "@/shared/components/app/ratings/models/ratings.model"
 import { type RatingItem } from "@/shared/components/app/ratings/types"
 import { getRatingTypeLabel, getServerLabel } from "@/shared/components/app/ratings/labels"
 import { parsePreferencesSearch, resolvePreferences } from "@/shared/components/app/ratings/preferences"
@@ -105,6 +105,7 @@ export async function data(pageCtx: PageContextServer) {
     rows = page.data.length === 0 ? null : page.data as RatingData
 
     const ctx = createCtx()
+    ratingsGroups(ctx, groups)
     ratingsState.data(ctx, rows)
     ratingsState.meta(ctx, page.meta)
     ratingsState.filters.server(ctx, ratingsFilters.server)
