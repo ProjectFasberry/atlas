@@ -8,6 +8,7 @@ import { Typography } from "@/shared/ui/typography"
 import { Icon } from "@/shared/ui/icon"
 import { pageState } from "@/shared/models/page-context.model"
 import { translate } from "@/shared/locales/helpers"
+import { getLocale } from "@/paraglide/runtime"
 
 const frameClassName = "relative min-h-[420px] w-full flex-1 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900"
 
@@ -40,6 +41,17 @@ export const MapFrame = reatomComponent(({ ctx }) => {
   const server = data.find((item) => item.value === selected) ?? data[0]
   if (!server) return <MapFrameEmpty />
 
+  // Keep the embedded UI in the site language instead of the map default.
+  const src = (() => {
+    try {
+      const url = new URL(server.href, window.location.origin)
+      url.searchParams.set("lang", getLocale())
+      return url.toString()
+    } catch {
+      return server.href
+    }
+  })()
+
   return (
     <div className={frameClassName}>
       {!isClientside ? (
@@ -51,11 +63,10 @@ export const MapFrame = reatomComponent(({ ctx }) => {
         </div>
       ) : (
         <iframe
-          src={server.href}
+          src={src}
           title={translate["map.frameTitle"]({ server: server.name })}
           className="absolute inset-0 size-full border-0"
           allow="fullscreen"
-          allowFullScreen
         />
       )}
     </div>
