@@ -114,7 +114,7 @@ export const SectionWrapper = ({ className, ...props }: HTMLAttributes<HTMLDivEl
 
 export const sectionActionVariant = tv({
   slots: {
-    root: "h-6 min-w-6 gap-2",
+    root: "h-8 min-w-8 gap-1.5 py-0",
     label: "text-sm font-semibold",
     icon: "size-4"
   },

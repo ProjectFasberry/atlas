@@ -456,7 +456,7 @@ const StoreItems = reatomComponent(({ ctx }) => {
         <ErrorBlock title={error.message} />
         <Button
           background="default"
-          className="h-8 text-sm"
+          className="h-8 py-0 text-sm"
           onClick={() => storeItems.fetch(ctx)}
         >
           {translate["panel.retry"]()}
@@ -483,7 +483,7 @@ const StoreItems = reatomComponent(({ ctx }) => {
           {canCreate && (
             <Button
               background="positive"
-              className="h-9 px-4 text-sm"
+              className="h-9 px-4 py-0 text-sm"
               onClick={() => navigate("/private/store?target=create")}
             >
               {translate["panel.create"]()}
@@ -501,7 +501,7 @@ const StoreItems = reatomComponent(({ ctx }) => {
       {meta?.hasNextPage && (
         <Button
           background="default"
-          className="h-9 w-fit self-center text-sm"
+          className="h-9 w-fit self-center py-0 text-sm"
           disabled={loadingMore || fetching}
           onClick={() => storeItems.loadMore(ctx)}
         >
@@ -772,7 +772,7 @@ const StoreHeader = reatomComponent(({ ctx }) => {
       ) : (
         <Button
           background="default"
-          className="h-9 px-3 text-sm"
+          className="h-9 px-3 py-0 text-sm"
           onClick={() => navigate("/private/store")}
         >
           {translate["panel.back-to-store"]()}
@@ -833,7 +833,7 @@ const StoreFilters = reatomComponent(({ ctx }) => {
           <Button
             key={item.value}
             background="default"
-            className={`h-7 rounded-lg px-3 text-xs ${chip(category === item.value)}`}
+            className={`h-7 rounded-lg px-3 py-0 text-xs ${chip(category === item.value)}`}
             onClick={() => storeItems.setCategory(ctx, item.value)}
           >
             {item.title()}
@@ -844,7 +844,7 @@ const StoreFilters = reatomComponent(({ ctx }) => {
           <Button
             key={item.value}
             background="default"
-            className={`h-7 rounded-lg px-3 text-xs ${chip(wallet === item.value)}`}
+            className={`h-7 rounded-lg px-3 py-0 text-xs ${chip(wallet === item.value)}`}
             onClick={() => storeItems.setWallet(ctx, item.value)}
           >
             {item.title}
@@ -853,7 +853,7 @@ const StoreFilters = reatomComponent(({ ctx }) => {
         {(category !== "all" || wallet !== "ALL" || searchQuery.length > 0) && (
           <Button
             background="default"
-            className="h-7 rounded-lg px-3 text-xs bg-neutral-800"
+            className="h-7 rounded-lg px-3 py-0 text-xs bg-neutral-800"
             onClick={() => storeItems.resetFilters(ctx)}
           >
             {translate["panel.reset-the-filters"]()}
