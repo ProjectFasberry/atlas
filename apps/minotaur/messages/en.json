@@ -2009,8 +2009,7 @@
     "faq-saved": "Question saved",
     "faq-save-error": "Could not save the question",
     "faq-deleted": "Question deleted",
-    "faq-delete-error": "Could not delete the question",
-    "faq-delete-confirm": "Delete this question?"
+    "faq-delete-error": "Could not delete the question"
   },
   "wallet": {
     "title": "Wallet",

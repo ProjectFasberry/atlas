@@ -221,11 +221,7 @@ const FaqList = reatomComponent(({ ctx }) => {
           pending={pending}
           onChange={(patch) => faqPanel.editDraft(ctx, row.id, patch)}
           onSave={() => faqPanel.saveDraft(ctx, row.id)}
-          onDelete={() => {
-            if (window.confirm(translate["panel.faq-delete-confirm"]())) {
-              faqPanel.remove(ctx, row.id)
-            }
-          }}
+          onDelete={() => faqPanel.deleteBefore(ctx, row)}
         />
       ))}
     </div>

@@ -10,14 +10,12 @@ export type { GalleryApiItem as GalleryItem, GalleryFilter, GalleryTag };
 
 const EMPTY_COUNTS: GalleryCounts = { all: 0, nature: 0, cities: 0, events: 0, builds: 0 };
 
-/** API links are absolute; the grid takes a smaller rendition, the lightbox the full one. */
+/** Start the next page this many slides before the end of the loaded list. */
+const PREFETCH_DISTANCE = 4;
+
 export const galleryItemSrc = (item: GalleryApiItem, variant: "full" | "thumb" = "full") =>
   variant === "thumb" ? item.thumb : item.src;
 
-/**
- * Seeded items keep their caption in paraglide, editor-created ones carry text.
- * The id is the last resort, so a broken translation never hides an image.
- */
 export const galleryItemTitle = (item: GalleryApiItem) => {
   if (item.title) return item.title;
 
@@ -40,15 +38,6 @@ export const galleryTagLabel = (tag: GalleryTag) => {
   }
 };
 
-/*
- * Gallery list state.
- *
- * The cursor protocol lives here, not in the component: the page only observes
- * a sentinel and calls `loadMoreGallery`, so resets, guards and appends are the
- * same for any list view built on top of this model.
- */
-
-/** Page data the atoms were seeded from; a new object means a new route visit. */
 export const gallerySource = atom<GalleryPage | null>(null, "gallerySource")
 export const galleryItems = atom<GalleryApiItem[]>([], "galleryItems")
 export const galleryCounts = atom<GalleryCounts>(EMPTY_COUNTS, "galleryCounts")
@@ -83,7 +72,6 @@ export const galleryFetch = reatomAsync(async (ctx) => {
   withAbort(),
 )
 
-/** Seed from the route data; repeat renders with the same object keep the state. */
 export const initGallery = action((ctx, page: GalleryPage | null) => {
   if (ctx.get(gallerySource) === page) return;
 
@@ -108,7 +96,6 @@ export const selectGalleryFilter = action((ctx, value: GalleryFilter) => {
   galleryFetch(ctx);
 }, "selectGalleryFilter");
 
-/** Called by the sentinel observer; all guards and the cursor live here. */
 export const loadMoreGallery = action((ctx) => {
   if (ctx.get(galleryFetch.statusesAtom).isPending) return;
   if (!ctx.get(galleryHasNext) || !ctx.get(galleryCursor)) return;
@@ -116,7 +103,6 @@ export const loadMoreGallery = action((ctx) => {
   galleryFetch(ctx);
 }, "loadMoreGallery");
 
-/** First page failed: the retry either starts over or continues the list. */
 export const retryGallery = action((ctx) => {
   if (ctx.get(galleryFetch.statusesAtom).isPending) return;
 
@@ -127,9 +113,9 @@ export const openGallery = action((ctx, index: number) => {
   gallerySelected(ctx, index);
 
   // The carousel can be dragged past the loaded page: fetch the rest before
-  // the user reaches the last slide, not after the list dead-ends.
+  // the user reaches the end, not after the list dead-ends.
   const total = ctx.get(galleryItems).length;
-  if (ctx.get(galleryHasNext) && index >= total - 2) loadMoreGallery(ctx);
+  if (ctx.get(galleryHasNext) && index >= total - PREFETCH_DISTANCE) loadMoreGallery(ctx);
 }, "openGallery");
 
 export const closeGallery = action((ctx) => {
@@ -141,6 +127,13 @@ export const nextGallery = action((ctx) => {
   const total = ctx.get(galleryItems).length;
   if (current === null || total === 0) return;
 
+  // At the last loaded slide, wait for the next page instead of wrapping.
+  if (current >= total - 1 && ctx.get(galleryHasNext)) {
+    loadMoreGallery(ctx);
+    return;
+  }
+
+  if (current >= total - PREFETCH_DISTANCE) loadMoreGallery(ctx);
   gallerySelected(ctx, (current + 1) % total);
 }, "nextGallery");
 

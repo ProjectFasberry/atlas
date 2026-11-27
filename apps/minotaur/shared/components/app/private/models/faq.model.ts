@@ -1,6 +1,7 @@
 import { action, atom, reatomAsync, withErrorAtom, withStatusesAtom } from "@reatom/framework"
 import { toast } from "sonner"
 import { client } from "@/shared/lib/client-wrapper"
+import { alertDialog } from "@/shared/components/config/alert-dialog/alert-dialog.model"
 import { logError } from "@/shared/lib/log"
 import { translate } from "@/shared/locales/helpers"
 import type { paths } from "@/shared/types/gen/api/main.schema"
@@ -124,7 +125,6 @@ const setLocale = action((ctx, value: FaqLocale) => {
   fetch(ctx)
 }, "faqPanel.setLocale")
 
-/** Inline editing keeps every keystroke in one record; no component state. */
 const editDraft = action((ctx, id: string, patch: Partial<FaqDraft>) => {
   const drafts = ctx.get(draftsAtom)
   draftsAtom(ctx, {
@@ -163,6 +163,13 @@ const editNewDraft = action((ctx, patch: Partial<FaqDraft>) => {
   newDraftAtom(ctx, { ...ctx.get(newDraftAtom), ...patch })
 }, "faqPanel.editNewDraft")
 
+const deleteBefore = action((ctx, row: FaqRow) => {
+  alertDialog.open(ctx, {
+    title: translate["panel.confirm-delete"]({ title: row.question }),
+    onConfirm: () => remove(ctx, row.id),
+  })
+}, "faqPanel.deleteBefore")
+
 const submitCreate = action((ctx) => {
   const draft = ctx.get(newDraftAtom)
   if (!draft.question.trim() || !draft.answer.trim()) return
@@ -191,6 +198,7 @@ export const faqPanel = {
   remove,
   setScope,
   setLocale,
+  deleteBefore,
   editDraft,
   saveDraft,
   startCreate,

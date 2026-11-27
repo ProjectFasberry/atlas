@@ -2009,8 +2009,7 @@
     "faq-saved": "Вопрос сохранён",
     "faq-save-error": "Не удалось сохранить вопрос",
     "faq-deleted": "Вопрос удалён",
-    "faq-delete-error": "Не удалось удалить вопрос",
-    "faq-delete-confirm": "Удалить этот вопрос?"
+    "faq-delete-error": "Не удалось удалить вопрос"
   },
   "wallet": {
     "title": "Кошелёк",
