@@ -52,7 +52,7 @@ const HeaderDrawer = () => {
         aria-label={translate["header.menu"]()}
         aria-expanded={isOpenAtom()}
         aria-controls="header-menu"
-        class="xl:hidden absolute top-2 right-2 z-60 flex cursor-pointer items-center gap-1.5"
+        class="xl:hidden absolute top-2 right-4 z-60 flex cursor-pointer items-center gap-1.5"
       >
         <img
           src={chestStatusImage()}
