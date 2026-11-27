@@ -138,7 +138,11 @@ export const storeItems = atom(null, "storeItems").pipe(
 
         const { data, meta } = payload
         const current = ctx.get(storeItemsState.data) ?? []
-        storeItemsState.data(ctx, [...current, ...data])
+        const seen = new Set(current.map((item) => item.id))
+        storeItemsState.data(ctx, [
+          ...current,
+          ...data.filter((item) => !seen.has(item.id))
+        ])
         storeItemsState.meta(ctx, meta)
       },
       onReject: (_, e) => logError(e)

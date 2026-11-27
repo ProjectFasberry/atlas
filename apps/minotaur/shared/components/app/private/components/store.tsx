@@ -26,6 +26,7 @@ import { Select, createListCollection } from '@ark-ui/react/select'
 import { selectContentBaseStyle, selectVariant } from "@/shared/ui/select"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { getStaticImage } from "@/shared/lib/helpers"
+import { currentUserState } from "@/shared/models/current-user/index.model"
 import { createStoreItemValidationAtom } from "@/shared/components/app/private/models/store.model"
 import { translate } from "@/shared/locales/helpers"
 
@@ -73,6 +74,10 @@ const uploadLabel = ({ imageUploading, imgUrl }: { imageUploading: boolean, imgU
   return translate["panel.select-a-file"]()
 }
 
+/** Legacy rows may already store a full URL; new uploads store a `static` key. */
+const storeImageSrc = (value: string) =>
+  value.includes("https://") ? value : getStaticImage(value)
+
 const StoreImageField = ({ value, uploading, error, onFile, onClear }: {
   value?: string | null
   uploading: boolean
@@ -103,7 +108,7 @@ const StoreImageField = ({ value, uploading, error, onFile, onClear }: {
       {value && (
         <>
           <img
-            src={getStaticImage(value)}
+            src={storeImageSrc(value)}
             alt=""
             className="size-10 rounded-lg object-cover"
           />
@@ -314,7 +319,7 @@ export const CreateItem = reatomComponent(({ ctx }) => {
         <span className="text-xs font-medium uppercase tracking-wide text-neutral-500">
           {translate["panel.preview"]()}</span>
         <img
-          src={imgUrl ? getStaticImage(imgUrl) : getStaticImage("icons/adventure_icon.png")}
+          src={imgUrl ? storeImageSrc(imgUrl) : getStaticImage("icons/adventure_icon.png")}
           alt=""
           className="aspect-square w-full rounded-lg object-cover bg-neutral-800"
         />
@@ -368,6 +373,10 @@ const headerTitleAtom = atom((ctx) =>
 
 const StoreItem = reatomComponent<StoreItemProps>(({ ctx, imageUrl, description, title, id, ...base }) => {
   const item = { imageUrl, description, title, id, ...base }
+  const permissions = ctx.spy(currentUserState.perms)
+  const canCreate = permissions.includes("store.item.create")
+  const canUpdate = permissions.includes("store.item.update")
+  const canDelete = permissions.includes("store.item.delete")
 
   return (
     <div
@@ -392,19 +401,25 @@ const StoreItem = reatomComponent<StoreItemProps>(({ ctx, imageUrl, description,
           <LinkButton
             link={createLink("store", id)}
           />
-          <EditButton
-            onClick={() => navigate(`/private/store?target=edit&id=${id}`)}
-          />
-          <Button
-            className="p-0! h-6! w-6! aspect-square bg-neutral-800 hover:bg-neutral-700"
-            title={translate["panel.duplicate"]()}
-            onClick={() => duplicateStoreItem(ctx, id)}
-          >
-            <Icon name="sprite:copy" className="size-4" />
-          </Button>
-          <DeleteButton
-            onClick={() => deleteStoreItem.before(ctx, item)}
-          />
+          {canUpdate && (
+            <EditButton
+              onClick={() => navigate(`/private/store?target=edit&id=${id}`)}
+            />
+          )}
+          {canCreate && canUpdate && (
+            <Button
+              className="p-0! h-6! w-6! aspect-square bg-neutral-800 hover:bg-neutral-700"
+              title={translate["panel.duplicate"]()}
+              onClick={() => duplicateStoreItem(ctx, id)}
+            >
+              <Icon name="sprite:copy" className="size-4" />
+            </Button>
+          )}
+          {canDelete && (
+            <DeleteButton
+              onClick={() => deleteStoreItem.before(ctx, item)}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -429,6 +444,7 @@ const StoreItems = reatomComponent(({ ctx }) => {
 
   const meta = ctx.spy(storeItems.fetch.dataAtom)?.meta;
   const loadingMore = ctx.spy(storeItems.loadMore.statusesAtom).isPending;
+  const fetching = ctx.spy(storeItems.fetch.statusesAtom).isPending;
 
   return (
     <div className="flex flex-col gap-2 w-full h-full">
@@ -442,7 +458,7 @@ const StoreItems = reatomComponent(({ ctx }) => {
         <Button
           background="default"
           className="h-9 w-fit self-center text-sm"
-          disabled={loadingMore}
+          disabled={loadingMore || fetching}
           onClick={() => storeItems.loadMore(ctx)}
         >
           {translate["panel.show-more"]()}
@@ -689,6 +705,7 @@ const COMPONENTS: Record<string, ReactNode> = {
 const StoreHeader = reatomComponent(({ ctx }) => {
   const title = ctx.spy(headerTitleAtom);
   const styles = sectionActionVariant({ state: "default" })
+  const canCreate = ctx.spy(currentUserState.perms).includes("store.item.create")
 
   return (
     <div className="flex items-center justify-between gap-1 w-full">
@@ -697,13 +714,15 @@ const StoreHeader = reatomComponent(({ ctx }) => {
           {title}
         </Typography>
       </div>
-      <Button
-        onClick={() => navigate("/private/store?target=create")}
-        className={styles.root()}
-      >
-        <Typography className={styles.label()}>{translate["panel.create"]()}</Typography>
-        <Icon name="sprite:plus" className={styles.icon()} />
-      </Button>
+      {canCreate && (
+        <Button
+          onClick={() => navigate("/private/store?target=create")}
+          className={styles.root()}
+        >
+          <Typography className={styles.label()}>{translate["panel.create"]()}</Typography>
+          <Icon name="sprite:plus" className={styles.icon()} />
+        </Button>
+      )}
     </div>
   )
 }, "Header")

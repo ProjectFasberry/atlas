@@ -1,7 +1,7 @@
 import { storeItemCreateSchema } from '@/shared/schemas/store';
 import { logError } from "@/shared/lib/log";
-import { action, atom, type AtomState, batch, withErrorAtom } from "@reatom/framework";
-import { reatomAsync, reatomRecord, sleep, withAssign, withCache, withConcurrency, withDataAtom, withReset, withStatusesAtom } from "@reatom/framework";
+import { action, atom, type AtomState, withErrorAtom } from "@reatom/framework";
+import { reatomAsync, reatomRecord, sleep, withAssign, withConcurrency, withDataAtom, withReset, withStatusesAtom } from "@reatom/framework";
 import { type StoreItemsPayload } from "../../shop/models/store.model";
 import { client } from "@/shared/lib/client-wrapper";
 import { toast } from "sonner";
@@ -120,10 +120,7 @@ export const createStoreItem = atom(null, "createStoreItem").pipe(
       onFulfill: (ctx, res) => {
         toast.success(translate["panel.item-created"]());
 
-        batch(ctx, () => {
-          storeItems.fetch.cacheAtom.reset(ctx);
-          storeItems.fetch(ctx)
-        })
+        storeItems.fetch(ctx)
 
         createStoreItem.resetFull(ctx)
 
@@ -186,7 +183,6 @@ export const deleteStoreItem = atom(null, "deleteStoreItem").pipe(
       onFulfill: (ctx, res) => {
         toast.success(translate["panel.item-deleted"]());
 
-        storeItems.fetch.cacheAtom.reset(ctx);
         storeItems.fetch(ctx)
       },
       onReject: (_, e) => logError(e, { type: "combined" })
@@ -303,7 +299,6 @@ export const editStoreItem = atom(null, "editStoreItem").pipe(
       name: `${name}.submit`,
       onFulfill: (ctx) => {
         toast.success(translate["panel.item-updated"]());
-        storeItems.fetch.cacheAtom.reset(ctx);
         storeItems.fetch(ctx);
         ctx.schedule(() => navigate("/private/store"));
       },
@@ -339,19 +334,18 @@ export const storeItems = atom(null, "storeItems").pipe(
     }).pipe(
       withDataAtom(null),
       withStatusesAtom(),
-      withCache({ swr: false }),
       withErrorAtom()
     ),
     loadMore: reatomAsync(async (ctx): Promise<StoreItemsPage | null> => {
       const current: StoreItemsPage | null = ctx.get(storeItems.fetch.dataAtom)
       if (!current?.meta?.hasNextPage || !current.meta.endCursor) return null
 
-      return await getAdminStoreItems({
+      return await ctx.schedule(() => getAdminStoreItems({
         category: ctx.get(storeState.category),
         wallet: ctx.get(storeState.wallet),
         searchQuery: ctx.get(storeState.searchQuery).trim() || undefined,
         endCursor: current.meta.endCursor
-      })
+      }))
     }, {
       name: `${name}.loadMore`,
       onFulfill: (ctx, page: StoreItemsPage | null) => {
@@ -360,8 +354,9 @@ export const storeItems = atom(null, "storeItems").pipe(
         const current: StoreItemsPage | null = ctx.get(storeItems.fetch.dataAtom)
         if (!current) return
 
+        const seen = new Set(current.data.map((item) => item.id))
         storeItems.fetch.dataAtom(ctx, {
-          data: [...current.data, ...page.data],
+          data: [...current.data, ...page.data.filter((item) => !seen.has(item.id))],
           meta: page.meta
         })
       },
