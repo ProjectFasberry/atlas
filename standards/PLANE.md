@@ -17,12 +17,10 @@ comments are writable, project settings are not.
 
 ## Labels
 
-Every issue created by an agent gets `AI`, plus the label of the app it belongs
-to. The apps in this monorepo are:
+Issues are labelled by the app they belong to. The apps in this monorepo are:
 
 | Label | ID | Use for |
 |---|---|---|
-| `AI` | `9452e69a-6104-467e-8fcd-3999a08fb342` | every agent-created issue |
 | `minotaur` | `993c3a06-b4ff-4140-af5b-13a0671151f8` | anything inside `apps/minotaur` (web client) |
 | `taurus` | `543218c5-0e1d-475b-9d2c-379530efa7ec` | anything inside `apps/taurus` (landing site) |
 | `wiki` | `b2f3f7d2-0a9e-44f6-b656-9bdf8d415c9a` | anything inside `apps/wiki` |
@@ -95,8 +93,7 @@ belong in the description; long analysis goes to a linked Plane page.
 
 - Descriptions are HTML (`description_html`); markdown is not rendered. Plane
   derives `description_stripped`, which is useful for grepping.
-- `labels` replaces the whole set on update and silently drops `AI`; re-send it
-  when changing labels.
+- `labels` replaces the whole set on update; send the full list when changing it.
 - The rate limit is 60 requests per minute per API key. Batch ~10-15 writes per
   `execute` call; the sandbox has no timers, so rely on the gap between calls.
 - Identifiers are `FASBERRY-<n>`; `a2c819ff-...` is the project, not an issue.
