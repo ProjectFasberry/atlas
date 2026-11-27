@@ -1,4 +1,4 @@
-import { createEffect, createMemo, For, Show } from "solid-js";
+import { createEffect, createMemo, For, on, Show } from "solid-js";
 import { tv } from "tailwind-variants";
 import { createIdeas, selectedKeyAtom } from "../(models)/gameplay.model";
 import { Typography } from "@/shared/ui/typography";
@@ -98,11 +98,20 @@ export const IdeasNav = reatomComponent(({ ctx }) => {
     }
   };
 
-  // Keep the selected tab in view when it changes from the arrows, keyboard or
-  // a restored state; `block: nearest` does not scroll the page itself.
-  createEffect(() => {
-    tabs[selected()]?.scrollIntoView({ inline: "center", block: "nearest" });
-  });
+  // Scroll only the tab strip. `scrollIntoView` also moves the page, which made
+  // the landing jump to this section on load.
+  createEffect(on(selected, (index) => {
+    const tab = tabs[index];
+    const list = tab?.parentElement;
+    if (!tab || !list) return;
+
+    const tabRect = tab.getBoundingClientRect();
+    const listRect = list.getBoundingClientRect();
+    const left = list.scrollLeft + (tabRect.left - listRect.left)
+      - (list.clientWidth - tab.clientWidth) / 2;
+
+    list.scrollTo({ left, behavior: "smooth" });
+  }, { defer: true }));
 
   return (
     <div
