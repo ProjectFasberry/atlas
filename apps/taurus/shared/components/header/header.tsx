@@ -1,6 +1,7 @@
 import { Link } from "@/shared/components/link";
 import { toast } from 'solid-sonner';
 import { Menu } from '@ark-ui/solid/menu'
+import { Portal } from "solid-js/web"
 import { Typography } from "@/shared/ui/typography";
 import { useAtom } from "@reatom/npm-solid-js";
 import { createEffect, For, lazy, on, Show } from "solid-js";
@@ -125,23 +126,25 @@ const HeaderItemMenu = (props: MainHeaderLink) => {
               </Show>
             </div>
           </Menu.Trigger>
-          <Menu.Positioner>
-            <Menu.Content class={menuVariant.content({ class: "flex flex-col gap-2 w-full min-w-50" })}>
-              <Show when={props.childs}>
-                {(childs) => (
-                  <For each={childs()}>
-                    {(child) => (
-                      <Menu.Item value={child.name} class={headerItemVariant().base()}>
-                        <Link href={child.href} class="tr">
-                          <p class={headerItemVariant().label()}>{child.name}</p>
-                        </Link>
-                      </Menu.Item>
-                    )}
-                  </For>
-                )}
-              </Show>
-            </Menu.Content>
-          </Menu.Positioner>
+          <Portal>
+            <Menu.Positioner>
+              <Menu.Content class={menuVariant.content({ class: "flex flex-col gap-2 w-full min-w-50" })}>
+                <Show when={props.childs}>
+                  {(childs) => (
+                    <For each={childs()}>
+                      {(child) => (
+                        <Menu.Item value={child.name} class={headerItemVariant().base()}>
+                          <Link href={child.href} class="tr">
+                            <p class={headerItemVariant().label()}>{child.name}</p>
+                          </Link>
+                        </Menu.Item>
+                      )}
+                    </For>
+                  )}
+                </Show>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Portal>
         </Menu.Root>
       }
     >
@@ -177,7 +180,7 @@ export const Header = () => {
       class={`header flex items-center justify-between fixed top-0 w-full bg-repeat-x z-50 px-4 xl:absolute xl:px-8`}
       style={{ "background-size": '160px', "background-image": `url(${bgImage})` }}
     >
-      <Link href="/" class="bg-transparent cursor-pointer">
+      <Link href="/" class="bg-transparent cursor-pointer relative top-3">
         <img src={logoImage} draggable={false} width={224} height={64} title="Fasberry" alt="Fasberry" />
       </Link>
       <div class="absolute inset-y-0 left-1/2 hidden -translate-x-1/2 items-center gap-8 xl:flex">
