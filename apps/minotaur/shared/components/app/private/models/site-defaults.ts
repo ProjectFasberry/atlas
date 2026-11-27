@@ -54,11 +54,11 @@ export const BLOCK_DEFAULTS: Record<string, Record<string, Record<"ru" | "en", B
     "community": {
       "ru": {
         "title": "Куда дальше",
-        "description": "Карта, вики и модпак — в одном месте"
+        "description": "Карта, вики и галерея — в одном месте"
       },
       "en": {
         "title": "Where to next",
-        "description": "Map, wiki and modpack — all in one place"
+        "description": "Map, wiki and gallery in one place"
       }
     },
     "faq": {
@@ -152,37 +152,6 @@ export const BLOCK_DEFAULTS: Record<string, Record<string, Record<"ru" | "en", B
         "description": "Join Discord or Telegram — we will tell you how you can help."
       }
     }
-  },
-  "modpack": {
-    "modpack-hero": {
-      "ru": {
-        "title": "Сборки модов",
-        "description": "Скачай лаунчер — он сам поставит версию, моды и текстуры."
-      },
-      "en": {
-        "title": "Modpacks",
-        "description": "Download the launcher — it installs the version, mods and textures for you."
-      }
-    },
-    "modpack-manual": {
-      "ru": {
-        "title": "Сборки для продвинутых",
-        "description": "Если умеешь ставить моды сам — держи сборки. Если нет — просто скачай лаунчер."
-      },
-      "en": {
-        "title": "Builds for advanced players",
-        "description": "If you can install mods yourself, here are the builds. If not, just download the launcher."
-      }
-    },
-    "modpack-faq": {
-      "ru": {
-        "title": "Частые вопросы",
-        "description": "Коротко про установку"
-      },
-      "en": {
-        "title": "Frequently asked",
-        "description": "The short version of installing"
-      }
-    }
   }
+
 }

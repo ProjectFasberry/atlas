@@ -26,12 +26,6 @@ export const createCommunityItems = (): CommunityItem[] => [
     external: true
   },
   {
-    title: translate["community.items.modpack.title"](),
-    description: translate["community.items.modpack.description"](),
-    href: "/modpack",
-    icon: getStaticObject("minecraft", "icons/chest_closed.webp")
-  },
-  {
     title: translate["community.items.gallery.title"](),
     description: translate["community.items.gallery.description"](),
     href: "/gallery",

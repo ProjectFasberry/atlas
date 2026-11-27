@@ -48,7 +48,6 @@ const createPages = (): { value: SitePageId, title: string, path: string }[] => 
   { value: "servers", title: translate["panel.site-servers"](), path: "/servers" },
   { value: "start", title: translate["panel.site-start"](), path: "/start" },
   { value: "support", title: translate["panel.site-support"](), path: "/support" },
-  { value: "modpack", title: translate["panel.site-modpack"](), path: "/modpack" },
 ]
 
 const editVariant = (active: boolean) => active

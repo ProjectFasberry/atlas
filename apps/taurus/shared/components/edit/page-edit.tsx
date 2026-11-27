@@ -8,7 +8,7 @@ import { EditEntry } from "./edit-entry"
 import { EditToolbar } from "./edit-toolbar"
 
 type PageEditProps = {
-  /** Published document of the page (`content`, or `sections` for modpack). */
+  /** Published document of the page. */
   content: unknown
   page: EditPage
   /** Document kind this page edits, so a draft from another page never leaks. */

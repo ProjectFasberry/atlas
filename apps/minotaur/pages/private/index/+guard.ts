@@ -2,7 +2,7 @@ import { type PageContextServer } from "vike/types";
 import { redirect } from "vike/abort";
 import { getDataFromSnapshot } from "@/shared/models/app/utils";
 
-const CONTENT_PARENTS = ["news", "banner", "event", "modpack", "lands"]
+const CONTENT_PARENTS = ["news", "banner", "event", "lands"]
 const CONFIG_TABS = ["general", "roles", "dictionaries", "servers"]
 
 /** Old config links (`?parent=`) moved to the content and api pages. */

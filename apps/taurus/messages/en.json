@@ -109,7 +109,6 @@
       "account": "Account",
       "map": "Map",
       "wiki": "Wiki",
-      "modpack": "Modpack",
       "play": "Play",
       "world": "World",
       "community": "Community",
@@ -316,10 +315,6 @@
       "title": "Gallery",
       "description": "Fasberry gallery: screenshots of cities, events, builds and nature from the Minecraft project."
     },
-    "modpack": {
-      "title": "Modpack",
-      "description": "Fasberry modpack: mod list, version and installation through the Fasberry launcher."
-    },
     "global": {
       "description": "The official page of the Fasberry Minecraft project. Different servers and modes. Play through the Fasberry launcher or with your password.",
       "description-global": "How many top Minecraft projects do you know? Now you know one more.",
@@ -414,56 +409,6 @@
     },
     "minecraft-note": "Minecraft assets, names and textures belong to Mojang AB. This project is not affiliated with Mojang AB or Microsoft."
   },
-  "modpack": {
-    "title": "Modpacks",
-    "error": "Error loading modpacks",
-    "retry-later": "Please try again later",
-    "empty": "No modpacks available yet",
-    "download": "Download",
-    "subtitle": "Download the launcher — it installs the version, mods and textures for you.",
-    "action-text": "How to start",
-    "launcher": {
-      "title": "Play through the launcher",
-      "description": "Download the launcher — it installs the right version, mods and textures.",
-      "version": "Game version",
-      "version-note": "Picked automatically",
-      "resourcepack": "Textures and mods",
-      "resourcepack-note": "Installed automatically",
-      "updates": "Updates",
-      "updates-note": "Come with the launcher"
-    },
-    "manual": {
-      "title": "Builds for advanced players",
-      "description": "If you can install mods yourself, here are the builds. If not, just download the launcher.",
-      "count": "Builds: {count}",
-      "badge": "Manual",
-      "created": "Added {date}",
-      "empty": {
-        "title": "No separate builds yet",
-        "description": "Everything is already in the launcher — download it and play.",
-        "action": "Write in Discord"
-      }
-    },
-    "retry": "Retry",
-    "faq": {
-      "title": "Frequently asked",
-      "subtitle": "The short version of installing",
-      "items": {
-        "1": {
-          "question": "Do I install mods by hand?",
-          "answer": "No. The launcher downloads the version, mods and textures."
-        },
-        "2": {
-          "question": "Why manual builds then?",
-          "answer": "For players who install mods themselves or want a separate version."
-        },
-        "3": {
-          "question": "Where do I put a manual build?",
-          "answer": "Into the game folder, as described in the archive. If unsure, ask in Discord."
-        }
-      }
-    }
-  },
   "languages": {
     "title": "Language",
     "variants": {
@@ -527,7 +472,7 @@
   },
   "community": {
     "title": "Where to next",
-    "subtitle": "Map, wiki and modpack — all in one place",
+    "subtitle": "Map, wiki and gallery in one place",
     "items": {
       "map": {
         "title": "Map",
@@ -536,10 +481,6 @@
       "wiki": {
         "title": "Wiki",
         "description": "Guides, quests and useful tips"
-      },
-      "modpack": {
-        "title": "Modpack",
-        "description": "Ready-made builds and mods"
       },
       "gallery": {
         "title": "Gallery",
@@ -578,11 +519,11 @@
   "edit": {
     "mode": "Editing",
     "dirty": "Unsaved",
-    "save": "Save",
-    "publish": "Apply",
+    "save": "Save draft",
+    "publish": "Publish",
     "discard": "Discard",
     "exit": "Exit",
-    "saved": "Draft saved",
+    "saved": "Draft saved. Press Publish to make the changes live.",
     "published": "Published",
     "discarded": "Draft discarded",
     "save-error": "Could not save",

@@ -55,7 +55,7 @@ Taurus ships as a container image, like the other container apps.
 - Rollback pins `prod/taurus:sha-<commit>` in the host compose file, not a rebuild.
 - Deploy only on an explicit request, from a tree whose changes are understood.
   Other apps may be dirty; do not include them.
-- After rollout verify `/`, `/rules`, `/support`, `/gallery`, `/modpack`, `/credits`:
+- After rollout verify `/`, `/rules`, `/support`, `/gallery`, `/credits`:
   HTTP 200, expected copy, no console errors, no horizontal overflow. Report the
   image digest, not just "deployed".
 - The container is the only target: `vite build` emits the Node server entry,

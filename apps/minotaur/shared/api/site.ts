@@ -9,7 +9,7 @@ import { client } from "@/shared/lib/client-wrapper"
  * types from the generated schema as usual.
  */
 
-export type SitePageId = "home" | "servers" | "start" | "support" | "modpack"
+export type SitePageId = "home" | "servers" | "start" | "support"
 export type SiteLocale = "ru" | "en"
 
 export type SiteAdminPayload = {

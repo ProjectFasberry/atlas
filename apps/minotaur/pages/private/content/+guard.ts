@@ -6,7 +6,6 @@ const CONTENT_PERMISSIONS = [
   "news.create", "news.update", "news.delete",
   "banners.create", "banners.delete",
   "events.create", "events.delete",
-  "modpacks.create", "modpacks.delete",
   "lands.read",
 ]
 

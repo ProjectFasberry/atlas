@@ -23,16 +23,7 @@ const routes = {
       },
     ],
   }),
-  '/modpack/list': () => ({
-    data: [
-      {
-        id: 1,
-        name: 'E2E Modpack',
-        created_at: '2026-01-01T00:00:00.000Z',
-        downloadLink: 'https://example.test/modpack.zip',
-      },
-    ],
-  }),
+
   '/news/list': () => ({
     data: {
       data: [

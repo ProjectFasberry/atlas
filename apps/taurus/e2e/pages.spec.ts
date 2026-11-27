@@ -62,12 +62,7 @@ test.describe('landing pages', () => {
     expect(body).toContain('Природа');
   });
 
-  test('renders the modpack list from the api', async ({ request }) => {
-    const { response, body } = await text(request, '/modpack');
-    expect(response.status()).toBe(200);
-    expect(body).toContain('Играть через лаунчер');
-    expect(body).toContain('E2E Modpack');
-  });
+
 
   test('links the stable launcher download', async ({ request }) => {
     const { response, body } = await text(request, '/start');

@@ -14,7 +14,7 @@ import { translate } from "@/shared/locales/helpers"
  * stores that copy as the next draft; publishing promotes it.
  */
 
-export type EditPage = "home" | "servers" | "start" | "support" | "modpack"
+export type EditPage = "home" | "servers" | "start" | "support"
 
 export type EditSlide = { imageKey: string; alt: string }
 export type EditFeature = { iconKey: string; title: string; description: string }

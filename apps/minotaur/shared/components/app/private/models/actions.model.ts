@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { pageState } from "@/shared/models/page-context.model";
 import { translate } from "@/shared/locales/helpers"
 
-const PARENTS = ["news", "banner", "event", "dictionaries", "modpack", "lands", "api", "task"] as const
+const PARENTS = ["news", "banner", "event", "dictionaries", "lands", "api", "task"] as const
 const TYPES = ["create", "edit", "view"] as const;
 
 export type ActionParent = typeof PARENTS[number]
@@ -14,7 +14,7 @@ export type ActionType = typeof TYPES[number]
 /** Config panel route. Sections and modes only exist as query params on it. */
 export const PANEL_PATH = "/private"
 
-const CONTENT_PARENTS = ["news", "banner", "event", "modpack", "lands", "task"] as const
+const CONTENT_PARENTS = ["news", "banner", "event", "lands", "task"] as const
 
 /** Each section lives on the page that owns its tabs. */
 const pathForParent = (parent: ActionParent): string => {

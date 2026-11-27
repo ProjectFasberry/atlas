@@ -24,7 +24,6 @@ export const createMainHeaderLinks = () => ([
       { name: translate["header.links.map"](), href: `${APP_URL}/map`, },
       { name: translate["header.links.wiki"](), href: "https://wiki.fasberry.fun", },
       { name: translate["header.links.gallery"](), href: "/gallery", },
-      { name: translate["header.links.modpack"](), href: "/modpack", },
     ],
   },
   {

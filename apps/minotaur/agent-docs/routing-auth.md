@@ -104,7 +104,7 @@ The private panel is grouped into pages with `?tab=` deep links:
 | Page | Tabs |
 | --- | --- |
 | `/private` | `general`, `roles`, `dictionaries`, `servers` |
-| `/private/content` | `news`, `banner`, `event`, `modpack`, `lands` |
+| `/private/content` | `news`, `banner`, `event`, `lands` |
 | `/private/moderation` | `team`, `audit` |
 | `/private/analytics` | `players`, `builds` |
 | `/private/api-keys` | single section |

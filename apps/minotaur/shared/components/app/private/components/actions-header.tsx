@@ -6,7 +6,6 @@ import { newsSection } from "./news"
 import { bannersSection } from "./banners"
 import { dictionariesSection } from "./dictionaries"
 import { eventsSection } from "./events"
-import { modpackSection } from "./modpack"
 import { landsSection } from "./lands"
 import { apiKeysSection } from "./api"
 import { tasksSection } from "./tasks"
@@ -18,11 +17,6 @@ const COMPONENTS: Record<string, Partial<Record<ActionType, ComponentType>>> = {
     "create": newsSection.Header.Create,
     "edit": newsSection.Header.Edit,
     "view": newsSection.Header.View
-  },
-  "modpack": {
-    "create": modpackSection.Header.Create,
-    "edit": modpackSection.Header.Edit,
-    "view": modpackSection.Header.View
   },
   "event": {
     "create": eventsSection.Header.Create,

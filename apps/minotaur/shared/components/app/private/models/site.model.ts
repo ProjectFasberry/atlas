@@ -66,11 +66,6 @@ export const PAGE_BLOCKS: Record<SitePageId, { id: string, label: () => string }
     { id: "support-faq", label: translate["panel.block-support-faq"] },
     { id: "support-cta", label: translate["panel.block-support-cta"] },
   ],
-  modpack: [
-    { id: "modpack-hero", label: translate["panel.block-modpack-hero"] },
-    { id: "modpack-manual", label: translate["panel.block-modpack-manual"] },
-    { id: "modpack-faq", label: translate["panel.block-modpack-faq"] },
-  ],
 }
 
 export const createSectionId = () => `s${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`

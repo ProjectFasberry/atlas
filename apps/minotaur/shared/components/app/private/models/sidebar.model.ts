@@ -54,7 +54,6 @@ const NAMESPACE_KEYS: Record<string, string> = {
   history: "private.permissions.namespaces.history",
   lands: "private.permissions.namespaces.lands",
   metrics: "private.permissions.namespaces.metrics",
-  modpacks: "private.permissions.namespaces.modpacks",
   news: "private.permissions.namespaces.news",
   options: "private.permissions.namespaces.options",
   permissions: "private.permissions.namespaces.permissions",
@@ -70,7 +69,7 @@ const NAMESPACE_KEYS: Record<string, string> = {
 
 const NAMESPACE_ORDER = [
   "players", "store", "economy", "lands", "skins", "news", "events",
-  "team", "servers", "releases", "modpacks", "banners", "dictionaries",
+  "team", "servers", "releases", "banners", "dictionaries",
   "roles", "permissions", "metrics", "history", "options", "api", "tasks", "volume",
 ]
 
@@ -98,8 +97,6 @@ const PERMISSION_KEYS: Record<string, string> = {
   "lands.delete": "private.permissions.titles.lands.delete",
   "lands.read": "private.permissions.titles.lands.read",
   "metrics.read": "private.permissions.titles.metrics.read",
-  "modpacks.create": "private.permissions.titles.modpacks.create",
-  "modpacks.delete": "private.permissions.titles.modpacks.delete",
   "news.create": "private.permissions.titles.news.create",
   "news.delete": "private.permissions.titles.news.delete",
   "news.update": "private.permissions.titles.news.update",
@@ -220,7 +217,7 @@ export type SidebarLink = { title: string, value: string, permissions: string[],
 
 export const sidebarLinks: SidebarLink[] = [
   { title: translate["panel.configuration"](), value: "/private/", permissions: [CONFIG_PANEL_READ_PERMISSION], icon: "sprite:settings" },
-  { title: translate["panel.content"](), value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "modpacks.create", "modpacks.delete", "tasks.create", "tasks.update", "tasks.delete", LANDS_READ_PERMISSION, RULES_READ_PERMISSION], icon: "sprite:category" },
+  { title: translate["panel.content"](), value: "/private/content", permissions: ["news.create", "news.update", "news.delete", "banners.create", "banners.delete", "events.create", "events.delete", "tasks.create", "tasks.update", "tasks.delete", LANDS_READ_PERMISSION, RULES_READ_PERMISSION], icon: "sprite:category" },
   { title: translate["panel.site"](), value: "/private/site", permissions: [CONTENT_READ_PERMISSION], icon: "sprite:device-desktop" },
   { title: translate["panel.store"](), value: "/private/store", permissions: [STORE_ITEM_READ_PERMISSION], icon: "sprite:building-store" },
   { title: translate["panel.player"](), value: "/private/users", permissions: [PLAYERS_READ_PERMISSION], icon: "sprite:user-circle" },

@@ -6,7 +6,7 @@ import { logError } from "@/shared/lib/log"
 import { translate } from "@/shared/locales/helpers"
 import type { paths } from "@/shared/types/gen/api/main.schema"
 
-export type FaqScope = "home" | "modpack" | "support"
+export type FaqScope = "home" | "support"
 export type FaqLocale = "ru" | "en"
 
 type FaqList = paths["/privated/faq/list"]["get"]["responses"][200]["content"]["application/json"]["data"]
@@ -14,7 +14,7 @@ export type FaqRow = FaqList[number]
 type FaqCreate = paths["/privated/faq/create"]["post"]["requestBody"]["content"]["application/json"]
 type FaqUpdate = paths["/privated/faq/{id}"]["patch"]["requestBody"]["content"]["application/json"]
 
-export const FAQ_SCOPES: FaqScope[] = ["home", "modpack", "support"]
+export const FAQ_SCOPES: FaqScope[] = ["home", "support"]
 export const FAQ_LOCALES: FaqLocale[] = ["ru", "en"]
 
 export type FaqDraft = {

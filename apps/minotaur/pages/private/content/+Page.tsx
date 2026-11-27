@@ -7,7 +7,6 @@ import { ActionsHeaderSlot } from "@/shared/components/app/private/components/ac
 import { newsSection } from "@/shared/components/app/private/components/news"
 import { bannersSection } from "@/shared/components/app/private/components/banners"
 import { eventsSection } from "@/shared/components/app/private/components/events"
-import { modpackSection } from "@/shared/components/app/private/components/modpack"
 import { landsSection } from "@/shared/components/app/private/components/lands"
 import { tasksSection } from "@/shared/components/app/private/components/tasks"
 import { RulesPanel } from "@/shared/components/app/private/components/rules"
@@ -17,13 +16,12 @@ import { type ActionParent } from "@/shared/components/app/private/models/action
 import { RULES_READ_PERMISSION } from "@/shared/consts/permissions"
 import { translate } from "@/shared/locales/helpers"
 
-type ContentTab = Extract<ActionParent, "news" | "banner" | "event" | "modpack" | "lands" | "task"> | "rules" | "faq"
+type ContentTab = Extract<ActionParent, "news" | "banner" | "event" | "lands" | "task"> | "rules" | "faq"
 
 const CONTENT_TABS: PanelTab<ContentTab>[] = [
   { value: "news", title: translate["panel.news"](), permissions: ["news.create", "news.update", "news.delete"] },
   { value: "banner", title: translate["panel.banners"](), permissions: ["banners.create", "banners.delete"] },
   { value: "event", title: translate["panel.events"](), permissions: ["events.create", "events.delete"] },
-  { value: "modpack", title: translate["panel.modpacks"](), permissions: ["modpacks.create", "modpacks.delete"] },
   { value: "lands", title: translate["panel.lands"](), permissions: ["lands.read"] },
   { value: "task", title: translate["panel.tasks"](), permissions: ["tasks.create", "tasks.update", "tasks.delete"] },
   { value: "rules", title: translate["panel.rules"](), permissions: [RULES_READ_PERMISSION] },
@@ -52,8 +50,6 @@ const ContentSection = reatomComponent(({ ctx }) => {
         return { title: translate["panel.banners"](), wrapper: <bannersSection.Wrapper /> }
       case "event":
         return { title: translate["panel.events"](), wrapper: <eventsSection.Wrapper /> }
-      case "modpack":
-        return { title: translate["panel.modpacks"](), wrapper: <modpackSection.Wrapper /> }
       case "lands":
         return { title: translate["panel.lands"](), wrapper: <landsSection.Wrapper /> }
       case "task":

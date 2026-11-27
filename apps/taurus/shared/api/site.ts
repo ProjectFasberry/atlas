@@ -6,7 +6,7 @@ type ContentResponse = ContentByPage["responses"][200]["content"]["application/j
 type ContentQuery = NonNullable<ContentByPage["parameters"]["query"]>
 
 export type SiteLocale = NonNullable<ContentQuery["locale"]>
-export type SitePage = "home" | "servers" | "start" | "support" | "modpack"
+export type SitePage = "home" | "servers" | "start" | "support"
 
 type SiteSection = { id: string; title: string; body: string; hidden: boolean }
 export type BlockContent = { title?: string; description?: string; hidden?: boolean }

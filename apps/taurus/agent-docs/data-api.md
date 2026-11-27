@@ -30,12 +30,10 @@ const items = response.data?.data?.data ?? []
 | --- | --- |
 | `/rules/list`, `/rules/tags` | `/rules` (SSR) |
 | `/news/list` | landing news |
-| `/modpack/list` | `/modpack` (SSR) |
 | `/server/status` | landing join panel, `/status` |
 | `/site/content/{page}` | editable copy for `/` (carousel) and `/servers` |
 | `/server/player/{nickname}` | `/status` avatars |
 
-`/modpack/list` may return `[]`; render an empty state, not a blank page.
 
 ## Editable content
 

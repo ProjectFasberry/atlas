@@ -15,7 +15,7 @@ pnpm --filter taurus test:e2e
 `e2e/serve.mjs` starts `e2e/mock-backend.mjs` (port 4546) and `vike dev` (port 3101) with test
 `PUBLIC_ENV__*` / `VITE_*` values, so `import.meta.env` points at the mock.
 
-Covered: the home page, the static pages, the rules and modpack lists rendered from the mocked
+Covered: the home page, the static pages, the rules and gallery rendered from the mocked
 api, 404, and the `/wiki/*` -> `wiki.fasberry.fun` and `/info/*` -> `api.fasberry.fun` redirects.
 
 Not covered: browser interactions. Chromium dies on the `vike dev` pages on a loaded machine

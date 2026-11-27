@@ -25,7 +25,6 @@ const ROUTES: Route[] = [
   { path: "/", page: "pages/index", priority: "1.0", changefreq: "daily" },
   { path: "/start", page: "pages/start", priority: "0.9", changefreq: "weekly" },
   { path: "/servers", page: "pages/servers", priority: "0.9", changefreq: "weekly" },
-  { path: "/modpack", page: "pages/modpack", priority: "0.8", changefreq: "weekly" },
   { path: "/status", page: "pages/status", priority: "0.7", changefreq: "hourly" },
   { path: "/gallery", page: "pages/gallery", priority: "0.7", changefreq: "weekly" },
   { path: "/rules", page: "pages/rules", priority: "0.6", changefreq: "monthly" },

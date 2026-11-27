@@ -19,7 +19,6 @@ const answerClassName = `min-h-24 w-full resize-y rounded-xl border border-neutr
 
 const scopeTitle: Record<FaqScope, string> = {
   home: translate["panel.faq-scope-home"](),
-  modpack: translate["panel.faq-scope-modpack"](),
   support: translate["panel.faq-scope-support"](),
 }
 

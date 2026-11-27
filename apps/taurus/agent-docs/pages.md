@@ -12,7 +12,7 @@ Vike file routing under `pages/`. Directories in parentheses — `(components)`,
 | `+Layout.tsx` | Only if the route family needs a different shell. |
 | `_error/+Page.tsx` | Global error page. |
 
-Public routes today: `/`, `/rules`, `/support`, `/gallery`, `/modpack`,
+Public routes today: `/`, `/rules`, `/support`, `/gallery`,
 `/status`, `/start`, `/info/*`. Redirects are centralized in
 `renderer/+config.ts`; do not add redirects elsewhere.
 
