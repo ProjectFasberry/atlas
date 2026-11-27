@@ -1423,7 +1423,9 @@
   "validation": {
     "command-value": "У команды должно быть значение",
     "command-starts": "Команда должна начинаться с {parents}",
-    "price": "Цена должна быть целым числом"
+    "price": "Цена должна быть целым числом",
+    "title-required": "Укажите название",
+    "value-required": "Укажите значение"
   },
   "panel": {
     "resourcepacks": "Ресурспаки",

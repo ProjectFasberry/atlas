@@ -37,17 +37,18 @@ export const nullableStoreCommandSchema = z
 /** Prices are whole units of a game currency, never fractions or negatives. */
 export const storePriceStringSchema = z
 	.string()
+	.trim()
 	.regex(/^\d+$/, translate["validation.price"]());
 
 export const storeItemSchema = z.object({
 	id: z.number(),
-	title: z.string(),
+	title: z.string().trim().min(1),
 	description: z.string().nullable(),
 	imageUrl: z.string(),
 	type: z.union([z.enum(STORE_TYPES), z.string()]),
 	command: nullableStoreCommandSchema,
 	refund_cmd: nullableStoreCommandSchema,
-	value: z.string(),
+	value: z.string().trim().min(1),
 	currency: z.string(),
 	price: z.number().int().nonnegative(),
 	content: editorFieldSchema,

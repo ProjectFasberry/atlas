@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { editorFieldSchema, type JsonValue } from "./news";
 import { GAME_CURRENCIES, nullableStoreCommandSchema, storeItemSchema, storePriceStringSchema } from "./payment";
+import { translate } from "@/shared/locales/helpers"
 
 const fields = storeItemSchema.pick({
 	title: true,
@@ -42,11 +43,11 @@ export const storeItemEditSchema = z.array(
 );
 
 export const storeItemCreateSchema = z.object({
-	title: z.string(),
+	title: z.string().trim().min(1, translate["validation.title-required"]()),
 	description: z.string().nullable(),
 	price: storePriceStringSchema,
 	type: z.string(),
-	value: z.string(),
+	value: z.string().trim().min(1, translate["validation.value-required"]()),
 	currency: z.enum(GAME_CURRENCIES),
 	imageUrl: z.string().optional().nullable(),
 	command: nullableStoreCommandSchema,

@@ -1423,7 +1423,9 @@
   "validation": {
     "command-value": "The command needs a value",
     "command-starts": "The command must start with {parents}",
-    "price": "Price must be a whole number"
+    "price": "Price must be a whole number",
+    "title-required": "Enter a title",
+    "value-required": "Enter a value"
   },
   "panel": {
     "resourcepacks": "Resource packs",
