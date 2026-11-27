@@ -6,10 +6,8 @@ import { Icon } from "@/shared/ui/icon"
 import { Input } from "@/shared/ui/input";
 import { Vaul, VaulContent, VaulHeader, VaulTrigger } from "@/shared/ui/vaul";
 import { translate } from "@/shared/locales/helpers";
-import { CheckboxIndicatorIcon, checkboxVariant } from "@/shared/ui/checkbox";
-import { Checkbox } from "@ark-ui/react/checkbox";
 
-/** Filter values and the defaults they fall back to when unchecked. */
+/** Filter values and the defaults they fall back to when a chip is toggled off. */
 const FILTERS = [
   {
     key: "category",
@@ -37,18 +35,30 @@ export const StoreSearch = reatomComponent(({ ctx }) => {
   const { searchQuery } = ctx.spy(storeFiltersAtom)
 
   return (
-    <div className="flex h-10 items-center justify-start w-full relative">
+    <div className="relative flex h-10 w-full items-center">
       <Icon
         name="sprite:search"
-        className="size-[18px] text-neutral-400 absolute left-2 sm:left-4"
+        className="pointer-events-none absolute left-3 size-[18px] text-neutral-500"
       />
       <Input
         value={searchQuery}
+        aria-label={translate["store.filters.placeholders.search"]()}
         placeholder={translate["store.filters.placeholders.search"]()}
-        className='w-full pl-8 sm:pl-12'
+        className="w-full pl-10 pr-10"
         onChange={e => storeItems.onChangeEvent(ctx, e)}
-        maxLength={1024}
+        maxLength={128}
       />
+      {searchQuery.length > 0 && (
+        <button
+          type="button"
+          aria-label={translate["store.filters.clear"]()}
+          className="absolute right-2 flex size-7 items-center justify-center rounded-lg
+            text-neutral-400 duration-150 hover:bg-neutral-800 hover:text-neutral-100"
+          onClick={() => storeItems.setSearch(ctx, "")}
+        >
+          <Icon name="sprite:x" className="size-4" />
+        </button>
+      )}
     </div>
   )
 }, "StoreSearch")
@@ -57,30 +67,37 @@ const StoreFilterItem = reatomComponent<{ filter: typeof FILTERS[number] }>(({ c
   const current = ctx.spy(storeFiltersAtom)[filter.key]
 
   return (
-    <div className="flex flex-col gap-2">
-      <Typography className="text-neutral-400 text-lg">
+    <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+      <legend className="text-lg text-neutral-400">
         {translate[filter.title]()}
-      </Typography>
-      <div className='flex flex-col gap-2 w-full'>
-        {filter.options.map((option) => (
-          <Checkbox.Root
-            key={option.value}
-            id={`${filter.key}-${option.value}`}
-            className={checkboxVariant.root("bg-neutral-800 px-2 h-8 rounded-lg w-full")}
-            checked={current === option.value}
-            onCheckedChange={(e) => {
-              storeItems.setFilter(ctx, filter.key, e.checked ? option.value : filter.defaultValue)
-            }}
-          >
-            <Checkbox.Control className={checkboxVariant.control({ variant: "filled" })} />
-            <Checkbox.Label className={checkboxVariant.label()}>
+      </legend>
+      <div className="flex flex-wrap gap-1">
+        {filter.options.map((option) => {
+          const active = current === option.value
+
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => storeItems.setFilter(
+                ctx,
+                filter.key,
+                active ? filter.defaultValue : option.value,
+              )}
+              className={`h-9 rounded-lg px-3 text-sm font-medium duration-150
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400
+                ${active
+                  ? "bg-neutral-50 text-neutral-950"
+                  : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100"
+                }`}
+            >
               {translate[option.label]()}
-            </Checkbox.Label>
-            <Checkbox.HiddenInput />
-          </Checkbox.Root>
-        ))}
+            </button>
+          )
+        })}
       </div>
-    </div>
+    </fieldset>
   )
 }, "StoreFilterItem")
 
@@ -92,13 +109,31 @@ export const StoreFilterList = reatomComponent(() => (
 
 const storeFiltersIsOpenAtom = atom(false)
 
-export const StoreFiltersSheet = () => {
+export const StoreFiltersSheet = reatomComponent(({ ctx }) => {
+  const filters = ctx.spy(storeFiltersAtom)
+  const activeCount = [
+    filters.category !== "all",
+    filters.wallet !== "ALL",
+    filters.searchQuery.trim().length > 0,
+  ].filter(Boolean).length
+
   return (
     <Vaul openAtom={storeFiltersIsOpenAtom}>
-      <VaulTrigger>
-        <div className="flex bg-neutral-800 items-center justify-center rounded-xl h-10 aspect-square p-2 sm:p-3 lg:p-4">
-          <Icon name="sprite:filter" className="size-5 text-neutral-400" />
-        </div>
+      <VaulTrigger asChild>
+        <button
+          type="button"
+          aria-label={translate["store.filters.title"]()}
+          className="relative flex h-10 aspect-square items-center justify-center
+            rounded-xl bg-neutral-800 duration-150 hover:bg-neutral-700"
+        >
+          <Icon name="sprite:filter" className="size-5 text-neutral-300" />
+          {activeCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center
+              rounded-full bg-green-500 text-[10px] font-semibold text-neutral-950">
+              {activeCount}
+            </span>
+          )}
+        </button>
       </VaulTrigger>
       <VaulContent>
         <VaulHeader title={translate["store.filters.title"]()} />
@@ -108,4 +143,4 @@ export const StoreFiltersSheet = () => {
       </VaulContent>
     </Vaul>
   )
-}
+}, "StoreFiltersSheet")

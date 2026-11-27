@@ -527,7 +527,8 @@
   "store": {
     "page": {
       "title": "Store",
-      "description": "Support the Fasberry project by purchasing ranks, unique items, and in-game currency. Enhance your gameplay and help the project grow!"
+      "description": "Support the Fasberry project by purchasing ranks, unique items, and in-game currency. Enhance your gameplay and help the project grow!",
+      "tagline": "Perks, events and in-game currency in one place."
     },
     "title": "Store",
     "buy": "Buy",
@@ -552,7 +553,8 @@
           "charism": "Charisma",
           "belkoin": "Belkoin"
         }
-      }
+      },
+      "clear": "Clear search"
     },
     "item": {
       "not-found": "Item not found",
@@ -575,7 +577,12 @@
     },
     "list": {
       "empty": "No items available",
-      "load-more": "Show more"
+      "load-more": "Show more",
+      "empty-filters": "Nothing matches these filters. Try another query or reset them.",
+      "empty-hint": "Items will appear here once they are added.",
+      "reset": "Reset filters",
+      "error": "Could not load the store",
+      "retry": "Retry"
     },
     "orders": {
       "status": {
@@ -697,7 +704,7 @@
   "cart": {
     "page": {
       "title": "Cart",
-      "description": ""
+      "description": "Review the items, recipient and total before checkout."
     },
     "content": {
       "title": "Contents",

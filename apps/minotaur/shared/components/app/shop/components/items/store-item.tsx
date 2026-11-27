@@ -1,6 +1,6 @@
 import { Link } from "@/shared/components/config/link/link"
-import { getStaticImage } from "@/shared/lib/helpers"
 import { Typography } from "@/shared/ui/typography"
+import { Icon } from "@/shared/ui/icon"
 import { type StoreItem as StoreItemProps } from "../../models/store-item.model"
 import { storeItemsState } from "../../models/store.model"
 import { cart, cartContainsItemAtom } from "../../models/store-cart.model"
@@ -10,52 +10,8 @@ import { Button } from "@/shared/ui/button"
 import { createLink } from "@/shared/components/config/link/link.model"
 import { getCurrencies } from "@/shared/models/shared.model"
 import { translate } from "@/shared/locales/helpers"
-
-const buyButtonVariants = tv({
-  base: `group gap-2 duration-150 h-10 *:duration-150 px-6 w-full rounded-xl`,
-  variants: {
-    variant: {
-      inCart: "bg-neutral-50 hover:bg-neutral-200",
-      add: "bg-green-500/80"
-    }
-  },
-  defaultVariants: {
-    variant: "add"
-  }
-})
-
-const buyButtonTypographyVariants = tv({
-  base: `font-semibold text-base text-nowrap`,
-  variants: {
-    variant: {
-      inCart: "text-neutral-900",
-      add: "text-neutral-50"
-    }
-  },
-  defaultVariants: {
-    variant: "add"
-  }
-})
-
-const storeItemVariant = tv({
-  base: `flex flex-col items-center w-full overflow-hidden rounded-xl justify-between gap-2 p-2 sm:p-4 relative`,
-  variants: {
-    variant: {
-      default: "bg-gradient-to-b from-neutral-800/80 via-neutral-800/70 to-neutral-800/60"
-    }
-  },
-  slots: {
-    avatarImg: "min-h-16 min-w-16",
-    info: "flex flex-col w-full gap-1 overflow-hidden justify-center relative z-[2] items-center",
-    footer: "flex flex-col mt-0 sm:mt-2 items-center relative z-[2] justify-center w-full gap-2",
-    title: "text-lg lg:text-xl leading-tight font-semibold truncate text-white w-full text-center block whitespace-nowrap",
-    summary: "truncate h-5 relative -top-1 text-xs sm:text-sm w-full text-center",
-    priceWrapper: "flex items-center justify-center h-9 py-1 px-4 rounded-full"
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-})
+import { navigate } from "vike/client/router"
+import { storeItemTypeLabel, storeItemTypeTone } from "../../lib/labels"
 
 const itemPriceVariant = tv({
   base: "",
@@ -84,10 +40,10 @@ export const ItemPrice = reatomComponent<ItemPriceProps>(({ ctx, price, currency
   const currencyInfo = currencies[currency];
 
   return (
-    <div className="flex items-center gap-1 text-base select-none text-nowrap font-semibold">
-      <Typography className={itemPriceVariant(price.variant)}>
+    <span className="flex select-none items-center gap-1 whitespace-nowrap font-semibold">
+      <span className={itemPriceVariant(price.variant)}>
         {price.value}
-      </Typography>
+      </span>
       {currencyInfo?.img ? (
         <img
           src={currencyInfo.img}
@@ -99,90 +55,96 @@ export const ItemPrice = reatomComponent<ItemPriceProps>(({ ctx, price, currency
       ) : (
         <span>{currencyInfo?.symbol ?? currency}</span>
       )}
-    </div>
+    </span>
   )
 }, "ItemPrice")
 
-export const ItemSelectToCart = reatomComponent<Pick<StoreItemProps, "id">>(({ ctx, id }) => {
-  // The cart list arrives in the SSR snapshot, so the real state renders before
-  // hydration instead of a placeholder; `pending` only drives the spinner.
+/**
+ * One action for both card variants: add to the cart, or open it when the item
+ * is already there. Removing stays on the cart screen, where it is explicit.
+ */
+export const ItemSelectToCart = reatomComponent<
+  Pick<StoreItemProps, "id"> & { className?: string }
+>(({ ctx, id, className = "" }) => {
   const isInCart = ctx.spy(cartContainsItemAtom(id))
   const isLoading = ctx.spy(storeItemsState.pending).includes(id)
-  const variant: "inCart" | "add" = isInCart ? "inCart" : "add"
+
+  if (isInCart) {
+    return (
+      <Button
+        background="white"
+        className={`h-10 w-full gap-1.5 px-4 text-sm font-semibold ${className}`}
+        onClick={() => navigate("/store/cart")}
+      >
+        <Icon name="sprite:check" className="size-4" />
+        {translate["store.inCart"]()}
+      </Button>
+    )
+  }
 
   return (
     <Button
-      className={buyButtonVariants({ variant })}
+      background="positive"
+      className={`h-10 w-full gap-1.5 px-4 text-sm font-semibold ${className}`}
       disabled={isLoading}
-      onClick={() => cart.toggle(ctx, id)}
-      withSpinner={true}
+      withSpinner
       isLoading={isLoading}
+      onClick={() => cart.addItem(ctx, id)}
     >
-      <Typography className={buyButtonTypographyVariants({ variant })}>
-        {isInCart ? translate["store.inCart"]() : translate["store.buy"]()}
-      </Typography>
+      {translate["store.buy"]()}
     </Button>
   )
 }, "ItemSelectToCart")
 
-const storeItemBgImage = getStaticImage("patterns/pattern_light.png")
-
 export const StoreItem = ({
-  description, id, title, price, imageUrl, currency
+  description, id, title, price, imageUrl, currency, type
 }: StoreItemProps) => {
   return (
-    <div className={storeItemVariant().base()}>
-      <div className="z-[1] select-none absolute w-full h-full">
-        <img
-          src={storeItemBgImage}
-          draggable={false}
-          width={600}
-          height={600}
-          alt=""
-        />
-      </div>
+    <article className="group flex flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900">
       <Link
         href={createLink("store", id)}
-        className="flex relative z-[2] items-center justify-center rounded-lg"
+        className="relative flex aspect-5/3 items-center justify-center bg-neutral-800/50 p-4"
       >
         <img
           src={imageUrl}
           draggable={false}
-          width={64}
-          height={64}
+          width={96}
+          height={96}
           alt=""
-          className={storeItemVariant().avatarImg()}
+          className="size-24 object-contain transition-transform duration-200 group-hover:scale-105"
         />
+        <span className={`absolute left-2 top-2 rounded-md px-2 py-1 text-[10px] font-semibold
+          uppercase tracking-wide ${storeItemTypeTone(type)}`}>
+          {storeItemTypeLabel(type)}
+        </span>
       </Link>
-      <div className={storeItemVariant().info()}>
-        <a
-          href={createLink("store", id)}
-          target="_blank"
-          className="w-full overflow-hidden"
-        >
-          <Typography className={storeItemVariant().title()}>
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <Link href={createLink("store", id)} className="min-w-0">
+          <h3 className="truncate text-base font-semibold text-white duration-150
+            group-hover:text-neutral-200">
             {title}
-          </Typography>
-        </a>
-        <Typography color="gray" className={storeItemVariant().summary()}>
+          </h3>
+        </Link>
+        <p className="line-clamp-2 min-h-9 text-xs leading-4.5 text-neutral-400">
           {description}
-        </Typography>
-      </div>
-      <div className={storeItemVariant().footer()}>
-        <div className={storeItemVariant().priceWrapper({ className: "bg-blue-600" })}>
-          <ItemPrice currency={currency} price={{ value: price }} />
+        </p>
+        <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
+          <span className="flex h-10 w-fit items-center rounded-full bg-neutral-800 px-3">
+            <ItemPrice currency={currency} price={{ value: price }} />
+          </span>
+          <ItemSelectToCart id={id} className="w-full px-3 sm:w-auto" />
         </div>
-        <ItemSelectToCart id={id} />
       </div>
-    </div>
+    </article>
   )
 }
 
 export const StoreItemRow = ({
-  description, id, title, price, imageUrl, currency
+  description, id, title, price, imageUrl, currency, type
 }: StoreItemProps) => {
   return (
-    <div className="flex flex-col gap-3 rounded-xl bg-neutral-900 p-3 sm:flex-row sm:items-center">
+    <article className="flex flex-col gap-3 rounded-xl border border-neutral-800 bg-neutral-900 p-3
+      sm:flex-row sm:items-center">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <Link
           href={createLink("store", id)}
@@ -198,24 +160,30 @@ export const StoreItemRow = ({
           />
         </Link>
         <div className="flex min-w-0 flex-col gap-1">
-          <Link
-            href={createLink("store", id)}
-            className="truncate text-base font-semibold text-white
-              duration-150 hover:text-neutral-300"
-          >
-            {title}
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href={createLink("store", id)}
+              className="truncate text-base font-semibold text-white
+                duration-150 hover:text-neutral-300"
+            >
+              {title}
+            </Link>
+            <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold
+              uppercase tracking-wide ${storeItemTypeTone(type)}`}>
+              {storeItemTypeLabel(type)}
+            </span>
+          </div>
           <Typography color="gray" className="line-clamp-2 text-sm">{description}</Typography>
         </div>
       </div>
       <div className="flex items-center justify-between gap-3 sm:shrink-0 sm:justify-end">
-        <div className="flex h-9 items-center rounded-full bg-blue-600 px-4">
+        <span className="flex h-10 items-center rounded-full bg-neutral-800 px-4">
           <ItemPrice currency={currency} price={{ value: price }} />
-        </div>
+        </span>
         <div className="w-32 sm:w-36">
           <ItemSelectToCart id={id} />
         </div>
       </div>
-    </div>
+    </article>
   )
 }

@@ -7,9 +7,22 @@ export const CartPrice = reatomComponent(({ ctx }) => {
   const prices = ctx.spy(cartState.price)
   const currencies = getCurrencies(ctx);
 
+  const totals = Object.entries(prices)
+    .filter((entry): entry is [string, number] =>
+      typeof entry[1] === "number" && entry[1] > 0
+    )
+
+  if (!totals.length) {
+    return (
+      <Typography className="text-lg leading-5 font-semibold">
+        0
+      </Typography>
+    )
+  }
+
   return (
-    <div className="space-y-1">
-      {Object.entries(prices).map(([currency, value]) => {
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {totals.map(([currency, value]) => {
         const { symbol, img } = currencies[currency] ?? { symbol: currency }
 
         return (

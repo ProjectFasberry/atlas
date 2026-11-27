@@ -4,6 +4,7 @@ import { Icon } from "@/shared/ui/icon"
 import { Typography } from "@/shared/ui/typography"
 import { Avatar } from "@/shared/ui/avatar"
 import { createLink } from "@/shared/components/config/link/link.model"
+import { Link } from "@/shared/components/config/link/link"
 import { cart, cartDataItemIsSelectAtom, type CartItem as CartItemProps } from "../../models/store-cart.model"
 import { storeItemsState } from "../../models/store.model"
 import { changeLocalRecipient } from "../../../settings/models/settings-store.model"
@@ -51,10 +52,8 @@ export const CartItem = reatomComponent<CartItemProps>(({
       border border-neutral-800 bg-neutral-900/40 p-3 sm:p-4"
     >
       <CartItemSelect id={id} title={title} />
-      <a
+      <Link
         href={createLink("store", id.toString())}
-        target="_blank"
-        rel="noreferrer"
         className="flex shrink-0 items-center justify-center
         overflow-hidden rounded-lg bg-neutral-800 size-16"
       >
@@ -64,14 +63,12 @@ export const CartItem = reatomComponent<CartItemProps>(({
           height={64}
           alt=""
           loading="lazy"
-          className="select-none size-full object-cover"
+          className="select-none size-full object-contain"
         />
-      </a>
+      </Link>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <a
+        <Link
           href={createLink("store", id.toString())}
-          target="_blank"
-          rel="noreferrer"
           className="min-w-0"
         >
           <Typography className="truncate text-sm font-semibold sm:text-base">{title}</Typography>
@@ -80,7 +77,7 @@ export const CartItem = reatomComponent<CartItemProps>(({
               {description}
             </Typography>
           )}
-        </a>
+        </Link>
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"

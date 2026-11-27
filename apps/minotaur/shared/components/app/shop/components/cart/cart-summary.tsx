@@ -9,6 +9,7 @@ import {
 } from "../../models/store-cart.model"
 import { CartPrice } from "./cart-price"
 import { translate } from "@/shared/locales/helpers"
+import { GAME_SERVERS } from "@/shared/consts/game"
 
 const CartStatus = reatomComponent(({ ctx }) => {
   const price = ctx.spy(cartState.price);
@@ -28,7 +29,7 @@ const CartStatus = reatomComponent(({ ctx }) => {
           : translate["cart.status.unavailable"]()}
       </span>
       {price.available && (
-        <Link href="/store" className="font-semibold text-red-200 hover:text-white">
+        <Link href="/wallet" className="font-semibold text-red-200 hover:text-white">
           {translate["cart.status.topUp"]()}
         </Link>
       )}
@@ -44,7 +45,7 @@ const CartServerSelect = reatomComponent(({ ctx }) => {
     <div className="flex items-center justify-between gap-2 text-xs text-neutral-400">
       <span>{translate["cart.server.title"]()}</span>
       <div className="flex items-center gap-1">
-        {["bisquite", "muffin"].map((value) => (
+        {GAME_SERVERS.map((value) => (
           <button
             key={value}
             type="button"

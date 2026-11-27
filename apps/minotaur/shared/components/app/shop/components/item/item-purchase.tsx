@@ -82,9 +82,9 @@ export const ItemPurchase = reatomComponent(({ ctx }) => {
     <div className="flex flex-col gap-4 rounded-xl bg-neutral-900 p-4
       sm:p-5 lg:sticky lg:top-24">
       <div className="flex flex-col gap-1">
-        <Typography className="text-2xl font-semibold leading-tight">
+        <h1 className="text-2xl font-semibold leading-tight">
           {data.title}
-        </Typography>
+        </h1>
         {data.description && (
           <Typography color="gray" className="text-sm">
             {data.description}

@@ -6,8 +6,7 @@ import { Typography } from "@/shared/ui/typography"
 import { menuVariant } from "@/shared/ui/menu"
 import { translate } from "@/shared/locales/helpers"
 import { balance, balanceState } from "../models/balance.model"
-
-const SERVERS = ["bisquite", "muffin"] as const
+import { GAME_SERVERS } from "@/shared/consts/game"
 
 export const WalletServerSelect = reatomComponent(({ ctx }) => {
   const current = ctx.spy(balanceState.targetServer)
@@ -31,7 +30,7 @@ export const WalletServerSelect = reatomComponent(({ ctx }) => {
             <Typography className="px-2 text-xs" color="gray">
               {translate["player.balance.servers"]()}
             </Typography>
-            {SERVERS.map((server) => (
+            {GAME_SERVERS.map((server) => (
               <Menu.Item key={server} value={server} asChild>
                 <Button
                   data-state={current === server ? "active" : "inactive"}
