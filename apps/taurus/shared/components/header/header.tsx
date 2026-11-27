@@ -170,7 +170,7 @@ export const Header = () => {
           {(item) => <HeaderItemMenu {...item} />}
         </For>
       </div>
-      <div class="hidden xl:flex items-center gap-4">
+      <div class="hidden xl:flex items-center gap-4 pr-4">
         <Link
           href={APP_URL}
           class="text-sm font-medium text-neutral-200 duration-150 hover:text-white"
