@@ -82,7 +82,12 @@
         "description": "Auction, shops and currency - earn and spend."
       }
     },
-    "version": "Version {version}"
+    "version": "Version {version}",
+    "connect.title": "How to connect",
+    "connect.description": "The launcher picks the version and mods. Without it, join from any client at:",
+    "connect.launch": "Download launcher",
+    "details": "Details",
+    "play": "Play"
   },
   "contacts": {
     "title": "Project Socials",
