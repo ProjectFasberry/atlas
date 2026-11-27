@@ -4,7 +4,6 @@ import { reatomAsync, withCache, withErrorAtom, withStatusesAtom } from "@reatom
 import { action, atom, batch } from "@reatom/framework";
 import { withAssign } from "@reatom/framework";
 import { withLocalStorage } from "@reatom/persist-web-storage";
-import { GAME_SERVERS } from "@/shared/consts/game";
 
 type BalancePayload = ExtractApiData<"getServerBalance">["data"] & { available?: boolean; purchasable?: boolean }
 
@@ -20,7 +19,7 @@ export const balanceState = atom(null, "balanceState").pipe(
         )
       }))
     ),
-    targetServer: atom<string>(GAME_SERVERS[0], "balanceTargetServer").pipe(
+    targetServer: atom("bisquite", "balanceTargetServer").pipe(
       withLocalStorage({ key: "balance-target-server" })
     )
   }))
@@ -36,7 +35,7 @@ export const balance = atom(null, "balance").pipe(
       const server = ctx.get(balanceState.targetServer);
 
       return await client.get("/server/balance", {
-        params: { query: { server: server as (typeof GAME_SERVERS)[number] } }
+        params: { query: { server: server as "muffin" | "bisquite" } }
       })
     }, {
       name: `${name}.fetch`,

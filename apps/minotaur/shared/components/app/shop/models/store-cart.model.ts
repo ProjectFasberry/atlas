@@ -16,7 +16,7 @@ import { userState } from "@/shared/models/app/index.model";
 import { cartContainsItemAtom, cartState } from "./store-cart.state";
 import { toast } from "sonner";
 import { translate } from "@/shared/locales/helpers";
-import type { GameServer } from "@/shared/consts/game";
+import type { GameServer } from "../lib/servers";
 
 export * from "./store-cart.state";
 

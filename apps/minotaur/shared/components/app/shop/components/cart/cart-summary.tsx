@@ -9,7 +9,7 @@ import {
 } from "../../models/store-cart.model"
 import { CartPrice } from "./cart-price"
 import { translate } from "@/shared/locales/helpers"
-import { GAME_SERVERS } from "@/shared/consts/game"
+import { GAME_SERVERS } from "../../lib/servers"
 
 const CartStatus = reatomComponent(({ ctx }) => {
   const price = ctx.spy(cartState.price);
