@@ -2,6 +2,7 @@ import { action, atom, reatomAsync, withAssign, withReset } from "@reatom/framew
 import { client } from "@/shared/lib/client-wrapper";
 import { logError } from "@/shared/lib/log";
 import { translate } from "@/shared/locales/helpers"
+import { getVisitorId } from "./visitor.model";
 
 type LinkKind = "invite" | "referral";
 
@@ -83,8 +84,13 @@ export const linkFlow = atom(null, "linkFlow").pipe(
       linkState.pending(ctx, true);
 
       try {
+        // Best effort: a blocked fingerprint must not stop a legitimate referral.
+        const visitorId = kind === "referral"
+          ? await getVisitorId().catch(() => undefined)
+          : undefined;
+
         const payload = await client.raw.post<AcceptPayload>("/auth/link/accept", {
-          json: kind === "referral" ? { token, nickname, password } : { token, password },
+          json: kind === "referral" ? { token, nickname, password, visitorId } : { token, password },
         });
 
         return payload;
