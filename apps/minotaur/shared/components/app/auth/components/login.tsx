@@ -85,11 +85,10 @@ const LoginTwoFactor = reatomComponent(({ ctx }) => {
         <Input
           id="login-two-factor"
           value={code}
-          onChange={(event) => authState.twoFactor.code(ctx, event.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
-          inputMode="numeric"
+          onChange={(event) => authState.twoFactor.code(ctx, event.target.value.replace(/[^A-Za-z0-9-]/g, "").toUpperCase().slice(0, 20))}
           autoComplete="one-time-code"
           placeholder="000000"
-          maxLength={6}
+          maxLength={20}
         />
       </AuthField>
       {error && (
@@ -101,7 +100,7 @@ const LoginTwoFactor = reatomComponent(({ ctx }) => {
         type="submit"
         className="w-full h-10 font-semibold"
         background="positive"
-        disabled={isPending || code.length !== 6}
+        disabled={isPending || code.length < 6}
         withSpinner
         isLoading={isPending}
       >

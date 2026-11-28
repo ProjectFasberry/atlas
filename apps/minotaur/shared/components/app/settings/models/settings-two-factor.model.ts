@@ -29,8 +29,10 @@ export const twoFactor = atom(null, "twoFactor").pipe(
       }
     }).pipe(withStatusesAtom(), withErrorAtom()),
 
-    startSetup: reatomAsync(async (ctx) => {
-      return await ctx.schedule(() => client.post("/auth/2fa/setup"));
+    startSetup: reatomAsync(async (ctx, password: string) => {
+      return await ctx.schedule(() =>
+        client.raw.post<SetupPayload>("/auth/2fa/setup", { json: { password } })
+      );
     }, {
       name: `${name}.startSetup`,
       onFulfill: (ctx, res) => {

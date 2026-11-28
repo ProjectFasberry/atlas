@@ -164,13 +164,20 @@ const DisableForm = reatomComponent(({ ctx }) => {
         <label htmlFor="two-factor-disable-code" className="text-sm font-medium text-neutral-300">
           {translate["settings.security.two-factor.code"]()}
         </label>
-        <TwoFactorCodeInput id="two-factor-disable-code" value={code} onChange={setCode} />
+        <Input
+          id="two-factor-disable-code"
+          value={code}
+          onChange={(event) => setCode(event.target.value.replace(/[^A-Za-z0-9-]/g, "").toUpperCase().slice(0, 20))}
+          autoComplete="one-time-code"
+          placeholder="000000"
+          maxLength={20}
+        />
       </div>
       <Button
         type="submit"
         variant="danger"
         className="self-start"
-        disabled={isPending || !password || code.length !== 6}
+        disabled={isPending || !password || code.length < 6}
         withSpinner
         isLoading={isPending}
       >
@@ -186,6 +193,16 @@ export const TwoFactorSettings = reatomComponent(({ ctx }) => {
   const status = ctx.spy(twoFactorState.status)
   const step = ctx.spy(twoFactorState.step)
   const isSetupPending = ctx.spy(twoFactor.startSetup.statusesAtom).isPending
+  const setupError = ctx.spy(twoFactor.startSetup.errorAtom)
+  const [password, setPassword] = useState("")
+
+  if (ctx.spy(twoFactor.fetchStatus.errorAtom)) {
+    return (
+      <Typography color="gray" className="text-sm">
+        {translate["settings.security.two-factor.load-error"]()}
+      </Typography>
+    )
+  }
 
   if (ctx.spy(twoFactor.fetchStatus.statusesAtom).isFirstPending || !status) {
     return <Skeleton className="h-24 w-full" />
@@ -212,17 +229,38 @@ export const TwoFactorSettings = reatomComponent(({ ctx }) => {
         )}
       </div>
       {!status.enabled && (
-        <Button
-          type="button"
-          background="positive"
-          className="self-start"
-          disabled={isSetupPending}
-          withSpinner
-          isLoading={isSetupPending}
-          onClick={() => spawn(ctx, (spawnCtx) => twoFactor.startSetup(spawnCtx))}
-        >
-          {translate["settings.security.two-factor.enable"]()}
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="two-factor-setup-password" className="text-sm font-medium text-neutral-300">
+              {translate["settings.security.two-factor.password"]()}
+            </label>
+            <Input
+              id="two-factor-setup-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </div>
+          <Button
+            type="button"
+            background="positive"
+            className="self-start"
+            disabled={isSetupPending || !password}
+            withSpinner
+            isLoading={isSetupPending}
+            onClick={() => spawn(ctx, (spawnCtx) => twoFactor.startSetup(spawnCtx, password))}
+          >
+            {translate["settings.security.two-factor.enable"]()}
+          </Button>
+        </div>
+      )}
+      {setupError && !status.enabled && (
+        <Typography className="text-sm text-red-300">
+          {String(setupError).includes("TOO_MANY_REQUESTS")
+            ? translate["settings.security.two-factor.too-many"]()
+            : translate["settings.security.two-factor.wrong-password"]()}
+        </Typography>
       )}
       {status.enabled && <DisableForm />}
     </div>

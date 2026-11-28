@@ -1110,7 +1110,10 @@
         "cancel": "Cancel",
         "disable-title": "Disable 2FA",
         "password": "Password",
-        "disable": "Disable"
+        "disable": "Disable",
+        "wrong-password": "Wrong password",
+        "load-error": "Could not load two-factor settings",
+        "too-many": "Too many attempts, try again later"
       }
     },
     "errors": {
