@@ -1,8 +1,15 @@
 import { SettingsContentWrapper, SettingsSection } from "./ui"
 import { type SettingsSectionItem } from "../models/settings.model"
 import { translate } from "@/shared/locales/helpers"
+import { TwoFactorSettings } from "./settings-two-factor"
 
-const SECURITY_SECTIONS: SettingsSectionItem[] = []
+const SECURITY_SECTIONS: SettingsSectionItem[] = [
+  {
+    title: translate["settings.security.two-factor.title"](),
+    description: translate["settings.security.two-factor.description"](),
+    children: <TwoFactorSettings />
+  },
+]
 
 export const SettingsMainSecurity = () => {
   return (

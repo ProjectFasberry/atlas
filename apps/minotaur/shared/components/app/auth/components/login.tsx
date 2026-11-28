@@ -9,12 +9,13 @@ import { Button } from "@/shared/ui/button"
 import { spawn } from "@reatom/framework"
 import { Separator } from "@/shared/ui/separator"
 import { AuthField, NicknameInput, PasswordInput } from "./auth"
-import { authState } from "../models/auth.model"
+import { auth, authState } from "../models/auth.model"
 import { focusFirstAuthError } from "./focus"
 import { IconLoader } from "@/shared/ui/icon-loader"
 import { QrCode } from "@ark-ui/react/qr-code"
 import { qrCodeVariant } from "@/shared/ui/qr-code"
 import { Link } from "@/shared/components/config/link/link"
+import { Input } from "@/shared/ui/input"
 import { pageState } from "@/shared/models/page-context.model"
 import { getNextPath } from "@/shared/lib/auth-redirect"
 import { translate } from "@/shared/locales/helpers"
@@ -53,7 +54,73 @@ const LoginPasswordSubmit = reatomComponent(({ ctx }) => {
   )
 }, "LoginPasswordSubmit")
 
+const LoginTwoFactor = reatomComponent(({ ctx }) => {
+  const code = ctx.spy(authState.twoFactor.code)
+  const isPending = ctx.spy(login.twoFactor.statusesAtom).isPending
+    || ctx.spy(authState.isProcessing)
+  const error = ctx.spy(login.twoFactor.errorAtom)
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    spawn(ctx, (spawnCtx) => login.twoFactor(spawnCtx))
+  }
+
+  const back = () => {
+    authState.twoFactor.challenge.reset(ctx)
+    authState.twoFactor.code.reset(ctx)
+    auth.resetErrors(ctx)
+  }
+
+  return (
+    <form className="flex flex-col gap-4 w-full h-full" onSubmit={handleSubmit}>
+      <div className="flex flex-col gap-1">
+        <p className="text-sm font-medium text-neutral-200">
+          {translate["auth.login.two-factor.title"]()}
+        </p>
+        <p className="text-sm text-neutral-400">
+          {translate["auth.login.two-factor.description"]()}
+        </p>
+      </div>
+      <AuthField id="login-two-factor" label={translate["auth.login.two-factor.label"]()}>
+        <Input
+          id="login-two-factor"
+          value={code}
+          onChange={(event) => authState.twoFactor.code(ctx, event.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          placeholder="000000"
+          maxLength={6}
+        />
+      </AuthField>
+      {error && (
+        <p className="text-sm text-red-300">
+          {translate["auth.login.two-factor.invalid"]()}
+        </p>
+      )}
+      <Button
+        type="submit"
+        className="w-full h-10 font-semibold"
+        background="positive"
+        disabled={isPending || code.length !== 6}
+        withSpinner
+        isLoading={isPending}
+      >
+        {translate["auth.login.two-factor.submit"]()}
+      </Button>
+      <button
+        type="button"
+        onClick={back}
+        className="text-sm text-neutral-400 duration-150 hover:text-neutral-50"
+      >
+        {translate["auth.login.two-factor.back"]()}
+      </button>
+    </form>
+  )
+}, "LoginTwoFactor")
+
 const LoginPassword = reatomComponent(({ ctx }) => {
+  if (ctx.spy(authState.twoFactor.challenge)) return <LoginTwoFactor />
+
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -232,12 +299,14 @@ const LoginFormComponent = reatomComponent(({ ctx }) =>
 
 export const LoginForm = reatomComponent(({ ctx }) => {
   const active = ctx.spy(authLoginVariantAtom)
+  const twoFactor = !!ctx.spy(authState.twoFactor.challenge)
 
   return (
     <div className="flex flex-col gap-6 w-full h-full">
       <LoginFormComponent />
       <div className={`flex flex-col w-full gap-2 items-center justify-center
-        ${active === "password" ? "max-sm:hidden" : ""}`}>
+        ${active === "password" ? "max-sm:hidden" : ""}
+        ${twoFactor ? "hidden" : ""}`}>
         <div className="flex items-center w-full gap-4">
           <Separator className="flex-1" />
           <span className="shrink-0 text-sm text-neutral-50">

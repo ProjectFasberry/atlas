@@ -2524,6 +2524,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/login/2fa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Complete two-factor login */
+        post: operations["postAuthLogin2fa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login/qr/generate": {
         parameters: {
             query?: never;
@@ -2676,6 +2693,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/client/login/2fa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Complete launcher two-factor login */
+        post: operations["postAuthClientLogin2fa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/client/validate": {
         parameters: {
             query?: never;
@@ -2806,6 +2840,74 @@ export interface paths {
         get: operations["getAuthValidate-session"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/2fa/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get two-factor status */
+        get: operations["getAuth2faStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/2fa/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start two-factor setup */
+        post: operations["postAuth2faSetup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/2fa/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm two-factor setup */
+        post: operations["postAuth2faConfirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/2fa/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Disable two-factor */
+        post: operations["postAuth2faDisable"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10397,6 +10499,10 @@ export interface operations {
                         data: {
                             nickname: string;
                             uuid: string;
+                        } | {
+                            /** @constant */
+                            requires_2fa: true;
+                            challenge: string;
                         };
                     };
                 };
@@ -10439,6 +10545,61 @@ export interface operations {
                          * @enum {string}
                          */
                         error: "TOO_MANY_REQUESTS";
+                    };
+                };
+            };
+        };
+    };
+    postAuthLogin2fa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    challenge: string;
+                    code: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    challenge: string;
+                    code: string;
+                };
+                "multipart/form-data": {
+                    challenge: string;
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                            uuid: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TWO_FACTOR_INVALID
+                         * @enum {string}
+                         */
+                        error: "TWO_FACTOR_INVALID";
                     };
                 };
             };
@@ -10786,6 +10947,10 @@ export interface operations {
                             token: string;
                             /** Format: date-time */
                             expires_at: string;
+                        } | {
+                            /** @constant */
+                            requires_2fa: true;
+                            challenge: string;
                         };
                     };
                 };
@@ -10817,6 +10982,65 @@ export interface operations {
                          * @enum {string}
                          */
                         error: "TOO_MANY_REQUESTS";
+                    };
+                };
+            };
+        };
+    };
+    postAuthClientLogin2fa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    challenge: string;
+                    code: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    challenge: string;
+                    code: string;
+                };
+                "multipart/form-data": {
+                    challenge: string;
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            nickname: string;
+                            uuid: string;
+                            avatar: string;
+                            token: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TWO_FACTOR_INVALID
+                         * @enum {string}
+                         */
+                        error: "TWO_FACTOR_INVALID";
                     };
                 };
             };
@@ -11237,6 +11461,186 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: boolean;
+                    };
+                };
+            };
+        };
+    };
+    getAuth2faStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            enabled: boolean;
+                            backupCodesRemaining: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postAuth2faSetup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            secret: string;
+                            otpauth: string;
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description Response for status 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TWO_FACTOR_ALREADY_ENABLED
+                         * @enum {string}
+                         */
+                        error: "TWO_FACTOR_ALREADY_ENABLED";
+                    };
+                };
+            };
+        };
+    };
+    postAuth2faConfirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    code: string;
+                };
+                "multipart/form-data": {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            backupCodes: string[];
+                        };
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TWO_FACTOR_INVALID
+                         * @enum {string}
+                         */
+                        error: "TWO_FACTOR_INVALID";
+                    };
+                };
+            };
+        };
+    };
+    postAuth2faDisable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    password: string;
+                    code: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    password: string;
+                    code: string;
+                };
+                "multipart/form-data": {
+                    password: string;
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        data: "OK";
+                    };
+                };
+            };
+            /** @description Response for status 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @default TWO_FACTOR_INVALID
+                         * @enum {string}
+                         */
+                        error: "TWO_FACTOR_INVALID";
                     };
                 };
             };

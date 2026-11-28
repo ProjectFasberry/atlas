@@ -187,7 +187,15 @@
         "error-description": "Check your connection and try again."
       },
       "submit": "Sign in",
-      "forgot": "Forgot password?"
+      "forgot": "Forgot password?",
+      "two-factor": {
+        "title": "Two-factor check",
+        "description": "Enter the code from your authenticator app.",
+        "label": "Code",
+        "submit": "Confirm",
+        "back": "Back",
+        "invalid": "Invalid code"
+      }
     },
     "register": {
       "success": "You have successfully registered on the Fasberry project!",
@@ -225,7 +233,8 @@
         "user-exists": "Such a player is already registered",
         "token-not-found": "Verification is required",
         "unknown": "Something went wrong. Please try again.",
-        "captcha": "Verification failed"
+        "captcha": "Verification failed",
+        "two-factor-invalid": "Invalid code"
       },
       "password-visibility": {
         "show": "Show password",
@@ -1080,7 +1089,29 @@
     },
     "title": "Settings",
     "security": {
-      "title": "Security"
+      "title": "Security",
+      "two-factor": {
+        "title": "Two-factor authentication",
+        "description": "A code from your authenticator app when signing in.",
+        "enabled": "2FA is on",
+        "disabled": "2FA is off",
+        "enable": "Enable 2FA",
+        "setup-title": "Connect the app",
+        "setup-description": "Scan the QR with Google Authenticator, Aegis or 1Password and enter the code.",
+        "code": "Authenticator code",
+        "confirm": "Confirm",
+        "invalid": "Invalid code",
+        "backup-title": "Backup codes",
+        "backup-description": "Save them: each code works once if you lose your phone.",
+        "backup-remaining": "Backup codes left: {count}",
+        "copy": "Copy",
+        "copied": "Copied",
+        "done": "Done",
+        "cancel": "Cancel",
+        "disable-title": "Disable 2FA",
+        "password": "Password",
+        "disable": "Disable"
+      }
     },
     "errors": {
       "title": "Something went wrong"

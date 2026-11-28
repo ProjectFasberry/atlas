@@ -39,6 +39,12 @@ export const authState = atom(null, "authState").pipe(
     errorsType: atom<AuthErrorType[]>([], `${name}.errorsType`).pipe(withReset()),
     isProcessing: atom(false, `${name}.isProcessing`).pipe(withReset()),
     token: atom<Nullable<string>>(null, `${name}.token`).pipe(withReset()),
+    twoFactor: atom(null, `${name}.twoFactor`).pipe(
+      withAssign((_, name) => ({
+        challenge: atom<Nullable<string>>(null, `${name}.challenge`).pipe(withReset()),
+        code: atom("", `${name}.code`).pipe(withReset()),
+      }))
+    ),
   }))
 )
 
@@ -138,6 +144,10 @@ const getAuthErrors = (): Record<string, AuthErrorInfo> => ({
   },
   "CAP_UNAVAILABLE": {
     message: () => translate["auth.shared.errors.captcha"](),
+    fields: [],
+  },
+  "TWO_FACTOR_INVALID": {
+    message: () => translate["auth.shared.errors.two-factor-invalid"](),
     fields: [],
   },
 });

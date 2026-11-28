@@ -64,6 +64,14 @@ export const login = atom(null, "login").pipe(
               return;
             }
 
+            const data = res as { requires_2fa?: boolean; challenge?: string };
+
+            if (data?.requires_2fa && data.challenge) {
+              authState.twoFactor.challenge(ctx, data.challenge);
+              authState.isProcessing(ctx, false);
+              return;
+            }
+
             goAfterAuth(getNextPath(ctx.get(pageState.urlParsed)?.search))
           },
           onReject: (ctx, e) => {
@@ -77,6 +85,36 @@ export const login = atom(null, "login").pipe(
           withStatusesAtom()
         )
       }))
+    ),
+    twoFactor: reatomAsync(async (ctx) => {
+      const challenge = ctx.get(authState.twoFactor.challenge);
+      const code = ctx.get(authState.twoFactor.code).trim();
+
+      if (!challenge || code.length < 6) return;
+
+      authState.isProcessing(ctx, true);
+
+      return await client.raw.post("/auth/login/2fa", {
+        json: { challenge, code },
+        timeout: 10000,
+      });
+    }, {
+      name: `${name}.twoFactor`,
+      onFulfill: (ctx, res) => {
+        if (!res) return;
+
+        authState.twoFactor.challenge.reset(ctx);
+        authState.twoFactor.code.reset(ctx);
+        authState.isProcessing(ctx, false);
+        goAfterAuth(getNextPath(ctx.get(pageState.urlParsed)?.search));
+      },
+      onReject: (ctx, e) => {
+        authState.isProcessing(ctx, false);
+        defineError(ctx, e);
+      }
+    }).pipe(
+      withErrorAtom(),
+      withStatusesAtom()
     ),
   })),
 );
