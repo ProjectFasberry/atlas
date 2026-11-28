@@ -11,6 +11,7 @@ import { dayjs } from "@/shared/lib/dayjs"
 import { anticheat, anticheatState, setAnticheatFilter, setAnticheatHours } from "../models/anticheat.model"
 import { runGrimAction, type GrimAction } from "@/shared/api/anticheat"
 import { translate } from "@/shared/locales/helpers"
+import { serverName } from "@/shared/lib/server-name"
 
 const HOURS = [6, 24, 72, 168]
 
@@ -72,7 +73,7 @@ export const AnticheatPanel = reatomComponent(({ ctx }) => {
               key={`${row.server}-${row.check_name}`}
               className="rounded-md border border-neutral-800 px-2 py-1 text-xs text-neutral-300"
             >
-              {row.check_name} · {row.server} · <span className="tabular-nums text-white">{row.total}</span>
+              {row.check_name} · {serverName(row.server)} · <span className="tabular-nums text-white">{row.total}</span>
             </span>
           ))}
         </div>
@@ -110,7 +111,7 @@ export const AnticheatPanel = reatomComponent(({ ctx }) => {
                 <TableCell className="text-sm text-neutral-300">{flag.check_name}</TableCell>
                 <TableCell className="text-right tabular-nums text-sm text-amber-300">{flag.violations}</TableCell>
                 <TableCell className="text-right tabular-nums text-sm text-neutral-400">{flag.suppressed}</TableCell>
-                <TableCell className="text-sm text-neutral-400">{flag.server}</TableCell>
+                <TableCell className="text-sm text-neutral-400">{serverName(flag.server)}</TableCell>
                 <TableCell className="text-right text-xs text-neutral-500">{formatTime(flag.created_at)}</TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">

@@ -110,7 +110,7 @@ describe("type guards", () => {
 
 		expect(isRatingServer("bisquite")).toBe(true);
 		expect(isRatingServer("muffin")).toBe(true);
-		expect(isRatingServer("lobby")).toBe(false);
+		expect(isRatingServer("lobby")).toBe(true);
 		expect(isRatingServer(undefined)).toBe(false);
 	});
 });

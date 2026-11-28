@@ -11,6 +11,7 @@ import { Dialog, DialogTitle } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { dialogVariant } from "@/shared/ui/dialog";
 import { ErrorBlock } from "@/shared/ui/error-block";
+import { serverName } from "@/shared/lib/server-name";
 
 const PlayerLocation = reatomComponent<{ nickname: string }>(({ ctx, nickname }) => {
   useUpdate((ctx) => playerActivity.location.fetch(ctx, nickname), [nickname]);
@@ -50,17 +51,17 @@ const PlayerServer = reatomComponent(({ ctx }) => {
   return (
     <>
       <Dialog.Root open={ctx.spy(openAtom)} onOpenChange={v => openAtom(ctx, v.open)}>
-        {server === 'Lobby' ? (
+        {server.toLowerCase() === 'lobby' ? (
           <div className="flex justify-start cursor-pointer items-center overflow-x-auto gap-2 w-full">
             <Typography className="text-neutral-400 font-semibold text-sm">
-              {translate["player.activity.server"]()} <span className="text-neutral-50">{server}</span>
+              {translate["player.activity.server"]()} <span className="text-neutral-50">{serverName(server)}</span>
             </Typography>
           </div>
         ) : (
           <Dialog.Trigger>
             <div className="flex justify-start cursor-pointer items-center overflow-x-auto gap-2 w-full">
               <Typography className="text-neutral-400 font-semibold text-sm">
-                {translate["player.activity.server"]()} <span className="text-neutral-50">{server}</span>
+                {translate["player.activity.server"]()} <span className="text-neutral-50">{serverName(server)}</span>
               </Typography>
             </div>
           </Dialog.Trigger>

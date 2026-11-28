@@ -346,7 +346,8 @@
     "servers": {
       "global": "Глобальные",
       "bisquite": "Bisquite",
-      "muffin": "Muffin"
+      "muffin": "Muffin",
+      "lobby": "Лобби"
     },
     "sort": {
       "label": "Сортировка",
@@ -1680,6 +1681,8 @@
     "mute": "Мут",
     "navigation": "Навигация",
     "back": "Назад",
+    "title-ru": "Название (RU)",
+    "title-en": "Название (EN)",
     "title-2": "Название",
     "name-optional": "Название (необязательно)",
     "item-name": "Название товара",

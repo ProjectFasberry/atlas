@@ -346,7 +346,8 @@
     "servers": {
       "global": "Global",
       "bisquite": "Bisquite",
-      "muffin": "Muffin"
+      "muffin": "Muffin",
+      "lobby": "Lobby"
     },
     "sort": {
       "label": "Sort",
@@ -1680,6 +1681,8 @@
     "mute": "Mute",
     "navigation": "Navigation",
     "back": "Back",
+    "title-ru": "Title (RU)",
+    "title-en": "Title (EN)",
     "title-2": "Title",
     "name-optional": "Name (optional)",
     "item-name": "Item name",

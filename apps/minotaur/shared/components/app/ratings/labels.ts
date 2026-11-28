@@ -18,6 +18,7 @@ const SERVER_KEYS = {
 	global: "ratings.servers.global",
 	bisquite: "ratings.servers.bisquite",
 	muffin: "ratings.servers.muffin",
+	lobby: "ratings.servers.lobby",
 } as const;
 
 export type RatingType = RatingKind;

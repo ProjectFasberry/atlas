@@ -98,7 +98,8 @@ const ServerEditorFields = reatomComponent(({ ctx }) => {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
-        <Field label={translate["panel.title-2"]()} val={form.fullname} onChange={handleSet("fullname")} />
+        <Field label={translate["panel.title-ru"]()} val={form.fullname} onChange={handleSet("fullname")} />
+        <Field label={translate["panel.title-en"]()} val={form.fullname_en} onChange={handleSet("fullname_en")} />
         <Field
           label="Origin"
           val={mode === "create" ? form.origin : (server?.origin ?? "")}
@@ -260,7 +261,9 @@ export const Servers = reatomComponent(({ ctx }) => {
               <TableCell>
                 <div className="flex flex-col">
                   <span className="font-semibold">{s.fullname}</span>
-                  <span className="text-xs text-neutral-500">{s.origin}</span>
+                  <span className="text-xs text-neutral-500">
+                    {s.origin}{s.fullname_en ? ` · ${s.fullname_en}` : ""}
+                  </span>
                 </div>
               </TableCell>
               <TableCell>

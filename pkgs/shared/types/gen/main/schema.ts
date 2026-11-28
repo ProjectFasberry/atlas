@@ -6657,6 +6657,7 @@ export interface operations {
                         data: {
                             id: number;
                             fullname: string;
+                            fullname_en: string;
                             description: (string | null) | null;
                             thumbnail: string;
                             origin: string;
@@ -6687,6 +6688,7 @@ export interface operations {
                 "application/json": {
                     origin: string;
                     fullname: string;
+                            fullname_en: string;
                     description?: (string | null) | null;
                     thumbnail?: string;
                     available?: boolean;
@@ -6710,6 +6712,7 @@ export interface operations {
                 "application/x-www-form-urlencoded": {
                     origin: string;
                     fullname: string;
+                            fullname_en: string;
                     description?: (string | null) | null;
                     thumbnail?: string;
                     available?: boolean;
@@ -6733,6 +6736,7 @@ export interface operations {
                 "multipart/form-data": {
                     origin: string;
                     fullname: string;
+                            fullname_en: string;
                     description?: (string | null) | null;
                     thumbnail?: string;
                     available?: boolean;
@@ -6766,6 +6770,7 @@ export interface operations {
                         data: {
                             id: number;
                             fullname: string;
+                            fullname_en: string;
                             description: (string | null) | null;
                             thumbnail: string;
                             origin: string;
@@ -6907,6 +6912,7 @@ export interface operations {
                         data: {
                             id: number;
                             fullname: string;
+                            fullname_en: string;
                             description: (string | null) | null;
                             thumbnail: string;
                             origin: string;
@@ -6989,6 +6995,7 @@ export interface operations {
             content: {
                 "application/json": {
                     fullname?: string;
+                            fullname_en?: string;
                     description?: (string | null) | null;
                     thumbnail?: string;
                     available?: boolean;
@@ -7011,6 +7018,7 @@ export interface operations {
                 };
                 "application/x-www-form-urlencoded": {
                     fullname?: string;
+                            fullname_en?: string;
                     description?: (string | null) | null;
                     thumbnail?: string;
                     available?: boolean;
@@ -7033,6 +7041,7 @@ export interface operations {
                 };
                 "multipart/form-data": {
                     fullname?: string;
+                            fullname_en?: string;
                     description?: (string | null) | null;
                     thumbnail?: string;
                     available?: boolean;
@@ -7066,6 +7075,7 @@ export interface operations {
                         data: {
                             id: number;
                             fullname: string;
+                            fullname_en: string;
                             description: (string | null) | null;
                             thumbnail: string;
                             origin: string;
@@ -12590,6 +12600,7 @@ export interface operations {
                                 [key: string]: {
                                     id: string;
                                     fullname: string;
+                            fullname_en: string;
                                     available: boolean;
                                     excluded: boolean;
                                     runtime: {
@@ -12683,6 +12694,7 @@ export interface operations {
                                 [key: string]: {
                                     online: number;
                                     fullname: string;
+                            fullname_en: string;
                                     thumbnail: string;
                                     max: number;
                                     players: string[];

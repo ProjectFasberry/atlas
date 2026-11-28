@@ -10,6 +10,7 @@ export type ResourcePackOption = ExtractApiData<"getPrivatedServersResource-pack
 export type ServerPayload = {
   id: number
   fullname: string
+  fullname_en: string
   description: string | null
   thumbnail: string
   origin: string
@@ -27,6 +28,7 @@ export type ServerPayload = {
 export type ServerPatch = Partial<Pick<
   ServerPayload,
   | "fullname"
+  | "fullname_en"
   | "description"
   | "thumbnail"
   | "available"
@@ -43,6 +45,7 @@ export type ServerPatch = Partial<Pick<
 export type ServerForm = {
   origin: string
   fullname: string
+  fullname_en: string
   description: string
   thumbnail: string
   client_version: string
@@ -62,6 +65,7 @@ const JAVA_BY_VERSION: Record<string, string> = {
 const emptyForm: ServerForm = {
   origin: "",
   fullname: "",
+  fullname_en: "",
   description: "",
   thumbnail: "",
   client_version: "",
@@ -76,6 +80,7 @@ function formOf(s: ServerPayload): ServerForm {
   return {
     origin: s.origin,
     fullname: s.fullname,
+    fullname_en: s.fullname_en,
     description: s.description ?? "",
     thumbnail: s.thumbnail,
     client_version: s.client_version,
@@ -92,6 +97,7 @@ export function createOf(form: ServerForm) {
   return {
     origin: form.origin.trim().toLowerCase(),
     fullname: form.fullname.trim(),
+    fullname_en: form.fullname_en.trim(),
     description: form.description.trim() || null,
     thumbnail: form.thumbnail.trim(),
     client_version: form.client_version.trim(),
@@ -106,6 +112,7 @@ export function createOf(form: ServerForm) {
 export function patchOf(form: ServerForm): ServerPatch {
   return {
     fullname: form.fullname.trim(),
+    fullname_en: form.fullname_en.trim(),
     description: form.description.trim() || null,
     thumbnail: form.thumbnail.trim(),
     client_version: form.client_version.trim(),

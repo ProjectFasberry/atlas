@@ -3,6 +3,7 @@ import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts"
 import { clsx } from "cnfast"
+import { serverName } from "@/shared/lib/server-name"
 import { Button } from "@/shared/ui/button"
 import { ErrorBlock } from "@/shared/ui/error-block"
 import { Noop } from "@/shared/ui/noop"
@@ -111,7 +112,10 @@ const ServersChart = ({ servers }: { servers: { server: string, online: number }
   return (
     <div className="h-48 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={servers} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+        <BarChart
+          data={servers.map((entry) => ({ ...entry, server: serverName(entry.server) }))}
+          margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
+        >
           <CartesianGrid stroke="#262626" strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="server" tick={{ fill: "#737373", fontSize: 11 }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fill: "#737373", fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
@@ -172,7 +176,7 @@ const ServerSwitch = reatomComponent<{ servers: string[] }>(({ ctx, servers }) =
           )}
           onClick={() => setPlayersServer(ctx, server)}
         >
-          {server}
+          {serverName(server)}
         </Button>
       ))}
     </div>
@@ -204,7 +208,7 @@ const RecentEvents = reatomComponent(({ ctx }) => {
           <div className="flex items-center gap-2 min-w-0">
             <span className={clsx("size-1.5 shrink-0 rounded-full", event.type === "join" ? "bg-green-500" : "bg-red")} />
             <Typography className="truncate text-sm">{event.name}</Typography>
-            <span className="text-neutral-500">{event.server}</span>
+            <span className="text-neutral-500">{serverName(event.server)}</span>
           </div>
           <span className="shrink-0 text-neutral-500">{dayjs(event.date).format("HH:mm:ss")}</span>
         </div>
