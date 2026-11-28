@@ -18,12 +18,13 @@ const PLATFORM_ICONS: Record<string, IconName> = {
 }
 
 const SessionItemTrigger = ({ session, current }: { session: SessionPayload, current?: boolean }) => {
-  const { browser, os, platform, ip, created_at } = session;
+  const { browser, os, platform, ip, created_at, last_seen, new_device } = session;
   const platformIcon = PLATFORM_ICONS[platform?.type ?? "unknown"] ?? PLATFORM_ICONS["unknown"];
   const browserLabel = [browser.name, browser.version].filter(Boolean).join(" ")
     || translate["settings.devices.sections.sessions.unknown-device"]();
   const osLabel = [os?.name, os?.versionName].filter(Boolean).join(" ");
   const createdAt = dayjs(created_at).format("DD.MM.YYYY HH:mm");
+  const lastSeen = dayjs(last_seen).format("DD.MM.YYYY HH:mm");
 
   return (
     <div className="flex w-full items-center gap-3 overflow-hidden rounded-lg px-2 py-2
@@ -41,12 +42,21 @@ const SessionItemTrigger = ({ session, current }: { session: SessionPayload, cur
               {translate["settings.devices.sections.sessions.this-device"]()}
             </span>
           )}
+          {new_device && (
+            <span className="shrink-0 rounded bg-amber-500/15 px-1.5 py-0.5
+              text-[10px] font-semibold uppercase text-amber-400">
+              {translate["settings.devices.sections.sessions.new-device"]()}
+            </span>
+          )}
         </div>
         <Typography color="gray" className="truncate text-sm leading-4">
           {osLabel ? `${osLabel} · ${ip}` : ip}
         </Typography>
         <Typography color="gray" className="truncate text-xs leading-4">
           {translate["settings.devices.sections.sessions.created"]({ date: createdAt })}
+        </Typography>
+        <Typography color="gray" className="truncate text-xs leading-4">
+          {translate["settings.devices.sections.sessions.last-seen"]({ date: lastSeen })}
         </Typography>
       </div>
     </div>
@@ -155,6 +165,62 @@ const SessionsListCurrent = reatomComponent(({ ctx }) => {
   return <SessionItem session={current} type="current" />
 }, "SessionsListCurrent")
 
+const LoginHistory = reatomComponent(({ ctx }) => {
+  if (ctx.spy(sessions.fetchHistory.errorAtom)) {
+    return (
+      <Typography color="gray" className="text-sm">
+        {translate["settings.devices.sections.sessions.history.load-error"]()}
+      </Typography>
+    )
+  }
+
+  if (ctx.spy(sessions.fetchHistory.statusesAtom).isFirstPending) {
+    return Array.from({ length: 3 }).map((_, idx) => <Skeleton key={idx} className="h-14 w-full" />)
+  }
+
+  const data = ctx.spy(sessionsState.history);
+  if (!data || isEmptyArray(data)) {
+    return (
+      <Typography color="gray" className="text-sm">
+        {translate["settings.devices.sections.sessions.history.empty"]()}
+      </Typography>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-1 w-full">
+      {data.map((event) => (
+        <div key={event.id} className="flex items-start justify-between gap-3 rounded-lg
+          bg-neutral-900 px-3 py-2">
+          <div className="flex min-w-0 flex-col">
+            <Typography className="truncate text-sm font-medium leading-5">
+              {event.browser}
+            </Typography>
+            <Typography color="gray" className="truncate text-xs leading-4">
+              {event.os} · {event.ip} · {
+                event.client === "launcher"
+                  ? translate["settings.devices.sections.sessions.history.client-launcher"]()
+                  : translate["settings.devices.sections.sessions.history.client-web"]()
+              }
+            </Typography>
+          </div>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <Typography color="gray" className="text-xs leading-4">
+              {dayjs(event.created_at).format("DD.MM.YYYY HH:mm")}
+            </Typography>
+            {event.new_device && (
+              <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px]
+                font-semibold uppercase text-amber-400">
+                {translate["settings.devices.sections.sessions.new-device"]()}
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}, "LoginHistory")
+
 export const SessionsList = () => {
   useUpdate(sessions.init, []);
 
@@ -171,6 +237,12 @@ export const SessionsList = () => {
           {translate["settings.devices.sections.sessions.active-sessions"]()}
         </p>
         <SessionsListActive />
+      </div>
+      <div className="flex flex-col gap-2 w-full">
+        <p className="text-sm font-medium leading-4">
+          {translate["settings.devices.sections.sessions.history.title"]()}
+        </p>
+        <LoginHistory />
       </div>
     </div>
   )

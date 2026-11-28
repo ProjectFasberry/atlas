@@ -944,7 +944,16 @@
           "end-session-confirm": "End this session?",
           "end-session-description": "The device will be signed out. Continue?",
           "expired": "The session is stale, refresh the list",
-          "cannot-delete-current": "You cannot end the current session"
+          "cannot-delete-current": "You cannot end the current session",
+          "new-device": "New device",
+          "last-seen": "Last active: {date}",
+          "history": {
+            "title": "Login history",
+            "empty": "No logins yet",
+            "load-error": "Could not load login history",
+            "client-web": "Web",
+            "client-launcher": "Launcher"
+          }
         },
         "add-device": {
           "title": "Link a device to your account by scanning a QR code",

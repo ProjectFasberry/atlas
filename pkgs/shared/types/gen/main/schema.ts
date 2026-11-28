@@ -2846,6 +2846,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/session/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get login history */
+        get: operations["getAuthSessionHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/session/all": {
         parameters: {
             query?: never;
@@ -11116,16 +11133,19 @@ export interface operations {
                     token: string;
                     password: string;
                     nickname?: string;
+                    visitorId?: string;
                 };
                 "application/x-www-form-urlencoded": {
                     token: string;
                     password: string;
                     nickname?: string;
+                    visitorId?: string;
                 };
                 "multipart/form-data": {
                     token: string;
                     password: string;
                     nickname?: string;
+                    visitorId?: string;
                 };
             };
         };
@@ -11244,6 +11264,9 @@ export interface operations {
                             /** Format: date-time */
                             created_at: string;
                             id: string;
+                            /** Format: date-time */
+                            last_seen: string;
+                            new_device: boolean;
                             browser: {
                                 name: string;
                                 version: string;
@@ -11283,6 +11306,9 @@ export interface operations {
                             /** Format: date-time */
                             created_at: string;
                             id: string;
+                            /** Format: date-time */
+                            last_seen: string;
+                            new_device: boolean;
                             browser: {
                                 name: string;
                                 version: string;
@@ -11295,6 +11321,39 @@ export interface operations {
                                 type?: string;
                             };
                         };
+                    };
+                };
+            };
+        };
+    };
+    getAuthSessionHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: number;
+                            nickname: string;
+                            ip: string;
+                            browser: string;
+                            os: string;
+                            platform: string;
+                            client: string;
+                            new_device: boolean;
+                            /** Format: date-time */
+                            created_at: string;
+                        }[];
                     };
                 };
             };

@@ -8,6 +8,7 @@ import { translate } from "@/shared/locales/helpers";
 
 type CurrentSession = ExtractApiData<"getAuthSessionCurrent">["data"]
 type SessionRow = ExtractApiData<"getAuthSessionList">["data"][number]
+type LoginHistoryRow = ExtractApiData<"getAuthSessionHistory">["data"][number]
 
 export type SessionPayload = CurrentSession
 export type SesssionsPayload = SessionRow[];
@@ -16,6 +17,7 @@ export const sessionsState = atom(null, "sessionsState").pipe(
   withAssign((_, name) => ({
     activeList: atom<SesssionsPayload | null>(null, `${name}.activeList`),
     current: atom<SessionPayload | null>(null, `${name}.current`),
+    history: atom<LoginHistoryRow[] | null>(null, `${name}.history`),
     isConfirmed: atom<boolean>(false, `${name}.isConfirmed`).pipe(withReset())
   }))
 )
@@ -35,6 +37,20 @@ export const sessions = atom(null, "sessions").pipe(
       onFulfill: (ctx, res) => {
         sessionsState.current(ctx, res);
         sessions.fetchActive(ctx)
+      }
+    }).pipe(
+      withStatusesAtom(),
+      withCache({ swr: false }),
+      withErrorAtom()
+    ),
+    fetchHistory: reatomAsync(async (ctx) => {
+      return await ctx.schedule(() =>
+        client.get("/auth/session/history", { signal: ctx.controller.signal })
+      );
+    }, {
+      name: `${name}.fetchHistory`,
+      onFulfill: (ctx, res) => {
+        sessionsState.history(ctx, isEmptyArray(res) ? null : res);
       }
     }).pipe(
       withStatusesAtom(),
@@ -67,8 +83,10 @@ export const sessions = atom(null, "sessions").pipe(
     refetchAll: action((ctx) => {
       sessions.fetchActive.cacheAtom.reset(ctx);
       sessions.fetchCurrent.cacheAtom.reset(ctx);
+      sessions.fetchHistory.cacheAtom.reset(ctx);
 
       sessions.fetchCurrent(ctx)
+      sessions.fetchHistory(ctx)
     }),
     terminateById: reatomAsync(async (ctx, id: string) => {
       if (!id) throw new Error("SESSION_ID_MISSING");
