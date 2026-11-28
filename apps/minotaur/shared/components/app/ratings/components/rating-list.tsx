@@ -197,20 +197,6 @@ const RATING_TABLE: Record<RatingType, TableConfig> = {
     rowKey: (row, idx) => `${row.nickname ?? row.player ?? "row"}-${row.area ?? "area"}-${idx}`,
     nickname: (row) => row.nickname
   },
-  votes: {
-    columns: [
-      rankColumn,
-      playerColumn,
-      {
-        key: "votes",
-        label: () => translate["ratings.columns.votes"](),
-        align: "right",
-        render: (row) => <NumberCell value={row.votes} />
-      }
-    ],
-    rowKey: (row, idx) => `${row.nickname ?? "row"}-${idx}`,
-    nickname: (row) => row.nickname
-  },
   wiki: {
     columns: [
       rankColumn,

@@ -171,10 +171,10 @@ describe("fetchRatings", () => {
 	it("defaults the page size", async () => {
 		get.mockResolvedValue({ data: [], meta: meta() });
 
-		await fetchRatings("votes", { asc: false });
+		await fetchRatings("playtime", { asc: false });
 
 		expect(get).toHaveBeenCalledWith("/server/rating/{by}", expect.objectContaining({
-			params: { path: { by: "votes" }, query: { asc: false, limit: 50 } },
+			params: { path: { by: "playtime" }, query: { asc: false, limit: 50 } },
 		}));
 	});
 });

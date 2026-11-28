@@ -315,7 +315,6 @@
       "belkoin": "Belkoin",
       "map": "Map",
       "score": "Score",
-      "votes": "Votes",
       "revisions": "Edits",
       "referrals": "Invited",
       "purchases": "Purchases",
@@ -328,7 +327,6 @@
       "charism": "Charisma",
       "belkoin": "Belkoin",
       "parkour": "Parkour",
-      "votes": "Votes",
       "wiki": "Wiki",
       "referrals": "Referrals",
       "purchases": "Purchases",
@@ -371,7 +369,7 @@
       "title": "{type} rating — {server}",
       "description": "Fasberry rating: {type} — {server}. The top players, scores and stats update automatically."
     },
-    "intro": "Playtime, economy, lands, parkour, votes, wiki and referrals - every Fasberry rating in one place."
+    "intro": "Playtime, economy, lands, parkour, wiki and referrals - every Fasberry rating in one place."
   },
   "land": {
     "not-found": "It seems this region no longer exists",

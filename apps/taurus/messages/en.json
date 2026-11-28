@@ -207,15 +207,9 @@
     "action-text": "How to support?",
     "eyebrow": "Support",
     "heading": "How to help the project",
-    "description": "You can help without money: with a vote, a link, or help with the wiki and art.",
+    "description": "You can help without money: with a link or help with the wiki and art.",
     "share-text": "Check out this cozy project",
     "cards": {
-      "vote": {
-        "title": "Vote",
-        "description": "Vote on a server-list site. That's how new players find us.",
-        "action": "Vote now",
-        "note": "Usually once a day"
-      },
       "share": {
         "title": "Share",
         "description": "Your link brings new players.",
@@ -254,7 +248,7 @@
     "thanks": {
       "title": "Thank you",
       "caption": "Steve and Alex are already here",
-      "description": "Thanks for voting, sharing and helping. You keep the project alive.",
+      "description": "Thanks for sharing and helping. You keep the project alive.",
       "action": "Join Discord"
     },
     "faq": {
@@ -262,18 +256,10 @@
       "subtitle": "The short version of how it works",
       "items": {
         "1": {
-          "question": "Why vote?",
-          "answer": "Votes move us up the server list. That's where new players come from."
-        },
-        "2": {
-          "question": "How often can I vote?",
-          "answer": "Usually once a day on each site. The button opens the voting page."
-        },
-        "3": {
           "question": "What else helps the project?",
           "answer": "Tell your friends, report a bug, or help with the wiki and art."
         },
-        "4": {
+        "2": {
           "question": "Where should I write?",
           "answer": "To the project's Discord or Telegram."
         }

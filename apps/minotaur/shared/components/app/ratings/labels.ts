@@ -8,7 +8,6 @@ const TYPE_KEYS = {
 	charism: "ratings.types.charism",
 	belkoin: "ratings.types.belkoin",
 	parkour: "ratings.types.parkour",
-	votes: "ratings.types.votes",
 	wiki: "ratings.types.wiki",
 	referrals: "ratings.types.referrals",
 	purchases: "ratings.types.purchases",

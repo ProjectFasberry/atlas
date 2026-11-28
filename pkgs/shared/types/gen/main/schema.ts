@@ -192,6 +192,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/privated/store/item/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List store items for the panel */
+        get: operations["getPrivatedStoreItemList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/privated/store/item/editable-fields": {
         parameters: {
             query?: never;
@@ -578,40 +595,6 @@ export interface paths {
         /** Edit a banner */
         post: operations["postPrivatedBannersByIdEdit"];
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/privated/modpacks/create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create a modpack */
-        post: operations["postPrivatedModpacksCreate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/privated/modpacks/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete a modpack */
-        delete: operations["deletePrivatedModpacksById"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1813,23 +1796,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/third-party/vote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Process player vote */
-        post: operations["postThird-partyVote"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/news/list": {
         parameters: {
             query?: never;
@@ -1856,40 +1822,6 @@ export interface paths {
         };
         /** Get news single */
         get: operations["getNewsById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/modpack/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get modpack list */
-        get: operations["getModpackList"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/modpack/id": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get modpack single */
-        get: operations["getModpackId"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4388,6 +4320,51 @@ export interface operations {
             };
         };
     };
+    getPrivatedStoreItemList: {
+        parameters: {
+            query: {
+                endCursor?: string;
+                category?: "all" | "donate" | "event";
+                wallet: "CHARISM" | "BELKOIN" | "ALL";
+                searchQuery?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Response for status 200 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            data: {
+                                id: number;
+                                title: string;
+                                description: (string | null) | null;
+                                imageUrl: string;
+                                type: string;
+                                value: string;
+                                currency: string;
+                                price: number;
+                                content: unknown;
+                            }[];
+                            meta: {
+                                hasNextPage: boolean;
+                                hasPrevPage: boolean;
+                                startCursor?: string;
+                                endCursor?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
     "getPrivatedStoreItemEditable-fields": {
         parameters: {
             query?: never;
@@ -5363,100 +5340,6 @@ export interface operations {
                             href_title: string;
                             href_value: string;
                         };
-                    };
-                };
-            };
-        };
-    };
-    postPrivatedModpacksCreate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    downloadLink: string;
-                };
-                "application/x-www-form-urlencoded": {
-                    name: string;
-                    downloadLink: string;
-                };
-                "multipart/form-data": {
-                    name: string;
-                    downloadLink: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            id: number;
-                            name: string;
-                            downloadLink: string;
-                            /** Format: date-time */
-                            created_at: string;
-                        };
-                    };
-                };
-            };
-            /** @description Response for status 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @default INVALID_LINK
-                         * @enum {string}
-                         */
-                        error: "INVALID_LINK";
-                    };
-                };
-            };
-            /** @description Response for status 500 */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error: string;
-                    };
-                };
-            };
-        };
-    };
-    deletePrivatedModpacksById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        data: "OK";
                     };
                 };
             };
@@ -7849,7 +7732,7 @@ export interface operations {
     getPrivatedFaqList: {
         parameters: {
             query?: {
-                scope?: "home" | "modpack" | "support";
+                scope?: "home" | "support";
                 locale?: "ru" | "en";
             };
             header?: never;
@@ -7895,7 +7778,7 @@ export interface operations {
                      * @default home
                      * @enum {string}
                      */
-                    scope: "home" | "modpack" | "support";
+                    scope: "home" | "support";
                     /**
                      * @default ru
                      * @enum {string}
@@ -7912,7 +7795,7 @@ export interface operations {
                      * @default home
                      * @enum {string}
                      */
-                    scope: "home" | "modpack" | "support";
+                    scope: "home" | "support";
                     /**
                      * @default ru
                      * @enum {string}
@@ -7929,7 +7812,7 @@ export interface operations {
                      * @default home
                      * @enum {string}
                      */
-                    scope: "home" | "modpack" | "support";
+                    scope: "home" | "support";
                     /**
                      * @default ru
                      * @enum {string}
@@ -8019,7 +7902,7 @@ export interface operations {
                      * @default home
                      * @enum {string}
                      */
-                    scope?: "home" | "modpack" | "support";
+                    scope?: "home" | "support";
                     /**
                      * @default ru
                      * @enum {string}
@@ -8036,7 +7919,7 @@ export interface operations {
                      * @default home
                      * @enum {string}
                      */
-                    scope?: "home" | "modpack" | "support";
+                    scope?: "home" | "support";
                     /**
                      * @default ru
                      * @enum {string}
@@ -8053,7 +7936,7 @@ export interface operations {
                      * @default home
                      * @enum {string}
                      */
-                    scope?: "home" | "modpack" | "support";
+                    scope?: "home" | "support";
                     /**
                      * @default ru
                      * @enum {string}
@@ -9078,16 +8961,6 @@ export interface operations {
         requestBody?: never;
         responses: never;
     };
-    "postThird-partyVote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: never;
-    };
     getNewsList: {
         parameters: {
             query: {
@@ -9169,64 +9042,6 @@ export interface operations {
                             };
                             content?: unknown;
                         };
-                    };
-                };
-            };
-        };
-    };
-    getModpackList: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            id: number;
-                            /** Format: date-time */
-                            created_at: string;
-                            name: string;
-                            downloadLink: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    getModpackId: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Response for status 200 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: ({
-                            id: number;
-                            /** Format: date-time */
-                            created_at: string;
-                            name: string;
-                            downloadLink: string;
-                        } | null) | null;
                     };
                 };
             };
@@ -10499,7 +10314,7 @@ export interface operations {
     getFaq: {
         parameters: {
             query?: {
-                scope?: "home" | "modpack" | "support";
+                scope?: "home" | "support";
                 locale?: "ru" | "en";
             };
             header?: never;
@@ -11651,7 +11466,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                by: "belkoin" | "charism" | "lands" | "lands-members" | "reputation" | "playtime" | "parkour" | "votes" | "wiki" | "referrals" | "purchases";
+                by: "belkoin" | "charism" | "lands" | "lands-members" | "reputation" | "playtime" | "parkour" | "wiki" | "referrals" | "purchases";
             };
             cookie?: never;
         };
@@ -11769,20 +11584,6 @@ export interface operations {
                                 ulid: string;
                                 name: string;
                                 members_count: number;
-                            }[];
-                            meta: {
-                                hasNextPage: boolean;
-                                hasPrevPage: boolean;
-                                startCursor?: string;
-                                endCursor?: string;
-                            };
-                        } | {
-                            data: {
-                                /** @constant */
-                                kind: "votes";
-                                nickname: string;
-                                votes: number;
-                                avatar: string;
                             }[];
                             meta: {
                                 hasNextPage: boolean;

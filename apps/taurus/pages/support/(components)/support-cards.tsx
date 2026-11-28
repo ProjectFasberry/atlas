@@ -10,8 +10,6 @@ import {
   BlockControls, BlockSubtitle, BlockTitle, useBlockHidden
 } from "@/shared/components/edit/section-block"
 
-const voteUrl = "https://hotmc.ru/vote-259308"
-const voteIcon = getStaticObject("minecraft", "icons/experience_big.webp")
 const shareIcon = getStaticObject("minecraft", "icons/bell.webp")
 const helpIcon = getStaticObject("minecraft", "icons/book_big.webp")
 
@@ -81,19 +79,7 @@ export const SupportCards = reatomComponent(({ ctx }) => {
         />
         <BlockControls id="support-help" />
       </header>
-      <div class="grid gap-3 lg:grid-cols-3">
-        <SupportCard
-          icon={voteIcon}
-          title={translate["support.cards.vote.title"]()}
-          description={translate["support.cards.vote.description"]()}
-        >
-          <ActionButton href={voteUrl}>
-            {translate["support.cards.vote.action"]()}
-          </ActionButton>
-          <Typography color="gray" class="text-center text-xs">
-            {translate["support.cards.vote.note"]()}
-          </Typography>
-        </SupportCard>
+      <div class="grid gap-3 lg:grid-cols-2">
         <SupportCard
           icon={shareIcon}
           title={translate["support.cards.share.title"]()}
