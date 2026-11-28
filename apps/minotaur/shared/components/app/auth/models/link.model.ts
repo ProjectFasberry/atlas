@@ -107,7 +107,15 @@ export const linkFlow = atom(null, "linkFlow").pipe(
       },
       onReject: (ctx, error) => {
         logError(error);
-        linkState.error(ctx, invalidLink());
+
+        const message = error instanceof Error ? error.message : "";
+        const text = message === "You cannot refer yourself"
+          ? translate["auth.link.error-self"]()
+          : message === "This device already accepted a referral"
+            ? translate["auth.link.error-device"]()
+            : invalidLink();
+
+        linkState.error(ctx, text);
       },
     }),
   })),

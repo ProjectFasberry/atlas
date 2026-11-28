@@ -293,7 +293,9 @@
       "error-invalid": "The link is invalid or expired",
       "error-passwords": "Passwords do not match",
       "error-password-short": "The password must be at least 8 characters",
-      "error-nickname-short": "The nickname must be at least 3 characters"
+      "error-nickname-short": "The nickname must be at least 3 characters",
+      "error-self": "You cannot refer yourself",
+      "error-device": "This browser has already accepted a referral"
     }
   },
   "ratings": {
